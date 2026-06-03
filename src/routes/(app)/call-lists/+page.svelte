@@ -109,19 +109,21 @@
 		<select bind:value={filterClient}
 			class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-white focus:border-white focus:outline-none">
 			<option value="">All clients</option>
-	{#if loading}
-		<div class="flex-1 p-8 space-y-3">
-			{#each [1,2,3,4,5] as _}
-				<div class="h-14 bg-[#0f0f0f] border border-[#1a1a1a] rounded-xl animate-pulse"></div>
-			{/each}
-		</div>
-	{:else}
-
-			{#each uniqueClients as client}
-				<option value={client?.id}>{client?.name}</option>
-			{/each}
+			{#if !loading}
+				{#each uniqueClients as client}
+					<option value={client?.id}>{client?.name}</option>
+				{/each}
+			{/if}
 		</select>
 	</div>
+
+{#if loading}
+	<div class="flex-1 p-8 space-y-3">
+		{#each [1,2,3,4,5] as _}
+			<div class="h-14 bg-[#0f0f0f] border border-[#1a1a1a] rounded-xl animate-pulse"></div>
+		{/each}
+	</div>
+{:else}
 
 	<div class="flex flex-1 overflow-hidden">
 		<!-- List panel -->

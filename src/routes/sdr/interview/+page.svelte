@@ -189,4 +189,12 @@
 					<div class="space-y-2">
 						<audio src={audioUrl} controls class="w-full h-8"></audio>
 						<button onclick={() => { audioUrl = null; chunks = []; }}
-							class="te
+							class="text-xs text-[#444] hover:text-white transition-colors mt-1">
+							Discard & Re-record
+						</button>
+					</div>
+				{/if}
+			</div>
+		</div>
+{/if}
+</div>

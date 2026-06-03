@@ -73,5 +73,27 @@ export const GET: RequestHandler = async ({ request }) => {
 			.eq('status', 'active')
 			.is('deleted_at', null)
 			.limit(500);
-	return json({ success: true });
+		for (const c of contacts ?? []) {
+			const score = await calculateScore(c.id, c.user_id);
+			await supabaseAdmin.from('contacts').update({ contact_score: score, score_updated_at: new Date().toISOString() }).eq('id', c.id);
+			updated++;
+		}
+	} else {
+		// User path: score authenticated user's contacts
+		const user = await requireAuth(request);
+		const ownerId = await getEffectiveUserId(user.id);
+		const { data: contacts } = await supabaseAdmin
+			.from('contacts')
+			.select('id')
+			.eq('user_id', ownerId)
+			.eq('status', 'active')
+			.is('deleted_at', null)
+			.limit(200);
+		for (const c of contacts ?? []) {
+			const score = await calculateScore(c.id, ownerId);
+			await supabaseAdmin.from('contacts').update({ contact_score: score, score_updated_at: new Date().toISOString() }).eq('id', c.id);
+			updated++;
+		}
+	}
+	return json({ success: true, updated });
 };

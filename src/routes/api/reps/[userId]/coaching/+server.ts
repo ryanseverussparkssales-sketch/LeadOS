@@ -111,5 +111,9 @@ Return JSON ONLY:
 		const clean = text.replace(/```json?\n?/gi, '').replace(/```/g, '').trim();
 		const start = clean.indexOf('{'), end = clean.lastIndexOf('}');
 		const coaching = JSON.parse(clean.slice(start, end + 1));
-	return json({ success: true });
+		return json({ coaching });
+	} catch (e) {
+		console.error('[coaching]', e);
+		return json({ coaching: null });
+	}
 };

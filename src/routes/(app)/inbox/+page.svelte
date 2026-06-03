@@ -351,4 +351,16 @@
                     <div class="p-4 border-t border-[var(--c-border)] space-y-2 flex-shrink-0">
                         {#if selected.channel === 'email'}
                             <input bind:value={replySubject} placeholder="Subject" class="w-full rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-surface-2)] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-                    
+                        {/if}
+                        <textarea bind:value={replyBody} placeholder="Type a reply..." rows="3"
+                            class="w-full rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-surface-2)] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+                        <button onclick={sendReply} disabled={sendingReply}
+                            class="self-end rounded-lg bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-[#e5e5e5] disabled:opacity-50 transition-colors">
+                            {sendingReply ? 'Sending…' : 'Send'}
+                        </button>
+                    </div>
+                {/if}
+            {/if}
+        </div>
+    </div>
+</div>

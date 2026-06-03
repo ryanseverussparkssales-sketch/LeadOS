@@ -203,7 +203,7 @@
 					{#each [
 						'Make outbound calls to vetted contact lists in your assigned campaigns',
 						'Qualify prospects against client-defined criteria',
-						'Book appointments directly to the client's calendar',
+						"Book appointments directly to the client's calendar",
 						'Log outcomes and notes after each call — takes 10 seconds',
 						'Improve with AI coaching feedback that shows exactly what to fix',
 					] as item}
@@ -275,4 +275,12 @@
 				<div class="rounded-2xl border {step.accent ? 'border-white/20 bg-[#0a0a0a]' : 'border-[#1a1a1a] bg-[#080808]'} p-7">
 					<div style="font-size:28px;font-weight:600;color:{step.accent ? '#fff' : '#1a1a1a'};letter-spacing:-.03em;line-height:1;margin-bottom:14px">{step.num}</div>
 					<h3 class="text-white font-medium mb-3">{step.title}</h3>
-					<p class="text-xs text-[#444] leading-
+					<p class="text-xs text-[#444] leading-relaxed">{step.body}</p>
+			{#if step.href}
+				<a href={step.href} class="inline-block mt-4 text-xs text-[#666] hover:text-white transition-colors">{step.cta}</a>
+			{/if}
+		</div>
+	{/each}
+	</div>
+	</div>
+</div>

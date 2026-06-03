@@ -910,4 +910,8 @@
 				<a href="https://supabase.com/dashboard/project/_/auth/users" target="_blank" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white inline-block">Manage in Supabase →</a>
 			</div>
 
-		<!-- ── VOICE & DEVICE ─────────
+		<!-- ── VOICE & DEVICE ───────── -->
+		{/if}
+		</div>
+	</div>
+</div>

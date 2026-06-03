@@ -61,7 +61,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	// Analyze each call for highlight moments
 	for (const call of calls.slice(0, 10)) {
 		if (!call.raw_transcript || call.call_duration_seconds < 30) continue;
-
 		try {
 			const msg = await anthropic.messages.create({
 				model: 'claude-haiku-4-5-20251001',
@@ -83,49 +82,24 @@ Identify moments that show:
 
 Return ONLY valid JSON array (empty if no strong moments):
 [{"clip_type": "opener|objection|genuine", "transcript_excerpt": "...", "ai_reason": "why this clip is strong", "display_order": 0}]
-`;
-
-		const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
-		const msg = await client.messages.create({
-			model: 'claude-haiku-4-5-20251001',
-			max_tokens: 1000,
-			messages: [{ role: 'user', content: prompt }],
-		});
-
-		const text = msg.content[0].type === 'text' ? msg.content[0].text : '';
-		const clips = JSON.parse(text.replace(/```json?\n?/gi, '').replace(/```/g, '').trim());
-
-		const rows = clips.map((c: any, i: number) => ({
-			user_id: userId,
-			call_id: null,
-			clip_type: c.clip_type,
-			transcript_excerpt: c.transcript_excerpt,
-			ai_reason: c.ai_reason,
-			display_order: i,
-			is_featured: false,
-		}));
-
-		await supabaseAdmin.from('rep_supercut_clips').insert(rows);
-		return json({ generated: rows.length });
-	} catch (err) {
-		console.error('[supercut POST]', err);
-		return json({ generated: 0 });
+`
+				}]
+			});
+			const text = msg.content[0].type === 'text' ? msg.content[0].text : '';
+			const callClips = JSON.parse(text.replace(/```json?\n?/gi, '').replace(/```/g, '').trim());
+			clips.push(...callClips.map((c: any, i: number) => ({
+				user_id: user.id,
+				call_id: call.id,
+				clip_type: c.clip_type,
+				transcript_excerpt: c.transcript_excerpt,
+				ai_reason: c.ai_reason,
+				display_order: clips.length + i,
+				is_featured: false,
+			})));
+		} catch (e) { console.error('[supercut call]', e); }
 	}
-};
 
-export const PATCH: RequestHandler = async ({ request, url }) => {
-	const user = await requireAuth(request);
-	const id = url.searchParams.get('id');
-	if (!id) throw error(400, 'id required');
-	const body = await request.json();
-	await supabaseAdmin.from('rep_supercut_clips').update(body).eq('id', id).eq('user_id', user.id);
-	return json({ success: true });
-};
-
-export const DELETE: RequestHandler = async ({ request, url }) => {
-	const user = await requireAuth(request);
-	const id = url.searchParams.get('id');
-	if (!id) throw error(400, 'id required');
-	await supabaseAdmin.from('rep_supercut_clips').delete().eq('id', id).eq('user_id', user.id);
-	return json({ success: true });
+	await supabaseAdmin.from('rep_supercut_clips').delete().eq('user_id', user.id);
+	if (clips.length) await supabaseAdmin.from('rep_supercut_clips').insert(clips);
+	return json({ generated: clips.length });
 };

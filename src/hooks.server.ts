@@ -308,7 +308,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 							}
 						}
 					}
-				} catch (err) { console.error('[voicemail-recording] error:', err); }
+				}
+			} catch (err) { console.error('[voicemail-recording] error:', err); }
 			})();
 			return new Response('', { status: 200 });
 		}

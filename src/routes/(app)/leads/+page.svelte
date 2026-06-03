@@ -208,8 +208,6 @@
 	<!-- Header + tabs -->
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
 		<h2 class="text-white text-sm font-medium mb-3">Lead Generation</h2>
-		<div class="flex gap-1 flex-wrap">
-
 	{#if loading}
 		<div class="flex-1 p-8 space-y-3">
 			{#each [1,2,3,4,5] as _}
@@ -217,7 +215,7 @@
 			{/each}
 		</div>
 	{:else}
-
+		<div class="flex gap-1 flex-wrap">
 			{#each ([['web','Web Scraper'],['screenshot','Screenshot OCR'],['enrich','AI Enrichment'],['search','Biz Search'],['streamer','Streamer Lookup'],['csv','CSV Import']] as [Tab,string][]) as [t, label]}
 				<button onclick={() => tab = t}
 					class="rounded-lg px-4 py-1.5 text-xs transition-colors {tab === t ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">
@@ -225,6 +223,7 @@
 				</button>
 			{/each}
 		</div>
+	{/if}
 	</div>
 
 	<div class="flex flex-1 overflow-hidden">
@@ -481,5 +480,4 @@
 			</div>
 		</div>
 	</div>
-{/if}
 </div>

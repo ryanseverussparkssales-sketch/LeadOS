@@ -1341,8 +1341,7 @@
 					</div>
 
 				</div>
-			</div>
 		{/if}
+			</div>
 	</div>
 
-</div>

@@ -162,4 +162,9 @@
 				</div>
 			{:else}
 				<div class="flex items-center justify-center h-full">
-					<p class="text-[#
+					<p class="text-[#555] text-sm">Select a project or create one above.</p>
+			</div>
+	{/if}
+	</div>
+</div>
+</div>

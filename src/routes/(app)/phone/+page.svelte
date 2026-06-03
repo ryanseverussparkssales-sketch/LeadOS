@@ -777,4 +777,15 @@
 									<div class="flex items-center gap-2">
 										<p class="text-white font-semibold text-sm">{selectedThread.contacts?.name ?? selectedThread.remote_number}</p>
 										{#if selectedThread.contacts?.contact_score}
-											<span 
+											<span class="text-xs font-mono {selectedThread.contacts.contact_score >= 70 ? 'text-green-400' : 'text-[#555]'}">{selectedThread.contacts.contact_score}</span>
+									{/if}
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
+</div>
+</div>

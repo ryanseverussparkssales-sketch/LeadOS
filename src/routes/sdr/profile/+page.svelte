@@ -203,4 +203,11 @@
 			</div>
 
 			<!-- Work history & credentials -->
-			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3">
+				<p class="text-xs text-[#999] uppercase tracking-widest">Work History</p>
+				<textarea bind:value={previousRoles} rows="3" placeholder="Previous roles and experience..."
+					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+			</div>
+		</div>
+{/if}
+</div>

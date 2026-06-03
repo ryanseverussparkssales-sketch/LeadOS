@@ -133,5 +133,9 @@ export const POST: RequestHandler = async ({ request, params }) => {
 			campaign_id: params.id,
 			contact_id: id,
 		}));
+		await supabaseAdmin.from('campaign_contacts').upsert(rows, { onConflict: 'campaign_id,contact_id' });
+		await syncToDefaultList(params.id, contactIds as string[]);
+		return json({ added: rows.length });
+	}
 	return json({ success: true });
 };

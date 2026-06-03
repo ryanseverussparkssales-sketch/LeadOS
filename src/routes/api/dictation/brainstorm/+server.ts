@@ -34,5 +34,12 @@ Return JSON:
 Keep each item under 12 words. Max 4 items per array.`
             }]
         });
-	return json({ success: true });
+        const text = message.content[0]?.type === 'text' ? message.content[0].text : '{}';
+        let result;
+        try { result = JSON.parse(text); } catch { result = { summary: text, actionItems: [], ideas: [], followUps: [] }; }
+        return json(result);
+    } catch (err) {
+        console.error('[dictation/brainstorm]', err);
+        return json({ error: 'AI service failed' }, { status: 500 });
+    }
 };

@@ -499,114 +499,61 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 				.not('stage', 'in', '(won,lost)')
 				.limit(3);
 
-			return JSON.stringify({
-				...contact,
-				recentCalls: calls ?? [],
-				openTasks: tasks ?? [],
-				openDeals: deals ?? [],
-			});
+			return JSON.stringify({ contact, recentCalls: calls ?? [], openTasks: tasks ?? [], openDeals: deals ?? [] });
 		}
 
-		return JSON.stringify({ error: 'Unknown tool' });
+		return JSON.stringify({ error: `Unknown tool: ${name}` });
 	} catch (err) {
-		return JSON.stringify({ error: String(err) });
+		console.error('[ai/chat] executeTool error:', err);
+		return JSON.stringify({ error: err instanceof Error ? err.message : 'Tool execution failed' });
 	}
 }
 
-// ── Chat endpoint ─────────────────────────────────────────────────────────────
+// ── Main handler ──────────────────────────────────────────────────────────────
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
-	if (await rateLimitUser(user.id, { max: 60, windowMs: 60_000 })) throw error(429, 'Rate limit exceeded');
+	if (await rateLimitUser(user.id, { max: 30, windowMs: 60_000 })) throw error(429, 'Rate limit exceeded — max 30 AI requests/minute');
 	const ownerId = await getEffectiveUserId(user.id);
 
-	const { message, conversationHistory } = await request.json() as { message: string; conversationHistory?: { role: string; content: any }[] };
-	if (!message?.trim()) throw error(400, 'message required');
+	const { messages, systemPrompt: customSystem } = await request.json();
 
-	// Build Anthropic message array from history + new user message
-	const historyMessages: Anthropic.MessageParam[] = (conversationHistory ?? []).map(m => ({
-		role: m.role as 'user' | 'assistant',
-		content: m.content,
-	}));
-	const initialMessages: Anthropic.MessageParam[] = [
-		...historyMessages,
-		{ role: 'user', content: message },
-	];
+	const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+	const systemPrompt = customSystem ?? `You are LeadOS AI — a sales intelligence assistant embedded in a CRM. You help manage contacts, calls, tasks, campaigns, and pipeline.
 
-	const systemPrompt = `You are LeadOS AI — a smart assistant built into LeadOS, a sales dialer CRM used by Ryan Sparks at Sparks Curiosity Studio.
+Use tools to look up live data. Be concise and actionable. Today is ${today}.`;
 
-Current date and time: ${new Date().toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+	let loopMessages: Anthropic.MessageParam[] = messages;
+	let finalResponse = '';
 
-You can:
-- FIND records: search contacts, deals, campaigns, clients
-- CREATE tasks and schedule callbacks
-- LOG activities on contacts (call notes, meeting notes)
-- NAVIGATE the user to any page
-- TEACH features (ask about campaigns, power dialer, sequences, etc.)
-- ANALYZE data: call stats, pipeline, revenue, quotas
+	for (let round = 0; round < 5; round++) {
+		const response = await anthropic.messages.create({
+			model: 'claude-sonnet-4-6',
+			max_tokens: 2000,
+			system: systemPrompt,
+			tools: TOOLS,
+			messages: loopMessages,
+		});
 
-Always try to take action when the user's intent is clear. If they say "remind me to call Bryan tomorrow" — create the task, don't just describe how.
-
-Current user: Ryan Sparks — Sparks Curiosity Studio
-Primary client: Welfel Ventures (Bryan + Peter Welfel)
-Projects: iotty Smart Home (CS/support), Huntt.gg (streamer outreach), The Beard Club
-Other client: Wrench Node (Tampa Bay mechanics outreach)
-
-If a search returns 0 results, acknowledge it and suggest the closest alternative.
-If intent is ambiguous between multiple contacts or records, always ask for clarification before acting.
-Keep responses under 200 words unless showing a list or code. Use bullet points for lists, plain prose otherwise.`;
-
-	// Agentic loop — handle tool use
-	let currentMessages = [...initialMessages];
-	let response: Anthropic.Message;
-	const MAX_ITERATIONS = 5;
-	// Collect all tool results across iterations for returning to client
-	const allToolResults: { tool: string; result: any }[] = [];
-
-	for (let i = 0; i < MAX_ITERATIONS; i++) {
-		let response_iter: Anthropic.Message;
-		try {
-			response_iter = await anthropic.messages.create({
-				model: 'claude-sonnet-4-5',
-				max_tokens: 1024,
-				system: systemPrompt,
-				tools: TOOLS,
-				messages: currentMessages,
-			});
-		} catch (err: any) {
-			console.error('[ai/chat] API error on iteration', i, err.message);
-			return json({
-				role: 'assistant',
-				content: 'I ran into a technical issue. Please try again in a moment.'
-			}, { status: 200 }); // 200 so client shows as assistant message
-		}
-		response = response_iter;
-
-		if (response.stop_reason !== 'tool_use') break;
-
-		// Execute tool calls
-		const toolResultBlocks: Anthropic.ToolResultBlockParam[] = [];
-		for (const block of response.content) {
-			if (block.type !== 'tool_use') continue;
-			const resultStr = await executeTool(block.name, block.input as Record<string, unknown>, ownerId);
-			let parsedResult: any;
-			try { parsedResult = JSON.parse(resultStr); } catch { parsedResult = resultStr; }
-			allToolResults.push({ tool: block.name, result: parsedResult });
-			toolResultBlocks.push({ type: 'tool_result', tool_use_id: block.id, content: resultStr });
+		if (response.stop_reason === 'end_turn') {
+			const textBlock = response.content.find(b => b.type === 'text');
+			finalResponse = textBlock?.type === 'text' ? textBlock.text : '';
+			break;
 		}
 
-		// Add assistant response + tool results to conversation
-		currentMessages = [
-			...currentMessages,
-			{ role: 'assistant' as const, content: response.content },
-			{ role: 'user' as const, content: toolResultBlocks },
-		];
+		if (response.stop_reason === 'tool_use') {
+			const assistantMsg: Anthropic.MessageParam = { role: 'assistant', content: response.content };
+			const toolResults: Anthropic.ToolResultBlockParam[] = [];
+			for (const block of response.content) {
+				if (block.type === 'tool_use') {
+					const result = await executeTool(block.name, block.input as Record<string, unknown>, ownerId);
+					toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: result });
+				}
+			}
+			loopMessages = [...loopMessages, assistantMsg, { role: 'user', content: toolResults }];
+			continue;
+		}
+		break;
 	}
 
-	// Extract text from final response
-	const finalText = response!.content
-		.filter(b => b.type === 'text')
-		.map(b => (b as Anthropic.TextBlock).text)
-		.join('');
-
-	return json({ reply: finalText, toolResults: allToolResults, stopReason: response!.stop_reason });
+	return json({ message: finalResponse, messages: loopMessages });
 };

@@ -33,10 +33,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
 	const { title, description, taskType, priority, status, dueDate, contactId, callId, campaignId, aiSuggested } = await request.json();
 	if (!title?.trim()) throw error(400, 'title required');
-	const { data, error: e } = await supabaseAdmin
-		.from('tasks')
-		.insert({ user_id: user.id, title: title.trim(), description: description ?? null, task_type: taskType ?? 'follow_up', priority: priority ?? 'medium', status: status ?? 'pending', due_date: dueDate ?? null, contact_id: contactId ?? null, call_id: callId ?? null,
-		}).select('*, contact:contacts(id,name,company)').single();
+	try {
+		const { data, error: e } = await supabaseAdmin
+			.from('tasks')
+			.insert({ user_id: user.id, title: title.trim(), description: description ?? null, task_type: taskType ?? 'follow_up', priority: priority ?? 'medium', status: status ?? 'pending', due_date: dueDate ?? null, contact_id: contactId ?? null, call_id: callId ?? null, campaign_id: campaignId ?? null, ai_suggested: aiSuggested ?? false })
+			.select('*, contact:contacts(id,name,company)')
+			.single();
 		if (e) throw error(500, e.message ?? 'Failed to create task');
 		return json(data, { status: 201 });
 	} catch (err) {

@@ -360,3 +360,13 @@ export function widgetsForTier(tier: 'free' | 'pro' | 'agency') {
 export const WIDGET_CATEGORIES = [
 	...new Set(Object.values(WIDGET_REGISTRY).map(w => w.category))
 ];
+
+/** Widgets eligible for the top band (flair/ambient) */
+export const TOP_BAND_WIDGETS = ALL_WIDGETS.filter(w => w.topBandEligible);
+
+/** Get the default slot size for a widget type */
+export function getDefaultSlot(type: string): { cols: 1 | 2 | 3; rows: 'sm' | 'md' | 'lg' | 'xl' } {
+	const def = WIDGET_REGISTRY[type];
+	if (def) return { cols: def.defaultCols, rows: def.defaultRows };
+	return { cols: 1, rows: 'md' };
+}

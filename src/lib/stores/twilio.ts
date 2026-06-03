@@ -257,3 +257,30 @@ export async function destroyDevice(): Promise<void> {
 		if (tokenRefreshTimer) { clearTimeout(tokenRefreshTimer); tokenRefreshTimer = null; }
 	}
 }
+
+/** Answer the current incoming call */
+export async function answerIncomingCall(): Promise<void> {
+	const { get } = await import('svelte/store');
+	const current = get(incomingCall);
+	if (!current?.call) return;
+	try {
+		current.call.accept();
+		activeCall.set(current.call);
+		incomingCall.set(null);
+	} catch (err) {
+		console.error('[twilio] answerIncomingCall error:', err);
+	}
+}
+
+/** Reject the current incoming call */
+export async function rejectIncomingCall(): Promise<void> {
+	const { get } = await import('svelte/store');
+	const current = get(incomingCall);
+	if (!current?.call) return;
+	try {
+		current.call.reject();
+		incomingCall.set(null);
+	} catch (err) {
+		console.error('[twilio] rejectIncomingCall error:', err);
+	}
+}

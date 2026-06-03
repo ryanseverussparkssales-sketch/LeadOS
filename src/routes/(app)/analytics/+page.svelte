@@ -234,4 +234,13 @@
 						] as row}
 							<div class="flex items-center justify-between">
 								<p class="text-sm text-white">{row.label}</p>
-								<p class="text-sm" style="font-family
+								<p class="text-sm" style="font-familyvar(--font-mono);color:#ccc">{typeof row.cost === 'number' ? `$${row.cost.toFixed(4)}` : '—'}</p>
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
+		</div>
+{/if}
+{/if}
+</div>

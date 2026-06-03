@@ -492,4 +492,13 @@
 	<!-- Bulk task modal -->
 	{#if showBulkTask}
 		<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onclick={() => showBulkTask = false}>
-			<div class="bg-[#111] border border-[#2a2a2a] rounded-xl p-6 w-full max-w-md mx-4 space-y-3"
+			<div class="bg-[#111] border border-[#2a2a2a] rounded-xl p-6 w-full max-w-md mx-4 space-y-3">
+			<p class="text-white font-semibold text-sm mb-4">Create Tasks</p>
+			<p class="text-xs text-[#555]">Create follow-up tasks for {selectedIds.size} selected contact{selectedIds.size === 1 ? '' : 's'}.</p>
+			<div class="flex gap-2 mt-4">
+				<button onclick={() => showBulkTask = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
+				<button onclick={createBulkTasks} class="px-4 py-2 bg-white text-black rounded text-xs font-semibold hover:bg-[#e5e5e5] transition-colors">Create Tasks</button>
+			</div>
+		</div>
+	</div>
+	{/if}

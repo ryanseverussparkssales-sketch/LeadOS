@@ -179,4 +179,23 @@
 								<p class="text-sm text-[#888]">{profile.previous_roles}</p>
 							</div>
 						{/if}
-					
+						{#if profile.top_achievement}
+							<div class="flex items-start gap-2">
+								<span class="text-sm">🏆</span>
+								<p class="text-sm text-[#888]">{profile.top_achievement}</p>
+							</div>
+						{/if}
+						{#if profile.certifications?.length}
+							<div class="flex flex-wrap gap-1.5">
+								{#each profile.certifications as cert}
+									<span class="text-[10px] border border-[#2a2a2a] text-[#666] px-2 py-0.5 rounded-full">{cert}</span>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/if}
+
+		</div>
+	{/if}
+</div>

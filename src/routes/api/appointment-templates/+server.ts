@@ -3,7 +3,7 @@ import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supa
 import type { RequestHandler } from './$types';
 
 // Default question packs by vertical
-export const DEFAULT_TEMPLATES: Record<string, { name: string; questions: any[] }> = {
+const DEFAULT_TEMPLATES: Record<string, { name: string; questions: any[] }> = {
 	window_sales: {
 		name: 'Window Sales',
 		questions: [

@@ -474,3 +474,11 @@
 			</a>
 		{/each}
 		<div class="px-2
+mt-2 border-t border-[#1a1a1a] pt-2">
+	<a href="/settings" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[#888] hover:text-[#ccc] hover:bg-[#111]">
+		<span>⚙️</span>
+		{#if !collapsed}<span>Settings</span>{/if}
+	</a>
+</div>
+</div>
+</aside>

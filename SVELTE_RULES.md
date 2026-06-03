@@ -18,7 +18,8 @@
 
 ## File write safety (learned the hard way)
 - Always use Python bash writes for API server files, not the Write/Edit tools
-- The Write/Edit tools write to Windows FS; bash Python writes to the Linux mount
+- **Why:** The Write/Edit tools have a truncation bug on large .ts files — they silently cut off the end. Python bash `open(f,'w').write(content)` does not. Both write to the same underlying Windows filesystem (the Linux sandbox mounts it at `/sessions/.../mnt/`).
+- **Rule:** `.svelte` files and small targeted edits → Edit tool is fine. Large `+server.ts` rewrites → Python bash only.
 - Vercel builds from Windows FS — deploy from Windows terminal: `vercel deploy --prod`
 - Local build fails due to EPERM on .svelte-kit — that's expected, use Vercel
 

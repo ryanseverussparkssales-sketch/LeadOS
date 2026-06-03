@@ -229,4 +229,8 @@
 				</div>
 				<a href="/sdr" class="rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors whitespace-nowrap">
 					📞 Open Dialer
-				</
+				</a>
+		</div>
+	</div>
+	{/if}
+	</div>

@@ -23,7 +23,7 @@ Return: {"intent": "<one of: interested|objection|opt_out|question|callback_requ
 
 	const text = res.content[0].type === 'text' ? res.content[0].text : '';
 	try {
-		const clean = text.replace(/```json?\n?/gi, '').replace(/```
+		const clean = text.replace(/```json?\n?/gi, '').replace(/```/g, '').trim();
 		const parsed = JSON.parse(clean);
 
 		// Update the SMS log with intent classification

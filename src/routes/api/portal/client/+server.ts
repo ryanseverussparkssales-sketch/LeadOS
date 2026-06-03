@@ -83,7 +83,7 @@ export const GET: RequestHandler = async ({ request }) => {
 		: 0;
 
 	// Time tracking hours (last 30 days)
-y) => {
+	const hoursLogged = await (async () => {
 		const { data: timeData } = await supabaseAdmin
 			.from('time_entries')
 			.select('duration_minutes')
@@ -118,10 +118,7 @@ y) => {
 			connectRate,
 			avgDuration,
 			recentWins: recentWins.length,
-			hoursLogged: await (async () => {
-				// already computed above
-				return 0;
-			})().catch(() => 0),
+			hoursLogged: hoursLogged,
 		},
 		projects,
 		recentCalls: callData.slice(0, 20),

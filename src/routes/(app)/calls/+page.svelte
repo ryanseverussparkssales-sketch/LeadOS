@@ -176,4 +176,11 @@
 					<!-- Recording player -->
 					{#if selected.recording_url && recordingUrl}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4">
-		
+							<audio controls src={recordingUrl} class="w-full h-8 mt-2" style="filter: invert(0.7) sepia(0.2)"></audio>
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</div>
+	</div>
+</div>

@@ -840,4 +840,12 @@
 							{sendingSms ? '...' : 'Send'}
 						</button>
 					</div>
-					<TemplatePicker type="sms" onSelect={applyTemplate} contactName={contact?.n
+					<TemplatePicker type="sms" onSelect={applyTemplate} contactName={contact?.name ?? ''} />
+				</div>
+			</div>
+{/if}
+</div>
+</div>
+</div>
+{/if}
+</div>

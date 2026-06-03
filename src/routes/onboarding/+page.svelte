@@ -223,4 +223,9 @@
 			<div class="rounded-xl border border-green-800/40 bg-green-950/10 p-8 text-center space-y-4">
 				<p class="text-5xl">🎉</p>
 				<h2 class="text-2xl font-semibold">You're all set</h2>
-				<p class="text-sm text-[#666] 
+				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">LeadOS is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
+				<a href="/dashboard" class="inline-block rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Go to Dashboard →</a>
+			</div>
+		{/if}
+	</div>
+</div>

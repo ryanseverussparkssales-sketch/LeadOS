@@ -51,13 +51,6 @@ Make the language conversational and human. Avoid corporate buzzwords.`;
 		messages: [{ role: 'user', content: prompt }],
 	});
 
-	
-	const stream = await client.messages.stream({
-		model: 'claude-sonnet-4-6',
-		max_tokens: 3000,
-		messages: [{ role: 'user', content: prompt }],
-	});
-
 	let fullText = '';
 	for await (const chunk of stream) {
 		if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {

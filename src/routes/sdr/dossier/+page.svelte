@@ -129,4 +129,16 @@
 							</div>
 							<div class="space-y-3">
 								{#each group.items as item}
-									<div class="rounded-x
+									<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-3">
+							<p class="text-xs font-semibold text-white mb-1">{item.title}</p>
+							<p class="text-xs text-[#888] whitespace-pre-wrap leading-relaxed">{item.content}</p>
+						</div>
+					{/each}
+					</div>
+				</div>
+			{/each}
+			{/if}
+		</div>
+	{/if}
+	</div>
+</div>

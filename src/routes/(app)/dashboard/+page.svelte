@@ -561,4 +561,4 @@
   }
   .widget-card:hover .widget-drag-handle { color: #777; opacity: 1; }
   .widget-drag-handle:active { cursor: grabbing; }
-  /* On touch devices
+  /* On touch devices */</style>

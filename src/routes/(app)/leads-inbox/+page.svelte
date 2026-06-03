@@ -593,7 +593,15 @@
 												class="text-[#333] hover:text-white disabled:opacity-20 text-xs px-1 transition-colors">↓</button>
 										</div>
 										<p class="text-xs text-[#888] leading-relaxed flex-1">
-											<span class="text-[#555]">if </span><span class="text-white">{rule.condition_field}</span>
-											<span class="text-[#555]"> {rule.condition_operator} </span>
-											{#if rule.condition_value}<span class="text-yellow-400">"{rule.condition_value}"</span>{/if}
-											<span class="text
+											<span class="text-[#555]"> → </span><span class="text-white">{rule.action_type}</span>
+									</p>
+								</div>
+							{/each}
+					{/if}
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</div>
+</div>
+</div>

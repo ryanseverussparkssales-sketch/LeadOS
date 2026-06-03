@@ -323,4 +323,13 @@
                                                 <p class="text-xs text-[#666] leading-relaxed whitespace-pre-wrap font-mono">{win.raw_transcript.slice(0, 1500)}{win.raw_transcript.length > 1500 ? '\n[truncated]' : ''}</p>
                                             </div>
                                         </div>
-     
+                                    {/if}
+                                </div>
+                            {/if}
+                        </div>
+                    {/each}
+                {/if}
+            </div>
+        {/if}
+{/if}
+    </div>

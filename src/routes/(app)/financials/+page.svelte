@@ -1398,4 +1398,13 @@
 												{/if}
 											</div>
 										</div>
-									{
+									{/if}
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		{/each}
+	{/if}
+	</div>
+</div>

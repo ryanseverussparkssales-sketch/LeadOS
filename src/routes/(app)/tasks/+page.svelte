@@ -197,4 +197,16 @@
 				{#each displayedTasks as task}
 					<div class="flex items-center gap-4 px-8 py-4 hover:bg-[#111] transition-colors group {isOverdue(task) ? 'border-l-2 border-red-900' : ''}">
 						<!-- Complete checkbox -->
-						<button onclick={() => complete(task)} class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors {task.status === 'completed' ? '
+						<button onclick={() => complete(task)} class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors {task.status === 'completed' ? 'border-green-500 bg-green-500/20' : 'border-[#333] hover:border-white'}">
+						</button>
+						<!-- Task content -->
+						<div class="flex-1 min-w-0">
+							<p class="text-sm {task.status === 'completed' ? 'line-through text-[#555]' : 'text-white'} truncate">{task.title}</p>
+							{#if task.due_date}<p class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#555]'} mt-0.5">{formatDate(task.due_date)}</p>{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+</div>

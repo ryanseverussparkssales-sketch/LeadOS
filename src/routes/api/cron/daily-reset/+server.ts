@@ -100,5 +100,7 @@ export const GET = async ({ request }: { request: Request }) => {
     try {
         await supabaseAdmin.rpc('cleanup_rate_limits');
         results.rate_limits_cleaned = true;
-	return json({ success: true });
+    } catch (e) { console.error('[cron] cleanup_rate_limits error:', e); }
+
+	return json({ success: true, results });
 };

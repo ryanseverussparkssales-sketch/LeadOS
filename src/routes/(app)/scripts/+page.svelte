@@ -514,4 +514,21 @@
 							<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-3 group hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 								<div class="flex items-start justify-between mb-2">
 									<p class="text-sm text-yellow-400 font-medium">"{obj.objection}"</p>
-									<button onclick={() => deleteObjection(obj.id)} class="opacity-0 g
+									<button onclick={() => deleteObjection(obj.id)} class="opacity-0 group-hover:opacity-100 text-[#666] hover:text-red-400 transition-colors text-xs ml-auto">🗑</button>
+								</div>
+								{#if obj.response}<p class="text-sm text-[#ccc] mt-2">{obj.response}</p>{/if}
+							</div>
+						{/each}
+					</div>
+				</div>
+			{:else}
+				<div class="flex items-center justify-center h-full">
+					<div class="text-center">
+						<p class="text-3xl mb-3">📝</p>
+						<p class="text-[#555] text-sm">Select a script to view it</p>
+					</div>
+				</div>
+			{/if}
+		</div>
+	</div>
+</div>

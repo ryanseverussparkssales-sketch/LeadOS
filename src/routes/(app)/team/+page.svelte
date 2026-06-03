@@ -535,4 +535,11 @@
 
 			{#if showPayrollForm}
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
-					<div class="text-sm font-medium mb-3">New Payroll
+					<div class="text-sm font-medium mb-3">New Payroll Entry</div>
+				<p class="text-xs text-[#555] mb-3">Log a manual payroll payment for a rep</p>
+				<button onclick={() => showPayrollForm = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Close</button>
+			</div>
+		{/if}
+{/if}
+</div>
+</div>

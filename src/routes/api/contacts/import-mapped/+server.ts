@@ -106,9 +106,9 @@ export const POST: RequestHandler = async ({ request }) => {
 					.insert({ campaign_id: bulkCampaignId, contact_id: contact.id })
 					.then(({ error: ccErr }) => {
 						if (ccErr && !ccErr.message?.includes('duplicate')) {
-						console.error('[import-mapped] campaign_contacts error:', ccErr.message);
-					}
-				}
+							console.error('[import-mapped] campaign_contacts error:', ccErr.message);
+						}
+					})
 			}
 		}
 	}

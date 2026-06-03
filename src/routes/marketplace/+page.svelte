@@ -164,4 +164,14 @@
 			</div>
 		{/if}
 
-		<!-- Hire
+		<!-- HireSDRs CTA -->
+	<div class="mt-16 pt-12 border-t border-[#1a1a1a] text-center">
+		<p style="font-family:var(--font-label);font-size:11px;letter-spacing:.3em;color:#444" class="mb-6">LOOKING TO SCALE YOUR OUTREACH?</p>
+		<a href="/contact" class="inline-block px-8 py-3 border border-[#262626] text-[#666] text-xs hover:border-[#444] hover:text-white transition-colors" style="font-family:var(--font-label);letter-spacing:.2em">
+			HIRE MANAGED SDRS →
+		</a>
+		<p class="mt-3 text-[10px] text-[#333]">$1/contact + $200/appointment · Sparks Curiosity Studio</p>
+	</div>
+
+	</div>
+</div>

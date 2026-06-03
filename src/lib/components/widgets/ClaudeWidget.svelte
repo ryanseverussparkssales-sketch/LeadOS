@@ -226,4 +226,6 @@
                 <span class="text-black text-xs font-bold">{loading ? '…' : '↑'}</span>
             </button>
         </div>
-        <p class="text-[9px] text-[#222] mt-1.5 text-center">Enter to send · S
+        <p class="text-[9px] text-[#222] mt-1.5 text-center">Enter to send · Shift+Enter for new line</p>
+        </div>
+    </div>

@@ -64,6 +64,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 				} as Parameters<typeof twiml.dial>[0]);
 				dial.number(phoneNumber.forwarding_number);
 			} else {
+				// No forwarding — ring browser client
 				const clientIdentity = env.TWILIO_CLIENT_IDENTITY ?? 'agent';
 				const dial = twiml.dial({
 					timeout: 30,
@@ -75,69 +76,31 @@ export const POST: RequestHandler = async ({ request, url }) => {
 				} as Parameters<typeof twiml.dial>[0]);
 				dial.client(clientIdentity);
 			}
-
-			const greetingText = phoneNumber?.voicemail_greeting
-				?? 'You have reached our voicemail. Please leave a message after the tone.';
-			if (phoneNumber?.voicemail_greeting_url) {
-				twiml.play(phoneNumber.voicemail_greeting_url);
+		} else {
+			// Outbound call initiated by browser client
+			if (!to) {
+				twiml.say('No destination number provided.');
 			} else {
-				twiml.say({ voice: 'Polly.Joanna' }, greetingText);
+				const dial = twiml.dial({
+					callerId: passedCallerId || from,
+					timeout: 30,
+					record: 'record-from-ringing',
+					recordingStatusCallback: `${baseUrl}/api/twilio/recording`,
+					recordingStatusCallbackMethod: 'POST',
+					action: `${baseUrl}/api/twilio/status`,
+					method: 'POST',
+				} as Parameters<typeof twiml.dial>[0]);
+				dial.number(to);
 			}
-			twiml.record({
-				maxLength: 120,
-				transcribe: true,
-				transcribeCallback: `${baseUrl}/api/twilio/recording`,
-				recordingStatusCallback: `${baseUrl}/api/twilio/recording`,
-				recordingStatusCallbackMethod: 'POST',
-			});
-			twiml.hangup();
-
-			return new Response(twiml.toString(), { headers: { 'Content-Type': 'application/xml' } });
 		}
 
-		// ── OUTBOUND ──────────────────────────────────────────────────────────
-		const outboundCallerId = passedCallerId || env.TWILIO_PHONE_NUMBER;
-
-		if (callId && callSid) {
-			supabaseAdmin.from('calls')
-				.update({ twilio_call_sid: callSid })
-				.eq('id', callId)
-				.then(({ error }) => { if (error) console.error('[voice] DB update error:', error); })
-				.catch(console.error);
-		}
-
-		if (!to || !outboundCallerId) {
-			twiml.say('Configuration error. Please check server settings.');
-			return new Response(twiml.toString(), { headers: { 'Content-Type': 'application/xml' } });
-		}
-
-		// TCPA compliance — brief recording cue to SDR only (plays before dialing)
-		twiml.say({ voice: 'Polly.Salli', language: 'en-US' }, 'Recording.');
-
-		const dial = twiml.dial({
-			callerId: outboundCallerId,
-			machineDetection: 'DetectMessageEnd',
-			asyncAmd: 'true',
-			amdStatusCallback: `${baseUrl}/api/twilio/amd`,
-			amdStatusCallbackMethod: 'POST',
-			record: 'record-from-ringing',
-			recordingStatusCallback: `${baseUrl}/api/twilio/recording`,
-			recordingStatusCallbackMethod: 'POST',
-			action: `${baseUrl}/api/twilio/status`,
-			method: 'POST',
+		return new Response(twiml.toString(), {
+			headers: { 'Content-Type': 'text/xml' },
 		});
-		dial.number(to);
-
-		return new Response(twiml.toString(), { headers: { 'Content-Type': 'application/xml' } });
-
 	} catch (err) {
-		console.error('[voice webhook] FATAL ERROR:', err);
-		const twiml = new VoiceResponse();
-		twiml.say('A server error occurred.');
-		return new Response(twiml.toString(), { status: 200, headers: { 'Content-Type': 'application/xml' } });
+		console.error('[twilio/voice]', err);
+		const errTwiml = new twilio.twiml.VoiceResponse();
+		errTwiml.say('An error occurred. Please try again.');
+		return new Response(errTwiml.toString(), { headers: { 'Content-Type': 'text/xml' } });
 	}
-};
-
-export const GET: RequestHandler = async () => {
-	return new Response('<Response/>', { headers: { 'Content-Type': 'application/xml' } });
 };

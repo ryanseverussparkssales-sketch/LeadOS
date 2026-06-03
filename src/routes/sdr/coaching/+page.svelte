@@ -138,10 +138,10 @@
 
 			<!-- Weekly win rate trend (bar chart) -->
 			{#if data.weeks?.length > 1}
+				{@const maxRate = Math.max(...data.weeks.map((w: any) => w.winRate), 1)}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 mb-6">
 					<p style="font-family:var(--font-label);font-size:9px;letter-spacing:.16em;color:#444;margin-bottom:16px">Win Rate by Week</p>
 					<div class="flex items-end gap-1.5 h-20">
-						{@const maxRate = Math.max(...data.weeks.map((w: any) => w.winRate), 1)}
 						{#each data.weeks.slice(-8) as week}
 							<div class="flex-1 flex flex-col items-center gap-1">
 								<div class="w-full rounded-sm bg-yellow-500/70 transition-all"

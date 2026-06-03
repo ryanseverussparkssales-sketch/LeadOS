@@ -229,4 +229,12 @@
 								<p class="text-xs text-[#555] mt-2">— {t.client_name}{t.client_title ? `, ${t.client_title}` : ''}{t.client_company ? ` @ ${t.client_company}` : ''}</p>
 							</div>
 							<div class="flex items-center gap-2 shrink-0">
-								{#if t.approved}<span class="text-[9px] text-
+								{#if t.approved}<span class="text-[9px] text-green-400">✓ Approved</span>{/if}
+							</div>
+						</div>
+				</div>
+					{/each}
+			</div>
+				{/if}
+		</div>
+	</div>

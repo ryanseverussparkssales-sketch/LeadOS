@@ -741,4 +741,6 @@
     transition: box-shadow 0.15s, background 0.15s;
   }
   .ctrl-btn:hover:not(:disabled) {
-    background: var(--g
+    background: var(--gradient-to-right, #1a1a1a, #2a2a2a);
+  }
+</style>

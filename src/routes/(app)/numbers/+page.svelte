@@ -808,4 +808,18 @@
 												class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors">
 												{savingNumSettings ? 'Saving...' : 'Save'}
 											</button>
-											<button onclick={() => expandedNumId
+											<button onclick={() => expandedNumId = expandedNumId === num.id ? null : num.id}
+								class="text-xs text-[#666] hover:text-white transition-colors px-2">
+								{expandedNumId === num.id ? 'Collapse' : 'Settings'}
+							</button>
+						</div>
+					</div>
+				{/if}
+						</div>
+		{/each}
+		</div>
+	{/if}
+</div>
+	</div>
+{/if}
+</div>

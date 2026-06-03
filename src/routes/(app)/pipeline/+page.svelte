@@ -345,4 +345,13 @@
 				<div>
 					<label class="text-xs text-[#555] block mb-1">Value ($)</label>
 					<input bind:value={dealEdit.value} type="number" placeholder="0"
-						class=
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
+			</div>
+			<div class="flex gap-2">
+				<button onclick={saveDealEdit} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Save</button>
+				<button onclick={() => editingDeal = null} class="rounded-lg border border-[#333] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
+			</div>
+		</div>
+	{/if}
+	</div>
+{/if}
