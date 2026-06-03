@@ -1,0 +1,24 @@
+{
+  "framework": "sveltekit",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".vercel/output",
+  "crons": [
+    {
+      "path": "/api/sequences/advance",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/daily-reset",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/gmail/sync",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/client-reports",
+      "schedule": "0 8 * * 1"
+    }
+  ]
+}

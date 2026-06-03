@@ -1,0 +1,55 @@
+User-agent: *
+
+# Public pages — index freely
+Allow: /
+Allow: /pricing
+Allow: /about
+Allow: /join
+Allow: /coaching
+Allow: /marketplace
+Allow: /contact
+Allow: /rep/
+
+# API — never crawl
+Disallow: /api/
+
+# Authenticated app — do not index
+Disallow: /dashboard
+Disallow: /dialer
+Disallow: /phone
+Disallow: /inbox
+Disallow: /calls
+Disallow: /contacts
+Disallow: /companies
+Disallow: /campaigns
+Disallow: /projects
+Disallow: /tasks
+Disallow: /scripts
+Disallow: /templates
+Disallow: /messaging
+Disallow: /sequences
+Disallow: /analytics
+Disallow: /reports
+Disallow: /leaderboard
+Disallow: /agency
+Disallow: /clients
+Disallow: /team
+Disallow: /financials
+Disallow: /pipeline
+Disallow: /settings
+Disallow: /numbers
+Disallow: /trash
+Disallow: /import
+Disallow: /leads
+Disallow: /my-leads
+Disallow: /notifications
+Disallow: /automations
+
+# Portals — do not index
+Disallow: /sdr/
+Disallow: /client-portal
+Disallow: /onboarding
+Disallow: /embed/
+Disallow: /portal/
+
+Sitemap: https://lead-os-livid.vercel.app/sitemap.xml
