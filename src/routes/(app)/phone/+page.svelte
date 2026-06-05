@@ -181,8 +181,7 @@
 	onMount(async () => {
 		const urlN = $page.url.searchParams.get('number');
 		if (urlN) number = urlN;
-		// Ensure the single global device is up (idempotent — usually already inited by the layout).
-		initTwilioDevice().catch(() => {});
+		// The global device is initialized once by the (app) layout — we only consume it here.
 		await Promise.all([loadCalls(), loadTasks(), loadThreads(), loadVoicemails(), loadPhoneNumbers()]);
 		const pRes = await apiFetch('/api/projects');
 		if (pRes.ok) projects = await pRes.json();
