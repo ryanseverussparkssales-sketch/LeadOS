@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { supabaseAdmin, getEffectiveUserId } from './supabase';
+import { isSuperAdmin } from './superadmin';
 
 export type Tier = 'free' | 'pro' | 'agency';
 
@@ -10,6 +11,9 @@ export const TIER_LIMITS = {
 } as const;
 
 export async function getUserTier(userId: string): Promise<Tier> {
+	// Platform super-admins are unlimited (treated as the top tier) on their own account.
+	if (isSuperAdmin(userId)) return 'agency';
+
 	const { data } = await supabaseAdmin
 		.from('settings')
 		.select('subscription_tier')

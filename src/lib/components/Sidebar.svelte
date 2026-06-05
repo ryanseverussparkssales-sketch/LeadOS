@@ -9,6 +9,7 @@
 	import { apiFetch } from '$lib/api';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import { superAdmin } from '$lib/stores/admin';
 
 	const user = $derived($currentUser);
 
@@ -479,6 +480,13 @@
 		{/each}
 		<div class="px-2
 mt-2 border-t border-[#1a1a1a] pt-2">
+	{#if $superAdmin}
+		<a href="/admin" aria-current={isActive('/admin') ? 'page' : undefined}
+			class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[var(--call)] hover:bg-[var(--call)]/10 {isActive('/admin') ? 'bg-[var(--call)]/10' : ''}">
+			<Icon name="shield" class="flex-shrink-0 text-current" />
+			{#if !collapsed}<span class="truncate">Platform Admin</span>{/if}
+		</a>
+	{/if}
 	<a href="/settings" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[#888] hover:text-[#ccc] hover:bg-[#111]">
 		<span>⚙️</span>
 		{#if !collapsed}<span>Settings</span>{/if}

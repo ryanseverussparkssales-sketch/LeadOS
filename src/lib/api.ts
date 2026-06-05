@@ -15,6 +15,12 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
 	const buildHeaders = (token: string | null): HeadersInit => {
 		const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 		if (token) headers['Authorization'] = `Bearer ${token}`;
+		// Super-admin "view as account": only honoured server-side if the real user
+		// is a super-admin, so this is inert for everyone else.
+		if (typeof localStorage !== 'undefined') {
+			const impersonate = localStorage.getItem('impersonate_owner');
+			if (impersonate) headers['X-Impersonate-Owner'] = impersonate;
+		}
 		return headers;
 	};
 

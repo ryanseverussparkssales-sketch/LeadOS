@@ -8,6 +8,9 @@
 	import HelpPanel from '$lib/components/HelpPanel.svelte';
 	import IncomingCallBanner from '$lib/components/IncomingCallBanner.svelte';
 	import FloatingCallBar from '$lib/components/FloatingCallBar.svelte';
+	import ImpersonationBanner from '$lib/components/ImpersonationBanner.svelte';
+	import { superAdmin } from '$lib/stores/admin';
+	import { stopImpersonation } from '$lib/stores/impersonation';
 	import { onMount, onDestroy } from 'svelte';
 	import { goto, onNavigate } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
@@ -85,6 +88,16 @@
 						return;
 					}
 				}
+				// 3. Super-admin status → enables the /admin area + "view as" banner.
+				try {
+					const statusRes = await apiFetch('/api/admin/status');
+					if (statusRes.ok) {
+						const st = await statusRes.json();
+						superAdmin.set(!!st.superAdmin);
+						// Clear any stale impersonation flag if this user isn't actually an admin.
+						if (!st.superAdmin) stopImpersonation();
+					}
+				} catch { /* non-fatal */ }
 			} catch (portalErr) {
 				console.warn('[layout] Role check failed, continuing as admin:', portalErr);
 			}
@@ -124,6 +137,7 @@
 <HelpPanel />
 <IncomingCallBanner />
 <FloatingCallBar />
+<ImpersonationBanner />
 
 {#if checking}
 	<div class="flex h-screen items-center justify-center bg-[var(--c-surface-0)]">
