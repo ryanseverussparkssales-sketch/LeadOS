@@ -72,9 +72,14 @@ function scheduleTokenRefresh(expiresInSeconds = 3600) {
 // ── Device initialization ─────────────────────────────────────────────────────
 export async function initTwilioDevice(): Promise<void> {
 	if (!browser || deviceInitialized) return;
+	// Claim the slot SYNCHRONOUSLY (before any await) so a second concurrent caller —
+	// e.g. the Dialer and the layout both calling on load — bails here instead of
+	// building a second Device that knocks the first offline and rejects incoming calls.
+	deviceInitialized = true;
 
 	const token = await fetchToken();
 	if (!token) {
+		deviceInitialized = false;
 		twilioError.set(
 			'Could not get Twilio token — check TWILIO_ACCOUNT_SID, TWILIO_API_KEY_SID, TWILIO_API_KEY_SECRET, and TWILIO_APP_SID in Settings'
 		);
@@ -87,6 +92,7 @@ export async function initTwilioDevice(): Promise<void> {
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			stream.getTracks().forEach(t => t.stop()); // stop immediately — just checking permission
 		} catch (micErr) {
+			deviceInitialized = false;
 			twilioError.set('Microphone access denied. Allow mic access in your browser and try again.');
 			return;
 		}
@@ -228,6 +234,7 @@ export async function initTwilioDevice(): Promise<void> {
 		try {
 			await device.register();
 		} catch (regErr) {
+			deviceInitialized = false;
 			const msg = regErr instanceof Error ? regErr.message : String(regErr);
 			twilioError.set(
 				`Twilio registration failed: ${msg}. Make sure your browser allows microphone access and WebRTC connections.`
@@ -239,6 +246,7 @@ export async function initTwilioDevice(): Promise<void> {
 		deviceInitialized = true;
 		scheduleTokenRefresh();
 	} catch (err: any) {
+		deviceInitialized = false;
 		const msg = err instanceof Error ? err.message : String(err);
 		console.error('[twilio-store] init failed:', err);
 		if (msg.includes('microphone') || msg.includes('permission') || msg.includes('NotAllowed')) {
