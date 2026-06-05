@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const persona = url.searchParams.get('persona') ?? '';
 	const greeting = mode === 'practice'
 		? (env.RELAY_PRACTICE_GREETING ?? 'Hello?')   // the AI buyer answers; the rep pitches
-		: (env.RELAY_WELCOME_GREETING ?? "Hi, this is Rogue's assistant calling — do you have a quick minute?");
+		: (env.RELAY_WELCOME_GREETING ?? "Hi, this is the Edelhaus assistant calling — do you have a quick minute?");
 
 	const attrs = [
 		`url="${escapeXml(wsUrl)}"`,

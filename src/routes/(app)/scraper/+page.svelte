@@ -157,7 +157,7 @@
 		const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/csv' });
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
-		a.download = 'roguescraper-leads.csv';
+		a.download = 'edelhaus-leads.csv';
 		a.click();
 		URL.revokeObjectURL(a.href);
 	}
