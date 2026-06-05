@@ -104,6 +104,7 @@ export async function initTwilioDevice(): Promise<void> {
 
 		// ── Event handlers ────────────────────────────────────────────────────
 		device.on('registered', () => {
+			console.log('[edelhaus] ✅ device REGISTERED — ready to receive incoming');
 			twilioReady.set(true);
 			twilioError.set(null);
 		});
@@ -157,6 +158,7 @@ export async function initTwilioDevice(): Promise<void> {
 		device.on('incoming', async (call: any) => {
 			const from: string = call.parameters?.From ?? '';
 			const to: string = call.parameters?.To ?? '';
+			console.log('[edelhaus] 📞 INCOMING call reached the browser — from', from, 'to', to);
 
 			// Try to match caller to a contact
 			let contactName: string | null = null;
