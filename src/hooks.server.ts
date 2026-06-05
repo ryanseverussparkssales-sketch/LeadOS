@@ -192,9 +192,22 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const calledNum = params['To'] ?? '';
 			const base = event.url.origin.replace('http://', 'https://');
 
-			const { data: phoneRec } = await supabaseAdmin
-				.from('phone_numbers').select('id, user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
+			const COLS = 'id, user_id, phone_number, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds';
+			let { data: phoneRec } = await supabaseAdmin
+				.from('phone_numbers').select(COLS)
 				.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
+
+			// Format-tolerant fallback: if the exact string didn't match (e.g. the number
+			// is stored as (484) 286-5470 vs +14842865470), match on the last 10 digits.
+			if (!phoneRec) {
+				const wanted = calledNum.replace(/\D/g, '').slice(-10);
+				const { data: actives } = await supabaseAdmin
+					.from('phone_numbers').select(COLS).eq('status', 'active');
+				phoneRec = (actives ?? []).find(
+					(p) => ((p.phone_number as string) ?? '').replace(/\D/g, '').slice(-10) === wanted
+				) ?? null;
+			}
+			console.log('[incoming] called', calledNum, '→', phoneRec ? `owner ${phoneRec.user_id}` : 'NUMBER NOT FOUND in phone_numbers');
 
 			// Record the inbound call so its recording/transcript can be correlated by
 			// twilio_call_sid later. Isolated try/catch so a DB hiccup never breaks the call.

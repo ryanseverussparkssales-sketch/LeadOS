@@ -5,6 +5,7 @@
 	import { toastSuccess, toastError, toastInfo } from '$lib/stores/toast';
 	import { currentUser } from '$lib/stores';
 	import { supabase } from '$lib/services/auth';
+	import { twilioDevice, twilioReady as twReadyStore, twilioError as twErrorStore, initTwilioDevice } from '$lib/stores/twilio';
 	import DialerWidgetPanel from '$lib/components/DialerWidgetPanel.svelte';
 	import DialButtonRenderer from '$lib/components/DialButtonRenderer.svelte';
 	import Icon from '$lib/components/Icon.svelte';
@@ -12,8 +13,12 @@
 	let number = $state('');
 	let callState = $state<'idle' | 'calling' | 'connected'>('idle');
 	let callDuration = $state(0);
-	let twilioReady = $state(false);
+	// Use the ONE global Twilio device (registered for incoming). Creating a second
+	// device here knocked the global one offline → inbound calls went to voicemail.
+	const device = $derived($twilioDevice);
+	const twilioReady = $derived($twReadyStore);
 	let twilioError = $state('');
+	$effect(() => { if ($twErrorStore) twilioError = $twErrorStore; });
 	let muted = $state(false);
 	let onHold = $state(false);
 	let aiCalling = $state(false);
@@ -33,7 +38,6 @@
 	let phoneNumbers = $state<{id:string; phone_number:string; friendly_name:string; client_id:string|null; is_primary:boolean; status:string}[]>([]);
 	let selectedFromNumber = $state('');
 	let durationInterval: ReturnType<typeof setInterval> | null = null;
-	let device: any = null;
 	let activeCall: any = null;
 
 	type RightTab = 'calls' | 'tasks' | 'sms' | 'voicemails';
@@ -177,7 +181,9 @@
 	onMount(async () => {
 		const urlN = $page.url.searchParams.get('number');
 		if (urlN) number = urlN;
-		await Promise.all([initTwilio(), loadCalls(), loadTasks(), loadThreads(), loadVoicemails(), loadPhoneNumbers()]);
+		// Ensure the single global device is up (idempotent — usually already inited by the layout).
+		initTwilioDevice().catch(() => {});
+		await Promise.all([loadCalls(), loadTasks(), loadThreads(), loadVoicemails(), loadPhoneNumbers()]);
 		const pRes = await apiFetch('/api/projects');
 		if (pRes.ok) projects = await pRes.json();
 
@@ -194,21 +200,14 @@
 
 	onDestroy(() => {
 		if (durationInterval) clearInterval(durationInterval);
-		try { if (device) device.destroy(); } catch {}
+		// Do NOT destroy the global device here — it's shared and must keep receiving calls.
 		if (realtimeChannel) supabase.removeChannel(realtimeChannel);
 	});
 
+	// Retry button → re-init the shared global device.
 	async function initTwilio() {
 		twilioError = '';
-		try {
-			const { Device } = await import('@twilio/voice-sdk');
-			const res = await apiFetch('/api/twilio/token', { method: 'POST' });
-			if (!res.ok) { twilioError = 'Could not get Twilio token'; return; }
-			const { token } = await res.json();
-			device = new Device(token, { logLevel: 1, codecPreferences: ['opus', 'pcmu'] as any });
-			device.on('error', (err: {message:string}) => { twilioError = err.message; });
-			twilioReady = true;
-		} catch (err) { twilioError = err instanceof Error ? err.message : 'Twilio init failed'; }
+		await initTwilioDevice().catch(() => {});
 	}
 
 	async function dial(n?: string) {
@@ -270,68 +269,28 @@
 		aiCalling = false;
 	}
 
-	// Start an AI practice call. The relay rings THIS browser (to: client:<identity>);
-	// the rep answers and pitches the AI buyer persona; on hang-up the relay logs coaching.
-	//
-	// The device is normally NOT registered for inbound (so it can't steal real customer
-	// calls). We arm it only for the practice window and auto-accept the practice leg, then
-	// disarm — keeping the inbound-ring-theft fix intact for everyday use.
-	let practiceArmed = false;
-	let practiceDisarmTimer: ReturnType<typeof setTimeout> | null = null;
-
-	function onPracticeIncoming(call: any) {
-		if (!practiceArmed) return;          // only the practice window auto-accepts
-		practiceArmed = false;
-		if (practiceDisarmTimer) { clearTimeout(practiceDisarmTimer); practiceDisarmTimer = null; }
-		activeCall = call;
-		callState = 'connected'; muted = false; onHold = false;
-		callDuration = 0;
-		if (durationInterval) clearInterval(durationInterval);
-		durationInterval = setInterval(() => callDuration++, 1000);
-		call.on('disconnect', () => {
-			if (durationInterval) { clearInterval(durationInterval); durationInterval = null; }
-			callState = 'idle'; activeCall = null; muted = false; onHold = false;
-			disarmPractice();
-			setTimeout(() => loadCalls(), 2500);   // surface the coaching summary once persisted
-		});
-		call.on('error', (err: { message: string }) => { twilioError = err.message; callState = 'idle'; disarmPractice(); });
-		try { call.accept(); } catch (e) { twilioError = e instanceof Error ? e.message : 'Could not answer'; }
-	}
-
-	function disarmPractice() {
-		practiceArmed = false;
-		if (practiceDisarmTimer) { clearTimeout(practiceDisarmTimer); practiceDisarmTimer = null; }
-		try { device?.off('incoming', onPracticeIncoming); } catch {}
-		try { device?.unregister(); } catch {}
-	}
-
+	// Start an AI practice call. The relay rings THIS browser via the shared global device
+	// (to: client:<identity>); the incoming leg surfaces in the standard call card — answer
+	// it and pitch the AI buyer persona. On hang-up the relay logs coaching.
 	async function startPractice() {
-		if (practiceStarting || callState !== 'idle') return;
+		if (practiceStarting) return;
 		if (!device || !twilioReady) { toastError('Phone not ready yet — wait a moment and retry'); return; }
 		practiceStarting = true;
 		try {
-			// Arm the browser to receive the inbound practice leg.
-			practiceArmed = true;
-			device.on('incoming', onPracticeIncoming);
-			try { await device.register(); } catch {}
-			// Safety net: disarm if the call never arrives (e.g. server rejected it).
-			practiceDisarmTimer = setTimeout(() => { if (callState === 'idle') disarmPractice(); }, 30000);
-
 			const res = await apiFetch('/api/twilio/practice/start', {
 				method: 'POST',
 				body: JSON.stringify({ persona: practicePersona, from: selectedFromNumber || undefined }),
 			});
 			if (res.ok) {
-				toastSuccess('Your phone will ring — answer it and start your pitch');
+				toastSuccess('Your phone will ring — answer the card and start your pitch');
+				setTimeout(() => loadCalls(), 3000);
 			} else {
-				disarmPractice();
 				const e = await res.json().catch(() => ({}));
 				if (res.status === 402) toastError('AI practice calls require a Pro plan');
 				else if (res.status === 503) toastError('AI practice calls are not enabled');
 				else toastError(e.message ?? 'Could not start practice call');
 			}
 		} catch {
-			disarmPractice();
 			toastError('Could not start practice call');
 		}
 		practiceStarting = false;
