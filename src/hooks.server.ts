@@ -193,7 +193,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const base = event.url.origin.replace('http://', 'https://');
 
 			const { data: phoneRec } = await supabaseAdmin
-				.from('phone_numbers').select('id, user_id, assigned_user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
+				.from('phone_numbers').select('id, user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
 				.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
 
 			// Record the inbound call so its recording/transcript can be correlated by
@@ -227,12 +227,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 				const ringTimeout = phoneRec.ring_timeout_seconds ?? 25;
 				const { clientIdentityForUser } = await import('$lib/server/twilio');
 
+				// Read the assigned rep separately + leniently, so a not-yet-migrated
+				// `assigned_user_id` column can never break the number lookup (which would
+				// send every inbound call straight to voicemail).
+				let assignedUserId: string | null = null;
+				const { data: assignRow } = await supabaseAdmin
+					.from('phone_numbers').select('assigned_user_id').eq('id', phoneRec.id).maybeSingle();
+				assignedUserId = (assignRow as { assigned_user_id?: string | null } | null)?.assigned_user_id ?? null;
+
 				// Per-rep routing: ring the assigned rep's browser only. If the number has
 				// no assigned rep, ring a group — the owner plus all active team members —
 				// and the first to answer wins.
 				let targets: string[];
-				if (phoneRec.assigned_user_id) {
-					targets = [clientIdentityForUser(phoneRec.assigned_user_id)];
+				if (assignedUserId) {
+					targets = [clientIdentityForUser(assignedUserId)];
 				} else {
 					const { data: reps } = await supabaseAdmin
 						.from('team_members')
@@ -244,6 +252,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 					for (const r of reps ?? []) if (r.member_user_id) ids.add(r.member_user_id);
 					targets = [...ids].map(clientIdentityForUser);
 				}
+				console.log('[incoming]', calledNum, '→ targets:', targets.join(', '), '| assigned:', assignedUserId ?? 'none');
 
 				if (phoneRec.forwarding_enabled && phoneRec.forwarding_number) {
 					// Forward to external number

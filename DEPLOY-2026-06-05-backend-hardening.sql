@@ -21,6 +21,7 @@
 -- decrypts tolerantly, so plaintext historical values (if any) keep working.
 
 ALTER TABLE user_settings
+  ADD COLUMN IF NOT EXISTS subscription_tier      TEXT DEFAULT 'free',  -- free | pro | agency (tier source of truth)
   ADD COLUMN IF NOT EXISTS twilio_account_sid     TEXT,
   ADD COLUMN IF NOT EXISTS twilio_auth_token      TEXT,  -- encrypted
   ADD COLUMN IF NOT EXISTS twilio_api_key_sid     TEXT,

@@ -15,7 +15,7 @@ export async function getUserTier(userId: string): Promise<Tier> {
 	if (isSuperAdmin(userId)) return 'agency';
 
 	const { data } = await supabaseAdmin
-		.from('settings')
+		.from('user_settings')
 		.select('subscription_tier')
 		.eq('user_id', userId)
 		.maybeSingle();

@@ -7,18 +7,19 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ request }) => {
 	await requireSuperAdmin(request);
 
-	const [usersRes, settingsRes, userSettingsRes, membersRes] = await Promise.all([
+	const [usersRes, userSettingsRes, membersRes] = await Promise.all([
 		supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
-		// Tier lives on `settings`; the editable display name lives on `user_settings`.
-		supabaseAdmin.from('settings').select('user_id, subscription_tier'),
-		supabaseAdmin.from('user_settings').select('user_id, agency_name, company_name'),
+		// user_settings is the single source for both display name and tier.
+		supabaseAdmin.from('user_settings').select('user_id, agency_name, company_name, subscription_tier'),
 		supabaseAdmin.from('team_members').select('owner_user_id, member_user_id, status'),
 	]);
 
 	const tierMap = new Map<string, string | null>();
-	for (const s of settingsRes.data ?? []) tierMap.set(s.user_id, (s as any).subscription_tier);
 	const nameMap = new Map<string, string | null>();
-	for (const s of userSettingsRes.data ?? []) nameMap.set(s.user_id, (s as any).agency_name || (s as any).company_name || null);
+	for (const s of userSettingsRes.data ?? []) {
+		tierMap.set(s.user_id, (s as any).subscription_tier);
+		nameMap.set(s.user_id, (s as any).agency_name || (s as any).company_name || null);
+	}
 
 	const memberOwnerOf = new Map<string, string>(); // member_user_id -> owner
 	const teamSize = new Map<string, number>();       // owner -> active member count

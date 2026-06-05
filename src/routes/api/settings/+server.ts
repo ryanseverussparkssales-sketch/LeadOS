@@ -45,10 +45,30 @@ export const PUT: RequestHandler = async ({ request }) => {
 		}
 	}
 
-	const { data, error } = await supabaseAdmin
-		.from('user_settings')
-		.upsert({ ...sanitized, user_id: user.id, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
-		.select().single();
+	// Resilient upsert: if the live DB is missing a column the form sent (schema
+	// drift), strip that column and retry rather than failing the whole save. This
+	// keeps Settings working even when a migration hasn't been applied yet.
+	const payload: Record<string, unknown> = { ...sanitized, user_id: user.id, updated_at: new Date().toISOString() };
+	let data: Record<string, unknown> | null = null;
+	let error: { message: string } | null = null;
+	for (let attempt = 0; attempt < 12; attempt++) {
+		const res = await supabaseAdmin
+			.from('user_settings')
+			.upsert(payload, { onConflict: 'user_id' })
+			.select().single();
+		data = res.data as Record<string, unknown> | null;
+		error = res.error;
+		if (!error) break;
+		// PostgREST reports a missing column like: Could not find the 'X' column of 'user_settings'
+		const col = error.message.match(/'([^']+)' column/)?.[1] ?? error.message.match(/column "([^"]+)"/)?.[1];
+		if (col && col !== 'user_id' && col in payload) {
+			console.warn('[settings] dropping unknown column and retrying:', col);
+			delete payload[col];
+			continue;
+		}
+		console.error('[settings] upsert error:', error.message);
+		break;
+	}
 
 	if (error) return json({ error: error.message }, { status: 400 });
 

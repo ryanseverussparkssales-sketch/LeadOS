@@ -9,8 +9,8 @@ export const GET: RequestHandler = async ({ request }) => {
 	const since30 = new Date(Date.now() - 30 * 86400000).toISOString();
 
 	const [accountsCount, tiers, contacts, calls, callsRecent, teamMembers] = await Promise.all([
-		supabaseAdmin.from('settings').select('user_id', { count: 'exact', head: true }),
-		supabaseAdmin.from('settings').select('subscription_tier'),
+		supabaseAdmin.from('user_settings').select('user_id', { count: 'exact', head: true }),
+		supabaseAdmin.from('user_settings').select('subscription_tier'),
 		supabaseAdmin.from('contacts').select('id', { count: 'exact', head: true }),
 		supabaseAdmin.from('calls').select('id', { count: 'exact', head: true }),
 		supabaseAdmin.from('calls').select('id', { count: 'exact', head: true }).gte('created_at', since30),

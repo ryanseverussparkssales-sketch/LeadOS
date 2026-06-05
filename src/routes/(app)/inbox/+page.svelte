@@ -4,21 +4,25 @@
     import { apiFetch } from '$lib/api';
     import { toastSuccess, toastError } from '$lib/stores/toast';
 
-    type Channel = 'all' | 'sms' | 'email';
+    type Channel = 'all' | 'sms' | 'email' | 'voicemail';
     type Thread = {
         id: string;
-        channel: 'sms' | 'email';
+        channel: 'sms' | 'email' | 'voicemail';
         contactName: string | null;
         contactId: string | null;
         contactScore: number | null;
         subject: string | null; // email only
-        remoteNumber: string | null; // sms only
+        remoteNumber: string | null; // sms / voicemail caller
         lastBody: string;
         lastDirection: string;
         lastAt: string;
         unreadCount: number;
         isOptedOut?: boolean;
         intentLabel?: string | null; // most recent inbound intent
+        recordingUrl?: string | null; // voicemail only
+        transcript?: string | null;   // voicemail only
+        lineLabel?: string | null;    // which number it came in on
+        durationSeconds?: number | null;
     };
 
     let channel = $state<Channel>('all');
@@ -47,15 +51,17 @@
     const totalUnread = $derived(threads.filter(t => t.unreadCount > 0).length);
     const smsUnread = $derived(threads.filter(t => t.channel === 'sms' && t.unreadCount > 0).length);
     const emailUnread = $derived(threads.filter(t => t.channel === 'email' && t.unreadCount > 0).length);
+    const vmUnread = $derived(threads.filter(t => t.channel === 'voicemail' && t.unreadCount > 0).length);
 
     onMount(loadAll);
 
     async function loadAll() {
         loading = true;
         try {
-        const [smsRes, emailRes] = await Promise.all([
+        const [smsRes, emailRes, vmRes] = await Promise.all([
             apiFetch('/api/sms/threads?limit=100'),
             apiFetch('/api/emails/threads?limit=100'),
+            apiFetch('/api/phone/voicemails?limit=100'),
         ]);
 
         const combined: Thread[] = [];
@@ -98,6 +104,29 @@
             }
         }
 
+        if (vmRes.ok) {
+            const vms = await vmRes.json();
+            for (const v of vms ?? []) {
+                const unread = v.status === 'unread' || v.is_read === false;
+                combined.push({
+                    id: v.id, channel: 'voicemail',
+                    contactName: v.contact_name ?? v.caller_name ?? null,
+                    contactId: v.contact_id ?? null,
+                    contactScore: null,
+                    subject: null,
+                    remoteNumber: v.from_number ?? v.caller_id ?? null,
+                    lastBody: v.transcript ?? '🎙 Voicemail',
+                    lastDirection: 'inbound',
+                    lastAt: v.received_at ?? v.created_at,
+                    unreadCount: unread ? 1 : 0,
+                    recordingUrl: v.recording_url ?? null,
+                    transcript: v.transcript ?? null,
+                    lineLabel: v.phone_number?.friendly_name ?? v.phone_number?.phone_number ?? null,
+                    durationSeconds: v.duration_seconds ?? null,
+                });
+            }
+        }
+
         // Sort by last activity
         threads = combined.sort((a, b) => new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime());
         } catch (e) {
@@ -113,7 +142,15 @@
         messages = [];
         replyBody = ''; aiDraft = '';
 
-        if (t.channel === 'sms') {
+        if (t.channel === 'voicemail') {
+            // No message thread — the detail pane shows the recording + transcript.
+            if (t.unreadCount > 0) {
+                await apiFetch(`/api/phone/voicemails/${t.id}/read`, { method: 'POST' }).catch(() => {});
+            }
+            threads = threads.map(th => th.id === t.id ? { ...th, unreadCount: 0 } : th);
+            loadingMessages = false;
+            return;
+        } else if (t.channel === 'sms') {
             const r = await apiFetch(`/api/sms?thread_id=${t.id}&limit=100`);
             if (r.ok) messages = await r.json();
             else toastError('Failed to load conversation — try again');
@@ -234,10 +271,10 @@
         <div class="flex items-center gap-4">
             <h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Inbox</h2>
             <div class="flex gap-1">
-                {#each (['all','sms','email'] as Channel[]) as ch}
+                {#each (['all','sms','email','voicemail'] as Channel[]) as ch}
                     <button onclick={() => channel = ch}
                         class="px-3 py-1 rounded-lg text-xs font-medium transition-colors {channel === ch ? 'bg-white text-black' : 'text-[#555] hover:text-white border border-[var(--c-border-subtle)]'}">
-                        {ch === 'all' ? `All${totalUnread ? ` (${totalUnread})` : ''}` : ch === 'sms' ? `SMS${smsUnread ? ` (${smsUnread})` : ''}` : `Email${emailUnread ? ` (${emailUnread})` : ''}`}
+                        {ch === 'all' ? `All${totalUnread ? ` (${totalUnread})` : ''}` : ch === 'sms' ? `SMS${smsUnread ? ` (${smsUnread})` : ''}` : ch === 'email' ? `Email${emailUnread ? ` (${emailUnread})` : ''}` : `Voicemail${vmUnread ? ` (${vmUnread})` : ''}`}
                     </button>
                 {/each}
             </div>
@@ -304,7 +341,7 @@
                 <div class="border-b border-[var(--c-border)] px-8 py-4 flex items-center justify-between flex-shrink-0 bg-[var(--c-surface-1)]">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span>{selected.channel === 'sms' ? '💬' : '✉️'}</span>
+                            <span>{selected.channel === 'sms' ? '💬' : selected.channel === 'voicemail' ? '🎙️' : '✉️'}</span>
                             <p class="text-white font-semibold text-sm">{selected.contactName ?? selected.remoteNumber ?? 'Unknown'}</p>
                             {#if selected.contactScore}
                                 <span class="text-xs font-mono {selected.contactScore >= 70 ? 'text-[var(--accent)]' : 'text-[#555]'}">{selected.contactScore}</span>
@@ -323,6 +360,41 @@
                     {/if}
                 </div>
 
+                {#if selected.channel === 'voicemail'}
+                    <!-- Voicemail: recording + transcript -->
+                    <div class="flex-1 overflow-y-auto p-8 space-y-5">
+                        <div class="flex items-center gap-2 text-xs text-[#555] flex-wrap">
+                            <span>🎙️ Voicemail</span>
+                            {#if selected.lineLabel}<span>· to {selected.lineLabel}</span>{/if}
+                            {#if selected.durationSeconds}<span>· {Math.floor(selected.durationSeconds/60)}m {selected.durationSeconds%60}s</span>{/if}
+                            <span>· {timeAgo(selected.lastAt)}</span>
+                        </div>
+                        {#if selected.recordingUrl}
+                            <!-- svelte-ignore a11y_media_has_caption -->
+                            <audio src={selected.recordingUrl} controls preload="none" class="w-full"></audio>
+                        {:else}
+                            <p class="text-xs text-[#555]">Recording not available.</p>
+                        {/if}
+                        {#if selected.transcript}
+                            <div>
+                                <p class="text-[10px] text-[#555] uppercase tracking-widest mb-1.5">Transcript</p>
+                                <p class="text-sm text-white leading-relaxed whitespace-pre-wrap">{selected.transcript}</p>
+                            </div>
+                        {:else}
+                            <p class="text-sm text-[#555] italic">No transcript available.</p>
+                        {/if}
+                    </div>
+                    <!-- Voicemail actions -->
+                    <div class="p-4 border-t border-[var(--c-border)] flex gap-2 flex-shrink-0">
+                        {#if selected.remoteNumber}
+                            <a href="/phone?number={encodeURIComponent(selected.remoteNumber)}"
+                                class="rounded-lg bg-[var(--call)] text-[var(--call-ink)] px-4 py-2 text-xs font-semibold hover:bg-[var(--call-hi)] transition-colors flex items-center gap-1.5"><Icon name="phone" size={14} /> Call back</a>
+                        {/if}
+                        {#if selected.contactId}
+                            <a href="/contacts/{selected.contactId}" class="rounded-lg border border-[var(--c-border-subtle)] text-[#888] px-4 py-2 text-xs font-medium hover:text-white transition-colors">View contact</a>
+                        {/if}
+                    </div>
+                {:else}
                 <!-- Messages -->
                 <div class="flex-1 overflow-y-auto p-4 space-y-2" bind:this={messagesEl}>
                     {#if loadingMessages}
@@ -375,6 +447,7 @@
                             {sending ? 'Sending…' : 'Send'}
                         </button>
                     </div>
+                {/if}
                 {/if}
             {/if}
         </div>

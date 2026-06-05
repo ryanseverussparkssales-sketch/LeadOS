@@ -9,7 +9,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 	if (!['free', 'pro', 'agency'].includes(tier)) throw error(400, 'tier must be free | pro | agency');
 
 	const { error: e } = await supabaseAdmin
-		.from('settings')
+		.from('user_settings')
 		.upsert(
 			{ user_id: params.id, subscription_tier: tier, updated_at: new Date().toISOString() },
 			{ onConflict: 'user_id' }

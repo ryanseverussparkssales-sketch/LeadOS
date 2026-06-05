@@ -33,5 +33,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		title: scraped.raw_title ?? null,
 		status: 'active',
 	}).select().single();
-	return json({ success: true });
+
+	// Mark the scraped row as added so the "Added" state survives a reload.
+	if (contact) {
+		await supabaseAdmin.from('scraped_contacts')
+			.update({ status: 'added', contact_id: contact.id }).eq('id', scrapedId);
+	}
+	return json({ success: true, contactId: contact?.id });
 };
