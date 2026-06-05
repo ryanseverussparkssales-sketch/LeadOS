@@ -193,7 +193,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const base = event.url.origin.replace('http://', 'https://');
 
 			const { data: phoneRec } = await supabaseAdmin
-				.from('phone_numbers').select('id, user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
+				.from('phone_numbers').select('id, user_id, assigned_user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
 				.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
 
 			// Record the inbound call so its recording/transcript can be correlated by
@@ -225,11 +225,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 			if (phoneRec) {
 				const ringTimeout = phoneRec.ring_timeout_seconds ?? 25;
-				// Ring the browsers registered under THIS number's account — a per-account
-				// identity, so an inbound call can never cross into another tenant's browser.
-				const { getTwilioCreds, resolveClientIdentity } = await import('$lib/server/twilio');
-				const numberCreds = await getTwilioCreds(phoneRec.user_id);
-				const clientIdentity = resolveClientIdentity(numberCreds);
+				const { clientIdentityForUser } = await import('$lib/server/twilio');
+
+				// Per-rep routing: ring the assigned rep's browser only. If the number has
+				// no assigned rep, ring a group — the owner plus all active team members —
+				// and the first to answer wins.
+				let targets: string[];
+				if (phoneRec.assigned_user_id) {
+					targets = [clientIdentityForUser(phoneRec.assigned_user_id)];
+				} else {
+					const { data: reps } = await supabaseAdmin
+						.from('team_members')
+						.select('member_user_id')
+						.eq('owner_user_id', phoneRec.user_id)
+						.eq('status', 'active')
+						.not('member_user_id', 'is', null);
+					const ids = new Set<string>([phoneRec.user_id]);
+					for (const r of reps ?? []) if (r.member_user_id) ids.add(r.member_user_id);
+					targets = [...ids].map(clientIdentityForUser);
+				}
 
 				if (phoneRec.forwarding_enabled && phoneRec.forwarding_number) {
 					// Forward to external number
@@ -241,8 +255,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 					});
 					dial.number(phoneRec.forwarding_number);
 				} else {
-					// Ring the browser app (WebRTC client) first
-					// action fires if client doesn't answer → goes to voicemail
+					// Ring the targeted browser(s). Multiple <Client> nouns ring together;
+					// action fires if nobody answers → goes to voicemail.
 					const dial = twiml.dial({
 						timeout: ringTimeout,
 						action: base + '/api/phone/forward-status',
@@ -251,7 +265,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 						recordingStatusCallback: base + '/api/twilio/recording',
 						recordingStatusCallbackMethod: 'POST',
 					} as any);
-					dial.client(clientIdentity);
+					for (const t of targets) dial.client(t);
 				}
 			} else {
 				// Number not in DB — ring browser with default identity

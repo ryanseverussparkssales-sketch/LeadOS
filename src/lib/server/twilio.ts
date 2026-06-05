@@ -106,17 +106,17 @@ export async function getTwilioCreds(userId: string): Promise<TwilioCreds> {
 }
 
 /**
- * The Twilio client identity a tenant's browsers register as — and that inbound
- * calls dial. Must be UNIQUE per account: the legacy shared default ('agent') made
- * `client:agent` ambiguous platform-wide, so one tenant's call could ring another
- * tenant's browser. We derive a per-account identity from the owner id; an owner who
- * deliberately set a custom (non-default) identity keeps it. Browsers within one
- * account share this identity and ring together as a group.
+ * The Twilio client identity a SPECIFIC user's browser registers as — and that
+ * inbound calls dial to reach that one user. Per-user (not per-account) so a call
+ * can be targeted to a single assigned rep. Each rep in an agency registers under
+ * their own `user_<id>`; the inbound webhook dials the assigned rep's identity, or
+ * rings the owner + all active reps as a group when a number has no assignment.
+ *
+ * (Was previously per-account `acct_<ownerId>`, which fixed cross-tenant collisions
+ * but rang every browser on the account — too coarse for per-rep routing.)
  */
-export function resolveClientIdentity(creds: TwilioCreds): string {
-	const configured = creds.clientIdentity;
-	if (configured && configured !== 'agent') return configured;
-	return `acct_${creds.ownerId}`;
+export function clientIdentityForUser(userId: string): string {
+	return `user_${userId}`;
 }
 
 /**

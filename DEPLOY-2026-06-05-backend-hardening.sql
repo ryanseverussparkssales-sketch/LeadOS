@@ -76,6 +76,15 @@ CREATE INDEX IF NOT EXISTS payouts_member_idx ON payouts(team_member_id);
 CREATE INDEX IF NOT EXISTS payouts_call_idx   ON payouts(call_id);
 
 
+-- ── 2d. Per-rep call routing ────────────────────────────────────────────────
+-- A phone number can be assigned to one team member; inbound calls then ring only
+-- that rep's browser (identity user_<id>). NULL = ring the owner + all active reps
+-- as a group. Read by hooks.server.ts /api/phone/incoming.
+ALTER TABLE phone_numbers
+  ADD COLUMN IF NOT EXISTS assigned_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS phone_numbers_assigned_idx ON phone_numbers(assigned_user_id);
+
+
 -- ── 3. Payout double-pay guard ──────────────────────────────────────────────
 -- The payouts approval route reserves a row per (call_id, team_member_id) BEFORE
 -- moving money and relies on this unique index as the concurrency gate: a racing

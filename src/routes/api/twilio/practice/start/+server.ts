@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import { getUserTier } from '$lib/server/tier';
-import { getTwilioCreds, resolveClientIdentity } from '$lib/server/twilio';
+import { getTwilioCreds, clientIdentityForUser } from '$lib/server/twilio';
 import { env } from '$env/dynamic/private';
 import twilio from 'twilio';
 import type { RequestHandler } from './$types';
@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
 	const { persona, from } = await request.json() as { persona?: string; from?: string };
 	const personaId = (persona || 'default').replace(/[^a-z_]/gi, '').slice(0, 40) || 'default';
-	const identity = resolveClientIdentity(creds);
+	const identity = clientIdentityForUser(user.id);
 	const fromNumber = from || creds.phoneNumber;
 	if (!fromNumber) throw error(400, 'No "from" number available.');
 

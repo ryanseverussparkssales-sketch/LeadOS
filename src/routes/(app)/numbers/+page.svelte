@@ -60,8 +60,19 @@
 		smsEnabled?: boolean;
 		voicemailEnabled?: boolean;
 		ringTimeout?: number;
+		assignedUserId?: string;
 	}>({});
 	let savingNumSettings = $state(false);
+
+	// Team members available to receive calls (those with a linked login). Used to
+	// assign a number to one rep — inbound calls then ring only that rep's browser.
+	let teamMembers = $state<{ id: string; member_user_id: string | null; member_email: string; member_name?: string | null; status: string }[]>([]);
+	const assignableReps = $derived(teamMembers.filter(m => m.member_user_id && m.status === 'active'));
+
+	async function loadTeam() {
+		const r = await apiFetch('/api/team');
+		if (r.ok) teamMembers = await r.json();
+	}
 
 	function openNumSettings(num: PhoneNumber) {
 		expandedNumId = num.id;
@@ -72,6 +83,7 @@
 			smsEnabled: (num as any).sms_enabled ?? true,
 			voicemailEnabled: (num as any).voicemail_enabled ?? true,
 			ringTimeout: (num as any).ring_timeout_seconds ?? 20,
+			assignedUserId: (num as any).assigned_user_id ?? '',
 		};
 	}
 
@@ -86,6 +98,7 @@
 				sms_enabled: editingNum.smsEnabled,
 				voicemail_enabled: editingNum.voicemailEnabled,
 				ring_timeout_seconds: editingNum.ringTimeout,
+				assigned_user_id: editingNum.assignedUserId || null,
 			}),
 		});
 		if (res.ok) {
@@ -173,6 +186,7 @@
 		loading = false;
 
 		loadA2PStatus();
+		loadTeam();
 	});
 
 	async function addNumber() {
@@ -746,6 +760,20 @@
 											<label class="text-xs text-[#555] block mb-1">Ring Timeout (seconds)</label>
 											<input type="number" bind:value={editingNum.ringTimeout} min="10" max="60"
 												class="w-24 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
+										</div>
+										<!-- Per-rep routing: which rep's browser this number rings -->
+										<div>
+											<label class="text-xs text-[#555] block mb-1">Assigned rep</label>
+											<select bind:value={editingNum.assignedUserId}
+												class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
+												<option value="">Whole team (ring everyone)</option>
+												{#each assignableReps as rep}
+													<option value={rep.member_user_id}>{rep.member_name || rep.member_email}</option>
+												{/each}
+											</select>
+											<p class="text-[10px] text-[#444] mt-1">
+												{editingNum.assignedUserId ? 'Inbound calls ring only this rep.' : 'Inbound calls ring the owner and all active reps; first to answer wins.'}
+											</p>
 										</div>
 										<!-- Voicemail greeting section -->
 									<div class="space-y-3">
