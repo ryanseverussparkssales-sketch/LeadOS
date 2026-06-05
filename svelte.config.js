@@ -17,11 +17,14 @@ const config = {
 	kit: {
 		adapter: adapter(),
 
-		// CSRF: Twilio webhooks arrive from api.twilio.com so we can't enforce same-origin.
-		// All API routes are protected by requireAuth() making framework CSRF redundant.
+		// CSRF: Twilio webhooks are server-to-server POSTs with NO Origin header, so
+		// `trustedOrigins` can't allow them (it only matches a present Origin) — that
+		// caused "Cross-site POST form submissions are forbidden" (HTTP 403 → Twilio 11200)
+		// on /api/twilio/* callbacks. Disable the framework origin check; these endpoints
+		// are protected by Twilio signature verification (hooks.server.ts) and every other
+		// API route by requireAuth() Bearer-token auth, so same-origin checking is redundant.
 		csrf: {
-			// Migrated from deprecated checkOrigin: false
-			trustedOrigins: ['https://api.twilio.com', 'https://webhooks.twilio.com'],
+			checkOrigin: false,
 		},
 	},
 };
