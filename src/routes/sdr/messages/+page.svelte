@@ -11,7 +11,7 @@
 	});
 </script>
 
-<svelte:head><title>Messages — RogueOS SDR</title></svelte:head>
+<svelte:head><title>Messages — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-hidden">
 	<Inbox currentUserRole="sdr" currentUserName={userName} showNewChannel={false} />

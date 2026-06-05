@@ -12,7 +12,7 @@ function generateICS(opts: {
 	return [
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
-		'PRODID:-//RogueOS//EN',
+		'PRODID:-//Edelhaus//EN',
 		'METHOD:REQUEST',
 		'BEGIN:VEVENT',
 		`UID:${opts.uid}@leados`,
@@ -114,7 +114,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const contactName = (appt.contact as any)?.name ?? 'Contact';
 
 				const ics = [
-					'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//RogueOS//EN','METHOD:REQUEST',
+					'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Edelhaus//EN','METHOD:REQUEST',
 					'BEGIN:VEVENT',
 					`UID:${appt.id}@leados`,
 					`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').split('.')[0]}Z`,

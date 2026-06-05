@@ -131,7 +131,7 @@
 
 			<!-- Footer -->
 			<div class="px-5 py-3 border-t border-[#1e1e1e]">
-				<p class="text-[10px] text-[#333]">Press ? to open this panel · Version: RogueOS MVP</p>
+				<p class="text-[10px] text-[#333]">Press ? to open this panel · Version: Edelhaus MVP</p>
 			</div>
 		</div>
 	</div>

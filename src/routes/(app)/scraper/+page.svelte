@@ -172,8 +172,8 @@
 <div class="wrap">
 	<header class="head">
 		<div>
-			<h1 class="font-display title">RogueScraper</h1>
-			<p class="sub">Pull leads into RogueOS — geo-targeted Places search, single pages, or open-web keyword sweeps.</p>
+			<h1 class="font-display title">Edelhaus Scraper</h1>
+			<p class="sub">Pull leads into Edelhaus — geo-targeted Places search, single pages, or open-web keyword sweeps.</p>
 		</div>
 		<button class="btn ghost" onclick={exportCsv} disabled={totalShown === 0}>Export CSV</button>
 	</header>

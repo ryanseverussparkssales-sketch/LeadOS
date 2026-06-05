@@ -53,7 +53,7 @@
 	}
 </script>
 
-<svelte:head><title>Automations — RogueOS</title></svelte:head>
+<svelte:head><title>Automations — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">

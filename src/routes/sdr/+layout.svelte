@@ -96,7 +96,7 @@
 	});
 </script>
 
-<svelte:head><title>RogueOS — SDR</title></svelte:head>
+<svelte:head><title>Edelhaus — SDR</title></svelte:head>
 
 {#if loading}
 	<div class="flex items-center justify-center h-screen bg-[#0a0a0a]">
@@ -105,7 +105,7 @@
 {:else}
 {#snippet sidebarInner()}
 	<div class="px-4 py-5 border-b border-[#1e1e1e]">
-		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:13px;letter-spacing:.28em;color:#fff">ROGUEOS</p>
+		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:13px;letter-spacing:.28em;color:#fff">EDELHAUS</p>
 		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:8px;letter-spacing:.18em;color:#2a2a2a;margin-top:2px">SDR PORTAL</p>
 	</div>
 
@@ -145,7 +145,7 @@
 		<div class="md:hidden flex items-center gap-3 px-4 py-2.5 border-b border-[#111] bg-[#050505] shrink-0">
 			<button onclick={() => sidebarOpen = true} aria-label="Open menu"
 				class="p-1 rounded text-[#888] hover:text-white transition-colors">☰</button>
-			<span class="text-xs font-bold tracking-widest text-[#f5f5f5]">ROGUEOS · SDR</span>
+			<span class="text-xs font-bold tracking-widest text-[#f5f5f5]">EDELHAUS · SDR</span>
 		</div>
 
 		<!-- Today's stats strip -->

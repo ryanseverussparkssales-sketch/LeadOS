@@ -252,7 +252,7 @@
 	}
 </script>
 
-<svelte:head><title>Team — RogueOS</title></svelte:head>
+<svelte:head><title>Team — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 

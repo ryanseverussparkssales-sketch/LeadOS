@@ -6,7 +6,7 @@
     let data = $state<any>(null);
     let loading = $state(true);
     let activeTab = $state<'dashboard' | 'overview' | 'wins' | 'approvals' | 'invoices' | 'messages' | 'docs'>('dashboard');
-    let agencyName = $state('RogueLeads');
+    let agencyName = $state('Edelhaus');
 
     interface WinEntry { id: string; outcome: string; created_at: string; contact: { name: string; company: string; phone: string } | null; call_duration_seconds: number | null; summary: string | null; recording_url: string | null; raw_transcript: string | null; }
     let wins = $state<WinEntry[]>([]);

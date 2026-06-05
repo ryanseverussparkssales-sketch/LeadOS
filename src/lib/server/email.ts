@@ -111,7 +111,7 @@ async function sendViaResend(options: SendEmailOptions): Promise<EmailResult> {
     const apiKey = env.RESEND_API_KEY;
     if (!apiKey) return { success: false, error: 'RESEND_API_KEY not configured' };
 
-    const fromAddress = options.from ?? env.RESEND_FROM ?? 'RogueOS <noreply@leados.app>';
+    const fromAddress = options.from ?? env.RESEND_FROM ?? 'Edelhaus <noreply@leados.app>';
     const toArray = Array.isArray(options.to) ? options.to : [options.to];
 
     const res = await fetch('https://api.resend.com/emails', {

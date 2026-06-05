@@ -116,7 +116,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			amount: String(amount_cents),
 			currency: 'usd',
 			destination: member.stripe_connect_account_id,
-			description: `RogueOS payout — call ${call_id}`,
+			description: `Edelhaus payout — call ${call_id}`,
 			'metadata[call_id]': call_id,
 			'metadata[team_member_id]': team_member_id,
 		}),

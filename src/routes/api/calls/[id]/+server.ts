@@ -110,7 +110,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 <p>Your campaign just got a <strong>${LABELS[body.outcome] ?? 'win'}</strong>.</p>
 <p><strong>${contactRow?.name ?? 'A contact'}${contactRow?.company ? ` at ${contactRow.company}` : ''}</strong> is now in your pipeline.</p>
 <p>View all appointments and activity in your <a href="${env.PUBLIC_SITE_URL ?? 'https://lead-os-livid.vercel.app'}/client-portal">client portal →</a></p>
-<p style="color:#888;font-size:12px">— ${clientBizName} via RogueOS</p>`,
+<p style="color:#888;font-size:12px">— ${clientBizName} via Edelhaus</p>`,
 					});
 				}
 			} catch (err) {

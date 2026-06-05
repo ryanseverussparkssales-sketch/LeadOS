@@ -263,7 +263,7 @@
     }
 </script>
 
-<svelte:head><title>Inbox — RogueOS</title></svelte:head>
+<svelte:head><title>Inbox — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
     <!-- Header -->

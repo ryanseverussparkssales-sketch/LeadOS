@@ -38,7 +38,7 @@
 	}
 </script>
 
-<svelte:head><title>My Callbacks — RogueOS SDR</title></svelte:head>
+<svelte:head><title>My Callbacks — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8">
 	<div class="flex items-center justify-between mb-6">

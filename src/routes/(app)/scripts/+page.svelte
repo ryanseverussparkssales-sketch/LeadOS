@@ -263,7 +263,7 @@
 	}
 </script>
 
-<svelte:head><title>Scripts — RogueOS</title></svelte:head>
+<svelte:head><title>Scripts — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">

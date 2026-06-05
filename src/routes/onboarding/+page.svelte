@@ -74,7 +74,7 @@
 	}
 </script>
 
-<svelte:head><title>Set up RogueOS</title></svelte:head>
+<svelte:head><title>Set up Edelhaus</title></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-4">
 	<div class="w-full max-w-lg">
@@ -99,7 +99,7 @@
 		<!-- Step 0: Welcome -->
 		{#if step === 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<h1 class="text-2xl font-semibold">Welcome to RogueOS 👋</h1>
+				<h1 class="text-2xl font-semibold">Welcome to Edelhaus 👋</h1>
 				<p class="text-sm text-[#666] leading-relaxed">
 					Let's get you set up in about 3 minutes. You'll need:
 				</p>
@@ -223,7 +223,7 @@
 			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-8 text-center space-y-4">
 				<p class="text-5xl">🎉</p>
 				<h2 class="text-2xl font-semibold">You're all set</h2>
-				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">RogueOS is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
+				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">Edelhaus is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
 				<a href="/dashboard" class="inline-block rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Go to Dashboard →</a>
 			</div>
 		{/if}

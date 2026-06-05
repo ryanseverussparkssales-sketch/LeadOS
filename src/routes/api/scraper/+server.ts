@@ -19,11 +19,15 @@ export const GET: RequestHandler = async ({ request }) => {
 };
 
 // POST: scrape a URL, extract from screenshot, enrich, search, streamer lookup, or CSV import
+// Modes that actually call a model — only these are tier-gated. Geo (Google Places)
+// and CSV import/preview don't use AI, so they're available to every plan.
+const AI_MODES = new Set(['web', 'screenshot', 'enrich', 'search', 'streamer']);
+
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
-	await assertAiAccess(user.id);
 	const body = await request.json();
 	const { mode, url, imageBase64, imageType, contactId, contactName, contactTitle, contactCompany } = body;
+	if (AI_MODES.has(mode)) await assertAiAccess(user.id);
 
 	// ── MODE: web ────────────────────────────────────────────────────────────
 	if (mode === 'web') {
@@ -31,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		let html = '';
 		try {
 			const res = await safeFetch(url, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RogueOS/1.0)' },
+				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Edelhaus/1.0)' },
 				signal: AbortSignal.timeout(10000),
 			});
 			html = (await res.text()).slice(0, 50000);
@@ -186,7 +190,7 @@ Return ONLY the JSON.`;
 		let searchHtml = '';
 		try {
 			const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query + ' contact phone')}`, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RogueOS/1.0)' },
+				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Edelhaus/1.0)' },
 				signal: AbortSignal.timeout(10000),
 			});
 			searchHtml = await ddgRes.text();

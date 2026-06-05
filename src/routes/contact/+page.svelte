@@ -42,21 +42,21 @@
 	}
 </script>
 
-<svelte:head><title>Hire SDRs — RogueOS by RogueLeads</title>
-	<meta property="og:title" content="Hire SDRs — RogueLeads" />
+<svelte:head><title>Hire SDRs — Edelhaus</title>
+	<meta property="og:title" content="Hire SDRs — Edelhaus" />
 	<meta property="og:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="RogueOS" />
+	<meta property="og:site_name" content="Edelhaus" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Hire SDRs — RogueLeads" />
+	<meta name="twitter:title" content="Hire SDRs — Edelhaus" />
 	<meta name="twitter:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" /></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white">
 
 	<nav class="border-b border-[#1a1a1a] px-8 py-5 flex items-center justify-between">
-		<a href="/" class="font-semibold">RogueOS</a>
+		<a href="/" class="font-semibold">Edelhaus</a>
 		<div class="flex items-center gap-5">
 			<a href="/?mode=login" class="text-xs text-[#555] hover:text-white transition-colors">Log in</a>
 		</div>
@@ -66,7 +66,7 @@
 
 		<!-- Hero -->
 		<div class="text-center mb-16">
-			<p class="text-xs text-[#444] uppercase tracking-widest mb-4">RogueLeads</p>
+			<p class="text-xs text-[#444] uppercase tracking-widest mb-4">Edelhaus</p>
 			<h1 class="text-5xl font-bold tracking-tight mb-5">Hire vetted SDRs.<br/><span class="text-[#444]">Pay per appointment.</span></h1>
 			<p class="text-[#555] text-lg max-w-xl mx-auto leading-relaxed">
 				We source, screen, and manage sales reps for your outbound campaigns.
@@ -215,6 +215,6 @@
 	</div>
 
 	<footer class="border-t border-[#1a1a1a] px-8 py-6 text-center">
-		<p class="text-xs text-[#333]">RogueOS · RogueLeads · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
+		<p class="text-xs text-[#333]">Edelhaus · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
 	</footer>
 </div>

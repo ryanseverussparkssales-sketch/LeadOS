@@ -87,7 +87,7 @@
 	const totalPay = $derived(monthlyBase + bonusEarned);
 </script>
 
-<svelte:head><title>My Performance — RogueOS SDR</title></svelte:head>
+<svelte:head><title>My Performance — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8">
 	<h2 class="text-white text-lg font-semibold mb-6">My Performance</h2>

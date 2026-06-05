@@ -226,7 +226,7 @@
 	);
 </script>
 
-<svelte:head><title>Dashboard — RogueOS</title></svelte:head>
+<svelte:head><title>Dashboard — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<!-- Header -->

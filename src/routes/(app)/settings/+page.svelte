@@ -311,7 +311,7 @@
 	const SETTINGS_BACKED = new Set(['profile','agency','appearance','calling','communication','voice','contacts','productivity','widgets','notifications','data']);
 </script>
 
-<svelte:head><title>Settings — RogueOS</title></svelte:head>
+<svelte:head><title>Settings — Edelhaus</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 	<!-- Left sidebar nav -->
@@ -812,7 +812,7 @@
 		<!-- ── TOKENS ──────────────────────────────────────── -->
 		{:else if section === 'tokens'}
 			<h2 class="text-white text-sm font-medium mb-6">API Tokens</h2>
-			<p class="text-xs text-[#555]">Tokens let external tools access RogueOS via API.</p>
+			<p class="text-xs text-[#555]">Tokens let external tools access Edelhaus via API.</p>
 			<div class="flex gap-3">
 				<input bind:value={newTokenName} placeholder="Token name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<button onclick={createToken} disabled={creatingToken || !newTokenName.trim()} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Create</button>

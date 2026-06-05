@@ -139,7 +139,7 @@ export const GET = async ({ request }: { request: Request }) => {
   <a href="${env.PUBLIC_SITE_URL ?? 'https://lead-os-livid.vercel.app'}/client-portal" class="cta">View Full Report →</a>
 
   <div class="footer">
-    Sent by ${owner.agency_name ?? 'RogueOS'} · <a href="${env.PUBLIC_SITE_URL ?? ''}/client-portal" style="color:#aaa">View portal</a>
+    Sent by ${owner.agency_name ?? 'Edelhaus'} · <a href="${env.PUBLIC_SITE_URL ?? ''}/client-portal" style="color:#aaa">View portal</a>
   </div>
 </div>
 </body>

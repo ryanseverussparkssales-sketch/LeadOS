@@ -82,7 +82,7 @@
 					</div>
 					<span class="text-xs text-[#555]">{completedCount}/{items.length} complete</span>
 				</div>
-				<span class="text-xs text-white font-medium">Get RogueOS set up</span>
+				<span class="text-xs text-white font-medium">Get Edelhaus set up</span>
 				<span class="text-[10px] text-[#444]">{expanded ? '▲' : '▼'}</span>
 			</button>
 			<button onclick={dismiss} class="text-[#333] hover:text-white text-xs ml-4">Dismiss</button>

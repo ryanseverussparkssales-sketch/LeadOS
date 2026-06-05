@@ -181,7 +181,7 @@
 				>
 					☰
 				</button>
-				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">ROGUEOS</span>
+				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">EDELHAUS</span>
 			</div>
 
 			<OnboardingChecklist />

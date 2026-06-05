@@ -66,6 +66,40 @@
 		window.location.href = '/dashboard';
 	}
 
+	// ── Create account ──────────────────────────────────────────────────────────
+	let showCreate = $state(false);
+	let creating = $state(false);
+	let form = $state<{ type: 'agency' | 'rep' | 'admin'; email: string; password: string; name: string; agencyName: string; ownerUserId: string; tier: string }>({
+		type: 'agency', email: '', password: '', name: '', agencyName: '', ownerUserId: '', tier: 'agency',
+	});
+
+	async function createAccount() {
+		if (!form.email || !form.password) { toastError('Email and password are required'); return; }
+		if (form.password.length < 8) { toastError('Password must be at least 8 characters'); return; }
+		if (form.type === 'rep' && !form.ownerUserId) { toastError('Pick the agency this rep belongs to'); return; }
+		creating = true;
+		const res = await apiFetch('/api/admin/accounts/create', {
+			method: 'POST',
+			body: JSON.stringify({
+				type: form.type, email: form.email.trim(), password: form.password,
+				name: form.name.trim() || undefined, agencyName: form.agencyName.trim() || undefined,
+				ownerUserId: form.ownerUserId || undefined, tier: form.tier,
+			}),
+		});
+		if (res.ok) {
+			toastSuccess(`${form.type.charAt(0).toUpperCase() + form.type.slice(1)} account created`);
+			showCreate = false;
+			form = { type: 'agency', email: '', password: '', name: '', agencyName: '', ownerUserId: '', tier: 'agency' };
+			const [aRes, mRes] = await Promise.all([apiFetch('/api/admin/accounts'), apiFetch('/api/admin/metrics')]);
+			if (aRes.ok) accounts = (await aRes.json()).accounts ?? [];
+			if (mRes.ok) metrics = await mRes.json();
+		} else {
+			const e = await res.json().catch(() => ({}));
+			toastError(e.message ?? 'Could not create account');
+		}
+		creating = false;
+	}
+
 	function fmtDate(d: string | null) {
 		if (!d) return '—';
 		return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -77,7 +111,7 @@
 	};
 </script>
 
-<svelte:head><title>Platform Admin — RogueOS</title></svelte:head>
+<svelte:head><title>Platform Admin — Edelhaus</title></svelte:head>
 
 <div class="h-full overflow-y-auto">
 	{#if loading}
@@ -91,7 +125,7 @@
 	{:else}
 		<div class="max-w-6xl mx-auto px-6 py-8 space-y-8">
 			<div>
-				<h1 class="text-2xl font-bold text-white">RogueOS Admin</h1>
+				<h1 class="text-2xl font-bold text-white">Edelhaus Admin</h1>
 				<p class="text-[#555] text-sm mt-1">Master view across every agency account on the platform.</p>
 			</div>
 
@@ -118,10 +152,16 @@
 
 			<!-- Accounts -->
 			<div class="space-y-3">
-				<div class="flex items-center justify-between">
+				<div class="flex items-center justify-between gap-3">
 					<h2 class="text-sm font-semibold text-white uppercase tracking-widest">Agency Accounts ({filtered.length})</h2>
-					<input bind:value={search} placeholder="Search email or agency…"
-						class="w-64 rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-1.5 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+					<div class="flex items-center gap-2">
+						<input bind:value={search} placeholder="Search email or agency…"
+							class="w-56 rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-1.5 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+						<button onclick={() => showCreate = true}
+							class="rounded-lg bg-[var(--call)] text-[var(--call-ink)] px-3 py-1.5 text-sm font-semibold hover:bg-[var(--call-hi)] transition-colors flex items-center gap-1.5 whitespace-nowrap">
+							<Icon name="plus" size={14} /> New Account
+						</button>
+					</div>
 				</div>
 
 				<div class="rounded-xl border border-[#2a2a2a] overflow-hidden">
@@ -167,6 +207,59 @@
 						</tbody>
 					</table>
 				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Create account modal -->
+	{#if showCreate}
+		<div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4" role="presentation" onclick={() => !creating && (showCreate = false)}>
+			<div class="w-full max-w-md rounded-2xl border border-[#2a2a2a] bg-[#0d0d0d] p-6 space-y-4" role="dialog" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={() => {}}>
+				<div class="flex items-center justify-between">
+					<h3 class="text-white font-semibold">New account</h3>
+					<button onclick={() => showCreate = false} aria-label="Close" class="text-[#555] hover:text-white"><Icon name="x" size={16} /></button>
+				</div>
+
+				<div class="grid grid-cols-3 gap-2">
+					{#each [['agency','Agency'],['rep','Rep'],['admin','Admin']] as [val,label]}
+						<button onclick={() => form.type = val as 'agency' | 'rep' | 'admin'}
+							class="rounded-lg border px-3 py-2 text-xs font-medium transition-colors {form.type === val ? 'border-[var(--call)] bg-[var(--call)]/12 text-[var(--call)]' : 'border-[#2a2a2a] text-[#888] hover:text-white'}">{label}</button>
+					{/each}
+				</div>
+
+				<input bind:value={form.email} type="email" placeholder="Email *"
+					class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+				<input bind:value={form.password} type="text" placeholder="Temp password (min 8) *"
+					class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+				<input bind:value={form.name} placeholder="Name (optional)"
+					class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+
+				{#if form.type === 'agency' || form.type === 'admin'}
+					<input bind:value={form.agencyName} placeholder="Agency name"
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none" />
+				{/if}
+				{#if form.type === 'agency'}
+					<select bind:value={form.tier} class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white focus:outline-none">
+						<option value="agency">agency plan</option>
+						<option value="pro">pro plan</option>
+						<option value="free">free plan</option>
+					</select>
+				{/if}
+				{#if form.type === 'rep'}
+					<select bind:value={form.ownerUserId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white focus:outline-none">
+						<option value="">Assign to agency… *</option>
+						{#each owners as o}
+							<option value={o.id}>{o.agency_name || o.email}</option>
+						{/each}
+					</select>
+				{/if}
+
+				<p class="text-[10px] text-[#555] leading-relaxed">They sign in with this email + temp password. {form.type === 'admin' ? 'Admins get the Edelhaus Admin dashboard and unlimited access.' : form.type === 'rep' ? 'Reps appear under the chosen agency and can be assigned numbers.' : 'Creates a fresh agency workspace.'}</p>
+
+				<button onclick={createAccount} disabled={creating}
+					class="w-full rounded-lg bg-[var(--call)] text-[var(--call-ink)] py-2.5 text-sm font-semibold hover:bg-[var(--call-hi)] disabled:opacity-50 transition-colors">
+					{creating ? 'Creating…' : 'Create account'}
+				</button>
 			</div>
 		</div>
 	{/if}

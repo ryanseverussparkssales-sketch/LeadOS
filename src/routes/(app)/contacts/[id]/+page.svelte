@@ -438,7 +438,7 @@
 	}
 </script>
 
-<svelte:head><title>{contact?.name ?? 'Contact'} — RogueOS</title></svelte:head>
+<svelte:head><title>{contact?.name ?? 'Contact'} — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	{#if loading}

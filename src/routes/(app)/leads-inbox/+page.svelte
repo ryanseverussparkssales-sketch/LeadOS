@@ -379,7 +379,7 @@
 	const allLeadsSelected = $derived(selectedSource === null);
 </script>
 
-<svelte:head><title>Lead Inbox — RogueOS</title></svelte:head>
+<svelte:head><title>Lead Inbox — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
 	<!-- Header -->

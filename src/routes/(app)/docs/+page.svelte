@@ -144,7 +144,7 @@
 	}
 </script>
 
-<svelte:head><title>Docs — RogueOS</title></svelte:head>
+<svelte:head><title>Docs — Edelhaus</title></svelte:head>
 
 {#if showAssignModal}
 	<FileAssignModal files={pendingFiles} onclose={() => { showAssignModal = false; pendingFiles = []; }} onsaved={onDocsSaved} />

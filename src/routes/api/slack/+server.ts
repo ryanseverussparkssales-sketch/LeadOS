@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const payload = {
 		text,
 		channel: channel ?? slackConfig.default_channel ?? '#general',
-		username: username ?? 'RogueOS',
+		username: username ?? 'Edelhaus',
 		icon_emoji: iconEmoji ?? ':telephone_receiver:',
 	};
 

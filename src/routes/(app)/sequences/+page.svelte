@@ -59,7 +59,7 @@
 	const TRIGGER_LABELS: Record<string,string> = { manual:'Manual', lead_arrived:'Lead Arrived', call_completed:'Call Completed', callback_outcome:'Callback Outcome' };
 </script>
 
-<svelte:head><title>Sequences — RogueOS</title></svelte:head>
+<svelte:head><title>Sequences — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">

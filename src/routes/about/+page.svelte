@@ -1,22 +1,22 @@
 <svelte:head>
-	<title>About — RogueLeads</title>
-	<meta property="og:title" content="About — RogueLeads" />
-	<meta property="og:description" content="We built the outreach infrastructure we needed ourselves. RogueOS is our platform. RogueLeads is our agency." />
+	<title>About — Edelhaus</title>
+	<meta property="og:title" content="About — Edelhaus" />
+	<meta property="og:description" content="We built the outreach infrastructure we needed ourselves. Edelhaus is the platform behind our agency." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="RogueOS" />
+	<meta property="og:site_name" content="Edelhaus" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="About — RogueLeads" />
-	<meta name="twitter:description" content="We built the outreach infrastructure we needed ourselves. RogueOS is our platform. RogueLeads is our agency." />
+	<meta name="twitter:title" content="About — Edelhaus" />
+	<meta name="twitter:description" content="We built the outreach infrastructure we needed ourselves. Edelhaus is the platform behind our agency." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" />
-	<meta name="description" content="We built the outreach infrastructure we wish existed. RogueOS is our platform. RogueLeads is our agency. Here's the story." />
+	<meta name="description" content="We built the outreach infrastructure we wish existed. Edelhaus is the platform behind our agency. Here's the story." />
 </svelte:head>
 
 <div class="min-h-screen bg-[#000] text-white" style="font-family:var(--font-ui,'Inter',system-ui,sans-serif)">
 
 	<!-- Nav -->
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
-		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">ROGUEOS</a>
+		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">EDELHAUS</a>
 		<div class="flex items-center gap-6">
 			<a href="/pricing" class="text-xs text-[#444] hover:text-white transition-colors">Pricing</a>
 			<a href="/contact" class="text-xs text-[#444] hover:text-white transition-colors">Contact</a>
@@ -32,7 +32,7 @@
 			<span style="font-style:italic;color:#444">we needed ourselves.</span>
 		</h1>
 		<p class="text-sm text-[#555] leading-relaxed max-w-2xl">
-			RogueLeads is a managed outreach agency. RogueOS is the platform we built to run it. Both are available to you — together or separately.
+			Edelhaus is a managed outreach agency. Edelhaus is the platform we built to run it. Both are available to you — together or separately.
 		</p>
 	</div>
 
@@ -50,14 +50,14 @@
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">What we built</p>
 				<p class="text-sm text-[#666] leading-relaxed">
-					RogueOS started as an internal tool for managing our own SDR team. It needed three things no single platform offered: a fast, AI-enhanced dialer for reps, a transparent client portal that builds trust without weekly report calls, and an agency command center that gives one person full operational visibility across every campaign and client simultaneously.
+					Edelhaus started as an internal tool for managing our own SDR team. It needed three things no single platform offered: a fast, AI-enhanced dialer for reps, a transparent client portal that builds trust without weekly report calls, and an agency command center that gives one person full operational visibility across every campaign and client simultaneously.
 				</p>
 			</div>
 
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">Where we are now</p>
 				<p class="text-sm text-[#666] leading-relaxed">
-					RogueLeads operates outbound campaigns for brands in home improvement, B2B services, and adjacent verticals. We run appointment-setting and lead rejuvenation programs, performance-based and retainer models. RogueOS is the infrastructure behind every campaign we run — and now it's available to other teams and agencies too.
+					Edelhaus operates outbound campaigns for brands in home improvement, B2B services, and adjacent verticals. We run appointment-setting and lead rejuvenation programs, performance-based and retainer models. Edelhaus is the infrastructure behind every campaign we run — and now it's available to other teams and agencies too.
 				</p>
 			</div>
 		</div>
@@ -120,9 +120,9 @@
 				<div class="w-12 h-12 rounded-xl border border-[#1a1a1a] bg-[#080808] flex items-center justify-center text-lg font-semibold text-[#444] shrink-0">R</div>
 				<div>
 					<p class="text-white font-medium mb-0.5">Ryan Sparks</p>
-					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.14em;color:#333;margin-bottom:10px">RogueLeads · RogueOS</p>
+					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.14em;color:#333;margin-bottom:10px">Edelhaus</p>
 					<p class="text-xs text-[#444] leading-relaxed max-w-lg">
-						Sales professional, actor, writer, and builder. Spent years doing outbound the hard way before deciding to build the tool that should have existed. RogueOS runs every campaign we run — which means every bug matters and every feature has to earn its place.
+						Sales professional, actor, writer, and builder. Spent years doing outbound the hard way before deciding to build the tool that should have existed. Edelhaus runs every campaign we run — which means every bug matters and every feature has to earn its place.
 					</p>
 					<div class="flex items-center gap-4 mt-4">
 						<a href="mailto:ryanseverussparkssales@gmail.com" class="text-[10px] text-[#333] hover:text-white transition-colors">Email</a>
@@ -152,14 +152,14 @@
 
 	<!-- Footer -->
 	<div class="border-t border-[#0a0a0a] px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4 max-w-5xl mx-auto">
-		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">ROGUEOS</span>
+		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">EDELHAUS</span>
 		<div class="flex items-center gap-6 text-[10px] text-[#2a2a2a]">
 			<a href="/pricing" class="hover:text-white transition-colors">Pricing</a>
 			<a href="/terms" class="hover:text-white transition-colors">Terms</a>
 			<a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
 			<a href="/contact" class="hover:text-white transition-colors">Contact</a>
 		</div>
-		<span class="text-[10px] text-[#1a1a1a]">© 2026 RogueLeads</span>
+		<span class="text-[10px] text-[#1a1a1a]">© 2026 Edelhaus</span>
 	</div>
 
 </div>

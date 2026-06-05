@@ -29,7 +29,7 @@ ${additionalContext ? `Additional context: ${additionalContext}` : ''}
 Return ONLY valid JSON with this exact structure:
 {
   "title": "Script name based on product and persona",
-  "opener": "REQUIRED: Begin with 'Hey [name], this is [your name] with RogueLeads — quick heads up, this call is being recorded for training purposes.' Then 1-2 natural sentences with a pattern interrupt.",
+  "opener": "REQUIRED: Begin with 'Hey [name], this is [your name] with Edelhaus — quick heads up, this call is being recorded for training purposes.' Then 1-2 natural sentences with a pattern interrupt.",
   "elevatorPitch": "30-second pitch if they ask who you are/what you do. Outcome-focused.",
   "discovery": "3-4 open-ended discovery questions to understand their situation and pain.",
   "closing": "How to close the call — book meeting, send info, or get callback. Specific language.",

@@ -99,7 +99,7 @@
 	}
 </script>
 
-<svelte:head><title>AI Interview — RogueOS SDR</title></svelte:head>
+<svelte:head><title>AI Interview — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 	<div class="mb-6">

@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Dialer — RogueOS</title>
+	<title>Dialer — Edelhaus</title>
 </svelte:head>
 
 <div class="flex flex-col flex-1 h-full">

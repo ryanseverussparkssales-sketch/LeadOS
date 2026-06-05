@@ -31,7 +31,7 @@
 	}
 </script>
 
-<svelte:head><title>Find Duplicates — RogueOS</title></svelte:head>
+<svelte:head><title>Find Duplicates — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">

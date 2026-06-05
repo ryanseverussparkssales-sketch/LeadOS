@@ -133,7 +133,7 @@
 	}
 </script>
 
-<svelte:head><title>Trash — RogueOS</title></svelte:head>
+<svelte:head><title>Trash — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto bg-[#0a0a0a]">
 	<!-- Header -->

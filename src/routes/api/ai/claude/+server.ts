@@ -18,7 +18,7 @@ export const POST = async ({ request }) => {
     const stream = await anthropic.messages.stream({
         model,
         max_tokens: 2048,
-        system: `You are Claude, a helpful AI assistant embedded in RogueOS — a sales CRM. 
+        system: `You are Claude, a helpful AI assistant embedded in Edelhaus — a sales CRM. 
 The user may ask you anything: writing help, research, brainstorming, explanations, code, math, creative work — anything.
 Be direct and concise. Use markdown formatting when it helps readability (headers, bullets, code blocks).
 Today's date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`,

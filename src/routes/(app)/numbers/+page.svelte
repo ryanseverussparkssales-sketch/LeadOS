@@ -214,14 +214,14 @@
 	}
 
 	async function deleteNumber(id: string) {
-		if (!confirm('Remove this number from RogueOS? (It will not be released from Twilio — use Release for that.)')) return;
+		if (!confirm('Remove this number from Edelhaus? (It will not be released from Twilio — use Release for that.)')) return;
 		await apiFetch(`/api/phone/numbers/${id}`, { method: 'DELETE' });
 		numbers = numbers.filter(n => n.id !== id);
 	}
 
 	async function releaseNumber(num: PhoneNumber) {
 		if (!num.twilio_phone_sid) {
-			if (!confirm(`Remove ${num.phone_number} from RogueOS? (No Twilio SID on record — will only remove from RogueOS.)`)) return;
+			if (!confirm(`Remove ${num.phone_number} from Edelhaus? (No Twilio SID on record — will only remove from Edelhaus.)`)) return;
 			await apiFetch(`/api/phone/numbers/${num.id}`, { method: 'DELETE' });
 			numbers = numbers.filter(n => n.id !== num.id);
 			return;
@@ -298,7 +298,7 @@
 			setTimeout(() => { purchaseTarget = null; }, 3500);
 		} else if (r.status === 207 && d.purchased) {
 			// Twilio purchase OK but DB save failed — auto-retry via /api/phone/numbers
-			purchaseMsg = 'Purchased from Twilio — saving to RogueOS...';
+			purchaseMsg = 'Purchased from Twilio — saving to Edelhaus...';
 			const retryRes = await apiFetch('/api/phone/numbers', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -423,7 +423,7 @@
 	}
 </script>
 
-<svelte:head><title>Phone Manager — RogueOS</title></svelte:head>
+<svelte:head><title>Phone Manager — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -568,7 +568,7 @@
 			<!-- Buy Numbers Panel -->
 			{#if showBuy}
 				<div class="border-b border-[#1e1e1e] bg-[#0a0a0a] p-6">
-					<p class="text-xs text-[#555] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with RogueOS webhooks.</p>
+					<p class="text-xs text-[#555] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with Edelhaus webhooks.</p>
 
 					<!-- Type toggle -->
 					<div class="flex gap-2 mb-4">

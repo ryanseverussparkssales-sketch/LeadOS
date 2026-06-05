@@ -110,7 +110,7 @@
 	);
 </script>
 
-<svelte:head><title>Call Review — RogueOS</title></svelte:head>
+<svelte:head><title>Call Review — Edelhaus</title></svelte:head>
 
 <div class="flex h-full overflow-hidden">
 

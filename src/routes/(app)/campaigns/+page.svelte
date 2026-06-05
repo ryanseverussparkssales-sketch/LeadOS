@@ -729,7 +729,7 @@
 	}
 </script>
 
-<svelte:head><title>Campaigns — RogueOS</title></svelte:head>
+<svelte:head><title>Campaigns — Edelhaus</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.templates-container')) showTemplates = false; }} />
 
 <div class="flex flex-col flex-1 h-full">

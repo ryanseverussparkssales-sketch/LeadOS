@@ -77,7 +77,7 @@
 				</table>
 				${invoice.scope_of_work ? `<p style="color:#666;font-style:italic;">${invoice.scope_of_work}</p>` : ''}
 				<p style="color:#666;margin-top:24px;">Thank you for your business.</p>
-				<p style="color:#999;font-size:13px;">Sent via RogueOS · ${agencyName}</p>
+				<p style="color:#999;font-size:13px;">Sent via Edelhaus · ${agencyName}</p>
 			</div>
 		`;
 
@@ -539,7 +539,7 @@
 	let tooltip = $state<{ x: number; y: number; text: string } | null>(null);
 </script>
 
-<svelte:head><title>Financials — RogueOS</title></svelte:head>
+<svelte:head><title>Financials — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 

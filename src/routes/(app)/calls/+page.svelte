@@ -93,7 +93,7 @@
 	$effect(() => { selected?.id; recordingError = false; });
 </script>
 
-<svelte:head><title>Calls — RogueOS</title></svelte:head>
+<svelte:head><title>Calls — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">

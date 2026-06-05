@@ -225,7 +225,7 @@
 
 	async function testSlack() {
 		slackTesting = true;
-		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 RogueOS test message from ${slackConfig.workspaceName || 'RogueOS'}`, channel: slackConfig.defaultChannel }) });
+		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 Edelhaus test message from ${slackConfig.workspaceName || 'Edelhaus'}`, channel: slackConfig.defaultChannel }) });
 		slackTestMsg = res.ok ? '✓ Message sent' : '✗ Failed — check webhook URL';
 		slackTesting = false;
 		setTimeout(() => slackTestMsg = '', 4000);
@@ -244,7 +244,7 @@
 	}
 </script>
 
-<svelte:head><title>Marketing — RogueOS</title></svelte:head>
+<svelte:head><title>Marketing — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 

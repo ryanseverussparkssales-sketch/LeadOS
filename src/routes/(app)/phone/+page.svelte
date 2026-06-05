@@ -561,7 +561,7 @@
 	}
 </script>
 
-<svelte:head><title>Phone — RogueOS</title></svelte:head>
+<svelte:head><title>Phone — Edelhaus</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 

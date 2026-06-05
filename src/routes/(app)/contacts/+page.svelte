@@ -270,7 +270,7 @@
 	}
 </script>
 
-<svelte:head><title>Contacts — RogueOS</title></svelte:head>
+<svelte:head><title>Contacts — Edelhaus</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.export-container')) showExport = false; }} />
 
 <div class="flex flex-col flex-1 h-full">

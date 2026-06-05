@@ -7,7 +7,7 @@
 	import LeaderboardWidget from '$lib/components/widgets/LeaderboardWidget.svelte';
 </script>
 
-<svelte:head><title>Dashboard — RogueOS SDR</title></svelte:head>
+<svelte:head><title>Dashboard — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-6">
 	<div class="max-w-5xl mx-auto">

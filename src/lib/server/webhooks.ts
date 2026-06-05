@@ -17,11 +17,11 @@ export async function deliverWebhooks(
 		const body = JSON.stringify({ event: eventType, timestamp: new Date().toISOString(), data: payload });
 		const headers: Record<string, string> = {
 			'Content-Type': 'application/json',
-			'X-RogueOS-Event': eventType,
+			'X-Edelhaus-Event': eventType,
 		};
 		if (hook.secret) {
 			const sig = createHmac('sha256', hook.secret).update(body).digest('hex');
-			headers['X-RogueOS-Signature'] = `sha256=${sig}`;
+			headers['X-Edelhaus-Signature'] = `sha256=${sig}`;
 		}
 		try {
 			await fetch(hook.url, { method: 'POST', headers, body, signal: AbortSignal.timeout(10000) });

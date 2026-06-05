@@ -1,5 +1,5 @@
 /**
- * Central widget registry for RogueOS dashboard.
+ * Central widget registry for Edelhaus dashboard.
  * To add a new widget: create the .svelte file and add one entry here.
  * The dashboard renders widgets dynamically — no if/else chain needed.
  */
@@ -212,7 +212,7 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
 	// ── TOOLS ───────────────────────────────────────────────────────────────
 	'chat': {
 		type: 'chat', label: 'AI Assistant', icon: '✦',
-		description: 'Ask RogueOS AI anything about your data',
+		description: 'Ask Edelhaus AI anything about your data',
 		component: ChatWidget, defaultCols: 1, defaultRows: 'lg',
 		category: 'tools',
 	},

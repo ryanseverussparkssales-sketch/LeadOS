@@ -4,7 +4,7 @@
 	interface Message { role: 'user' | 'assistant'; content: string; }
 
 	let messages = $state<Message[]>([
-		{ role: 'assistant', content: "Hi! I'm your RogueOS AI assistant. Ask me about your contacts, tasks, calls, pipeline, or anything in your CRM.\n\nTry: *\"How many callbacks do I have this week?\"* or *\"Show me my overdue tasks\"*" }
+		{ role: 'assistant', content: "Hi! I'm your Edelhaus AI assistant. Ask me about your contacts, tasks, calls, pipeline, or anything in your CRM.\n\nTry: *\"How many callbacks do I have this week?\"* or *\"Show me my overdue tasks\"*" }
 	]);
 	let input = $state('');
 	let loading = $state(false);

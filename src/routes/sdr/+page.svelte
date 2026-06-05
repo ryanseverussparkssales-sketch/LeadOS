@@ -40,7 +40,7 @@
 	});
 </script>
 
-<svelte:head><title>SDR Queue — RogueOS</title></svelte:head>
+<svelte:head><title>SDR Queue — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 overflow-hidden">
 	<!-- Stats bar -->

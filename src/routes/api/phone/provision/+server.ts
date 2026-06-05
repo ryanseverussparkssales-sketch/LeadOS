@@ -49,7 +49,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 	return json({ numbers, total: numbers.length });
 };
 
-// POST: purchase a number and register it in RogueOS
+// POST: purchase a number and register it in Edelhaus
 // Body: { phoneNumber, friendlyName, clientId, campaignId, isPrimary }
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
@@ -114,14 +114,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			registered: false,
 			twilioSid: purchased.sid,
 			phoneNumber: purchased.phone_number,
-			error: 'Purchased from Twilio but failed to save to RogueOS: ' + dbErr.message,
+			error: 'Purchased from Twilio but failed to save to Edelhaus: ' + dbErr.message,
 		}, { status: 207 });
 	}
 
 	return json({ purchased: true, registered: true, number: phoneRecord }, { status: 201 });
 };
 
-// DELETE: release a number back to Twilio and remove from RogueOS
+// DELETE: release a number back to Twilio and remove from Edelhaus
 // ?sid=PNxxx&id=uuid
 export const DELETE: RequestHandler = async ({ request, url }) => {
 	const user = await requireAuth(request);

@@ -321,7 +321,7 @@
 	}
 </script>
 
-<svelte:head><title>Clients — RogueOS</title></svelte:head>
+<svelte:head><title>Clients — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">

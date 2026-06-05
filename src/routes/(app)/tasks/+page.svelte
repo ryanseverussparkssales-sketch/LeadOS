@@ -100,7 +100,7 @@
 	const overdue = $derived(tasks.filter(t => isOverdue(t)).length);
 </script>
 
-<svelte:head><title>Tasks — RogueOS</title></svelte:head>
+<svelte:head><title>Tasks — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-2">

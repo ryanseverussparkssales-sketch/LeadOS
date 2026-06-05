@@ -143,7 +143,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 		<div>
-			<p class="text-white text-sm font-semibold">✦ RogueOS AI</p>
+			<p class="text-white text-sm font-semibold">✦ Edelhaus AI</p>
 			<p class="text-xs text-[#555] mt-0.5">Create, find, navigate, learn · Ctrl+J</p>
 		</div>
 		<button onclick={() => open = false} class="text-[#444] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close"><Icon name="x" size={14} /></button>

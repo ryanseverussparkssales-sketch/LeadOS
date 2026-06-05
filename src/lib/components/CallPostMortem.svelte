@@ -121,7 +121,7 @@
 	let sendingEmail = $state(false);
 	let emailSentMsg = $state('');
 
-	async function sendViaRogueOS() {
+	async function sendViaEdelhaus() {
 		if (!generatedEmail || !contact?.email) return;
 		sendingEmail = true; emailSentMsg = '';
 
@@ -140,7 +140,7 @@
 
 			if (res.ok) {
 				const d = await res.json();
-				emailSentMsg = `✓ Sent from ${d.from ?? 'RogueOS'} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
+				emailSentMsg = `✓ Sent from ${d.from ?? 'Edelhaus'} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
 			} else {
 				emailSentMsg = 'Send failed — check email accounts in Settings';
 			}

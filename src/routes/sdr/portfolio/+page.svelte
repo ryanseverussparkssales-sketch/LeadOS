@@ -104,7 +104,7 @@
 	const allClips = $derived(clips.filter(c => !c.is_featured));
 </script>
 
-<svelte:head><title>My Portfolio — RogueOS SDR</title></svelte:head>
+<svelte:head><title>My Portfolio — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto space-y-8">
 

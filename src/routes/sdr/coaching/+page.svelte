@@ -38,7 +38,7 @@
 	const trendColor = (t: string) => t === 'up' ? 'text-[var(--accent)]' : t === 'down' ? 'text-red-400' : 'text-[#555]';
 </script>
 
-<svelte:head><title>Coaching — RogueOS SDR</title></svelte:head>
+<svelte:head><title>Coaching — Edelhaus SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto">
 

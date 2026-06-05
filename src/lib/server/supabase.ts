@@ -31,20 +31,33 @@ async function authenticateRaw(request: Request) {
 export async function requireAuth(request: Request) {
 	const realUser = await authenticateRaw(request);
 	const impersonate = request.headers.get('x-impersonate-owner');
-	if (impersonate && impersonate !== realUser.id && isSuperAdmin(realUser.id)) {
+	// Only hit the DB admin check when an impersonation header is actually present.
+	if (impersonate && impersonate !== realUser.id && await isPlatformAdmin(realUser.id)) {
 		return { ...realUser, id: impersonate, real_id: realUser.id, impersonating: true };
 	}
 	return { ...realUser, real_id: realUser.id, impersonating: false };
 }
 
 /**
- * Require the caller to be a platform super-admin. Always checks the REAL token
- * identity (ignores any impersonation header), so admin endpoints are never reachable
- * by impersonating an admin. Throws 403 otherwise.
+ * Platform-admin check: the env-defined master (isSuperAdmin) OR a user promoted via
+ * the `platform_admins` table (created from the admin dashboard). The env master is the
+ * un-removable root; DB admins are additional operators. Async because of the DB lookup.
+ */
+export async function isPlatformAdmin(userId: string): Promise<boolean> {
+	if (isSuperAdmin(userId)) return true; // env master — fast path, no DB
+	const { data } = await supabaseAdmin
+		.from('platform_admins').select('user_id').eq('user_id', userId).maybeSingle();
+	return !!data;
+}
+
+/**
+ * Require the caller to be a platform admin (env master or DB-promoted). Always checks
+ * the REAL token identity (ignores any impersonation header), so admin endpoints are
+ * never reachable by impersonating an admin. Throws 403 otherwise.
  */
 export async function requireSuperAdmin(request: Request) {
 	const realUser = await authenticateRaw(request);
-	if (!isSuperAdmin(realUser.id)) throw error(403, 'Forbidden — super admin only');
+	if (!(await isPlatformAdmin(realUser.id))) throw error(403, 'Forbidden — super admin only');
 	return realUser;
 }
 

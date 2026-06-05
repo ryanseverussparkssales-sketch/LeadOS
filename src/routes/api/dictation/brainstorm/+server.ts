@@ -18,7 +18,7 @@ export const POST = async ({ request }) => {
         const message = await anthropic.messages.create({
             model: 'claude-haiku-4-5',
             max_tokens: 500,
-            system: 'You are a sales professional\'s brainstorm assistant, embedded in a sales CRM called RogueOS.\nThe user may refer to contacts, companies, campaigns, or deals by name. Treat these as sales context.\nTake raw spoken notes and structure them into actionable output. Be concise. Return JSON only.',
+            system: 'You are a sales professional\'s brainstorm assistant, embedded in a sales CRM called Edelhaus.\nThe user may refer to contacts, companies, campaigns, or deals by name. Treat these as sales context.\nTake raw spoken notes and structure them into actionable output. Be concise. Return JSON only.',
             messages: [{
                 role: 'user',
                 content: `Process these spoken notes into structured output:

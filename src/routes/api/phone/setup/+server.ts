@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			friendly_name: 'Primary (from .env)',
 			is_primary: true,
 			status: 'active',
-			voicemail_greeting: 'Hi, you\'ve reached RogueOS. Please leave a message after the tone.',
+			voicemail_greeting: 'Hi, you\'ve reached Edelhaus. Please leave a message after the tone.',
 			record_incoming: true,
 		})
 		.select()

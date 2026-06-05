@@ -37,7 +37,7 @@
 	}
 </script>
 
-<svelte:head><title>Snippets — RogueOS</title></svelte:head>
+<svelte:head><title>Snippets — Edelhaus</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -60,7 +60,7 @@
 			</div>
 			<div>
 				<label class="text-xs text-[#555] block mb-1">Content *</label>
-				<textarea bind:value={nContent} rows="4" placeholder="Hi, my name is Ryan from RogueOS. I'm reaching out because..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+				<textarea bind:value={nContent} rows="4" placeholder="Hi, my name is Ryan from Edelhaus. I'm reaching out because..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 			</div>
 			<button onclick={addSnippet} disabled={saving || !nTrigger.trim() || !nContent.trim()} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? 'Saving...' : 'Add Snippet'}</button>
 		</div>

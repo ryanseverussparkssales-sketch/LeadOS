@@ -42,7 +42,7 @@
 	}
 </script>
 
-<svelte:head><title>RogueLeads — Outreach For All</title></svelte:head>
+<svelte:head><title>Edelhaus — Outreach For All</title></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
 
@@ -70,7 +70,7 @@
 		<!-- Hero — full viewport centered -->
 		<div class="flex-1 flex flex-col items-center justify-center px-8 text-center relative" style="z-index:1">
 			<h1 class="hero-title" style="font-family:var(--font-display);font-weight:300;font-size:clamp(4rem,14vw,11rem);letter-spacing:-.02em;line-height:.92;color:#fff;margin-bottom:1.5rem">
-				RogueLeads
+				Edelhaus
 			</h1>
 			<p class="hero-sub" style="font-family:var(--font-label);font-size:clamp(.65rem,1.5vw,1rem);letter-spacing:.3em;color:#666;margin-bottom:5rem">
 				OUTREACH FOR ALL

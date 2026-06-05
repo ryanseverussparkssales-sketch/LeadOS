@@ -1,12 +1,12 @@
 <svelte:head>
-	<title>Pricing — RogueOS & RogueLeads</title>
-	<meta property="og:title" content="Pricing — RogueOS & RogueLeads" />
+	<title>Pricing — Edelhaus</title>
+	<meta property="og:title" content="Pricing — Edelhaus" />
 	<meta property="og:description" content="Simple, performance-based pricing. $20/mo dialer. $1/contact + $200/appointment for managed outreach. Free trial to start." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="RogueOS" />
+	<meta property="og:site_name" content="Edelhaus" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Pricing — RogueOS & RogueLeads" />
+	<meta name="twitter:title" content="Pricing — Edelhaus" />
 	<meta name="twitter:description" content="Simple, performance-based pricing. $20/mo dialer. $1/contact + $200/appointment for managed outreach. Free trial to start." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta name="description" content="Simple, performance-based pricing. Pay for the dialer, pay for contacts, pay for results — never for seat-warmers." />
@@ -16,7 +16,7 @@
 
 	<!-- Nav -->
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
-		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">ROGUEOS</a>
+		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">EDELHAUS</a>
 		<div class="flex items-center gap-6">
 			<a href="/contact" class="text-xs text-[#444] hover:text-white transition-colors">Contact</a>
 			<a href="/" class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-4 py-1.5 rounded-lg hover:border-white transition-colors">Log in →</a>
@@ -43,7 +43,7 @@
 
 			<!-- Starter -->
 			<div class="rounded-2xl border border-[#1a1a1a] bg-[#080808] p-8">
-				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:10px;letter-spacing:.18em;color:#444;margin-bottom:14px">RogueOS Platform</p>
+				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:10px;letter-spacing:.18em;color:#444;margin-bottom:14px">Edelhaus Platform</p>
 				<div class="flex items-baseline gap-2 mb-2">
 					<span style="font-size:42px;font-weight:600;letter-spacing:-.03em;color:#fff">$40</span>
 					<span class="text-xs text-[#444]">/month</span>
@@ -96,7 +96,7 @@
 						</div>
 						<div class="border-t border-[#0d0d0d] pt-6">
 							<p class="text-sm text-white font-medium mb-1">Commission stays yours</p>
-							<p class="text-xs text-[#444] leading-relaxed">Set your own bonus rates per appointment. Pay reps directly through Stripe Connect. RogueOS takes no cut of your appointments.</p>
+							<p class="text-xs text-[#444] leading-relaxed">Set your own bonus rates per appointment. Pay reps directly through Stripe Connect. Edelhaus takes no cut of your appointments.</p>
 						</div>
 					</div>
 				</div>
@@ -145,7 +145,7 @@
 
 	<!-- ── TRACK 2: MANAGED SERVICES ── -->
 	<div class="max-w-5xl mx-auto px-8 mb-24">
-		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.22em;color:#2a2a2a;margin-bottom:6px">Managed by RogueLeads</p>
+		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.22em;color:#2a2a2a;margin-bottom:6px">Managed by Edelhaus</p>
 		<h2 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:400;font-size:28px;letter-spacing:-.01em;color:#fff;margin-bottom:4px">Done-for-you outreach</h2>
 		<p class="text-xs text-[#444] mb-12">You provide the leads. We dial, qualify, and deliver booked appointments to your calendar.</p>
 
@@ -306,12 +306,12 @@
 
 	<!-- Footer -->
 	<div class="border-t border-[#0a0a0a] px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4 max-w-5xl mx-auto">
-		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">ROGUEOS</span>
+		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">EDELHAUS</span>
 		<div class="flex items-center gap-6 text-[10px] text-[#2a2a2a]">
 			<a href="/contact" class="hover:text-white transition-colors">Contact</a>
 			<a href="/" class="hover:text-white transition-colors">Log in</a>
 		</div>
-		<span class="text-[10px] text-[#1a1a1a]">© 2026 RogueLeads</span>
+		<span class="text-[10px] text-[#1a1a1a]">© 2026 Edelhaus</span>
 	</div>
 
 </div>

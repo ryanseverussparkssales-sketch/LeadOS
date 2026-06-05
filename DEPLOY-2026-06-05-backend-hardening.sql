@@ -86,6 +86,16 @@ ALTER TABLE phone_numbers
 CREATE INDEX IF NOT EXISTS phone_numbers_assigned_idx ON phone_numbers(assigned_user_id);
 
 
+-- ── 2e. Platform admins ─────────────────────────────────────────────────────
+-- Additional platform operators promoted from the RogueOS Admin dashboard. The
+-- env SUPER_ADMIN_USER_IDS master is the un-removable root; rows here are extra
+-- admins. Checked by isPlatformAdmin() in src/lib/server/supabase.ts.
+CREATE TABLE IF NOT EXISTS platform_admins (
+  user_id    UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 -- ── 3. Payout double-pay guard ──────────────────────────────────────────────
 -- The payouts approval route reserves a row per (call_id, team_member_id) BEFORE
 -- moving money and relies on this unique index as the concurrency gate: a racing

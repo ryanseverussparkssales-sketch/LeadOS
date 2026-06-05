@@ -27,7 +27,7 @@
 		{ href: '/contacts',     label: 'Contacts',         icon: 'users' },
 		{ href: '/companies',    label: 'Companies',        icon: 'building' },
 		{ href: '/leads',        label: 'Lead Gen',         icon: 'search' },
-		{ href: '/scraper',      label: 'RogueScraper',     icon: 'radar' },
+		{ href: '/scraper',      label: 'Edelhaus Scraper',     icon: 'radar' },
 		{ href: '/leads-inbox',  label: 'Lead Inbox',       icon: 'download' },
 		{ href: '/import',       label: 'Import',           icon: 'upload' },
 	];
@@ -174,7 +174,7 @@
 	<!-- Logo / collapse toggle -->
 	<div class="flex items-center justify-between px-3 py-3 border-b border-[var(--c-border)]">
 		{#if !collapsed}
-			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">ROGUEOS</span>
+			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">EDELHAUS</span>
 		{/if}
 		<button
 			onclick={() => collapsed = !collapsed}
