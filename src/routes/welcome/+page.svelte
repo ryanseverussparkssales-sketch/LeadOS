@@ -48,9 +48,8 @@
 	<!-- Hero -->
 	<section class="hero">
 		<p class="eyebrow">The house of luxury home</p>
-		<h1>
-			The finest in <em>home</em>,<br />delivered to one standard.
-		</h1>
+		<h1 class="wordmark">Edelhaus</h1>
+		<p class="tagline">The finest in <em>home</em>, delivered to one standard.</p>
 		<p class="lede">
 			Edelhaus brings the best brands across luxury home services and smart-home automation together —
 			with white-glove outreach, concierge installation, and customer support worthy of the homes they enter.
@@ -138,22 +137,28 @@
 
 	/* Hero */
 	.hero {
-		padding: clamp(60px, 12vh, 150px) clamp(20px, 6vw, 80px) clamp(50px, 9vh, 110px);
-		max-width: 1040px;
+		padding: clamp(48px, 9vh, 120px) clamp(20px, 6vw, 80px) clamp(50px, 9vh, 110px);
+		max-width: 1240px;
 	}
 	.eyebrow {
 		color: var(--gold); text-transform: uppercase; letter-spacing: 0.32em;
-		font-size: 12px; margin: 0 0 26px;
+		font-size: 12px; margin: 0 0 22px;
 	}
-	.hero h1 {
+	.wordmark {
 		font-family: 'Bodoni*', 'Playfair Display', Georgia, serif;
 		font-weight: 700; color: var(--paper);
-		font-size: clamp(40px, 7vw, 86px); line-height: 1.02; letter-spacing: -0.01em;
+		font-size: clamp(66px, 16vw, 220px); line-height: 0.88; letter-spacing: -0.03em;
+		margin: 0 0 24px;
+	}
+	.tagline {
+		font-family: 'Bodoni*', 'Playfair Display', Georgia, serif;
+		font-weight: 400; color: #d9d3c7;
+		font-size: clamp(22px, 3.2vw, 44px); line-height: 1.12; letter-spacing: -0.01em;
 		margin: 0 0 30px;
 	}
-	.hero h1 em { font-style: italic; color: var(--gold); }
+	.tagline em { font-style: italic; color: var(--gold); }
 	.lede {
-		max-width: 620px; color: #b9b2a6; font-size: clamp(16px, 1.5vw, 19px);
+		max-width: 640px; color: #b9b2a6; font-size: clamp(16px, 1.5vw, 19px);
 		line-height: 1.65; margin: 0 0 38px;
 	}
 	.cta { display: flex; gap: 14px; flex-wrap: wrap; }
