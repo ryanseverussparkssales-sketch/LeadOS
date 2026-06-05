@@ -36,7 +36,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 
 	// Mark contact as 'called' in call_list_contacts AND campaign_contacts
 	const { data: callRecord } = await supabaseAdmin
-		.from('calls').select('contact_id, call_list_id').eq('id', params.id).single();
+		.from('calls').select('contact_id, call_list_id, campaign_id').eq('id', params.id).single();
 	if (callRecord?.contact_id && callRecord?.call_list_id) {
 		await supabaseAdmin
 			.from('call_list_contacts')
@@ -82,6 +82,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 	if (body.outcome && WIN_NOTIFY.has(body.outcome) && callRecord?.campaign_id) {
 		(async () => {
 			try {
+				const ownerId = await getEffectiveUserId(user.id);
 				// Find client email via campaign → project → client
 				const { data: camp } = await supabaseAdmin
 					.from('campaigns')
@@ -109,7 +110,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 <p>Your campaign just got a <strong>${LABELS[body.outcome] ?? 'win'}</strong>.</p>
 <p><strong>${contactRow?.name ?? 'A contact'}${contactRow?.company ? ` at ${contactRow.company}` : ''}</strong> is now in your pipeline.</p>
 <p>View all appointments and activity in your <a href="${env.PUBLIC_SITE_URL ?? 'https://lead-os-livid.vercel.app'}/client-portal">client portal →</a></p>
-<p style="color:#888;font-size:12px">— ${clientBizName} via LeadOS</p>`,
+<p style="color:#888;font-size:12px">— ${clientBizName} via RogueOS</p>`,
 					});
 				}
 			} catch (err) {
@@ -146,8 +147,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 	if (body.outcome) {
 		const WIN_OUTCOMES = new Set(['appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback','follow_up_agreed','referral','proposal_requested']);
 		if (WIN_OUTCOMES.has(body.outcome) && callRecord?.campaign_id) {
-			supabaseAdmin.rpc('increment_campaign_win_count', { campaign_id: callRecord.campaign_id })
-				.catch(() => {}); // non-fatal
+			try { await supabaseAdmin.rpc('increment_campaign_win_count', { campaign_id: callRecord.campaign_id }); } catch { /* non-fatal */ }
 		}
 	}
 

@@ -27,9 +27,9 @@
       const orbR = (size * 0.28) * (1 + pulse * 0.18);
 
       // Outer glow ring
-      const glowColor = connected ? '#00ff88' : calling ? '#00ff44' : '#00cc44';
+      const glowColor = connected ? '#d4af37' : calling ? '#d4af37' : '#c8a24a';
       const outerGlow = ctx.createRadialGradient(mid, mid, orbR * 0.5, mid, mid, orbR * 2.2);
-      outerGlow.addColorStop(0, connected ? 'rgba(0,255,136,0.18)' : calling ? 'rgba(0,255,68,0.22)' : 'rgba(0,204,68,0.06)');
+      outerGlow.addColorStop(0, connected ? 'rgba(212,175,55,0.18)' : calling ? 'rgba(212,175,55,0.22)' : 'rgba(200,162,74,0.06)');
       outerGlow.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = outerGlow;
       ctx.beginPath(); ctx.arc(mid, mid, orbR * 2.2, 0, Math.PI * 2); ctx.fill();
@@ -37,17 +37,17 @@
       // Orb sphere gradient
       const grad = ctx.createRadialGradient(mid - orbR * 0.3, mid - orbR * 0.3, orbR * 0.05, mid, mid, orbR);
       if (connected) {
-        grad.addColorStop(0, `rgba(180,255,220,${0.7 + pulse * 0.3})`);
-        grad.addColorStop(0.4, `rgba(0,255,136,${0.6 + pulse * 0.2})`);
-        grad.addColorStop(1, 'rgba(0,60,30,0.95)');
+        grad.addColorStop(0, `rgba(245,228,160,${0.7 + pulse * 0.3})`);
+        grad.addColorStop(0.4, `rgba(212,175,55,${0.6 + pulse * 0.2})`);
+        grad.addColorStop(1, 'rgba(60,46,12,0.95)');
       } else if (calling) {
-        grad.addColorStop(0, `rgba(160,255,200,${0.6 + pulse * 0.35})`);
-        grad.addColorStop(0.4, `rgba(0,230,80,${0.55 + pulse * 0.3})`);
-        grad.addColorStop(1, 'rgba(0,40,15,0.95)');
+        grad.addColorStop(0, `rgba(240,222,150,${0.6 + pulse * 0.35})`);
+        grad.addColorStop(0.4, `rgba(208,170,60,${0.55 + pulse * 0.3})`);
+        grad.addColorStop(1, 'rgba(40,30,8,0.95)');
       } else {
-        grad.addColorStop(0, `rgba(80,200,120,${0.25 + pulse * 0.15})`);
-        grad.addColorStop(0.5, `rgba(0,130,50,${0.2 + pulse * 0.1})`);
-        grad.addColorStop(1, 'rgba(0,20,8,0.95)');
+        grad.addColorStop(0, `rgba(190,165,100,${0.25 + pulse * 0.15})`);
+        grad.addColorStop(0.5, `rgba(130,102,40,${0.2 + pulse * 0.1})`);
+        grad.addColorStop(1, 'rgba(20,15,5,0.95)');
       }
       ctx.fillStyle = grad;
       ctx.beginPath(); ctx.arc(mid, mid, orbR, 0, Math.PI * 2); ctx.fill();
@@ -67,7 +67,7 @@
       ctx.globalAlpha = 1;
 
       // Label
-      ctx.fillStyle = connected ? '#00ff88' : calling ? '#00ff44' : '#1a6630';
+      ctx.fillStyle = connected ? '#d4af37' : calling ? '#d4af37' : '#7a5e22';
       ctx.font = `${size * 0.09}px monospace`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(connected ? 'LIVE' : calling ? 'RING' : 'CALL', mid, mid + orbR + size * 0.1);

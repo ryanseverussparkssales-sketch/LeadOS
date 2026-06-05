@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastError } from '$lib/stores/toast';
 
 	interface Contact { id: string; name: string; phone: string; company: string; }
 	interface Call {
@@ -56,6 +57,7 @@
 		const params = new URLSearchParams({ limit: '100' });
 		if (filterOutcome) params.set('outcome', filterOutcome);
 		const res = await apiFetch(`/api/calls?${params}`);
+		if (!res.ok) toastError('Could not load calls — check your connection');
 		calls = res.ok ? await res.json() : [];
 		loading = false;
 	}
@@ -75,7 +77,7 @@
 			'info_requested','decision_maker','referral','follow_up_agreed','proposal_requested',
 			'trial_started','signed_up','investment_interest']);
 		const DEAD = new Set(['not_interested','do_not_call','disconnected','wrong_number']);
-		if (WINS.has(o)) return 'text-green-400';
+		if (WINS.has(o)) return 'text-[var(--accent)]';
 		if (DEAD.has(o)) return 'text-red-400';
 		if (o === 'answered') return 'text-blue-400';
 		if (o === 'left_voicemail') return 'text-yellow-400';
@@ -85,9 +87,13 @@
 	const recordingUrl = $derived(
 		selected?.id ? `/api/calls/recording?call_id=${selected.id}` : null
 	);
+
+	// Reset recording-load error whenever the selected call changes
+	let recordingError = $state(false);
+	$effect(() => { selected?.id; recordingError = false; });
 </script>
 
-<svelte:head><title>Calls — LeadOS</title></svelte:head>
+<svelte:head><title>Calls — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">
@@ -123,7 +129,12 @@
 		<!-- Calls list -->
 		<div class="w-80 shrink-0 border-r border-[#1e1e1e] overflow-y-auto">
 			{#if loading}
-	{:else if calls.length === 0}
+				<div class="p-4 space-y-2">
+					{#each [1,2,3,4,5,6] as _}
+						<div class="h-16 bg-[#0f0f0f] border border-[#1a1a1a] rounded-xl animate-pulse"></div>
+					{/each}
+				</div>
+				{:else if calls.length === 0}
 				<p class="text-[#444] text-xs text-center py-8">No calls yet</p>
 			{:else}
 				{#each calls as call}
@@ -140,7 +151,7 @@
 							<span class="text-xs text-[#444]">{formatDate(call.created_at)}</span>
 							<span class="text-xs text-[#333]">{formatDuration(call.call_duration_seconds)}</span>
 							{#if call.quality_score != null}
-								<span class="text-xs font-medium {call.quality_score >= 8 ? 'text-green-400' : call.quality_score >= 6 ? 'text-yellow-400' : 'text-red-400'}">{call.quality_score}/10</span>
+								<span class="text-xs font-medium {call.quality_score >= 8 ? 'text-[var(--accent)]' : call.quality_score >= 6 ? 'text-yellow-400' : 'text-red-400'}">{call.quality_score}/10</span>
 							{/if}
 						</div>
 						{#if call.summary}
@@ -176,7 +187,11 @@
 					<!-- Recording player -->
 					{#if selected.recording_url && recordingUrl}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4">
-							<audio controls src={recordingUrl} class="w-full h-8 mt-2" style="filter: invert(0.7) sepia(0.2)"></audio>
+							{#if recordingError}
+								<p class="text-xs text-[#666]">Recording unavailable — it may still be processing or could not be found.</p>
+							{:else}
+								<audio controls src={recordingUrl} onerror={() => recordingError = true} class="w-full h-8 mt-2" style="filter: invert(0.7) sepia(0.2)"></audio>
+							{/if}
 						</div>
 					{/if}
 				</div>

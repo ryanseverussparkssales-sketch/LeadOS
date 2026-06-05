@@ -40,7 +40,7 @@
 	});
 </script>
 
-<svelte:head><title>SDR Queue — LeadOS</title></svelte:head>
+<svelte:head><title>SDR Queue — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 overflow-hidden">
 	<!-- Stats bar -->
@@ -57,7 +57,7 @@
 					<p class="text-[10px] text-[#555]">Calls</p>
 				</div>
 				<div class="text-center">
-					<p class="text-green-400 font-semibold">{stats.answered}</p>
+					<p class="text-[var(--accent)] font-semibold">{stats.answered}</p>
 					<p class="text-[10px] text-[#555]">Answered</p>
 				</div>
 				<div class="text-center">
@@ -65,7 +65,7 @@
 					<p class="text-[10px] text-[#555]">Appointments</p>
 				</div>
 				<div class="text-center">
-					<p class="text-emerald-400 font-semibold">${stats.bonusEarned}</p>
+					<p class="text-[var(--accent)] font-semibold">${stats.bonusEarned}</p>
 					<p class="text-[10px] text-[#555]">Bonus earned</p>
 				</div>
 				{#if stats.appointments > 0}

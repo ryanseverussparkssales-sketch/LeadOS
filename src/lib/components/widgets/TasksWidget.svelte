@@ -42,7 +42,7 @@
 	{:else}
 		{#each tasks as task}
 			<div class="flex items-center gap-2 group">
-				<button onclick={() => complete(task.id)} class="w-4 h-4 rounded-full border border-[#444] shrink-0 hover:border-green-400 transition-colors flex items-center justify-center">
+				<button onclick={() => complete(task.id)} class="w-4 h-4 rounded-full border border-[#444] shrink-0 hover:border-[var(--accent)]/60 transition-colors flex items-center justify-center">
 				</button>
 				<div class="flex-1 min-w-0">
 					<p class="text-xs text-white truncate">{task.title}</p>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { apiFetch } from '$lib/api';
+	import Icon from '$lib/components/Icon.svelte';
 
 	let { onClose, onCreated, leadSource = '' }: {
 		onClose: () => void;
@@ -57,7 +58,7 @@
 
 		<div class="p-5 border-b border-[#2a2a2a] flex items-center justify-between">
 			<p class="text-white text-sm font-medium">New Contact</p>
-			<button onclick={onClose} class="text-[#666] hover:text-white transition-colors">✕</button>
+			<button onclick={onClose} class="text-[#666] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
 		</div>
 
 		<form onsubmit={handleSubmit} class="p-5 space-y-4">

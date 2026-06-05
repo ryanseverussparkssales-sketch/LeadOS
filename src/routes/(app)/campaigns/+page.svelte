@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { get } from 'svelte/store';
 	import { apiFetch } from '$lib/api';
@@ -65,6 +66,8 @@
 			campaigns = campaigns.map(c => c.id === id ? { ...c, ...(updated as any) } : c);
 			if (selectedCampaign?.id === id) selectedCampaign = { ...selectedCampaign, ...(updated as any) };
 			toastSuccess('Campaign activated — SDRs can now dial');
+		} else {
+			toastError('Failed to activate campaign');
 		}
 		activatingId = null;
 	}
@@ -74,6 +77,9 @@
 		if (r.ok) {
 			campaigns = campaigns.map(c => c.id === id ? { ...c, status: 'draft' } as any : c);
 			if (selectedCampaign?.id === id) selectedCampaign = { ...selectedCampaign, status: 'draft' } as any;
+			toastSuccess('Campaign sent back to draft');
+		} else {
+			toastError('Failed to update campaign');
 		}
 	}
 
@@ -107,6 +113,8 @@
 			const d = await r.json();
 			campaignContacts = d.contacts ?? [];
 			campaignListId = d.list_id;
+		} else {
+			toastError('Failed to load campaign contacts');
 		}
 		loadingCampaignContacts = false;
 	}
@@ -122,6 +130,9 @@
 			await loadCampaignContacts(selectedCampaign.id);
 			manualName = ''; manualPhone = ''; manualEmail = ''; manualCompany = '';
 			showAddContacts = null;
+			toastSuccess('Contact added');
+		} else {
+			toastError('Failed to add contact');
 		}
 		addingManual = false;
 	}
@@ -140,22 +151,33 @@
 	async function addExistingContacts() {
 		if (!selectedCampaign || selectedExisting.size === 0) return;
 		addingExisting = true;
-		await apiFetch(`/api/campaigns/${selectedCampaign.id}/contacts`, {
+		const r = await apiFetch(`/api/campaigns/${selectedCampaign.id}/contacts`, {
 			method: 'POST',
 			body: JSON.stringify({ mode: 'existing', contactIds: [...selectedExisting] }),
 		});
-		await loadCampaignContacts(selectedCampaign.id);
-		selectedExisting = new Set();
-		existingContacts = [];
-		existingSearch = '';
-		showAddContacts = null;
+		if (r.ok) {
+			await loadCampaignContacts(selectedCampaign.id);
+			selectedExisting = new Set();
+			existingContacts = [];
+			existingSearch = '';
+			showAddContacts = null;
+			toastSuccess('Contacts added to campaign');
+		} else {
+			toastError('Failed to add contacts');
+		}
 		addingExisting = false;
 	}
 
 	async function removeFromCampaign(listContactId: string) {
 		if (!selectedCampaign) return;
-		await apiFetch(`/api/campaigns/${selectedCampaign.id}/contacts?list_contact_id=${listContactId}`, { method: 'DELETE' });
-		campaignContacts = campaignContacts.filter(c => c.list_contact_id !== listContactId);
+		if (!confirm('Remove this contact from the campaign?')) return;
+		const r = await apiFetch(`/api/campaigns/${selectedCampaign.id}/contacts?list_contact_id=${listContactId}`, { method: 'DELETE' });
+		if (r.ok) {
+			campaignContacts = campaignContacts.filter(c => c.list_contact_id !== listContactId);
+			toastSuccess('Contact removed');
+		} else {
+			toastError('Failed to remove contact');
+		}
 	}
 
 	// Campaign Goals
@@ -175,14 +197,20 @@
 		if (!selectedCampaign) return;
 		savingGoal = true;
 		const res = await apiFetch('/api/campaign-goals', { method: 'POST', body: JSON.stringify({ campaignId: selectedCampaign.id, goalType: newGoalType, targetValue: newGoalTarget, period: newGoalPeriod }) });
-		if (res.ok) { const g = await res.json(); goals = [...goals.filter(x => !(x.goal_type === g.goal_type && x.period === g.period)), g]; }
+		if (res.ok) { const g = await res.json(); goals = [...goals.filter(x => !(x.goal_type === g.goal_type && x.period === g.period)), g]; toastSuccess('Goal saved'); }
+		else { toastError('Failed to save goal'); }
 		savingGoal = false;
 	}
 
 	async function deleteGoal(id: string) {
 		if (confirmDeleteGoal !== id) { confirmDeleteGoal = id; return; }
-		await apiFetch(`/api/campaign-goals/${id}`, { method: 'DELETE' });
-		goals = goals.filter(g => g.id !== id);
+		const res = await apiFetch(`/api/campaign-goals/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			goals = goals.filter(g => g.id !== id);
+			toastSuccess('Goal deleted');
+		} else {
+			toastError('Failed to delete goal');
+		}
 		confirmDeleteGoal = null;
 	}
 
@@ -311,7 +339,7 @@
 
 		// Get campaign contacts
 		const contactsRes = await apiFetch(`/api/campaigns/${selectedCampaign.id}/contacts?limit=200`);
-		if (!contactsRes.ok) { sendingEmailBlast = false; return; }
+		if (!contactsRes.ok) { emailBlastResult = '⚠ Could not load recipients — try again'; sendingEmailBlast = false; return; }
 		const { contacts } = await contactsRes.json();
 		const withEmail = contacts.filter((c: any) => c.email);
 
@@ -399,12 +427,18 @@
 	async function assignSdr(teamMemberId: string) {
 		if (!selectedCampaign) return;
 		const r = await apiFetch(`/api/campaigns/${selectedCampaign.id}/sdrs`, { method:'POST', body: JSON.stringify({ teamMemberId }) });
-		if (r.ok) { const d = await r.json(); campaignSdrs = [...campaignSdrs, d]; }
+		if (r.ok) { const d = await r.json(); campaignSdrs = [...campaignSdrs, d]; toastSuccess('Rep assigned'); }
+		else { toastError('Failed to assign rep'); }
 	}
 	async function unassignSdr(sdrId: string) {
 		if (!selectedCampaign) return;
-		await apiFetch(`/api/campaigns/${selectedCampaign.id}/sdrs?sdr_id=${sdrId}`, { method:'DELETE' });
-		campaignSdrs = campaignSdrs.filter(s => s.sdr_id !== sdrId);
+		const r = await apiFetch(`/api/campaigns/${selectedCampaign.id}/sdrs?sdr_id=${sdrId}`, { method:'DELETE' });
+		if (r.ok) {
+			campaignSdrs = campaignSdrs.filter(s => s.sdr_id !== sdrId);
+			toastSuccess('Rep removed');
+		} else {
+			toastError('Failed to remove rep');
+		}
 	}
 
 	onMount(async () => {
@@ -644,9 +678,13 @@
 	}
 
 	async function deleteCampaign(id: string) {
-		await apiFetch(`/api/campaigns/${id}`, { method: 'DELETE' });
-		if (selectedCampaign?.id === id) { selectedCampaign = null; campaignContacts = []; }
-		campaigns = campaigns.filter(c => c.id !== id);
+		const res = await apiFetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			if (selectedCampaign?.id === id) { selectedCampaign = null; campaignContacts = []; }
+			campaigns = campaigns.filter(c => c.id !== id);
+		} else {
+			toastError('Failed to delete campaign');
+		}
 		confirmDeleteId = null;
 	}
 
@@ -691,7 +729,7 @@
 	}
 </script>
 
-<svelte:head><title>Campaigns — LeadOS</title></svelte:head>
+<svelte:head><title>Campaigns — RogueOS</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.templates-container')) showTemplates = false; }} />
 
 <div class="flex flex-col flex-1 h-full">
@@ -714,7 +752,7 @@
 						<button
 							onclick={() => activateCampaign(c.id)}
 							disabled={activatingId === c.id}
-							class="rounded-lg bg-green-700 hover:bg-green-600 px-3 py-1.5 text-[10px] font-semibold text-white disabled:opacity-40 transition-colors whitespace-nowrap">
+							class="rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hi)] px-3 py-1.5 text-[10px] font-semibold text-[var(--accent-ink)] disabled:opacity-40 transition-colors whitespace-nowrap">
 							{activatingId === c.id ? '…' : '▶ Activate'}
 						</button>
 						<button
@@ -843,7 +881,7 @@
 											<span class="text-xs text-white">{wc.label}</span>
 											<span class="text-[10px] text-[#555]">×{wc.weight}</span>
 										</div>
-										<button type="button" onclick={() => removeWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs">✕</button>
+										<button type="button" onclick={() => removeWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
 									</div>
 								{/each}
 							</div>
@@ -926,7 +964,7 @@
 						<p class="text-sm text-white font-medium truncate flex-1">{campaign.name}</p>
 						<div class="flex items-center gap-1 shrink-0">
 							<span class="text-[10px] px-1.5 py-0.5 rounded-full {
-								(campaign as any).status === 'active' ? 'bg-green-950 text-green-400' :
+								(campaign as any).status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
 								(campaign as any).status === 'paused' ? 'bg-yellow-950 text-yellow-600' :
 								(campaign as any).status === 'completed' ? 'bg-blue-950 text-blue-400' :
 								(campaign as any).status === 'pending_approval' ? 'bg-orange-950 text-orange-400 animate-pulse' :
@@ -934,8 +972,8 @@
 							}">{(campaign as any).status === 'pending_approval' ? '⏳ awaiting approval' : ((campaign as any).status ?? 'draft')}</span>
 							<span class="text-[10px] px-1.5 py-0.5 rounded-full {
 								campaign.campaign_type === 'email' ? 'bg-blue-900/30 text-blue-400' :
-								campaign.campaign_type === 'sms' ? 'bg-green-900/30 text-green-400' :
-								campaign.campaign_type === 'mixed' ? 'bg-purple-900/30 text-purple-400' :
+								campaign.campaign_type === 'sms' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
+								campaign.campaign_type === 'mixed' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
 								'bg-[#1a1a1a] text-[#666]'
 							}">
 								{TYPE_ICONS[campaign.campaign_type] ?? '📞'}
@@ -966,8 +1004,8 @@
 						<p class="text-white text-sm font-medium">{selectedCampaign.name}</p>
 						<span class="shrink-0 text-xs px-2 py-0.5 rounded-full {
 							selectedCampaign.campaign_type === 'email' ? 'bg-blue-900/30 text-blue-400' :
-							selectedCampaign.campaign_type === 'sms' ? 'bg-green-900/30 text-green-400' :
-							selectedCampaign.campaign_type === 'mixed' ? 'bg-purple-900/30 text-purple-400' :
+							selectedCampaign.campaign_type === 'sms' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
+							selectedCampaign.campaign_type === 'mixed' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
 							'bg-[#1a1a1a] text-[#666]'
 						}">
 							{typeLabel(selectedCampaign.campaign_type)}
@@ -976,12 +1014,13 @@
 							<!-- Activate directly OR send to client for approval first -->
 							<button onclick={() => activateCampaign(selectedCampaign!.id)}
 								disabled={activatingId === selectedCampaign.id}
-								class="ml-auto text-xs text-green-400 hover:text-green-300 border border-green-800/40 px-2.5 py-1 rounded-lg transition-colors shrink-0 disabled:opacity-40">
+								class="ml-auto text-xs text-[var(--accent)] hover:text-[var(--accent)] border border-[var(--accent)]/40 px-2.5 py-1 rounded-lg transition-colors shrink-0 disabled:opacity-40">
 								▶ Activate Now
 							</button>
 							<button onclick={async () => {
 									const r = await apiFetch(`/api/campaigns/${selectedCampaign!.id}`, { method:'PATCH', body: JSON.stringify({ status:'pending_approval' }) });
 									if (r.ok) { const u = await r.json(); campaigns = campaigns.map(c => c.id === u.id ? { ...c, ...u } : c); selectedCampaign = { ...selectedCampaign!, ...u }; toastSuccess('Sent to client for optional approval'); }
+									else { toastError('Failed to send for approval'); }
 								}}
 								class="text-xs text-[#555] hover:text-yellow-400 border border-[#2a2a2a] hover:border-yellow-900/40 px-2.5 py-1 rounded-lg transition-colors shrink-0">
 								⏳ Send for Client Approval
@@ -996,7 +1035,7 @@
 							<button onclick={() => deleteCampaign(selectedCampaign!.id)} class="text-xs text-red-400 hover:text-red-300 ml-1">Yes</button>
 							<button onclick={() => confirmDeleteId = null} class="text-xs text-[#555] hover:text-white ml-1">No</button>
 						{:else}
-							<button onclick={() => confirmDeleteId = selectedCampaign!.id} class="text-xs text-red-700 hover:text-red-400 transition-colors shrink-0">✕</button>
+							<button onclick={() => confirmDeleteId = selectedCampaign!.id} class="text-xs text-red-700 hover:text-red-400 transition-colors shrink-0"><Icon name="x" size={14} /></button>
 						{/if}
 					</div>
 
@@ -1060,7 +1099,7 @@
 													<span class="text-xs text-white">{wc.label}</span>
 													<span class="text-[10px] text-[#555]">×{wc.weight}</span>
 												</div>
-												<button type="button" onclick={() => editRemoveWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs">✕</button>
+												<button type="button" onclick={() => editRemoveWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
 											</div>
 										{/each}
 									</div>
@@ -1096,17 +1135,19 @@
 						</div>
 
 						<!-- Appointment Template Quick-Setup -->
-						<div class="rounded-xl border border-green-800/30 bg-green-950/10 p-4 space-y-3">
+						<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4 space-y-3">
 							<div class="flex items-center justify-between">
-								<p class="text-xs text-green-400 font-medium">📅 Appointment Questions</p>
+								<p class="text-xs text-[var(--accent)] font-medium">📅 Appointment Questions</p>
 								<p class="text-[10px] text-[#444]">Qualifying questions reps see when booking</p>
 							</div>
 							<div class="grid grid-cols-3 gap-2">
-								{#each [['window_sales','🪟 Window Sales'],['roofing','🏠 Roofing'],['electrician','⚡ Electrician'],['smart_home','💡 Smart Home'],['general','📋 General']] as [key, label]}
+								{#each [['window_sales','Window Sales'],['roofing','Roofing'],['electrician','Electrician'],['smart_home','Smart Home'],['general','General']] as [key, label]}
 									<button onclick={async () => {
-										await apiFetch('/api/appointment-templates', { method:'POST', body: JSON.stringify({ campaignId: editingCampaign?.id, name: label.slice(3), questions: [] }) });
+										const r = await apiFetch('/api/appointment-templates', { method:'POST', body: JSON.stringify({ campaignId: editingCampaign?.id, name: label.slice(3), questions: [] }) });
 										// The template defaults are loaded server-side
-									}} class="rounded-lg border border-green-800/30 py-1.5 text-[10px] text-green-400 hover:bg-green-900/20 transition-colors">
+										if (r.ok) { toastSuccess('Appointment template set'); }
+										else { toastError('Failed to set template'); }
+									}} class="rounded-lg border border-[var(--accent)]/40 py-1.5 text-[10px] text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 										{label}
 									</button>
 								{/each}
@@ -1147,7 +1188,7 @@
 								<span class="text-white font-mono">{(selectedCampaign as any).calls_today ?? 0} / {(selectedCampaign as any).daily_call_goal}</span>
 							</div>
 							<div class="w-full h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
-								<div class="h-full rounded-full transition-all duration-500 {pct >= 100 ? 'bg-green-500' : pct >= 60 ? 'bg-yellow-500' : 'bg-white/40'}"
+								<div class="h-full rounded-full transition-all duration-500 {pct >= 100 ? 'bg-[var(--accent)]' : pct >= 60 ? 'bg-yellow-500' : 'bg-white/40'}"
 									style="width:{pct}%"></div>
 							</div>
 						</div>
@@ -1165,14 +1206,14 @@
 							{#if getWinConditions(selectedCampaign).length > 0}
 								<div class="flex flex-wrap gap-1 mb-2">
 									{#each getWinConditions(selectedCampaign) as wc}
-										<span class="text-xs bg-green-950/50 text-green-400 px-2 py-0.5 rounded">{wc.label} ×{wc.weight}</span>
+										<span class="text-xs bg-[var(--accent)]/12 text-[var(--accent)] px-2 py-0.5 rounded">{wc.label} ×{wc.weight}</span>
 									{/each}
 								</div>
 							{/if}
 							{#if selectedCampaign.target_wins}
 								<div class="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
 									<div class="h-full rounded-full transition-all duration-500 {
-										(selectedCampaign.win_count ?? 0) >= selectedCampaign.target_wins ? 'bg-green-500' : 'bg-blue-500'
+										(selectedCampaign.win_count ?? 0) >= selectedCampaign.target_wins ? 'bg-[var(--accent)]' : 'bg-blue-500'
 									}" style="width:{Math.min(((selectedCampaign.win_count ?? 0) / selectedCampaign.target_wins) * 100, 100)}%"></div>
 								</div>
 								<p class="text-xs text-[#444] mt-1">
@@ -1227,7 +1268,7 @@
 					</div>
 
 					{#if enrollResult}
-						<p class="text-xs text-green-400 mb-2">{enrollResult.enrolled} enrolled, {enrollResult.skipped} already active</p>
+						<p class="text-xs text-[var(--accent)] mb-2">{enrollResult.enrolled} enrolled, {enrollResult.skipped} already active</p>
 					{/if}
 
 					<!-- Email blast composer -->
@@ -1253,11 +1294,11 @@
 										<button
 											onclick={generateCampaignEmail}
 											disabled={generatingCampaignEmail}
-											class="rounded-lg border border-purple-800 px-2.5 py-1.5 text-xs text-purple-400 hover:bg-purple-900/20 disabled:opacity-40 transition-colors">
+											class="rounded-lg border border-[var(--accent)]/40 px-2.5 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors">
 											{generatingCampaignEmail ? '✨ Writing...' : '✨ AI Write'}
 										</button>
 										<input bind:value={campaignEmailPrompt} placeholder="Prompt (optional — e.g. 'focus on gaming partnership')"
-											class="flex-1 min-w-0 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-purple-600 focus:outline-none" />
+											class="flex-1 min-w-0 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-[var(--accent)]/40 focus:outline-none" />
 									</div>
 									<p class="text-xs text-[#444]">Use <code class="text-[#555]">{'{{name}}'}</code> and <code class="text-[#555]">{'{{company}}'}</code> — replaced per contact on send</p>
 									<input bind:value={emailSubject} placeholder="Subject line *"
@@ -1265,7 +1306,7 @@
 									<textarea bind:value={emailBody} rows="6" placeholder="Hi {{name}},&#10;&#10;..."
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 									{#if emailBlastResult}
-										<p class="text-xs {emailBlastResult.startsWith('✓') ? 'text-green-400' : 'text-yellow-400'}">{emailBlastResult}</p>
+										<p class="text-xs {emailBlastResult.startsWith('✓') ? 'text-[var(--accent)]' : 'text-yellow-400'}">{emailBlastResult}</p>
 									{/if}
 									<button onclick={prepareBlast} disabled={sendingEmailBlast || !emailSubject.trim() || !emailBody.trim()}
 										class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">

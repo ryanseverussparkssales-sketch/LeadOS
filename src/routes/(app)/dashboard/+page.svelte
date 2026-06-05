@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import { page } from '$app/stores';
 	import {
 		WIDGET_REGISTRY,
@@ -9,8 +11,8 @@
 		getDefaultSlot,
 	} from '$lib/widgetRegistry';
 
-	const LAYOUT_KEY = 'leados_dashboard_layout';
-	const TOP_BAND_KEY = 'leados_top_band';
+	const LAYOUT_KEY = 'rogueos_dashboard_layout';
+	const TOP_BAND_KEY = 'rogueos_top_band';
 
 	let topBand = $state<string[]>([]);
 	let editingTopBand = $state(false);
@@ -103,10 +105,11 @@
 			const spotifyResult = $page.url.searchParams.get('spotify');
 			const spotifyError = $page.url.searchParams.get('spotify_error');
 			if (spotifyResult === 'connected') {
-				console.log('[spotify] Connected successfully');
+				toastSuccess('Spotify connected');
 			}
 			if (spotifyError) {
 				console.error('[spotify] OAuth error:', spotifyError);
+				toastError('Spotify connection failed');
 			}
 		} catch { /* non-fatal */ }
 
@@ -147,7 +150,7 @@
 				method: 'PUT',
 				body: JSON.stringify({ dashboardLayout: layout }),
 			});
-		} catch { /* non-fatal */ }
+		} catch (e) { console.warn('[dashboard] layout save failed (non-fatal, cached locally):', e); }
 	}
 
 	function addWidget(type: string) {
@@ -223,7 +226,7 @@
 	);
 </script>
 
-<svelte:head><title>Dashboard — LeadOS</title></svelte:head>
+<svelte:head><title>Dashboard — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<!-- Header -->
@@ -393,9 +396,7 @@
 									onclick={() => removeWidget(widget.id)}
 									class="remove-btn text-xs text-[#444] hover:text-red-400 transition-all"
 									aria-label="Remove {widgetLabel(widget.type)} widget"
-									title="Remove widget">
-									✕
-								</button>
+									title="Remove widget"><Icon name="x" size={14} /></button>
 							</div>
 						</div>
 						<!-- Widget content — dynamic component from registry -->

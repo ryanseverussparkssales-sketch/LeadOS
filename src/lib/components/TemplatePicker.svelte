@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 
 	let { type = 'email', onSelect, contactName = '', contactCompany = '' }: {
@@ -95,7 +96,7 @@
 
 			<div class="p-2 border-t border-[#1e1e1e] flex justify-between items-center">
 				<a href="/templates" onclick={() => open = false} class="text-xs text-[#444] hover:text-white">Manage templates →</a>
-				<button onclick={() => open = false} class="text-xs text-[#444] hover:text-white">✕</button>
+				<button onclick={() => open = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 		</div>
 	{/if}

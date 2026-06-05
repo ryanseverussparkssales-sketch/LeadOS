@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { apiFetch } from '$lib/api';
@@ -142,10 +143,10 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 		<div>
-			<p class="text-white text-sm font-semibold">✦ LeadOS AI</p>
+			<p class="text-white text-sm font-semibold">✦ RogueOS AI</p>
 			<p class="text-xs text-[#555] mt-0.5">Create, find, navigate, learn · Ctrl+J</p>
 		</div>
-		<button onclick={() => open = false} class="text-[#444] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close">✕</button>
+		<button onclick={() => open = false} class="text-[#444] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close"><Icon name="x" size={14} /></button>
 	</div>
 
 	<!-- Quick actions (empty state) -->
@@ -180,8 +181,8 @@
 									{#if tr.result}
 										{@const fmt = fmtToolResult(tr)}
 										{#if fmt?.type === 'task'}
-											<div class="rounded-lg border border-green-800/40 bg-green-950/20 px-3 py-2">
-												<p class="text-xs text-green-400 font-medium">✓ Task Created</p>
+											<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-3 py-2">
+												<p class="text-xs text-[var(--accent)] font-medium">✓ Task Created</p>
 												<p class="text-xs text-[#888] mt-0.5">{fmt.data?.title}</p>
 												{#if fmt.data?.due_date}<p class="text-xs text-[#555]">Due: {new Date(fmt.data.due_date).toLocaleDateString()}</p>{/if}
 											</div>

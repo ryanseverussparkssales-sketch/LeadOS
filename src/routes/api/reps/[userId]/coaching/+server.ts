@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import Anthropic from '@anthropic-ai/sdk';
@@ -12,6 +13,7 @@ import { env } from '$env/dynamic/private';
  */
 export const GET = async ({ request, params }: { request: Request; params: { userId: string } }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	if (await rateLimitUser(user.id, { max: 10, windowMs: 60_000 })) return json({ available: false, reason: 'Rate limit exceeded' });
 	const targetUserId = params.userId === 'me' ? user.id : params.userId;
 

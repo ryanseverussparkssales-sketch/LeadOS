@@ -4,7 +4,7 @@
 	interface Message { role: 'user' | 'assistant'; content: string; }
 
 	let messages = $state<Message[]>([
-		{ role: 'assistant', content: "Hi! I'm your LeadOS AI assistant. Ask me about your contacts, tasks, calls, pipeline, or anything in your CRM.\n\nTry: *\"How many callbacks do I have this week?\"* or *\"Show me my overdue tasks\"*" }
+		{ role: 'assistant', content: "Hi! I'm your RogueOS AI assistant. Ask me about your contacts, tasks, calls, pipeline, or anything in your CRM.\n\nTry: *\"How many callbacks do I have this week?\"* or *\"Show me my overdue tasks\"*" }
 	]);
 	let input = $state('');
 	let loading = $state(false);
@@ -64,7 +64,7 @@
 			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 			.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 			.replace(/\*(.+?)\*/g, '<em class="text-[#aaa]">$1</em>')
-			.replace(/`(.+?)`/g, '<code class="bg-[#1a1a1a] px-1 rounded text-xs font-mono text-green-400">$1</code>')
+			.replace(/`(.+?)`/g, '<code class="bg-[#1a1a1a] px-1 rounded text-xs font-mono text-[var(--accent)]">$1</code>')
 			.replace(/^• (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#555] mt-0.5">•</span><span>$1</span></div>')
 			.replace(/^- (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#555] mt-0.5">–</span><span>$1</span></div>')
 			.replace(/\n/g, '<br/>');
@@ -75,7 +75,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between px-4 py-3 border-b border-[#1e1e1e]">
 		<div class="flex items-center gap-2">
-			<div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white">A</div>
+			<div class="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--accent)] to-blue-600 flex items-center justify-center text-xs font-bold text-white">A</div>
 			<span class="text-sm font-medium text-white">AI Assistant</span>
 			<span class="text-[10px] text-[#444] bg-[#1a1a1a] px-1.5 py-0.5 rounded">Claude Haiku</span>
 		</div>

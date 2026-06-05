@@ -3,6 +3,8 @@
 	import { apiFetch } from '$lib/api';
 	import { CRM_TEMPLATES } from '$lib/crmTemplates';
 	import CSVImportAdvanced from '$lib/components/CSVImportAdvanced.svelte';
+	import { parseCsv } from '$lib/utils/csv';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	type Mode = 'new' | 'sync' | 'undo' | 'reverse' | 'crm';
 	let mode = $state<Mode>('new');
@@ -48,13 +50,47 @@
 
 	async function undoBatch() {
 		if (!selectedBatch) return;
+		const count = batchContacts.length;
+		if (!confirm(`Permanently delete ${count} uncontacted contact${count === 1 ? '' : 's'} from this import? This cannot be undone.`)) return;
 		undoing = true; undoResult = null;
-		const res = await apiFetch(`/api/contacts/import-batches/${selectedBatch}`, { method:'DELETE' });
-		if (res.ok) {
-			undoResult = await res.json();
-			batches = batches.map(b => b.id === selectedBatch ? { ...b, can_undo: false } : b);
-		}
+		try {
+			const res = await apiFetch(`/api/contacts/import-batches/${selectedBatch}`, { method:'DELETE' });
+			if (res.ok) {
+				undoResult = await res.json();
+				batches = batches.map(b => b.id === selectedBatch ? { ...b, can_undo: false } : b);
+				toastSuccess(`Removed ${undoResult?.deleted ?? count} contacts`);
+			} else { toastError('Could not undo this import'); }
+		} catch { toastError('Could not undo this import'); }
 		undoing = false;
+	}
+
+	async function runSyncImport() {
+		if (!syncFile || syncing) return;
+		syncing = true; syncResult = null;
+		try {
+			const all = parseCsv(syncFile);
+			const headers = all[0] ?? [];
+			const rows = all.slice(1).map((cells) => {
+				const record: Record<string, string> = {};
+				headers.forEach((h, i) => {
+					const field = syncFieldMap[h];
+					if (field && field !== 'skip') record[field] = (cells[i] ?? '').trim();
+				});
+				const hasKey = !!(record.phone?.trim() || record.email?.trim() || record.name?.trim());
+				return { record, status: hasKey ? 'valid' : 'invalid' };
+			});
+			const res = await apiFetch('/api/contacts/sync-import', {
+				method: 'POST',
+				body: JSON.stringify({ rows, fieldMapping: syncFieldMap, updateFields: syncUpdateFields, filename: 'sync-import.csv' }),
+			});
+			if (res.ok) {
+				syncResult = await res.json();
+				toastSuccess(`Sync complete — ${syncResult?.created ?? 0} created, ${syncResult?.updated ?? 0} updated`);
+				const br = await apiFetch('/api/contacts/import-batches');
+				if (br.ok) batches = await br.json();
+			} else { toastError('Sync import failed'); }
+		} catch { toastError('Sync import failed'); }
+		syncing = false;
 	}
 
 	function loadCsvForSync(e: Event) {
@@ -87,8 +123,11 @@
 		const items = lookupInput.trim().split('\n').map(l => l.trim()).filter(Boolean);
 		if (!items.length) return;
 		lookingUp = true; lookupResults = []; lookupSummary = null;
-		const res = await apiFetch('/api/contacts/reverse-lookup', { method:'POST', body: JSON.stringify({ lookupType, items, enrichWithAI }) });
-		if (res.ok) { const d = await res.json(); lookupResults = d.results; lookupSummary = d.summary; }
+		try {
+			const res = await apiFetch('/api/contacts/reverse-lookup', { method:'POST', body: JSON.stringify({ lookupType, items, enrichWithAI }) });
+			if (res.ok) { const d = await res.json(); lookupResults = d.results; lookupSummary = d.summary; }
+			else { toastError('Lookup failed — please try again'); }
+		} catch { toastError('Lookup failed — check your connection'); }
 		lookingUp = false;
 	}
 
@@ -99,13 +138,13 @@
 	function fmtDate(iso: string) { return new Date(iso).toLocaleString(); }
 </script>
 
-<svelte:head><title>Import Center — LeadOS</title></svelte:head>
+<svelte:head><title>Import Center — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
 		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Import Center</h2>
 		<div class="flex gap-1 mt-3">
-			{#each ([['new','📥 New Import'],['sync','🔄 Sync Update'],['undo','↩ Undo Import'],['reverse','🔍 Reverse Lookup'],['crm','🏢 CRM Migration']] as [Mode,string][]) as [m, label]}
+			{#each ([['new','New Import'],['sync','Sync Update'],['undo','Undo Import'],['reverse','Reverse Lookup'],['crm','CRM Migration']] as [Mode,string][]) as [m, label]}
 				<button onclick={() => mode = m} class="rounded-lg px-4 py-1.5 text-xs transition-colors {mode === m ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">{label}</button>
 			{/each}
 		</div>
@@ -117,7 +156,7 @@
 		{#if mode === 'new'}
 			<div class="max-w-2xl">
 				<p class="text-xs text-[#555] mb-4">Standard CSV import with AI field mapping and dedup detection.</p>
-				<CSVImportAdvanced onImportDone={(n) => { /* refresh */ }} />
+				<CSVImportAdvanced onImportDone={async () => { const br = await apiFetch('/api/contacts/import-batches'); if (br.ok) batches = await br.json(); }} />
 			</div>
 
 		<!-- SYNC UPDATE -->
@@ -148,14 +187,14 @@
 
 					<p class="text-xs text-[#444]">Contacts matched by phone or email will have the checked fields updated. New contacts will be created.</p>
 
-					<button onclick={() => {}} disabled={syncing || !syncFile} class="rounded-lg bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-40">
+					<button onclick={runSyncImport} disabled={syncing || !syncFile} class="rounded-lg bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-40">
 						{syncing ? 'Syncing...' : 'Run Sync Import'}
 					</button>
 				{/if}
 
 				{#if syncResult}
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-1 text-sm hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-						<p class="text-green-400">✓ {syncResult.created} new contacts created</p>
+						<p class="text-[var(--accent)]">✓ {syncResult.created} new contacts created</p>
 						<p class="text-blue-400">↑ {syncResult.updated} existing contacts updated</p>
 						{#if syncResult.skipped > 0}<p class="text-[#555]">{syncResult.skipped} rows skipped</p>{/if}
 						{#if syncResult.errors > 0}<p class="text-red-400">{syncResult.errors} errors</p>{/if}
@@ -183,7 +222,7 @@
 										<p class="text-xs text-[#555]">{fmtDate(batch.created_at)} · {batch.total_created} created{batch.total_updated > 0 ? ` · ${batch.total_updated} updated` : ''} · {batch.source.toUpperCase()}</p>
 									</div>
 									{#if batch.can_undo}
-										<span class="text-xs text-green-400 bg-green-950/30 px-2 py-0.5 rounded">Can undo</span>
+										<span class="text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Can undo</span>
 									{:else}
 										<span class="text-xs text-[#444]">Locked</span>
 									{/if}
@@ -200,7 +239,7 @@
 									<div class="flex items-center gap-3 text-xs">
 										<p class="text-white flex-1 truncate">{c.name}</p>
 										<p class="text-[#555]">{c.company}</p>
-										<span class="{c.call_count > 0 ? 'text-yellow-400' : 'text-green-400'}">{c.call_count > 0 ? `${c.call_count} calls` : 'No calls'}</span>
+										<span class="{c.call_count > 0 ? 'text-yellow-400' : 'text-[var(--accent)]'}">{c.call_count > 0 ? `${c.call_count} calls` : 'No calls'}</span>
 									</div>
 								{/each}
 							</div>
@@ -213,8 +252,8 @@
 					{/if}
 
 					{#if undoResult}
-						<div class="rounded-xl border border-green-800/30 bg-green-950/10 p-4">
-							<p class="text-sm text-green-400">✓ {undoResult.message}</p>
+						<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4">
+							<p class="text-sm text-[var(--accent)]">✓ {undoResult.message}</p>
 						</div>
 					{/if}
 				{/if}
@@ -229,7 +268,7 @@
 				</div>
 
 				<div class="flex gap-2">
-					{#each ([['phone','📞 Phone Numbers'],['email','✉ Emails'],['company','🏢 Company Names'],['domain','🌐 Domains (+ AI)']] as [LookupType,string][]) as [t,l]}
+					{#each ([['phone','Phone Numbers'],['email','Emails'],['company','Company Names'],['domain','Domains (+ AI)']] as [LookupType,string][]) as [t,l]}
 						<button onclick={() => { lookupType = t; if (t==='domain') enrichWithAI=true; }} class="flex-1 rounded-lg border px-3 py-2 text-xs transition-colors {lookupType===t ? 'border-white text-white' : 'border-[#2a2a2a] text-[#555] hover:text-white'}">{l}</button>
 					{/each}
 				</div>
@@ -250,20 +289,20 @@
 				{#if lookupSummary}
 					<div class="grid grid-cols-3 gap-3">
 						<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-3 text-center"><p class="text-white text-lg font-semibold">{lookupSummary.total}</p><p class="text-xs text-[#555]">Total</p></div>
-						<div class="rounded-lg border border-green-800/30 bg-green-950/10 p-3 text-center"><p class="text-green-400 text-lg font-semibold">{lookupSummary.found}</p><p class="text-xs text-[#555]">Found in CRM</p></div>
+						<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 text-center"><p class="text-[var(--accent)] text-lg font-semibold">{lookupSummary.found}</p><p class="text-xs text-[#555]">Found in CRM</p></div>
 						<div class="rounded-lg border border-yellow-800/30 bg-yellow-950/10 p-3 text-center"><p class="text-yellow-400 text-lg font-semibold">{lookupSummary.notFound}</p><p class="text-xs text-[#555]">Not in CRM</p></div>
 					</div>
 
 					<div class="space-y-2 max-h-72 overflow-y-auto">
 						{#each lookupResults as result}
-							<div class="flex items-start gap-3 rounded-lg border {result.found ? 'border-green-800/30 bg-green-950/5' : 'border-[#2a2a2a] bg-[#111]'} px-4 py-3">
+							<div class="flex items-start gap-3 rounded-lg border {result.found ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} px-4 py-3">
 								<span class="text-base shrink-0">{result.found ? '✅' : '❌'}</span>
 								<div class="flex-1 min-w-0">
 									<p class="text-xs font-mono text-white">{result.input}</p>
 									{#if result.found && result.contact}
 										<p class="text-xs text-[#666] mt-0.5">{(result.contact as {name:string}).name} · {(result.contact as {company:string}).company}</p>
 									{:else if result.enrichment}
-										<p class="text-xs text-purple-400 mt-0.5">✨ {(result.enrichment as {companyName:string}).companyName} — {(result.enrichment as {industry:string}).industry}</p>
+										<p class="text-xs text-[var(--accent)] mt-0.5">✨ {(result.enrichment as {companyName:string}).companyName} — {(result.enrichment as {industry:string}).industry}</p>
 										<p class="text-xs text-[#444]">Target: {(result.enrichment as {likelyDecisionMaker:string}).likelyDecisionMaker}</p>
 									{:else if !result.found}
 										<p class="text-xs text-[#444] mt-0.5">Not found — could be a new lead</p>

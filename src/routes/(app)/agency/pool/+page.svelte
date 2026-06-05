@@ -38,6 +38,12 @@
 
 	onMount(loadData);
 
+	let searchDebounce: ReturnType<typeof setTimeout>;
+	function debouncedSearch() {
+		clearTimeout(searchDebounce);
+		searchDebounce = setTimeout(loadData, 300);
+	}
+
 	function toggleSelect(id: string) {
 		const s = new Set(selectedIds);
 		s.has(id) ? s.delete(id) : s.add(id);
@@ -84,7 +90,7 @@
 	});
 </script>
 
-<svelte:head><title>Lead Pool — LeadOS</title></svelte:head>
+<svelte:head><title>Lead Pool — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4 shrink-0">
@@ -96,7 +102,7 @@
 
 	<!-- Toolbar -->
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-3 shrink-0 flex-wrap">
-		<input bind:value={search} oninput={loadData} placeholder="Search contacts…"
+		<input bind:value={search} oninput={debouncedSearch} placeholder="Search contacts…"
 			class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-52" />
 
 		<select bind:value={filterStatus} onchange={loadData} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:outline-none">

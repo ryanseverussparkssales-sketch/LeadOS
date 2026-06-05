@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	type Tab = 'web' | 'screenshot' | 'enrich' | 'search' | 'streamer' | 'csv';
 	let tab = $state<Tab>('web');
@@ -124,6 +125,8 @@
 				const data = await res.json();
 				extracted = data.extracted;
 				if (data.saved) history = [data.saved, ...history];
+			} else {
+				toastError('Failed to extract contact info from screenshot');
 			}
 			extracting = false;
 		};
@@ -149,6 +152,8 @@
 					? data.enrichment.talkingPoints
 					: JSON.parse(data.enrichment.talkingPoints ?? '[]'),
 			};
+		} else {
+			toastError('Failed to generate enrichment');
 		}
 		enriching = false;
 	}
@@ -158,6 +163,8 @@
 		if (res.ok) {
 			history = history.map(h => h.id === id ? { ...h, status: 'added' } : h);
 			scraped = scraped.map(s => s.id === id ? { ...s, status: 'added' } : s);
+		} else {
+			toastError('Failed to add contact');
 		}
 	}
 
@@ -175,12 +182,14 @@
 		lookingUp = true; streamerResult = null;
 		const r = await apiFetch('/api/scraper', { method: 'POST', body: JSON.stringify({ mode: 'streamer', handle: streamerHandle, platform: streamerPlatform, callListId: streamerCallList || undefined }) });
 		if (r.ok) { const d = await r.json(); streamerResult = d.info ?? null; if (d.saved) history = [d.saved, ...history]; }
+		else { toastError('Streamer lookup failed'); }
 		lookingUp = false;
 	}
 
 	async function previewCsv() {
 		const r = await apiFetch('/api/scraper', { method: 'POST', body: JSON.stringify({ mode: 'csv_preview', csvText }) });
 		if (r.ok) { const d = await r.json(); csvHeaders = d.headers ?? []; csvTotalRows = d.totalRows ?? 0; }
+		else { toastError('Could not parse CSV — check the format'); }
 	}
 
 	async function importCsv() {
@@ -191,18 +200,20 @@
 			const hr = await apiFetch('/api/scraper');
 			if (hr.ok) history = await hr.json();
 			csvHeaders = []; csvText = '';
+		} else {
+			toastError('CSV import failed');
 		}
 		importing = false;
 	}
 
 	function confColor(c: number) {
-		if (c >= 0.85) return 'text-green-400';
+		if (c >= 0.85) return 'text-[var(--accent)]';
 		if (c >= 0.65) return 'text-yellow-400';
 		return 'text-red-400';
 	}
 </script>
 
-<svelte:head><title>Lead Gen — LeadOS</title></svelte:head>
+<svelte:head><title>Lead Gen — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<!-- Header + tabs -->
@@ -245,7 +256,7 @@
 					</div>
 					{#if scrapeError}<p class="text-xs text-red-400 mt-2">{scrapeError}</p>{/if}
 					{#if scraped.length > 0}
-						<p class="text-xs text-green-400 mt-3">Found {scraped.length} contact{scraped.length !== 1 ? 's' : ''}</p>
+						<p class="text-xs text-[var(--accent)] mt-3">Found {scraped.length} contact{scraped.length !== 1 ? 's' : ''}</p>
 					{/if}
 				</div>
 
@@ -352,7 +363,7 @@
 					</div>
 					{#if searchError}<p class="text-xs text-red-400">{searchError}</p>{/if}
 					{#if searchResults.length > 0}
-						<p class="text-xs text-green-400">Found {searchResults.length} contacts — review in the inbox panel.</p>
+						<p class="text-xs text-[var(--accent)]">Found {searchResults.length} contacts — review in the inbox panel.</p>
 					{/if}
 				</div>
 
@@ -383,7 +394,7 @@
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 text-xs space-y-1 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 							<p class="text-white font-medium">{streamerResult.name ?? streamerHandle}</p>
 							<p class="text-[#555]">{streamerResult.game ?? ''}{streamerResult.game && streamerResult.followers ? ' · ' : ''}{streamerResult.followers ?? ''} followers</p>
-							{#if streamerResult.email}<p class="text-green-400">{streamerResult.email}</p>{/if}
+							{#if streamerResult.email}<p class="text-[var(--accent)]">{streamerResult.email}</p>{/if}
 							{#if streamerResult.bio}<p class="text-[#777] mt-1">{streamerResult.bio}</p>{/if}
 						</div>
 					{/if}
@@ -407,7 +418,7 @@
 							</button>
 						</div>
 					{:else}
-						<p class="text-xs text-[#888]">Map your CSV columns to LeadOS fields. {csvTotalRows} rows detected.</p>
+						<p class="text-xs text-[#888]">Map your CSV columns to RogueOS fields. {csvTotalRows} rows detected.</p>
 						<div class="grid grid-cols-2 gap-3">
 							{#each [['name','Name / Business'],['phone','Phone'],['email','Email'],['company','Company'],['title','Title']] as [field, label]}
 								<div>
@@ -428,7 +439,7 @@
 						</div>
 					{/if}
 					{#if importResult}
-						<p class="text-xs text-green-400">Imported {importResult.imported} contacts. {importResult.skipped} skipped (empty rows).</p>
+						<p class="text-xs text-[var(--accent)]">Imported {importResult.imported} contacts. {importResult.skipped} skipped (empty rows).</p>
 					{/if}
 				</div>
 
@@ -464,7 +475,7 @@
 							<div class="text-right shrink-0">
 								<p class="text-xs text-[#444] capitalize mb-1">{contact.source?.replace(/_/g,' ')}</p>
 								{#if contact.status === 'added'}
-									<p class="text-xs text-green-400">✓ Added</p>
+									<p class="text-xs text-[var(--accent)]">✓ Added</p>
 								{:else if contact.status === 'rejected'}
 									<p class="text-xs text-[#444]">Rejected</p>
 								{:else}

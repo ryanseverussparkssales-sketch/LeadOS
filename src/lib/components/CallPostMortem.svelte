@@ -121,7 +121,7 @@
 	let sendingEmail = $state(false);
 	let emailSentMsg = $state('');
 
-	async function sendViaLeadOS() {
+	async function sendViaRogueOS() {
 		if (!generatedEmail || !contact?.email) return;
 		sendingEmail = true; emailSentMsg = '';
 
@@ -140,7 +140,7 @@
 
 			if (res.ok) {
 				const d = await res.json();
-				emailSentMsg = `✓ Sent from ${d.from ?? 'LeadOS'} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
+				emailSentMsg = `✓ Sent from ${d.from ?? 'RogueOS'} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
 			} else {
 				emailSentMsg = 'Send failed — check email accounts in Settings';
 			}
@@ -312,7 +312,7 @@
 			</div>
 			{#if outcome}
 				<span class="text-[10px] px-2 py-1 rounded-lg border shrink-0
-					{outcome === 'appointment_set' || outcome === 'demo_scheduled' || outcome === 'meeting_confirmed' || outcome === 'signed_up' ? 'border-green-800/40 bg-green-950/20 text-green-400' :
+					{outcome === 'appointment_set' || outcome === 'demo_scheduled' || outcome === 'meeting_confirmed' || outcome === 'signed_up' ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12 text-[var(--accent)]' :
 					 outcome === 'not_interested' || outcome === 'do_not_call' || outcome === 'disconnected' ? 'border-red-800/40 bg-red-950/20 text-red-400' :
 					 'border-[var(--c-border)] text-[var(--c-text-muted)]'}">
 					{CALL_OUTCOMES.find(o => o.value === outcome)?.label ?? outcome.replace(/_/g,' ')}
@@ -328,7 +328,7 @@
 				{#each [
 					{ value: 'left_voicemail',  label: 'Voicemail',       emoji: '📬', cls: 'border-[#1e1e1e] text-[#888] hover:border-blue-800 hover:text-blue-400' },
 					{ value: 'no_answer',       label: 'No Answer',       emoji: '📵', cls: 'border-[#1e1e1e] text-[#888] hover:border-[#333] hover:text-white' },
-					{ value: 'appointment_set', label: 'Appointment Set', emoji: '📅', cls: 'border-green-900/40 text-green-700 hover:border-green-600 hover:text-green-400 hover:bg-green-950/20' },
+					{ value: 'appointment_set', label: 'Appointment Set', emoji: '📅', cls: 'border-[var(--accent)]/40 text-[var(--accent)] hover:border-[var(--accent-hi)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/12' },
 					{ value: 'not_interested',  label: 'Not Interested',  emoji: '✕',  cls: 'border-[#1e1e1e] text-[#555] hover:border-red-900/40 hover:text-red-500' },
 				] as q}
 					<button
@@ -359,7 +359,7 @@
 										onclick={() => outcome = o.value}
 										class="rounded-lg border px-2.5 py-1.5 text-xs transition-colors
 											{outcome === o.value ? 'border-white bg-white/5 text-white' :
-											 group === 'Win' ? 'border-green-900/30 text-green-800 hover:text-green-400 hover:border-green-700' :
+											 group === 'Win' ? 'border-[var(--accent)]/40 text-[var(--accent)] hover:text-[var(--accent)] hover:border-[var(--accent-hi)]' :
 											 group === 'Dead' ? 'border-red-900/30 text-[#555] hover:text-red-500 hover:border-red-900/50' :
 											 'border-[#1e1e1e] text-[#555] hover:border-[#333] hover:text-white'}">
 										{o.label}
@@ -399,13 +399,13 @@
 
 		<!-- Quality score — color-accented border -->
 		{#if qualityScore}
-			<div class="rounded-lg border p-4 {qualityScore.overallScore >= 80 ? 'border-green-900/50 bg-green-950/20' : qualityScore.overallScore >= 60 ? 'border-yellow-900/50 bg-yellow-950/10' : 'border-red-900/50 bg-red-950/10'}">
+			<div class="rounded-lg border p-4 {qualityScore.overallScore >= 80 ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : qualityScore.overallScore >= 60 ? 'border-yellow-900/50 bg-yellow-950/10' : 'border-red-900/50 bg-red-950/10'}">
 				<div class="flex items-center justify-between mb-3">
 					<p class="text-xs text-[var(--c-text-muted)] uppercase tracking-widest">Call Quality</p>
 					<div class="flex items-center gap-2">
 						<span class="font-mono text-white font-bold text-lg">{qualityScore.overallScore}</span>
 						<span class="text-[var(--c-text-ghost)] text-sm">/100</span>
-						<span class="text-xs px-2 py-0.5 rounded-full ml-1 {qualityScore.overallScore >= 80 ? 'bg-green-950 text-green-400' : qualityScore.overallScore >= 60 ? 'bg-yellow-950 text-yellow-400' : 'bg-red-950 text-red-400'}">
+						<span class="text-xs px-2 py-0.5 rounded-full ml-1 {qualityScore.overallScore >= 80 ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : qualityScore.overallScore >= 60 ? 'bg-yellow-950 text-yellow-400' : 'bg-red-950 text-red-400'}">
 							{qualityScore.overallScore >= 80 ? 'Strong' : qualityScore.overallScore >= 60 ? 'Good' : qualityScore.overallScore >= 40 ? 'Fair' : 'Needs Work'}
 						</span>
 					</div>
@@ -497,7 +497,7 @@
 							</label>
 						{/each}
 						{#if acceptedTasks.size > 0}
-							<p class="text-xs text-green-400">{acceptedTasks.size} task{acceptedTasks.size !== 1 ? 's' : ''} will be created on save</p>
+							<p class="text-xs text-[var(--accent)]">{acceptedTasks.size} task{acceptedTasks.size !== 1 ? 's' : ''} will be created on save</p>
 						{/if}
 					{:else if !loadingTasks}
 						<p class="text-xs text-[var(--c-text-ghost)]">Click "Suggest Tasks" to generate AI follow-up recommendations.</p>
@@ -549,7 +549,7 @@
 		<!-- Book Appointment button — shows for win outcomes -->
 		{#if WIN_OUTCOMES_WITH_APPT.has(outcome)}
 			<button onclick={() => showAppointmentModal = true}
-				class="w-full rounded-lg border border-green-800/50 bg-green-950/20 py-2.5 text-sm font-medium text-green-400 hover:bg-green-950/40 transition-colors flex items-center justify-center gap-2">
+				class="w-full rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 py-2.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors flex items-center justify-center gap-2">
 				📅 Book Appointment / Qualifying Questions
 			</button>
 		{/if}

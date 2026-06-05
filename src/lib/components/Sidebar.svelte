@@ -8,73 +8,75 @@
 	import { currentUser } from '$lib/stores';
 	import { apiFetch } from '$lib/api';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	const user = $derived($currentUser);
 
 	// DIALING — primary tools, ordered by priority
 	const DIALING = [
-		{ href: '/inbox',        label: 'Inbox',            icon: '📬' },
-		{ href: '/dialer',       label: 'Power Dialer',     icon: '🎯' },
-		{ href: '/phone',        label: 'Desk Phone',       icon: '📞' },
-		{ href: '/dashboard',    label: 'Dashboard',        icon: '⬛' },
-		{ href: '/calls',        label: 'Calls',            icon: '📋' },
+		{ href: '/inbox',        label: 'Inbox',            icon: 'inbox' },
+		{ href: '/dialer',       label: 'Power Dialer',     icon: 'target' },
+		{ href: '/phone',        label: 'Desk Phone',       icon: 'phone' },
+		{ href: '/dashboard',    label: 'Dashboard',        icon: 'dashboard' },
+		{ href: '/calls',        label: 'Calls',            icon: 'history' },
 	];
 
 	// CONTACTS — both lead routes exist, keeping all three distinct pages
 	const CONTACTS = [
-		{ href: '/contacts',     label: 'Contacts',         icon: '👥' },
-		{ href: '/companies',    label: 'Companies',        icon: '🏭' },
-		{ href: '/leads',        label: 'Lead Gen',         icon: '🔍' },
-		{ href: '/leads-inbox',  label: 'Lead Inbox',       icon: '📥' },
-		{ href: '/import',       label: 'Import',           icon: '⬆️' },
+		{ href: '/contacts',     label: 'Contacts',         icon: 'users' },
+		{ href: '/companies',    label: 'Companies',        icon: 'building' },
+		{ href: '/leads',        label: 'Lead Gen',         icon: 'search' },
+		{ href: '/scraper',      label: 'RogueScraper',     icon: 'radar' },
+		{ href: '/leads-inbox',  label: 'Lead Inbox',       icon: 'download' },
+		{ href: '/import',       label: 'Import',           icon: 'upload' },
 	];
 
 	// WORK
 	const WORK = [
-		{ href: '/campaigns',    label: 'Campaigns',        icon: '📣' },
-		{ href: '/projects',     label: 'Projects',         icon: '📁' },
-		{ href: '/tasks',        label: 'Tasks',            icon: '✅' },
-		{ href: '/messaging',    label: 'Messaging',        icon: '💬' },
-		{ href: '/scripts',      label: 'Scripts',          icon: '📝' },
-		{ href: '/templates',    label: 'Templates',        icon: '📄' },
+		{ href: '/campaigns',    label: 'Campaigns',        icon: 'megaphone' },
+		{ href: '/projects',     label: 'Projects',         icon: 'folder' },
+		{ href: '/tasks',        label: 'Tasks',            icon: 'checklist' },
+		{ href: '/messaging',    label: 'Messaging',        icon: 'message' },
+		{ href: '/scripts',      label: 'Scripts',          icon: 'fileText' },
+		{ href: '/templates',    label: 'Templates',        icon: 'file' },
 	];
 
 	// CONTENT — collapsible
 	const CONTENT = [
-		{ href: '/marketing',    label: 'Marketing',        icon: '📢' },
-		{ href: '/snippets',     label: 'Snippets',         icon: '⚡' },
-		{ href: '/docs',         label: 'Docs',             icon: '📚' },
+		{ href: '/marketing',    label: 'Marketing',        icon: 'broadcast' },
+		{ href: '/snippets',     label: 'Snippets',         icon: 'zap' },
+		{ href: '/docs',         label: 'Docs',             icon: 'book' },
 	];
 
 	// ANALYTICS — top two always visible, rest collapsible
 	const ANALYTICS_TOP = [
-		{ href: '/analytics',    label: 'Analytics',        icon: '📊' },
-		{ href: '/reports',      label: 'Reports',          icon: '📑' },
+		{ href: '/analytics',    label: 'Analytics',        icon: 'chart' },
+		{ href: '/reports',      label: 'Reports',          icon: 'report' },
 	];
 	const ANALYTICS_MORE = [
-		{ href: '/win-loss',     label: 'Win/Loss',         icon: '🏆' },
-		{ href: '/leaderboard',  label: 'Leaderboard',      icon: '🥇' },
-		{ href: '/time',         label: 'Time',             icon: '⏱' },
+		{ href: '/win-loss',     label: 'Win/Loss',         icon: 'trophy' },
+		{ href: '/leaderboard',  label: 'Leaderboard',      icon: 'medal' },
+		{ href: '/time',         label: 'Time',             icon: 'clock' },
 	];
 
 	// AGENCY — Numbers moved to SYSTEM
 	const AGENCY = [
-		{ href: '/agency',         label: 'Command Center',   icon: '🎛' },
-		{ href: '/agency/pool',    label: 'Lead Pool',        icon: '📋' },
-		{ href: '/agency/calls',   label: 'Call Review',      icon: '🎙' },
-		{ href: '/agency/payouts', label: 'Payouts',          icon: '💸' },
-		{ href: '/clients',      label: 'Clients',          icon: '🏢' },
-		{ href: '/team',         label: 'Team',             icon: '👤' },
-		{ href: '/financials',   label: 'Financials',       icon: '💰' },
-		{ href: '/pipeline',     label: 'Pipeline',         icon: '🔄' },
-		{ href: '/my-leads',     label: 'My Leads',         icon: '⭐' },
+		{ href: '/agency',         label: 'Command Center',   icon: 'sliders' },
+		{ href: '/agency/pool',    label: 'Lead Pool',        icon: 'layers' },
+		{ href: '/agency/calls',   label: 'Call Review',      icon: 'mic' },
+		{ href: '/agency/payouts', label: 'Payouts',          icon: 'banknote' },
+		{ href: '/clients',      label: 'Clients',          icon: 'building' },
+		{ href: '/team',         label: 'Team',             icon: 'user' },
+		{ href: '/financials',   label: 'Financials',       icon: 'wallet' },
+		{ href: '/pipeline',     label: 'Pipeline',         icon: 'pipeline' },
+		{ href: '/my-leads',     label: 'My Leads',         icon: 'star' },
 	];
 
 	// SYSTEM — Numbers moved here from AGENCY
 	const SYSTEM = [
-		{ href: '/settings',     label: 'Settings',         icon: '⚙️' },
-		{ href: '/numbers',      label: 'Numbers',          icon: '📱' },
-		{ href: '/trash',        label: 'Trash',            icon: '🗑️' },
+		{ href: '/settings',     label: 'Settings',         icon: 'settings' },
+		{ href: '/numbers',      label: 'Numbers',          icon: 'smartphone' },
+		{ href: '/trash',        label: 'Trash',            icon: 'trash' },
 	];
 
 	// Mode switcher — persisted to localStorage
@@ -82,15 +84,15 @@
 	let mode = $state<Mode>('dial');
 
 	const MODES: { id: Mode; icon: string; label: string }[] = [
-		{ id: 'dial',      icon: '📞', label: 'Dial'      },
-		{ id: 'campaigns', icon: '📣', label: 'Campaigns' },
-		{ id: 'agency',    icon: '🏢', label: 'Agency'    },
-		{ id: 'analyze',   icon: '📊', label: 'Analyze'   },
+		{ id: 'dial',      icon: 'phone',     label: 'Dial'      },
+		{ id: 'campaigns', icon: 'megaphone', label: 'Campaigns' },
+		{ id: 'agency',    icon: 'building',  label: 'Agency'    },
+		{ id: 'analyze',   icon: 'chart',     label: 'Analyze'   },
 	];
 
 	function setMode(m: Mode) {
 		mode = m;
-		if (browser) localStorage.setItem('leados_mode', m);
+		if (browser) localStorage.setItem('rogueos_mode', m);
 	}
 
 	let collapsed = $state(false);
@@ -141,7 +143,7 @@
 	onMount(async () => {
 		if (!browser) return;
 		// Restore saved mode
-		const saved = localStorage.getItem('leados_mode') as Mode | null;
+		const saved = localStorage.getItem('rogueos_mode') as Mode | null;
 		if (saved && MODES.find(m => m.id === saved)) mode = saved;
 
 		// Auto-switch mode based on current path
@@ -149,7 +151,7 @@
 		if (['/agency','/clients','/team','/pipeline','/financials','/my-leads'].some(s => p.startsWith(s))) mode = 'agency';
 		else if (['/campaigns','/projects','/scripts','/templates','/messaging','/sequences'].some(s => p.startsWith(s))) mode = 'campaigns';
 		else if (['/analytics','/reports','/win-loss','/leaderboard','/time'].some(s => p.startsWith(s))) mode = 'analyze';
-		else if (['/dialer','/phone','/calls','/contacts','/leads','/inbox','/import'].some(s => p.startsWith(s))) mode = 'dial';
+		else if (['/dialer','/phone','/calls','/contacts','/leads','/scraper','/inbox','/import'].some(s => p.startsWith(s))) mode = 'dial';
 
 		try {
 			const res = await apiFetch('/api/notifications');
@@ -171,7 +173,7 @@
 	<!-- Logo / collapse toggle -->
 	<div class="flex items-center justify-between px-3 py-3 border-b border-[var(--c-border)]">
 		{#if !collapsed}
-			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">LEADOS</span>
+			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">ROGUEOS</span>
 		{/if}
 		<button
 			onclick={() => collapsed = !collapsed}
@@ -200,8 +202,9 @@
 				{#each MODES as m}
 					<button onclick={() => setMode(m.id)}
 						title={m.label}
-						class="w-9 h-9 rounded-lg flex items-center justify-center text-base transition-colors {mode === m.id ? 'bg-white/15 text-white' : 'text-[#444] hover:text-[#888] hover:bg-white/5'}">
-						{m.icon}
+						aria-pressed={mode === m.id}
+						class="mode-pill relative w-9 h-9 rounded-lg flex items-center justify-center transition-colors {mode === m.id ? 'text-white' : 'text-[#444] hover:text-[#888] hover:bg-white/5'}">
+						<Icon name={m.icon} size={18} />
 					</button>
 				{/each}
 			</div>
@@ -211,8 +214,9 @@
 				{#each MODES as m}
 					<button onclick={() => setMode(m.id)}
 						title={m.label}
-						class="flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-center transition-all {mode === m.id ? 'bg-[#1e1e1e] text-white shadow-sm' : 'text-[#444] hover:text-[#777]'}">
-						<span class="text-sm leading-none">{m.icon}</span>
+						aria-pressed={mode === m.id}
+						class="mode-pill relative flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-center transition-all {mode === m.id ? 'bg-[#121212] text-white' : 'text-[#444] hover:text-[#777]'}">
+						<Icon name={m.icon} size={16} />
 						<span style="font-family:var(--font-label);font-size:9px;letter-spacing:.18em;line-height:1">{m.label}</span>
 					</button>
 				{/each}
@@ -228,7 +232,7 @@
 	{/if}
 
 	<!-- Nav groups -->
-	<nav class="flex-1 overflow-y-auto px-2 pb-2 space-y-3">
+	<nav class="rogue-nav flex-1 overflow-y-auto px-2 pb-2 space-y-3">
 
 		<!-- DIAL MODE: Dialing + Contacts -->
 		{#if mode === 'dial'}
@@ -246,11 +250,11 @@
 					<!-- Special handling for /inbox to show combined unread badge -->
 					{#if item.href === '/inbox'}
 						<a
-							href={item.href}
-							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors relative {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+							href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors relative {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 							title={collapsed ? item.label : undefined}
 						>
-							<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+							<Icon name={item.icon} class="flex-shrink-0 text-current" />
 							{#if !collapsed}<span class="truncate">{item.label}</span>{/if}
 							{#if (smsUnread + emailUnread) > 0}
 								<span class="absolute top-1 left-6 bg-white text-black text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold leading-none">
@@ -261,25 +265,25 @@
 					<!-- Special handling for /phone to show SMS unread badge -->
 					{:else if item.href === '/phone'}
 						<a
-							href={item.href}
-							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors relative {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+							href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors relative {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 							title={collapsed ? item.label : undefined}
 						>
-							<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+							<Icon name={item.icon} class="flex-shrink-0 text-current" />
 							{#if !collapsed}<span class="truncate">{item.label}</span>{/if}
 							{#if smsUnread > 0}
-								<span class="absolute top-1 left-6 bg-green-500 text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold leading-none">
+								<span class="absolute top-1 left-6 bg-[var(--accent)] text-[var(--accent-ink)] text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold leading-none">
 									{smsUnread > 9 ? '9+' : smsUnread}
 								</span>
 							{/if}
 						</a>
 					{:else}
 						<a
-							href={item.href}
-							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+							href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 							title={collapsed ? item.label : undefined}
 						>
-							<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+							<Icon name={item.icon} class="flex-shrink-0 text-current" />
 							{#if !collapsed}
 								<span class="truncate">{item.label}</span>
 							{/if}
@@ -297,11 +301,11 @@
 			<div class="space-y-0.5">
 				{#each CONTACTS as item}
 					<a
-						href={item.href}
-						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+						href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 						title={collapsed ? item.label : undefined}
 					>
-						<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+						<Icon name={item.icon} class="flex-shrink-0 text-current" />
 						{#if !collapsed}
 							<span class="truncate">{item.label}</span>
 						{/if}
@@ -323,11 +327,11 @@
 			<div class="space-y-0.5">
 				{#each WORK as item}
 					<a
-						href={item.href}
-						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+						href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 						title={collapsed ? item.label : undefined}
 					>
-						<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+						<Icon name={item.icon} class="flex-shrink-0 text-current" />
 						{#if !collapsed}
 							<span class="truncate">{item.label}</span>
 						{/if}
@@ -351,11 +355,11 @@
 				<div transition:slide={{ duration: 150 }} class="space-y-0.5">
 					{#each CONTENT as item}
 						<a
-							href={item.href}
-							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+							href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 							title={collapsed ? item.label : undefined}
 						>
-							<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+							<Icon name={item.icon} class="flex-shrink-0 text-current" />
 							{#if !collapsed}
 								<span class="truncate">{item.label}</span>
 							{/if}
@@ -384,11 +388,11 @@
 			<div class="space-y-0.5">
 				{#each ANALYTICS_TOP as item}
 					<a
-						href={item.href}
-						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+						href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 						title={collapsed ? item.label : undefined}
 					>
-						<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+						<Icon name={item.icon} class="flex-shrink-0 text-current" />
 						{#if !collapsed}
 							<span class="truncate">{item.label}</span>
 						{/if}
@@ -398,11 +402,11 @@
 					<div transition:slide={{ duration: 150 }}>
 					{#each ANALYTICS_MORE as item}
 						<a
-							href={item.href}
-							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+							href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+							class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 							title={collapsed ? item.label : undefined}
 						>
-							<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+							<Icon name={item.icon} class="flex-shrink-0 text-current" />
 							{#if !collapsed}
 								<span class="truncate">{item.label}</span>
 							{/if}
@@ -426,11 +430,11 @@
 			<div class="space-y-0.5">
 				{#each AGENCY as item}
 					<a
-						href={item.href}
-						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+						href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 						title={collapsed ? item.label : undefined}
 					>
-						<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+						<Icon name={item.icon} class="flex-shrink-0 text-current" />
 						{#if !collapsed}
 							<span class="truncate">{item.label}</span>
 						{/if}
@@ -446,11 +450,11 @@
 			<div class="space-y-0.5">
 				{#each SYSTEM as item}
 					<a
-						href={item.href}
-						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+						href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 						title={collapsed ? item.label : undefined}
 					>
-						<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+						<Icon name={item.icon} class="flex-shrink-0 text-current" />
 						{#if !collapsed}<span class="truncate">{item.label}</span>{/if}
 					</a>
 				{/each}
@@ -466,10 +470,10 @@
 			{ href: '/help', label: 'Help & Support', icon: '?' },
 			{ href: '/notifications', label: 'Notifications', icon: '🔔' },
 		] as item}
-			<a href={item.href}
-				class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'bg-[#1a1a1a] text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
+			<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+				class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#888] hover:text-[#ccc] hover:bg-[#111]'}"
 				title={collapsed ? item.label : undefined}>
-				<span class="text-base leading-none flex-shrink-0">{item.icon}</span>
+				<Icon name={item.icon} class="flex-shrink-0 text-current" />
 				{#if !collapsed}<span class="truncate">{item.label}</span>{/if}
 			</a>
 		{/each}

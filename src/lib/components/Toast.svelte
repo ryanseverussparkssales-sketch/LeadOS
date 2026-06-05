@@ -1,5 +1,6 @@
 <script lang="ts">
     import { toasts, dismiss, type Toast } from '$lib/stores/toast';
+    import Icon from '$lib/components/Icon.svelte';
 
     const ICONS: Record<string, string> = {
         success: '✓',
@@ -24,7 +25,7 @@
         >
             <span class="toast-icon">{ICONS[t.type]}</span>
             <span class="toast-msg">{t.message}</span>
-            <button class="toast-close" onclick={() => dismiss(t.id)} aria-label="Dismiss">✕</button>
+            <button class="toast-close" onclick={() => dismiss(t.id)} aria-label="Dismiss"><Icon name="x" size={14} /></button>
             {#if t.duration && t.duration > 0}
                 <div class="toast-bar" style="animation-duration:{t.duration}ms"></div>
             {/if}

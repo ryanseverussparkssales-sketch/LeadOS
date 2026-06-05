@@ -55,14 +55,17 @@
 				tasks = tasks.map(t => t.id === task.id ? { ...t, status: 'completed' } : t);
 			}
 			toastSuccess('Task completed');
+		} else {
+			toastError('Failed to complete task');
 		}
 	}
 
 	let confirmDeleteId = $state<string | null>(null);
 
 	async function deleteTask(id: string) {
-		await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
-		tasks = tasks.filter(t => t.id !== id);
+		const res = await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+		if (res.ok) { tasks = tasks.filter(t => t.id !== id); toastSuccess('Task deleted'); }
+		else { toastError('Failed to delete task'); }
 		confirmDeleteId = null;
 	}
 
@@ -97,7 +100,7 @@
 	const overdue = $derived(tasks.filter(t => isOverdue(t)).length);
 </script>
 
-<svelte:head><title>Tasks — LeadOS</title></svelte:head>
+<svelte:head><title>Tasks — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-2">
@@ -180,7 +183,18 @@
 
 	<div class="flex-1 overflow-y-auto">
 		{#if loading}
-	{:else if displayedTasks.length === 0}
+			<div class="divide-y divide-[#1e1e1e]">
+				{#each Array(5) as _}
+					<div class="flex items-center gap-4 px-8 py-4 animate-pulse">
+						<div class="w-5 h-5 rounded-full bg-[#1a1a1a] shrink-0"></div>
+						<div class="flex-1 space-y-2">
+							<div class="h-3 w-1/3 bg-[#1a1a1a] rounded"></div>
+							<div class="h-2 w-1/5 bg-[#141414] rounded"></div>
+						</div>
+					</div>
+				{/each}
+			</div>
+		{:else if displayedTasks.length === 0}
 			<div class="flex items-center justify-center py-16 text-center">
 				<div>
 					{#if filterPriority || filterOverdueOnly}
@@ -197,13 +211,29 @@
 				{#each displayedTasks as task}
 					<div class="flex items-center gap-4 px-8 py-4 hover:bg-[#111] transition-colors group {isOverdue(task) ? 'border-l-2 border-red-900' : ''}">
 						<!-- Complete checkbox -->
-						<button onclick={() => complete(task)} class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors {task.status === 'completed' ? 'border-green-500 bg-green-500/20' : 'border-[#333] hover:border-white'}">
+						<button onclick={() => complete(task)} aria-label="Complete task" class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors {task.status === 'completed' ? 'border-[var(--accent)]/40 bg-[var(--accent)]/20' : 'border-[#333] hover:border-white'}">
 						</button>
+						<span class="shrink-0 text-sm {PRIORITY_COLORS[task.priority] ?? 'text-[#666]'}" title="{task.priority} priority · {task.task_type}">{TYPE_ICONS[task.task_type] ?? '·'}</span>
 						<!-- Task content -->
 						<div class="flex-1 min-w-0">
 							<p class="text-sm {task.status === 'completed' ? 'line-through text-[#555]' : 'text-white'} truncate">{task.title}</p>
-							{#if task.due_date}<p class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#555]'} mt-0.5">{formatDate(task.due_date)}</p>{/if}
+							<div class="flex items-center gap-2 mt-0.5 flex-wrap">
+								{#if task.due_date}<span class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#555]'}">{fmtDue(task.due_date)}</span>{/if}
+								<span class="text-xs capitalize {PRIORITY_COLORS[task.priority] ?? 'text-[#666]'}">{task.priority}</span>
+								{#if task.contact}<a href="/contacts/{task.contact.id}" class="text-xs text-[#666] hover:text-white truncate">{task.contact.name}</a>{/if}
+								{#if task.ai_suggested}<span class="text-xs text-[var(--accent)]/70">✨ AI</span>{/if}
+							</div>
 						</div>
+						<!-- Delete -->
+						{#if confirmDeleteId === task.id}
+							<div class="flex items-center gap-2 shrink-0">
+								<button onclick={() => deleteTask(task.id)} class="text-xs text-red-400 hover:text-red-300">Delete</button>
+								<button onclick={() => confirmDeleteId = null} class="text-xs text-[#555] hover:text-white">Cancel</button>
+							</div>
+						{:else}
+							<button onclick={() => confirmDeleteId = task.id} aria-label="Delete task"
+								class="shrink-0 text-[#444] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">🗑</button>
+						{/if}
 					</div>
 				{/each}
 			</div>

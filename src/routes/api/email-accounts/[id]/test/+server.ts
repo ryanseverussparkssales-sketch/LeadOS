@@ -32,10 +32,11 @@ export const POST: RequestHandler = async ({ request, params }) => {
         const { sendEmail } = await import('$lib/server/email');
         const result = await sendEmail({
             to: account.email_address,
-            subject: 'LeadOS — Connection Test',
+            subject: 'RogueOS — Connection Test',
             html: '<p>Your email account is connected and working correctly.</p>',
             text: 'Your email account is connected and working correctly.',
-            fromAccountId: account.id,
+            userId: ownerId,
+            accountId: account.id,
         });
 
         if (result.success) {

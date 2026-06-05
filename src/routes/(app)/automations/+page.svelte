@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Condition { field:string; operator:string; value:string; }
 	interface Action { type:string; params:Record<string,string>; }
@@ -29,22 +31,29 @@
 		if (!nName.trim()) return;
 		saving = true;
 		const res = await apiFetch('/api/automations', { method:'POST', body: JSON.stringify({ name:nName, triggerType:nTrigger, conditions:nConditions, actions:nActions }) });
-		if (res.ok) { rules = [await res.json(), ...rules]; showNew = false; nName = ''; }
+		if (res.ok) { rules = [await res.json(), ...rules]; showNew = false; nName = ''; toastSuccess('Rule created'); }
+		else { toastError('Failed to create rule'); }
 		saving = false;
 	}
 
 	async function toggleRule(rule: Rule) {
 		const res = await apiFetch(`/api/automations/${rule.id}`, { method:'PATCH', body: JSON.stringify({ enabled: !rule.enabled }) });
 		if (res.ok) rules = rules.map(r => r.id === rule.id ? { ...r, enabled: !r.enabled } : r);
+		else toastError('Failed to update rule');
 	}
 
 	async function deleteRule(id: string) {
-		await apiFetch(`/api/automations/${id}`, { method:'DELETE' });
-		rules = rules.filter(r => r.id !== id);
+		const res = await apiFetch(`/api/automations/${id}`, { method:'DELETE' });
+		if (res.ok) {
+			rules = rules.filter(r => r.id !== id);
+			toastSuccess('Rule deleted');
+		} else {
+			toastError('Failed to delete rule');
+		}
 	}
 </script>
 
-<svelte:head><title>Automations — LeadOS</title></svelte:head>
+<svelte:head><title>Automations — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -86,7 +95,7 @@
 								{#each OPERATORS as [v, l]}<option value={v}>{l}</option>{/each}
 							</select>
 							<input bind:value={cond.value} placeholder="value" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
-							<button onclick={() => nConditions = nConditions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1">✕</button>
+							<button onclick={() => nConditions = nConditions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1"><Icon name="x" size={14} /></button>
 						</div>
 					{/each}
 					<button onclick={() => nConditions = [...nConditions, {field:'lead_source',operator:'equals',value:''}]} class="text-xs text-[#555] hover:text-white">+ Add condition</button>
@@ -112,7 +121,7 @@
 							{:else}
 								<input bind:value={action.params.value} placeholder="Value" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							{/if}
-							<button onclick={() => nActions = nActions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1">✕</button>
+							<button onclick={() => nActions = nActions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1"><Icon name="x" size={14} /></button>
 						</div>
 					{/each}
 					<button onclick={() => nActions = [...nActions, {type:'create_task',params:{title:''}}]} class="text-xs text-[#555] hover:text-white">+ Add action</button>
@@ -136,7 +145,7 @@
 			{#each rules as rule}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 flex items-start gap-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<button onclick={() => toggleRule(rule)}
-						class="w-10 h-6 rounded-full shrink-0 mt-0.5 transition-colors {rule.enabled ? 'bg-green-600' : 'bg-[#2a2a2a]'} relative">
+						class="w-10 h-6 rounded-full shrink-0 mt-0.5 transition-colors {rule.enabled ? 'bg-[var(--accent)]' : 'bg-[#2a2a2a]'} relative">
 						<span class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all {rule.enabled ? 'left-5' : 'left-1'}"></span>
 					</button>
 					<div class="flex-1">

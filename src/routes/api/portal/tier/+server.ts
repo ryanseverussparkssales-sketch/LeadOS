@@ -23,6 +23,7 @@ export const GET: RequestHandler = async ({ request }) => {
 			clientPortal:     tier === 'agency',
 			teamMembers:      tier === 'agency',
 			unlimitedContacts: tier !== 'free',
+			practiceCalls:    tier !== 'free',
 		},
 	});
 };

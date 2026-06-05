@@ -1,10 +1,30 @@
-import type { Handle } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { runDurable } from '$lib/server/durable';
+
+// Twilio webhooks that are answered here in the hook (before resolve()), so their
+// signature validation must live here too — the matching +server.ts routes never run.
+const TWILIO_WEBHOOK_PATHS = new Set([
+	'/api/twilio/voice', '/api/twilio/recording', '/api/twilio/status',
+	'/api/phone/incoming', '/api/phone/forward-status', '/api/phone/voicemail-recording',
+]);
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const path   = event.url.pathname;
 	const method = event.request.method;
 
 	console.log(`[hooks] ${method} ${path}`);
+
+	// Reject forged Twilio webhooks. Read a clone so the original body stream is
+	// still available to the per-path handlers below.
+	if (method === 'POST' && TWILIO_WEBHOOK_PATHS.has(path)) {
+		const { verifyTwilioSignature } = await import('$lib/server/twilioVerify');
+		const form = await event.request.clone().formData();
+		const sigParams: Record<string, string> = {};
+		for (const [k, v] of form.entries()) sigParams[k] = v as string;
+		if (!verifyTwilioSignature(event.request, event.url, sigParams)) {
+			return new Response('Forbidden', { status: 403 });
+		}
+	}
 
 	// Bypass CSRF for ALL Twilio webhooks by handling them before resolve()
 	if (method === 'POST' && path === '/api/twilio/voice') {
@@ -34,30 +54,41 @@ export const handle: Handle = async ({ event, resolve }) => {
 			console.log('[voice] to:', to, '| callSid:', callSid, '| callerId:', callerId);
 
 			if (callId && callSid) {
-				// Fire-and-forget — use .then() not .catch() (Supabase v2)
-				supabaseAdmin.from('calls')
+				// Await this — the recording/status callbacks look the call up BY twilio_call_sid,
+				// so dropping this write on serverless would orphan the recording. It's one fast update.
+				const { error } = await supabaseAdmin.from('calls')
 					.update({ twilio_call_sid: callSid })
-					.eq('id', callId)
-					.then(({ error }) => { if (error) console.error('[voice] DB error:', error); });
+					.eq('id', callId);
+				if (error) console.error('[voice] DB error:', error);
 			}
 
 			if (to && callerId) {
 				// Force https — ngrok serves https but event.url.origin returns http
 				const base = event.url.origin.replace('http://', 'https://');
 				console.log('[voice] base URL:', base);
-				const dial = twiml.dial(
-					{
-						callerId,
-						action: base + '/api/twilio/status',
-						method: 'POST' as const,
-						record: 'record-from-ringing' as const,
-						recordingStatusCallback: base + '/api/twilio/recording',
-						recordingStatusCallbackMethod: 'POST' as const,
-					},
-					to
-				);
+				const dialAttrs = {
+					callerId,
+					action: base + '/api/twilio/status',
+					method: 'POST' as const,
+					record: 'record-from-ringing' as const,
+					recordingStatusCallback: base + '/api/twilio/recording',
+					recordingStatusCallbackMethod: 'POST' as const,
+				};
+				if (env.TWILIO_AMD_ENABLED === 'true') {
+					// AMD on the dialed leg → /api/twilio/amd drops a voicemail on machines.
+					const dial = twiml.dial(dialAttrs);
+					dial.number(
+						{
+							machineDetection: 'DetectMessageEnd',
+							amdStatusCallback: base + '/api/twilio/amd',
+							amdStatusCallbackMethod: 'POST',
+						} as Parameters<typeof dial.number>[0],
+						to,
+					);
+				} else {
+					twiml.dial(dialAttrs, to);
+				}
 				console.log('[voice] TwiML:', twiml.toString());
-				void dial; // suppress unused-variable warning
 			} else {
 				console.error('[voice] Missing to or callerId:', { to, callerId, hasTwilioEnv: !!env.TWILIO_PHONE_NUMBER });
 				twiml.say('Configuration error. Please check your Twilio phone number settings.');
@@ -74,7 +105,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if ((method === 'POST' || method === 'GET') && path === '/api/twilio/recording') {
 		console.log('[hooks] Recording webhook hit');
-		(async () => {
+		await runDurable((async () => {
 			try {
 				const { supabaseAdmin } = await import('$lib/server/supabase');
 				const { processCallRecording } = await import('$lib/server/ai');
@@ -82,6 +113,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 				const callSid      = form.get('CallSid') as string;
 				const recordingUrl = form.get('RecordingUrl') as string;
 				const status       = form.get('RecordingStatus') as string;
+				// No recording (short / no-answer call) — mark processed so the dialer poller stops waiting.
+				if (callSid && (status === 'absent' || status === 'failed')) {
+					await supabaseAdmin.from('calls')
+						.update({ summary: 'Recording unavailable', processed_at: new Date().toISOString() })
+						.eq('twilio_call_sid', callSid);
+				}
 				if (callSid && recordingUrl && status === 'completed') {
 					const { data: call } = await supabaseAdmin
 						.from('calls').select('id').eq('twilio_call_sid', callSid).maybeSingle();
@@ -107,26 +144,35 @@ export const handle: Handle = async ({ event, resolve }) => {
 					}
 				}
 			} catch (err) { console.error('[recording] error:', err); }
-		})();
+		})());
 		return new Response('', { status: 200 });
 	}
 
 	if ((method === 'POST' || method === 'GET') && path === '/api/twilio/status') {
-		(async () => {
+		await runDurable((async () => {
 			try {
 				const { supabaseAdmin } = await import('$lib/server/supabase');
 				const form = await event.request.clone().formData();
 				const callSid = form.get('CallSid') as string;
 				const dur     = parseInt(form.get('DialCallDuration') as string ?? '0');
+				const dialStatus = (form.get('DialCallStatus') as string ?? '').toLowerCase();
+				const outcomeMap: Record<string, string> = {
+					completed: 'answered', answered: 'answered', busy: 'busy',
+					'no-answer': 'no_answer', failed: 'no_answer', canceled: 'no_answer',
+				};
+				const autoOutcome = outcomeMap[dialStatus];
 				const { data: call } = await supabaseAdmin
-					.from('calls').select('id').eq('twilio_call_sid', callSid).maybeSingle();
+					.from('calls').select('id, outcome').eq('twilio_call_sid', callSid).maybeSingle();
 				if (call) {
-					await supabaseAdmin.from('calls').update({
-						call_duration_seconds: dur, ended_at: new Date().toISOString(),
-					}).eq('id', call.id);
+					// Never overwrite an outcome the rep already logged.
+					const repOutcomes = new Set(['appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback','not_interested','do_not_call','follow_up_agreed','left_voicemail','wrong_number','info_requested','referral']);
+					const updates: Record<string, unknown> = { ended_at: new Date().toISOString() };
+					if (dur > 0) updates.call_duration_seconds = dur;
+					if (autoOutcome && !repOutcomes.has(call.outcome ?? '')) updates.outcome = autoOutcome;
+					await supabaseAdmin.from('calls').update(updates).eq('id', call.id);
 				}
 			} catch (err) { console.error('[status] error:', err); }
-		})();
+		})());
 		return new Response('', { status: 200 });
 	}
 
@@ -150,12 +196,40 @@ export const handle: Handle = async ({ event, resolve }) => {
 				.from('phone_numbers').select('id, user_id, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds')
 				.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
 
+			// Record the inbound call so its recording/transcript can be correlated by
+			// twilio_call_sid later. Isolated try/catch so a DB hiccup never breaks the call.
+			const inCallSid = params['CallSid'];
+			if (phoneRec?.user_id && inCallSid) {
+				try {
+					const callerNorm = callerNum.replace(/\D/g, '');
+					const { data: c } = await supabaseAdmin
+						.from('contacts').select('id')
+						.eq('user_id', phoneRec.user_id).eq('phone_normalized', callerNorm).maybeSingle();
+					await supabaseAdmin.from('calls').insert({
+						user_id: phoneRec.user_id,
+						phone_number_id: phoneRec.id,
+						contact_id: c?.id ?? null,
+						direction: 'inbound',
+						call_type: 'inbound',
+						from_number: callerNum,
+						to_number: calledNum,
+						twilio_call_sid: inCallSid,
+						status: 'ringing',
+						started_at: new Date().toISOString(),
+					});
+				} catch (e) { console.error('[incoming] call row insert failed:', e); }
+			}
+
 			const VR = twilio.twiml.VoiceResponse;
 			const twiml = new VR();
 
 			if (phoneRec) {
 				const ringTimeout = phoneRec.ring_timeout_seconds ?? 25;
-				const clientIdentity = env.TWILIO_CLIENT_IDENTITY ?? 'agent';
+				// Ring the browsers registered under THIS number's account — a per-account
+				// identity, so an inbound call can never cross into another tenant's browser.
+				const { getTwilioCreds, resolveClientIdentity } = await import('$lib/server/twilio');
+				const numberCreds = await getTwilioCreds(phoneRec.user_id);
+				const clientIdentity = resolveClientIdentity(numberCreds);
 
 				if (phoneRec.forwarding_enabled && phoneRec.forwarding_number) {
 					// Forward to external number
@@ -239,7 +313,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// ── Voicemail recording ready ────────────────────────────────────────────
 	if ((method === 'POST' || method === 'GET') && path === '/api/phone/voicemail-recording') {
-		(async () => {
+		await runDurable((async () => {
 			try {
 				const { supabaseAdmin } = await import('$lib/server/supabase');
 				const form = await event.request.clone().formData();
@@ -283,7 +357,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 							status: 'pending',
 							notes: `Inbound voicemail received. Check /phone for recording.`,
 							due_date: new Date(Date.now() + 4 * 3600_000).toISOString(), // 4 hours
-						}).catch(() => {});
+						}).then(() => {}, () => {});
 
 						if (vm) {
 							const { env } = await import('$env/dynamic/private');
@@ -310,9 +384,22 @@ export const handle: Handle = async ({ event, resolve }) => {
 					}
 				}
 			} catch (err) { console.error('[voicemail-recording] error:', err); }
-			})();
+			})());
 			return new Response('', { status: 200 });
 		}
 
 	return resolve(event);
+};
+
+// Capture otherwise-silent server errors (previously there was no handleError hook,
+// so uncaught errors vanished). Logs a structured line + a reference id surfaced to
+// the user. Sentry-ready: if @sentry/sveltekit is installed and SENTRY_DSN is set,
+// report `error` here.
+export const handleError: HandleServerError = ({ error, event, status, message }) => {
+	const ref = crypto.randomUUID().slice(0, 8);
+	console.error(
+		`[error] ref=${ref} ${event.request.method} ${event.url.pathname} → ${status} ${message}`,
+		error,
+	);
+	return { message: status >= 500 ? `Internal error (ref ${ref})` : message };
 };

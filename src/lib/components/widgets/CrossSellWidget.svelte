@@ -163,7 +163,7 @@
 					</div>
 					<div class="flex items-center gap-1 shrink-0">
 						{#each Array(opp.score) as _}
-							<div class="w-1 h-1 rounded-full bg-green-500"></div>
+							<div class="w-1 h-1 rounded-full bg-[var(--accent)]"></div>
 						{/each}
 					</div>
 				</a>

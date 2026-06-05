@@ -6,14 +6,14 @@
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
     onMount(() => {
-        notes = localStorage.getItem('leados_scratchpad') ?? '';
+        notes = localStorage.getItem('rogueos_scratchpad') ?? '';
     });
 
     function handleInput() {
         if (saveTimer) clearTimeout(saveTimer);
         saved = false;
         saveTimer = setTimeout(() => {
-            localStorage.setItem('leados_scratchpad', notes);
+            localStorage.setItem('rogueos_scratchpad', notes);
             saved = true;
             setTimeout(() => saved = false, 1500);
         }, 800);
@@ -23,7 +23,7 @@
 <div class="flex flex-col h-full p-3">
     <div class="flex items-center justify-between mb-2">
         <p class="text-xs font-semibold text-white">📋 Scratch Pad</p>
-        {#if saved}<span class="text-[10px] text-green-400">Saved</span>{/if}
+        {#if saved}<span class="text-[10px] text-[var(--accent)]">Saved</span>{/if}
     </div>
     <textarea bind:value={notes} oninput={handleInput}
         placeholder="Quick notes, phone numbers, ideas..."

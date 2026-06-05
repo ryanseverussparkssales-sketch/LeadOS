@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Task { id: string; title: string; due_date: string | null; priority: string; status: string; contact?: { name: string; phone: string } | null; }
 	let callbacks = $state<Task[]>([]);
@@ -27,12 +28,17 @@
 	const PRIORITY_COLORS: Record<string, string> = { high: 'text-red-400', medium: 'text-yellow-400', low: 'text-[#555]' };
 
 	async function completeCallback(id: string) {
-		await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
-		callbacks = callbacks.filter(c => c.id !== id);
+		const res = await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
+		if (res.ok) {
+			callbacks = callbacks.filter(c => c.id !== id);
+			toastSuccess('Callback marked done');
+		} else {
+			toastError('Failed to complete callback — try again');
+		}
 	}
 </script>
 
-<svelte:head><title>My Callbacks — LeadOS SDR</title></svelte:head>
+<svelte:head><title>My Callbacks — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8">
 	<div class="flex items-center justify-between mb-6">
@@ -66,7 +72,7 @@
 					<div class="text-right shrink-0">
 						<p class="text-xs text-[#777] mb-2">{fmtDate(cb.due_date)}</p>
 						<button onclick={() => completeCallback(cb.id)}
-							class="rounded-lg bg-green-900/30 border border-green-800/40 px-3 py-1 text-xs text-green-400 hover:bg-green-900/50 transition-colors">
+							class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 px-3 py-1 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 							✓ Done
 						</button>
 					</div>

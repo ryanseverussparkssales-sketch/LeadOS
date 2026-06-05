@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Contact { id:string; name:string; phone:string; company:string; phone_normalized:string; }
 	let groups = $state<Contact[][]>([]);
@@ -17,16 +18,20 @@
 	}
 
 	async function merge(primaryId: string, mergeId: string) {
+		if (!confirm('Merge this contact into the first one? This cannot be undone.')) return;
 		merging = mergeId;
 		const res = await apiFetch('/api/contacts/merge', { method:'POST', body: JSON.stringify({ primaryId, mergeId }) });
 		if (res.ok) {
 			await load();
+			toastSuccess('Contacts merged');
+		} else {
+			toastError('Failed to merge contacts');
 		}
 		merging = null;
 	}
 </script>
 
-<svelte:head><title>Find Duplicates — LeadOS</title></svelte:head>
+<svelte:head><title>Find Duplicates — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">
@@ -60,7 +65,7 @@
 										{merging === contact.id ? 'Merging...' : 'Merge into first'}
 									</button>
 								{:else}
-									<span class="text-xs text-green-400 px-3">Keep</span>
+									<span class="text-xs text-[var(--accent)] px-3">Keep</span>
 								{/if}
 							</div>
 						{/each}

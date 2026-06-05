@@ -50,8 +50,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
             code,
-            client_id: env.GOOGLE_CLIENT_ID,
-            client_secret: env.GOOGLE_CLIENT_SECRET,
+            client_id: env.GOOGLE_CLIENT_ID ?? '',
+            client_secret: env.GOOGLE_CLIENT_SECRET ?? '',
             redirect_uri: getRedirectUri(),
             grant_type: 'authorization_code',
         }),

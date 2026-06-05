@@ -33,7 +33,7 @@
     }
 
     function intentColor(label: string) {
-        if (label === 'interested' || label === 'positive_reply') return 'text-green-400 bg-green-950/50';
+        if (label === 'interested' || label === 'positive_reply') return 'text-[var(--accent)] bg-[var(--accent)]/12';
         if (label === 'callback_request') return 'text-blue-400 bg-blue-950/50';
         return 'text-yellow-400 bg-yellow-950/50';
     }

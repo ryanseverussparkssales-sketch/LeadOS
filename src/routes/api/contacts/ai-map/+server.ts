@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import type { RequestHandler } from './$types';
@@ -22,6 +23,7 @@ const CRM_FIELDS = [
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	const ownerId = await getEffectiveUserId(user.id);
 	const { headers, sampleRows } = await request.json();
 	if (!headers?.length) throw error(400, 'headers required');

@@ -1,5 +1,5 @@
 /**
- * Central widget registry for LeadOS dashboard.
+ * Central widget registry for RogueOS dashboard.
  * To add a new widget: create the .svelte file and add one entry here.
  * The dashboard renders widgets dynamically — no if/else chain needed.
  */
@@ -25,17 +25,11 @@ import PhoneWidget from '$lib/components/widgets/PhoneWidget.svelte';
 import CoachingWidget from '$lib/components/widgets/CoachingWidget.svelte';
 import ScriptPanel from '$lib/components/widgets/ScriptPanel.svelte';
 import SpotifyWidget from '$lib/components/widgets/SpotifyWidget.svelte';
-import SpotifyBeats from '$lib/components/widgets/SpotifyBeats.svelte';
 import SpotifyMini from '$lib/components/widgets/SpotifyMini.svelte';
 import TimerWidget from '$lib/components/widgets/TimerWidget.svelte';
 import TimerPomodoro from '$lib/components/widgets/TimerPomodoro.svelte';
 import TimerSprint from '$lib/components/widgets/TimerSprint.svelte';
 import ProjectTimer from '$lib/components/widgets/ProjectTimer.svelte';
-import ChronoNexus from '$lib/components/widgets/ChronoNexus.svelte';
-import TransmissionLog from '$lib/components/widgets/TransmissionLog.svelte';
-import SignalArray from '$lib/components/widgets/SignalArray.svelte';
-import NeuralGrid from '$lib/components/widgets/NeuralGrid.svelte';
-import MatrixRain from '$lib/components/widgets/MatrixRain.svelte';
 import HotLeadsWidget from '$lib/components/widgets/HotLeadsWidget.svelte';
 import WinsFeedWidget from '$lib/components/widgets/WinsFeedWidget.svelte';
 import DailyGoalsWidget from '$lib/components/widgets/DailyGoalsWidget.svelte';
@@ -218,7 +212,7 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
 	// ── TOOLS ───────────────────────────────────────────────────────────────
 	'chat': {
 		type: 'chat', label: 'AI Assistant', icon: '✦',
-		description: 'Ask LeadOS AI anything about your data',
+		description: 'Ask RogueOS AI anything about your data',
 		component: ChatWidget, defaultCols: 1, defaultRows: 'lg',
 		category: 'tools',
 	},
@@ -237,50 +231,11 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
 	},
 
 	// ── FLAIR ───────────────────────────────────────────────────────────────
-	'spotify-beats': {
-		type: 'spotify-beats', label: 'Spotify Beats', icon: '🎧',
-		description: 'Animated music visualizer',
-		component: SpotifyBeats, defaultCols: 3, defaultRows: 'sm',
-		category: 'flair', topBandEligible: true,
-	},
 	'spotify-mini': {
 		type: 'spotify-mini', label: 'Spotify Mini', icon: '🎶',
 		description: 'Minimal now-playing strip',
 		component: SpotifyMini, defaultCols: 3, defaultRows: 'sm',
 		category: 'flair', topBandEligible: true,
-	},
-	'chrono-nexus': {
-		type: 'chrono-nexus', label: 'Chrono Nexus', icon: '🌀',
-		description: 'Orbital clock with live time display',
-		component: ChronoNexus, defaultCols: 1, defaultRows: 'md',
-		category: 'flair', topBandEligible: true,
-	},
-	'transmission': {
-		type: 'transmission', label: 'Transmission Log', icon: '📡',
-		description: 'Live activity feed in terminal style',
-		component: TransmissionLog, defaultCols: 2, defaultRows: 'sm',
-		category: 'flair', topBandEligible: true,
-	},
-	'signal-array': {
-		type: 'signal-array', label: 'Signal Array', icon: '⚡',
-		description: 'Animated signal visualization',
-		component: SignalArray, defaultCols: 1, defaultRows: 'sm',
-		category: 'flair',
-		minTier: 'pro', topBandEligible: true,
-	},
-	'neural-grid': {
-		type: 'neural-grid', label: 'Neural Grid', icon: '🧠',
-		description: 'Neural network animation overlay',
-		component: NeuralGrid, defaultCols: 1, defaultRows: 'sm',
-		category: 'flair',
-		minTier: 'pro', topBandEligible: true,
-	},
-	'matrix-rain': {
-		type: 'matrix-rain', label: 'Matrix Rain', icon: '💻',
-		description: 'The Matrix falling code effect',
-		component: MatrixRain, defaultCols: 3, defaultRows: 'xl',
-		category: 'flair',
-		minTier: 'pro', topBandEligible: true,
 	},
 
 	// ── NEW SALES WIDGETS ───────────────────────────────────────────────────

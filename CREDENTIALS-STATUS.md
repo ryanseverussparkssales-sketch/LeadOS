@@ -1,4 +1,4 @@
-# LeadOS — Credentials & Integration Status
+# RogueOS — Credentials & Integration Status
 **Last updated: 2026-05-30**
 
 ---
@@ -55,7 +55,7 @@
 | Service | Status | What's Needed |
 |---------|--------|--------------|
 | **Plaid** | Listed as quick-add account only | `PLAID_CLIENT_ID` + `PLAID_SECRET` from dashboard.plaid.com. Needs Plaid Link frontend SDK + backend `/api/plaid/exchange-token` endpoint. Use for: auto-import bank transactions into Balance Tracker |
-| **Stripe** | Listed in stack, no billing for LeadOS itself | Two separate things: (1) `STRIPE_SECRET_KEY` + `STRIPE_PUBLISHABLE_KEY` for billing customers for LeadOS subscriptions; (2) Same keys for collecting invoice payments. Register at dashboard.stripe.com |
+| **Stripe** | Listed in stack, no billing for RogueOS itself | Two separate things: (1) `STRIPE_SECRET_KEY` + `STRIPE_PUBLISHABLE_KEY` for billing customers for RogueOS subscriptions; (2) Same keys for collecting invoice payments. Register at dashboard.stripe.com |
 | **Mercury** | Account tracker only, no API pull | Mercury API is invite-only (mercury.com/api). `MERCURY_API_KEY` from Mercury dashboard. Use for: auto-pull bank balance + transactions |
 | **Wave** | Account tracker only | Wave API (developer.waveapps.com). OAuth-based. `WAVE_CLIENT_ID` + `WAVE_CLIENT_SECRET`. Use for: sync invoices to Wave accounting |
 | **Anthropic billing** | Stack entry only | Anthropic does not have a public billing API as of 2026. Pull from Supabase `api_usage_log` table instead (already tracked per call) |
@@ -83,7 +83,7 @@ GOOGLE_CLIENT_SECRET=
 SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 
-# Stripe (billing for LeadOS + invoice collection)
+# Stripe (billing for RogueOS + invoice collection)
 STRIPE_SECRET_KEY=
 STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=

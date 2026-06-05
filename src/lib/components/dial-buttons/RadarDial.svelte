@@ -23,11 +23,11 @@
       // Background clip
       ctx.save();
       ctx.beginPath(); ctx.arc(mid, mid, mid - 1, 0, Math.PI * 2); ctx.clip();
-      ctx.fillStyle = '#000a00';
+      ctx.fillStyle = '#0a0702';
       ctx.fillRect(0, 0, size, size);
 
       // Concentric rings
-      const ringColor = active ? '#003300' : '#001a00';
+      const ringColor = active ? '#3a2c10' : '#1f1708';
       for (let i = 1; i <= 3; i++) {
         ctx.strokeStyle = ringColor;
         ctx.lineWidth = 1;
@@ -41,7 +41,7 @@
       ctx.beginPath(); ctx.moveTo(mid, 4); ctx.lineTo(mid, size-4); ctx.stroke();
 
       // Outer ring
-      ctx.strokeStyle = active ? '#00aa00' : '#003300';
+      ctx.strokeStyle = active ? '#c8a24a' : '#3a2c10';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(mid, mid, mid - 3, 0, Math.PI * 2); ctx.stroke();
 
@@ -58,12 +58,12 @@
         ctx.moveTo(mid, mid);
         ctx.arc(mid, mid, sweepR, trailAngle, trailAngle + trailLen / 24);
         ctx.closePath();
-        ctx.fillStyle = `rgba(0,${active ? 255 : 150},0,${alpha})`;
+        ctx.fillStyle = active ? `rgba(212,175,55,${alpha})` : `rgba(168,132,47,${alpha})`;
         ctx.fill();
       }
 
       // Sweep line
-      ctx.strokeStyle = active ? '#00ff00' : '#006600';
+      ctx.strokeStyle = active ? '#d4af37' : '#8a6a2a';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(mid, mid);
@@ -84,10 +84,10 @@
         const pingAlpha = Math.max(0, 1 - pingAge * 0.6);
         if (pingAlpha > 0) {
           ctx.beginPath(); ctx.arc(pingX, pingY, 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0,255,80,${pingAlpha})`;
+          ctx.fillStyle = `rgba(212,175,55,${pingAlpha})`;
           ctx.fill();
           ctx.beginPath(); ctx.arc(pingX, pingY, 3 + pingAge * 4, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(0,255,80,${pingAlpha * 0.4})`;
+          ctx.strokeStyle = `rgba(212,175,55,${pingAlpha * 0.4})`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }
@@ -95,11 +95,11 @@
 
       // Center dot
       ctx.beginPath(); ctx.arc(mid, mid, 2, 0, Math.PI * 2);
-      ctx.fillStyle = active ? '#00ff00' : '#006600';
+      ctx.fillStyle = active ? '#d4af37' : '#8a6a2a';
       ctx.fill();
 
       // Label
-      ctx.fillStyle = active ? '#00cc00' : '#004400';
+      ctx.fillStyle = active ? '#c8a24a' : '#4a3812';
       ctx.font = `${size * 0.09}px monospace`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(connected ? 'PING' : calling ? 'SCAN' : 'RADAR', mid, size - 7);

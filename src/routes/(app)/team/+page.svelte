@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { currentUser } from '$lib/stores';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	const me = $derived($currentUser);
 
@@ -73,7 +75,7 @@
 
 	function fmtDate(d: string) { return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
 	function fmt(n: number) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n); }
-	function roleColor(r: string) { return r === 'manager' ? 'text-blue-400' : r === 'sdr' ? 'text-green-400' : r === 'agent' ? 'text-[#888]' : 'text-purple-400'; }
+	function roleColor(r: string) { return r === 'manager' ? 'text-blue-400' : r === 'sdr' ? 'text-[var(--accent)]' : r === 'agent' ? 'text-[#888]' : 'text-[var(--accent)]'; }
 
 	// ── Permissions ───────────────────────────────────────────────
 	let permMemberId = $state<string | null>(null);
@@ -83,8 +85,7 @@
 	const SDR_PERMS = [
 		{ key: 'coaching',       label: 'Coaching page' },
 		{ key: 'interview',      label: 'AI Interview' },
-		{ key: 'profile',        label: 'Marketplace profile' },
-		{ key: 'marketplace',    label: 'List on marketplace' },
+		{ key: 'profile',        label: 'Rep profile' },
 		{ key: 'bonus_visible',  label: 'See bonus amounts' },
 		{ key: 'performance',    label: 'Performance stats' },
 		{ key: 'dossier',        label: 'Client brief / dossier' },
@@ -229,23 +230,29 @@
 			await load();
 			payrollForm = { teamMemberId: '', memberEmail: '', payPeriodStart: '', payPeriodEnd: '', basePay: '', commission: '', bonuses: '', deductions: '0', status: 'pending', paymentMethod: 'ach', notes: '' };
 			showPayrollForm = false;
+			toastSuccess('Payroll entry saved');
+		} else {
+			toastError('Could not save payroll entry');
 		}
 		payrollSaving = false;
 	}
 
 	async function markPayrollPaid(id: string) {
-		await apiFetch(`/api/payroll/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'paid' }) });
-		await load();
+		if (!confirm('Mark this payroll entry as paid? This records the payment.')) return;
+		const res = await apiFetch(`/api/payroll/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'paid' }) });
+		if (res.ok) { await load(); toastSuccess('Marked as paid'); }
+		else toastError('Could not update payroll entry');
 	}
 
 	async function deletePayroll(id: string) {
 		if (!confirm('Delete payroll entry?')) return;
-		await apiFetch(`/api/payroll/${id}`, { method: 'DELETE' });
-		await load();
+		const res = await apiFetch(`/api/payroll/${id}`, { method: 'DELETE' });
+		if (res.ok) { await load(); toastSuccess('Payroll entry deleted'); }
+		else toastError('Could not delete payroll entry');
 	}
 </script>
 
-<svelte:head><title>Team — LeadOS</title></svelte:head>
+<svelte:head><title>Team — RogueOS</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 
@@ -269,7 +276,7 @@
 			<!-- Owner card -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 flex items-center gap-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium">{me?.email?.[0]?.toUpperCase() ?? 'O'}</div>
-				<div><div class="text-sm font-medium">{me?.email}</div><div class="text-xs text-purple-400">Owner</div></div>
+				<div><div class="text-sm font-medium">{me?.email}</div><div class="text-xs text-[var(--accent)]">Owner</div></div>
 			</div>
 
 			<!-- Invite form -->
@@ -304,7 +311,7 @@
 					<p class="text-xs text-blue-400 mt-1.5">This user will only see data for the selected client when they log in.</p>
 				{/if}
 
-				{#if inviteMsg}<p class="text-xs mt-2 {inviteMsg.startsWith('✓') ? 'text-green-400' : inviteMsg.startsWith('Error') ? 'text-red-400' : 'text-[#888]'}">{inviteMsg}</p>{/if}
+				{#if inviteMsg}<p class="text-xs mt-2 {inviteMsg.startsWith('✓') ? 'text-[var(--accent)]' : inviteMsg.startsWith('Error') ? 'text-red-400' : 'text-[#888]'}">{inviteMsg}</p>{/if}
 			</div>
 
 			<!-- Members list -->
@@ -324,11 +331,11 @@
 									{#if member.title}<span class="text-[#555]">· {member.title}</span>{/if}
 									{#if member.department}<span class="text-[#555]">· {member.department}</span>{/if}
 									{#if member.verbal_approved_at}
-									<span class="text-green-400 text-[10px]">· ✓ Verbal approved</span>
+									<span class="text-[var(--accent)] text-[10px]">· ✓ Verbal approved</span>
 								{:else if member.role === 'sdr'}
 									<span class="text-yellow-500 text-[10px]">· Pending verbal call</span>
 								{:else}
-									<span class="{member.status === 'active' ? 'text-green-400' : 'text-yellow-400'} capitalize">· {member.status}</span>
+									<span class="{member.status === 'active' ? 'text-[var(--accent)]' : 'text-yellow-400'} capitalize">· {member.status}</span>
 								{/if}
 								</div>
 							</div>
@@ -341,13 +348,13 @@
 							<div class="flex items-center gap-2">
 								{#if member.role === 'sdr' && !member.verbal_approved_at}
 									<button onclick={() => approveVerbal(member.id)}
-										class="text-xs text-green-400 hover:text-green-300 border border-green-900/40 rounded px-2 py-0.5 hover:border-green-400 transition-colors font-medium"
+										class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 rounded px-2 py-0.5 hover:border-[var(--accent)] transition-colors font-medium"
 										title="Mark verbal call complete — activates rep for dialing">
 										✓ Approve
 									</button>
 								{/if}
 								<button onclick={() => { activeTab = 'hr'; startEditHR(member); }} class="text-xs text-[#666] hover:text-white border border-[#333] rounded px-2 py-0.5 hover:border-white transition-colors">HR</button>
-								<button onclick={() => openPerms(member)} class="text-xs text-purple-400 hover:text-purple-300 border border-purple-900/40 rounded px-2 py-0.5 hover:border-purple-400 transition-colors">Perms</button>
+								<button onclick={() => openPerms(member)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 rounded px-2 py-0.5 hover:border-[var(--accent)]/60 transition-colors">Perms</button>
 								<select value={member.role} onchange={(e) => updateRole(member.id, (e.target as HTMLSelectElement).value)}
 									class="border border-[#2a2a2a] bg-[#1a1a1a] rounded px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
 									<option value="sdr">SDR</option>
@@ -375,14 +382,14 @@
 								<h3 class="text-white font-semibold">Permissions</h3>
 								<p class="text-xs text-[#555]">{member?.member_email} · <span class="capitalize">{member?.role}</span></p>
 							</div>
-							<button onclick={() => permMemberId = null} class="text-[#444] hover:text-white text-sm">✕</button>
+							<button onclick={() => permMemberId = null} class="text-[#444] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 						</div>
 						<div class="space-y-2">
 							{#each permList as perm}
 								<label class="flex items-center justify-between cursor-pointer group">
 									<span class="text-sm text-[#ccc] group-hover:text-white transition-colors">{perm.label}</span>
 									<button onclick={() => permValues = { ...permValues, [perm.key]: !permValues[perm.key] }}
-										class="relative w-10 h-5 rounded-full transition-colors {permValues[perm.key] !== false ? 'bg-green-600' : 'bg-[#2a2a2a]'}">
+										class="relative w-10 h-5 rounded-full transition-colors {permValues[perm.key] !== false ? 'bg-[var(--accent)]' : 'bg-[#2a2a2a]'}">
 										<span class="absolute top-0.5 transition-all {permValues[perm.key] !== false ? 'left-5' : 'left-0.5'} w-4 h-4 rounded-full bg-white"></span>
 									</button>
 								</label>
@@ -515,7 +522,7 @@
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Paid (all time)</div>
-					<div class="text-2xl font-semibold text-green-400">{fmt(totalPaidPayroll)}</div>
+					<div class="text-2xl font-semibold text-[var(--accent)]">{fmt(totalPaidPayroll)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Team Size</div>
@@ -534,12 +541,103 @@
 			</div>
 
 			{#if showPayrollForm}
-				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
-					<div class="text-sm font-medium mb-3">New Payroll Entry</div>
-				<p class="text-xs text-[#555] mb-3">Log a manual payroll payment for a rep</p>
-				<button onclick={() => showPayrollForm = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Close</button>
-			</div>
-		{/if}
+				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4 space-y-3">
+					<div class="text-sm font-medium">New Payroll Entry</div>
+					<div class="grid grid-cols-2 gap-3">
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Team member</label>
+							<select bind:value={payrollForm.teamMemberId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
+								<option value="">Select a member…</option>
+								{#each members as m}
+									<option value={m.id}>{m.first_name ? `${m.first_name} ${m.last_name}` : m.member_email}</option>
+								{/each}
+							</select>
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Payment method</label>
+							<select bind:value={payrollForm.paymentMethod} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
+								<option value="ach">ACH / Bank transfer</option>
+								<option value="stripe">Stripe</option>
+								<option value="paypal">PayPal</option>
+								<option value="check">Check</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Pay period start</label>
+							<input type="date" bind:value={payrollForm.payPeriodStart} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" />
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Pay period end</label>
+							<input type="date" bind:value={payrollForm.payPeriodEnd} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" />
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Base pay ($)</label>
+							<input type="number" min="0" step="0.01" bind:value={payrollForm.basePay} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Commission ($)</label>
+							<input type="number" min="0" step="0.01" bind:value={payrollForm.commission} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Bonuses ($)</label>
+							<input type="number" min="0" step="0.01" bind:value={payrollForm.bonuses} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
+						</div>
+						<div>
+							<label class="block text-xs text-[#666] mb-1">Deductions ($)</label>
+							<input type="number" min="0" step="0.01" bind:value={payrollForm.deductions} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
+						</div>
+					</div>
+					<div>
+						<label class="block text-xs text-[#666] mb-1">Notes</label>
+						<input bind:value={payrollForm.notes} placeholder="Optional" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
+					</div>
+					<div class="flex gap-2">
+						<button onclick={savePayroll} disabled={payrollSaving || !payrollForm.teamMemberId}
+							class="px-4 py-2 bg-white text-black rounded text-xs font-semibold hover:bg-white/90 disabled:opacity-40 transition-colors">
+							{payrollSaving ? 'Saving…' : 'Save entry'}
+						</button>
+						<button onclick={() => showPayrollForm = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
+					</div>
+				</div>
+			{/if}
+
+			<!-- Payroll entries -->
+			{#if filteredPayroll.length === 0}
+				<div class="text-center py-12 text-[#555] text-sm">No payroll entries{payrollPeriodFilter !== 'all' ? ` (${payrollPeriodFilter})` : ''} yet.</div>
+			{:else}
+				<div class="overflow-x-auto rounded-lg border border-[#1e1e1e]">
+					<table class="w-full text-sm min-w-[640px]">
+						<thead>
+							<tr class="text-left text-xs text-[#555] border-b border-[#1e1e1e]">
+								<th class="px-4 py-2 font-medium">Member</th>
+								<th class="px-4 py-2 font-medium">Period</th>
+								<th class="px-4 py-2 font-medium text-right">Net pay</th>
+								<th class="px-4 py-2 font-medium">Status</th>
+								<th class="px-4 py-2 font-medium text-right">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each filteredPayroll as p}
+								<tr class="border-b border-[#141414] hover:bg-[#0f0f0f] transition-colors">
+									<td class="px-4 py-2.5 text-white">{p.member_email ?? '—'}</td>
+									<td class="px-4 py-2.5 text-[#888] text-xs">{fmtDate(p.pay_period_start)} – {fmtDate(p.pay_period_end)}</td>
+									<td class="px-4 py-2.5 text-right text-white">{fmt(parseFloat(p.net_pay ?? 0))}</td>
+									<td class="px-4 py-2.5">
+										<span class="text-xs px-2 py-0.5 rounded-full {p.status === 'paid' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-yellow-500/10 text-yellow-400'}">{p.status}</span>
+									</td>
+									<td class="px-4 py-2.5 text-right whitespace-nowrap">
+										{#if p.status !== 'paid'}
+											<button onclick={() => markPayrollPaid(p.id)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] mr-3">Mark paid</button>
+										{/if}
+										<button onclick={() => deletePayroll(p.id)} aria-label="Delete payroll entry" class="text-xs text-[#555] hover:text-red-400">Delete</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 {/if}
 </div>
 </div>

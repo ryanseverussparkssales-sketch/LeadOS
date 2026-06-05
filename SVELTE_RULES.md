@@ -1,4 +1,4 @@
-# SvelteKit Rules for LeadOS
+# SvelteKit Rules for RogueOS
 
 ## Runes (always use these, never legacy $:)
 - `$state(value)` for reactive state
@@ -51,10 +51,42 @@
 - Route groups `(group)` for layout organization without URL impact
 - `+error.svelte` at route level for contextual error pages
 
-## What "professional" means for LeadOS specifically
+## What "professional" means for RogueOS specifically
 1. Pages load with data already present (SSR via +page.server.ts), no flash
 2. Forms use actions + enhance, not raw fetch
 3. Mutations invalidate the right data, not reload everything
 4. AI endpoints stream, never block
 5. Error states are explicit, not silent failures
 6. TypeScript strict throughout, no `any` except where genuinely dynamic
+
+---
+
+# LeadOS Stack Patterns (merged from Skills Kit — reconciled June 2026)
+
+Full reference: `docs/skills/LEADOSSTACK-SKILLS.md`. These are the **authoritative, codebase-adapted** versions. Where the kit conflicts with Svelte 5 or this repo's reality, the corrected rule below wins — see "⚠️ Corrections".
+
+## Svelte 5 `$state` typing
+- **Annotate the variable, never the rune:** `let x: T = $state(init)` — NOT `let x = $state<T>(init)` (that's the "Untyped function calls may not accept type arguments" error).
+  - `let contacts: Contact[] = $state([]);` · `let currentCall: CallSession | null = $state(null);`
+- Mutated DOM refs / vars must be `$state` too (fixes `non_reactive_update`): `let el: HTMLElement | null = $state(null);`
+- Store + local copy: `let local: T = $state($store);` then sync with a **sync** `$effect(() => { store.set(local); });`.
+
+## Accessibility (a11y)
+- **Clickable thing → real element.** Prefer `<button type="button">`; for modals prefer native `<dialog>` (`dialogRef.showModal()`, Esc closes, focus managed, backdrop free).
+- **If a div must be interactive (Pattern C):** add ALL of `role="button"` + `tabindex="0"` + `onkeydown` (Enter/Space → `preventDefault()` + action) + `aria-label`.
+- **Labels:** preferred `for`/`id` (`<label for="x">…</label><input id="x">`); else wrap input in label; last resort `aria-label`. This is the #1 a11y offender (298 instances).
+- Icon-only buttons need `aria-label`; `role="dialog"` divs need `tabindex`.
+
+## Svelte 5 migration / deprecations
+- **No `onclick|stopPropagation`** → `onclick={(e) => { e.stopPropagation(); handler(); }}` (same for `|preventDefault`).
+- **`<svelte:component>` is deprecated in runes mode** → reference the component directly (`<Comp />`) or via registry: `const C = $derived(registry[key]); <C />`.
+
+## Supabase typing (kills the `{ name: any }[]` plague — ~30 sites)
+- Create `src/lib/types/database.ts`: base interfaces + join types + typed query-helper functions that `return data as T`. Never `any` in return types or props.
+- **Adapt interfaces to the REAL schema** (`calls`, `call_list_contacts`, `scraped_contacts`, …). The kit's example uses illustrative tables (`call_logs`, `contacts.campaign_id`) that do NOT match this DB — generate from a prod dump (audit §3).
+
+## ⚠️ Corrections — where the Skills Kit is WRONG for this stack (do NOT follow the kit here)
+1. **Async `$effect` is an anti-pattern.** The kit shows `$effect(async () => { …; return cleanup; })`. In Svelte 5 the effect callback must be sync — an async callback's return is a Promise, not a teardown, and deps after the first `await` aren't tracked. **Keep `onMount(async () => {…})` for data loads.** For async + cleanup: `$effect(() => { const ac = new AbortController(); (async () => {…})(); return () => ac.abort(); });`. Do NOT migrate `onMount`→async `$effect`.
+2. **Env vars:** kit uses `VITE_*` + `import.meta.env.VITE_…` and a client-side `twilio()`. This repo uses `$env/dynamic/private` (server) + `PUBLIC_*` (client); Twilio is server-only. Follow the repo.
+3. **SSR / `+page.server.ts` loads:** kit assumes server loads. This app has `ssr = false` for `(app)` + `apiFetch` in `onMount`. Don't add server loads piecemeal (separate decision — audit §8).
+4. **Kit a11y "Pattern A" example contains `onclick|stopPropagation`** in the inner button — contradicts the deprecation rule. Use the manual-handler form.

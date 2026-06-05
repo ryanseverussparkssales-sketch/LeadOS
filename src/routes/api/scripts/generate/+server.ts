@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
+import { json, error } from '@sveltejs/kit';
 import { requireAuth } from '$lib/server/supabase';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import { env } from '$env/dynamic/private';
@@ -7,6 +8,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	if (await rateLimitUser(user.id, { max: 10, windowMs: 60_000 })) throw error(429, 'Rate limit exceeded — max 10 script generations/minute');
 	const { product, persona, keyBenefits, commonObjections, tone, campaignName, additionalContext } = await request.json();
 
@@ -27,7 +29,7 @@ ${additionalContext ? `Additional context: ${additionalContext}` : ''}
 Return ONLY valid JSON with this exact structure:
 {
   "title": "Script name based on product and persona",
-  "opener": "REQUIRED: Begin with 'Hey [name], this is [your name] with Sparks Curiosity Studio — quick heads up, this call is being recorded for training purposes.' Then 1-2 natural sentences with a pattern interrupt.",
+  "opener": "REQUIRED: Begin with 'Hey [name], this is [your name] with RogueLeads — quick heads up, this call is being recorded for training purposes.' Then 1-2 natural sentences with a pattern interrupt.",
   "elevatorPitch": "30-second pitch if they ask who you are/what you do. Outcome-focused.",
   "discovery": "3-4 open-ended discovery questions to understand their situation and pain.",
   "closing": "How to close the call — book meeting, send info, or get callback. Specific language.",

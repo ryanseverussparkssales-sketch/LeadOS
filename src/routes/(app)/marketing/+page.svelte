@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	// ── Tabs ──────────────────────────────────────────────────
 	type Tab = 'dashboard' | 'content' | 'social' | 'ads' | 'copy' | 'integrations';
@@ -60,14 +62,14 @@
 
 	// ── Platforms ─────────────────────────────────────────────
 	const SOCIAL_PLATFORMS = [
-		{ id: 'instagram', label: 'Instagram', icon: '📸', color: 'from-purple-600 to-pink-500' },
+		{ id: 'instagram', label: 'Instagram', icon: '📸', color: 'from-[var(--accent)] to-pink-500' },
 		{ id: 'facebook', label: 'Facebook', icon: '👥', color: 'from-blue-600 to-blue-500' },
 		{ id: 'linkedin', label: 'LinkedIn', icon: '💼', color: 'from-blue-700 to-blue-600' },
 		{ id: 'twitter', label: 'X / Twitter', icon: '🐦', color: 'from-gray-800 to-gray-700' },
 		{ id: 'tiktok', label: 'TikTok', icon: '🎵', color: 'from-gray-900 to-gray-800' },
 		{ id: 'youtube', label: 'YouTube', icon: '▶️', color: 'from-red-600 to-red-500' },
 		{ id: 'pinterest', label: 'Pinterest', icon: '📌', color: 'from-red-500 to-red-400' },
-		{ id: 'google_business', label: 'Google', icon: '🔍', color: 'from-blue-500 to-green-400' },
+		{ id: 'google_business', label: 'Google', icon: '🔍', color: 'from-blue-500 to-[var(--accent)]' },
 	];
 
 	const AD_PLATFORMS = [
@@ -96,7 +98,7 @@
 	function fmtDate(d: string) { return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'; }
 	function fmt(n: number) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n); }
 	function fmtNum(n: number) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n); }
-	const statusDot = (s: string) => s === 'active' || s === 'published' || s === 'connected' ? 'bg-green-400' : s === 'paused' || s === 'scheduled' ? 'bg-yellow-400' : s === 'ended' || s === 'failed' || s === 'disconnected' ? 'bg-red-400' : 'bg-[#555]';
+	const statusDot = (s: string) => s === 'active' || s === 'published' || s === 'connected' ? 'bg-[var(--accent)]' : s === 'paused' || s === 'scheduled' ? 'bg-yellow-400' : s === 'ended' || s === 'failed' || s === 'disconnected' ? 'bg-red-400' : 'bg-[#555]';
 
 	const clientName = (id: string) => clients.find(c => c.id === id)?.name ?? 'Own Business';
 
@@ -143,40 +145,48 @@
 	async function saveAsset() {
 		assetSaving = true;
 		const res = await apiFetch('/api/marketing/assets', { method: 'POST', body: JSON.stringify({ ...assetForm, clientId: assetForm.clientId || null }) });
-		if (res.ok) { await loadAll(); assetForm = { name: '', clientId: '', campaignId: '', assetType: 'image', source: 'upload', fileUrl: '', platform: 'general', status: 'draft', notes: '' }; showAssetForm = false; }
+		if (res.ok) { await loadAll(); assetForm = { name: '', clientId: '', campaignId: '', assetType: 'image', source: 'upload', fileUrl: '', platform: 'general', status: 'draft', notes: '' }; showAssetForm = false; toastSuccess('Asset saved'); }
+		else { toastError('Failed to save asset'); }
 		assetSaving = false;
 	}
 
 	async function deleteAsset(id: string) {
 		if (!confirm('Delete asset?')) return;
-		await apiFetch(`/api/marketing/assets/${id}`, { method: 'DELETE' });
-		await loadAll();
+		const res = await apiFetch(`/api/marketing/assets/${id}`, { method: 'DELETE' });
+		if (res.ok) { await loadAll(); toastSuccess('Asset deleted'); }
+		else { toastError('Failed to delete asset'); }
 	}
 
 	// ── Social actions ────────────────────────────────────────
 	async function saveSocial() {
 		socialSaving = true;
 		const res = await apiFetch('/api/marketing/social-accounts', { method: 'POST', body: JSON.stringify({ ...socialForm, clientId: socialForm.clientId || null, followers: parseInt(socialForm.followers) || 0 }) });
-		if (res.ok) { await loadAll(); socialForm = { clientId: '', platform: 'instagram', accountName: '', accountHandle: '', accountUrl: '', followers: '', status: 'connected' }; showSocialForm = false; }
+		if (res.ok) { await loadAll(); socialForm = { clientId: '', platform: 'instagram', accountName: '', accountHandle: '', accountUrl: '', followers: '', status: 'connected' }; showSocialForm = false; toastSuccess('Account added'); }
+		else { toastError('Failed to add account'); }
 		socialSaving = false;
 	}
 
 	async function deleteSocial(id: string) {
-		await apiFetch(`/api/marketing/social-accounts/${id}`, { method: 'DELETE' });
-		await loadAll();
+		if (!confirm('Disconnect this social account?')) return;
+		const res = await apiFetch(`/api/marketing/social-accounts/${id}`, { method: 'DELETE' });
+		if (res.ok) { await loadAll(); toastSuccess('Account removed'); }
+		else { toastError('Failed to remove account'); }
 	}
 
 	// ── Post actions ──────────────────────────────────────────
 	async function savePost() {
 		postSaving = true;
 		const res = await apiFetch('/api/marketing/social-posts', { method: 'POST', body: JSON.stringify({ ...postForm, clientId: postForm.clientId || null, scheduledAt: postForm.scheduledAt || null, assetId: postForm.assetId || null }) });
-		if (res.ok) { await loadAll(); postForm = { clientId: '', caption: '', hashtags: '', platforms: [], scheduledAt: '', assetId: '', status: 'draft' }; showPostComposer = false; }
+		if (res.ok) { await loadAll(); postForm = { clientId: '', caption: '', hashtags: '', platforms: [], scheduledAt: '', assetId: '', status: 'draft' }; showPostComposer = false; toastSuccess('Post saved'); }
+		else { toastError('Failed to save post'); }
 		postSaving = false;
 	}
 
 	async function deletePost(id: string) {
-		await apiFetch(`/api/marketing/social-posts/${id}`, { method: 'DELETE' });
-		await loadAll();
+		if (!confirm('Delete this post?')) return;
+		const res = await apiFetch(`/api/marketing/social-posts/${id}`, { method: 'DELETE' });
+		if (res.ok) { await loadAll(); toastSuccess('Post deleted'); }
+		else { toastError('Failed to delete post'); }
 	}
 
 	// ── Ad actions ────────────────────────────────────────────
@@ -185,7 +195,8 @@
 		const method = editingAdId ? 'PATCH' : 'POST';
 		const url = editingAdId ? `/api/marketing/ad-campaigns/${editingAdId}` : '/api/marketing/ad-campaigns';
 		const res = await apiFetch(url, { method, body: JSON.stringify({ ...adForm, clientId: adForm.clientId || null, budget: parseFloat(adForm.budget) || null, spent: parseFloat(adForm.spent) || 0, impressions: parseInt(adForm.impressions) || 0, clicks: parseInt(adForm.clicks) || 0, leads: parseInt(adForm.leads) || 0, startDate: adForm.startDate || null, endDate: adForm.endDate || null }) });
-		if (res.ok) { await loadAll(); adForm = { name: '', clientId: '', platform: 'meta', campaignType: 'awareness', status: 'active', budget: '', budgetPeriod: 'monthly', spent: '', impressions: '', clicks: '', leads: '', startDate: '', endDate: '', notes: '' }; showAdForm = false; editingAdId = null; }
+		if (res.ok) { await loadAll(); adForm = { name: '', clientId: '', platform: 'meta', campaignType: 'awareness', status: 'active', budget: '', budgetPeriod: 'monthly', spent: '', impressions: '', clicks: '', leads: '', startDate: '', endDate: '', notes: '' }; showAdForm = false; toastSuccess(editingAdId ? 'Campaign updated' : 'Campaign created'); editingAdId = null; }
+		else { toastError('Failed to save campaign'); }
 		adSaving = false;
 	}
 
@@ -199,7 +210,8 @@
 	async function generateCopy() {
 		copyGenerating = true; copyResult = null;
 		const res = await apiFetch('/api/marketing/generate-copy', { method: 'POST', body: JSON.stringify({ type: copyType, platform: copyPlatform, clientName: copyClientId ? clientName(copyClientId) : '', product: copyProduct, tone: copyTone, audience: copyAudience, extraContext: copyContext }) });
-		copyResult = res.ok ? (await res.json()).result : null;
+		if (res.ok) { copyResult = (await res.json()).result; }
+		else { copyResult = null; toastError('Failed to generate copy'); }
 		copyGenerating = false;
 	}
 
@@ -213,7 +225,7 @@
 
 	async function testSlack() {
 		slackTesting = true;
-		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 LeadOS test message from ${slackConfig.workspaceName || 'LeadOS'}`, channel: slackConfig.defaultChannel }) });
+		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 RogueOS test message from ${slackConfig.workspaceName || 'RogueOS'}`, channel: slackConfig.defaultChannel }) });
 		slackTestMsg = res.ok ? '✓ Message sent' : '✗ Failed — check webhook URL';
 		slackTesting = false;
 		setTimeout(() => slackTestMsg = '', 4000);
@@ -221,7 +233,9 @@
 
 	async function saveTeams() {
 		teamsSaving = true;
-		await apiFetch('/api/teams-webhook', { method: 'PUT', body: JSON.stringify({ webhookUrl: teamsConfig.webhookUrl, channelName: teamsConfig.channelName, notifyNewLeads: teamsConfig.notifyNewLeads, notifyCalls: teamsConfig.notifyCalls }) });
+		const res = await apiFetch('/api/teams-webhook', { method: 'PUT', body: JSON.stringify({ webhookUrl: teamsConfig.webhookUrl, channelName: teamsConfig.channelName, notifyNewLeads: teamsConfig.notifyNewLeads, notifyCalls: teamsConfig.notifyCalls }) });
+		if (res.ok) { toastSuccess('Teams settings saved'); }
+		else { toastError('Failed to save Teams settings'); }
 		teamsSaving = false;
 	}
 
@@ -230,7 +244,7 @@
 	}
 </script>
 
-<svelte:head><title>Marketing — LeadOS</title></svelte:head>
+<svelte:head><title>Marketing — RogueOS</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 
@@ -281,7 +295,7 @@
 			</div>
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 				<div class="text-[#666] text-xs mb-1">Ad Leads</div>
-				<div class="text-2xl font-semibold text-green-400">{fmtNum(totalLeads)}</div>
+				<div class="text-2xl font-semibold text-[var(--accent)]">{fmtNum(totalLeads)}</div>
 				<div class="text-xs text-[#555] mt-1">{fmtNum(totalImpressions)} impressions</div>
 			</div>
 		</div>
@@ -320,8 +334,8 @@
 				<!-- Canva quick-create buttons -->
 				{#each CANVA_FORMATS as f}
 					<a href={f.url} target="_blank" rel="noopener"
-						class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[#111] border border-[#2a2a2a] rounded-full hover:border-[#7c3aed] hover:text-purple-300 text-[#999] transition-colors">
-						<span class="w-4 h-4 bg-purple-600 rounded-sm inline-flex items-center justify-center text-white" style="font-size:9px">C</span>
+						class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-[#111] border border-[#2a2a2a] rounded-full hover:border-[#7c3aed] hover:text-[var(--accent-hi)] text-[#999] transition-colors">
+						<span class="w-4 h-4 bg-[var(--accent)] rounded-sm inline-flex items-center justify-center text-[var(--accent-ink)]" style="font-size:9px">C</span>
 						{f.label}
 					</a>
 				{/each}
@@ -409,7 +423,7 @@
 							{/if}
 							<div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
 								{#if asset.file_url}<a href={asset.file_url} target="_blank" rel="noopener" class="text-xs text-white border border-white/40 rounded px-2 py-1">View</a>{/if}
-								{#if asset.canva_edit_url}<a href={asset.canva_edit_url} target="_blank" rel="noopener" class="text-xs text-purple-300 border border-purple-400/40 rounded px-2 py-1">Edit in Canva</a>{/if}
+								{#if asset.canva_edit_url}<a href={asset.canva_edit_url} target="_blank" rel="noopener" class="text-xs text-[var(--accent)] border border-[var(--accent)]/40 rounded px-2 py-1">Edit in Canva</a>{/if}
 								<button onclick={() => deleteAsset(asset.id)} class="text-xs text-red-400 border border-red-400/40 rounded px-2 py-1">Del</button>
 							</div>
 						</div>
@@ -417,7 +431,7 @@
 							<div class="text-xs font-medium truncate">{asset.name}</div>
 							<div class="flex items-center gap-1 mt-1">
 								<span class="text-xs text-[#555]">{asset.platform}</span>
-								<span class="ml-auto text-xs {asset.status === 'published' ? 'text-green-400' : asset.status === 'approved' ? 'text-blue-400' : 'text-[#555]'}">{asset.status}</span>
+								<span class="ml-auto text-xs {asset.status === 'published' ? 'text-[var(--accent)]' : asset.status === 'approved' ? 'text-blue-400' : 'text-[#555]'}">{asset.status}</span>
 							</div>
 							{#if asset.client}<div class="text-xs text-[#444] truncate">{asset.client.name}</div>{/if}
 						</div>
@@ -569,7 +583,7 @@
 							<td class="px-4 py-3 text-xs text-[#666]">{post.client?.name ?? 'Own'}</td>
 							<td class="px-4 py-3"><span class="flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full {statusDot(post.status)}"></span>{post.status}</span></td>
 							<td class="px-4 py-3 text-xs text-[#666]">{post.scheduled_at ? fmtDate(post.scheduled_at) : fmtDate(post.created_at)}</td>
-							<td class="px-4 py-3 text-right"><button onclick={() => deletePost(post.id)} class="text-xs text-[#555] hover:text-red-400 transition-colors">✕</button></td>
+							<td class="px-4 py-3 text-right"><button onclick={() => deletePost(post.id)} class="text-xs text-[#555] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button></td>
 						</tr>
 					{:else}
 						<tr><td colspan="6" class="px-4 py-8 text-center text-[#555]">No posts yet — compose your first post above.</td></tr>
@@ -633,7 +647,7 @@
 						<div class="flex-1">
 							<div class="flex items-center gap-2 mb-1">
 								<span class="font-medium text-sm">{ad.name}</span>
-								<span class="text-xs px-2 py-0.5 rounded-full {ad.status === 'active' ? 'bg-green-400/10 text-green-400' : 'bg-[#222] text-[#666]'}">{ad.status}</span>
+								<span class="text-xs px-2 py-0.5 rounded-full {ad.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#222] text-[#666]'}">{ad.status}</span>
 								<span class="text-xs text-[#555]">{ad.platform} · {ad.campaign_type}</span>
 								{#if ad.client}<span class="text-xs text-blue-400">{ad.client.name}</span>{/if}
 							</div>
@@ -648,13 +662,13 @@
 								<span>Impressions: <strong class="text-white">{fmtNum(ad.impressions ?? 0)}</strong></span>
 								<span>Clicks: <strong class="text-white">{fmtNum(ad.clicks ?? 0)}</strong></span>
 								<span>CTR: <strong class="text-white">{ctr}%</strong></span>
-								<span>Leads: <strong class="text-green-400">{ad.leads ?? 0}</strong></span>
-								{#if cpl !== '—'}<span>CPL: <strong class="text-green-400">${cpl}</strong></span>{/if}
+								<span>Leads: <strong class="text-[var(--accent)]">{ad.leads ?? 0}</strong></span>
+								{#if cpl !== '—'}<span>CPL: <strong class="text-[var(--accent)]">${cpl}</strong></span>{/if}
 							</div>
 						</div>
 						<div class="flex gap-2">
 							<button onclick={() => editAd(ad)} class="text-xs text-[#666] hover:text-white transition-colors">Edit</button>
-							<button onclick={async () => { if(confirm('Delete?')) { await apiFetch(`/api/marketing/ad-campaigns/${ad.id}`, {method:'DELETE'}); await loadAll(); } }} class="text-xs text-[#666] hover:text-red-400 transition-colors">✕</button>
+							<button onclick={async () => { if(confirm('Delete?')) { const r = await apiFetch(`/api/marketing/ad-campaigns/${ad.id}`, {method:'DELETE'}); if (r.ok) { await loadAll(); toastSuccess('Campaign deleted'); } else { toastError('Failed to delete campaign'); } } }} class="text-xs text-[#666] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button>
 						</div>
 					</div>
 				</div>
@@ -730,7 +744,7 @@
 						<div class="mb-4">
 							<div class="text-xs text-[#666] mb-1">Caption</div>
 							<div class="bg-[#1a1a1a] rounded p-3 text-sm whitespace-pre-wrap">{copyResult.caption}</div>
-							<button onclick={() => navigator.clipboard.writeText(copyResult.caption)} class="mt-1 text-xs text-[#666] hover:text-white transition-colors">Copy to clipboard</button>
+							<button onclick={() => navigator.clipboard.writeText(copyResult.caption).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="mt-1 text-xs text-[#666] hover:text-white transition-colors">Copy to clipboard</button>
 						</div>
 					{/if}
 					{#if copyResult.hashtags}
@@ -776,7 +790,7 @@
 								<div class="flex items-center gap-2 mb-1">
 									<span class="text-xs text-[#555] w-4">{i+1}.</span>
 									<div class="flex-1 bg-[#1a1a1a] rounded px-3 py-1.5 text-sm">{s}</div>
-									<button onclick={() => navigator.clipboard.writeText(s)} class="text-xs text-[#555] hover:text-white transition-colors">Copy</button>
+									<button onclick={() => navigator.clipboard.writeText(s).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="text-xs text-[#555] hover:text-white transition-colors">Copy</button>
 								</div>
 							{/each}
 						</div>
@@ -797,7 +811,7 @@
 						<div class="font-medium text-sm">Slack</div>
 						<div class="text-xs text-[#666]">Send notifications to your Slack workspace</div>
 					</div>
-					{#if slackConfig.webhookUrl}<span class="ml-auto text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">Connected</span>{/if}
+					{#if slackConfig.webhookUrl}<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Connected</span>{/if}
 				</div>
 				<div class="space-y-3 mb-4">
 					<div>
@@ -828,8 +842,8 @@
 					{#if slackConfig.webhookUrl}
 						<button onclick={testSlack} disabled={slackTesting} class="px-3 py-1.5 border border-[#333] rounded text-xs text-[#999] hover:text-white transition-colors">{slackTesting ? 'Sending…' : 'Test'}</button>
 					{/if}
-					{#if slackMsg}<span class="text-xs text-green-400 self-center">{slackMsg}</span>{/if}
-					{#if slackTestMsg}<span class="text-xs {slackTestMsg.startsWith('✓') ? 'text-green-400' : 'text-red-400'} self-center">{slackTestMsg}</span>{/if}
+					{#if slackMsg}<span class="text-xs text-[var(--accent)] self-center">{slackMsg}</span>{/if}
+					{#if slackTestMsg}<span class="text-xs {slackTestMsg.startsWith('✓') ? 'text-[var(--accent)]' : 'text-red-400'} self-center">{slackTestMsg}</span>{/if}
 				</div>
 			</div>
 
@@ -841,7 +855,7 @@
 						<div class="font-medium text-sm">Microsoft Teams</div>
 						<div class="text-xs text-[#666]">Post notifications to a Teams channel</div>
 					</div>
-					{#if teamsConfig.webhookUrl}<span class="ml-auto text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">Connected</span>{/if}
+					{#if teamsConfig.webhookUrl}<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Connected</span>{/if}
 				</div>
 				<div class="space-y-3 mb-4">
 					<div>
@@ -869,12 +883,12 @@
 			<!-- Canva -->
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5">
 				<div class="flex items-center gap-2 mb-3">
-					<div class="w-6 h-6 bg-purple-600 rounded flex items-center justify-center text-white text-xs font-bold">C</div>
+					<div class="w-6 h-6 bg-[var(--accent)] rounded flex items-center justify-center text-[var(--accent-ink)] text-xs font-bold">C</div>
 					<div><div class="font-medium text-sm">Canva</div><div class="text-xs text-[#666]">Create designs — no API key required</div></div>
-					<span class="ml-auto text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">Ready</span>
+					<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Ready</span>
 				</div>
 				<p class="text-xs text-[#666] mb-3">Canva design buttons are available in the Content Hub tab. Click any format to open Canva directly. To use the Canva API for automated design generation, add your Canva API key in Settings → API Key Vault.</p>
-				<a href="https://www.canva.com/create/" target="_blank" rel="noopener" class="inline-block px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs transition-colors">Open Canva →</a>
+				<a href="https://www.canva.com/create/" target="_blank" rel="noopener" class="inline-block px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-[var(--accent-ink)] rounded text-xs transition-colors">Open Canva →</a>
 			</div>
 
 			<!-- Bannerbear -->

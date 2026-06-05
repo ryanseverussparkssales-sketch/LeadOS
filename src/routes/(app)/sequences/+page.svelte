@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Step { step_number:number; delay_days:number; subject:string; body:string; email_type:string; }
 	interface Sequence { id:string; name:string; description:string|null; trigger_type:string; status:string; steps:Step[]; created_at:string; }
@@ -17,6 +18,7 @@
 		advancing = true;
 		const res = await apiFetch('/api/sequences/advance', { method:'POST' });
 		if (res.ok) { const d = await res.json(); advanceMsg = `${d.advanced} step${d.advanced !== 1 ? 's' : ''} advanced`; setTimeout(() => advanceMsg = '', 3000); }
+		else { toastError('Failed to run due steps'); }
 		advancing = false;
 	}
 
@@ -31,18 +33,24 @@
 	});
 
 	async function createSequence() {
-		if (!nName.trim() || nSteps.some(s => !s.subject || !s.body)) return;
+		if (!nName.trim() || nSteps.some(s => !s.subject || !s.body)) { toastError('Add a name and fill in every step\'s subject and body'); return; }
 		saving = true;
 		const res = await apiFetch('/api/sequences', { method:'POST', body: JSON.stringify({ name:nName, description:nDesc||null, triggerType:nTrigger, steps:nSteps }) });
-		if (res.ok) { const s = await res.json(); sequences = [s, ...sequences]; showNew = false; nName = ''; nSteps = [{ step_number:1, delay_days:0, subject:'', body:'', email_type:'follow_up' }]; }
+		if (res.ok) { const s = await res.json(); sequences = [s, ...sequences]; showNew = false; nName = ''; nSteps = [{ step_number:1, delay_days:0, subject:'', body:'', email_type:'follow_up' }]; toastSuccess('Sequence created'); }
+		else { toastError('Failed to create sequence'); }
 		saving = false;
 	}
 
 	async function deleteSeq(id: string) {
 		if (!confirm('Delete this sequence?')) return;
-		await apiFetch(`/api/sequences/${id}`, { method:'DELETE' });
-		sequences = sequences.filter(s => s.id !== id);
-		if (selected?.id === id) selected = null;
+		const res = await apiFetch(`/api/sequences/${id}`, { method:'DELETE' });
+		if (res.ok) {
+			sequences = sequences.filter(s => s.id !== id);
+			if (selected?.id === id) selected = null;
+			toastSuccess('Sequence deleted');
+		} else {
+			toastError('Failed to delete sequence');
+		}
 	}
 
 	function addStep() { nSteps = [...nSteps, { step_number: nSteps.length+1, delay_days: 3, subject:'', body:'', email_type:'follow_up' }]; }
@@ -51,7 +59,7 @@
 	const TRIGGER_LABELS: Record<string,string> = { manual:'Manual', lead_arrived:'Lead Arrived', call_completed:'Call Completed', callback_outcome:'Callback Outcome' };
 </script>
 
-<svelte:head><title>Sequences — LeadOS</title></svelte:head>
+<svelte:head><title>Sequences — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">

@@ -1,5 +1,5 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId, normalizePhone } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 async function getOrCreateDefaultList(ownerId: string): Promise<string | null> {
@@ -51,29 +51,54 @@ export const POST: RequestHandler = async ({ request }) => {
 		} catch {
 			throw error(400, 'Invalid JSON body');
 		}
-		const { contact_id, call_type, script_id, campaign_id, call_list_id } = body as {
+		const { contact_id, phone_number, contact_name, call_type, script_id, campaign_id, call_list_id } = body as {
 			contact_id?: string;
+			phone_number?: string;
+			contact_name?: string;
 			call_type?: string;
 			script_id?: string;
 			campaign_id?: string;
 			call_list_id?: string;
 		};
-		if (!contact_id) throw error(400, 'contact_id required');
+		if (!contact_id && !phone_number) throw error(400, 'contact_id or phone_number required');
 
-		const { data: contact, error: contactErr } = await supabaseAdmin
-			.from('contacts')
-			.select('id, phone, call_count, status, name')
-			.eq('id', contact_id)
-			.eq('user_id', ownerId)
-			.maybeSingle();
+		// Resolve (or create) the contact this call is for. The desk phone dials raw
+		// numbers, so match an existing contact by phone or auto-create a lightweight one.
+		type ContactRow = { id: string; phone: string | null; call_count: number | null; status: string | null; name: string | null };
+		let contact: ContactRow | null = null;
 
-		if (contactErr) throw error(500, contactErr.message);
+		if (contact_id) {
+			const { data, error: contactErr } = await supabaseAdmin
+				.from('contacts').select('id, phone, call_count, status, name')
+				.eq('id', contact_id).eq('user_id', ownerId).maybeSingle();
+			if (contactErr) throw error(500, contactErr.message);
+			contact = data;
+		} else if (phone_number) {
+			const norm = normalizePhone(phone_number);
+			const { data: existing } = await supabaseAdmin
+				.from('contacts').select('id, phone, call_count, status, name')
+				.eq('user_id', ownerId).eq('phone_normalized', norm).maybeSingle();
+			if (existing) {
+				contact = existing;
+			} else {
+				const { data: created } = await supabaseAdmin
+					.from('contacts').insert({
+						user_id: ownerId,
+						name: contact_name ?? phone_number,
+						phone: phone_number,
+						phone_normalized: norm,
+						status: 'active',
+						contact_type: 'lead',
+						lead_source: 'desk_phone',
+					}).select('id, phone, call_count, status, name').single();
+				contact = created ?? null;
+			}
+		}
+
 		if (!contact) throw error(404, 'Contact not found');
-
 		if (contact.status === 'do_not_call') {
 			throw error(403, `Contact "${contact.name}" is marked Do Not Call`);
 		}
-
 		if (!contact.phone) throw error(400, 'Contact has no phone number');
 
 		const callListId = call_list_id ?? await getOrCreateDefaultList(ownerId);
@@ -83,7 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			.from('calls')
 			.insert({
 				user_id: ownerId,
-				contact_id,
+				contact_id: contact.id,
 				call_list_id: callListId,
 				phone_number: contact.phone,
 				call_type: call_type ?? 'cold_call',
@@ -100,8 +125,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		supabaseAdmin
 			.from('contacts')
 			.update({ call_count: (contact.call_count ?? 0) + 1, last_called_at: new Date().toISOString() })
-			.eq('id', contact_id)
-			.catch(console.error);
+			.eq('id', contact.id)
+			.then(({ error: e }) => { if (e) console.error('[calls/start] count update:', e); });
 
 		return json({ call_id: call.id, phone_number: contact.phone }, { status: 201 });
 	} catch (err) {

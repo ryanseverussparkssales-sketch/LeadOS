@@ -53,7 +53,7 @@
 	}
 
 	function momentumClass(m: string | undefined) {
-		if (m === 'rising') return 'bg-green-950 text-green-400';
+		if (m === 'rising') return 'bg-[var(--accent)]/12 text-[var(--accent)]';
 		if (m === 'dropping') return 'bg-red-950 text-red-400';
 		return 'bg-[#1a1a1a] text-[#555]';
 	}
@@ -109,7 +109,7 @@
 		<!-- Insights -->
 		<div class="space-y-2">
 			<div class="flex gap-2">
-				<span class="text-green-400 text-xs flex-shrink-0 mt-0.5">✓</span>
+				<span class="text-[var(--accent)] text-xs flex-shrink-0 mt-0.5">✓</span>
 				<p class="text-xs text-[#888] leading-relaxed">{c.topStrength}</p>
 			</div>
 			<div class="flex gap-2">

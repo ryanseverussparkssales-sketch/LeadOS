@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Client { id: string; name: string; }
 	interface CallList { id: string; name: string; call_list_contacts: [{count: number}]; }
@@ -43,18 +44,26 @@
 			method: 'POST',
 			body: JSON.stringify({ name: newCampaignName, project_id: selected.id }),
 		});
-		newCampaignName = '';
 		addingCampaign = false;
 		if (res.ok) {
+			newCampaignName = '';
 			const r = await apiFetch(`/api/campaigns?project_id=${selected.id}`);
 			campaigns = r.ok ? await r.json() : campaigns;
+			toastSuccess('Campaign created');
+		} else {
+			toastError('Failed to create campaign');
 		}
 	}
 
 	async function deleteCampaign(id: string) {
-		if (!confirm('Delete this campaign and all its call lists?')) return;
-		await apiFetch(`/api/campaigns/${id}`, { method: 'DELETE' });
-		campaigns = campaigns.filter(c => c.id !== id);
+		if (!confirm('Delete this campaign and all its call lists? This cannot be undone.')) return;
+		const res = await apiFetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			campaigns = campaigns.filter(c => c.id !== id);
+			toastSuccess('Campaign deleted');
+		} else {
+			toastError('Failed to delete campaign');
+		}
 	}
 
 	function listCount(c: Campaign) {
@@ -69,7 +78,7 @@
 	}
 </script>
 
-<svelte:head><title>Projects — LeadOS</title></svelte:head>
+<svelte:head><title>Projects — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">

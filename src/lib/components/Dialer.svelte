@@ -6,6 +6,7 @@
 	import CallPostMortem from './CallPostMortem.svelte';
 	import { currentContact, callState } from '$lib/stores';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import {
 		twilioDevice,
 		twilioReady as twilioReadyStore,
@@ -14,13 +15,15 @@
 		initTwilioDevice
 	} from '$lib/stores/twilio';
 	import DialerSidebar from './DialerSidebar.svelte';
+	import DialButtonRenderer from './DialButtonRenderer.svelte';
+	import Icon from './Icon.svelte';
 	import AppointmentModal from '$lib/components/AppointmentModal.svelte';
 	import WinCelebration from '$lib/components/WinCelebration.svelte';
 	import type { Contact } from '$lib/stores';
 
 	// Store-derived — drives the queue card only
 	const contact = $derived($currentContact);
-	const state   = $derived($callState);
+	const callPhase = $derived($callState);
 
 	// Local capture — persists through state changes so postmortem always has the right contact
 	let calledContact = $state<Contact | null>(null);
@@ -70,7 +73,7 @@
 	let queueRemaining = $state<number | null>(null);
 	// Shortcut hint — shown once per session until user presses ?
 	let showShortcutHint = $state(
-		typeof window !== 'undefined' && !sessionStorage.getItem('leados_hint_seen')
+		typeof window !== 'undefined' && !sessionStorage.getItem('rogueos_hint_seen')
 	);
 	let countdown = $state(0);
 	let countdownTimer: ReturnType<typeof setInterval> | null = null;
@@ -135,6 +138,20 @@
 
 	let beforeUnloadHandler: (e: BeforeUnloadEvent) => void;
 
+	// Keyboard-shortcut / window event handlers — named so onDestroy can remove them (prevents leak).
+	const onDialShortcut = () => { if ($callState === 'idle' && $currentContact) handleDial(); };
+	const onKeydownHint = (e: KeyboardEvent) => {
+		if (e.key === '?' && showShortcutHint) {
+			showShortcutHint = false;
+			sessionStorage.setItem('rogueos_hint_seen', '1');
+		}
+	};
+	const onSetOutcomeShortcut = (e: Event) => {
+		const ev = e as CustomEvent<string>;
+		// Handled by CallPostMortem via its own listener; just log here.
+		console.log('[shortcut] set outcome:', ev.detail);
+	};
+
 	// Bug 5: warn before leaving with an open postmortem
 	beforeNavigate(({ cancel }) => {
 		if ($callState === 'postmortem' && currentCallId) {
@@ -162,23 +179,12 @@
 		};
 		window.addEventListener('beforeunload', beforeUnloadHandler);
 
-		// Listen for keyboard shortcut events from KeyboardShortcuts component
-		window.addEventListener('leados:dial', () => { if ($callState === 'idle' && $currentContact) handleDial(); });
-		// Dismiss hint when ? is pressed
-		window.addEventListener('keydown', (e) => {
-			if (e.key === '?' && showShortcutHint) {
-				showShortcutHint = false;
-				sessionStorage.setItem('leados_hint_seen', '1');
-			}
-		});
+		// Keyboard shortcut events from KeyboardShortcuts component (named handlers — removed in onDestroy)
+		window.addEventListener('leados:dial', onDialShortcut);
+		window.addEventListener('keydown', onKeydownHint);
 		window.addEventListener('leados:end-call', handleEndCall);
 		window.addEventListener('leados:skip', skipContact);  // Bug 3: call skipContact not loadNextContact
-		window.addEventListener('leados:set-outcome', (e) => {
-			const ev = e as CustomEvent<string>;
-			// This is handled by CallPostMortem but we can set a store value
-			// For now just log it — CallPostMortem will handle via its own event listener
-			console.log('[shortcut] set outcome:', ev.detail);
-		});
+		window.addEventListener('leados:set-outcome', onSetOutcomeShortcut);
 
 		// Handle ?incoming=1 — call was answered via the IncomingCallBanner before arriving here.
 		// The active call is already in the global store; just sync local state to reflect it.
@@ -212,6 +218,11 @@
 
 	onDestroy(() => {
 		if (beforeUnloadHandler) window.removeEventListener('beforeunload', beforeUnloadHandler);
+		window.removeEventListener('leados:dial', onDialShortcut);
+		window.removeEventListener('keydown', onKeydownHint);
+		window.removeEventListener('leados:end-call', handleEndCall);
+		window.removeEventListener('leados:skip', skipContact);
+		window.removeEventListener('leados:set-outcome', onSetOutcomeShortcut);
 		clearAll();
 		// Do NOT destroy the device here — it lives in the global store and persists across navigation.
 		// The layout's onDestroy calls destroyDevice() when the whole app tears down.
@@ -270,6 +281,8 @@
 			setTimeout(() => {
 				endCall();
 			}, 1500);
+		} else {
+			toastError('Failed to drop voicemail — try again');
 		}
 		droppingVm = false;
 	}
@@ -299,6 +312,7 @@
 			callState.set('idle');
 		} catch {
 			currentContact.set(null);
+			toastError('Could not load the next contact — check your connection');
 		}
 		// Refresh queue count in background
 		refreshQueueCount();
@@ -415,7 +429,7 @@
 				apiFetch(`/api/phone/numbers/${phoneNumbers[usedIdx].id}`, {
 					method: 'PATCH',
 					body: JSON.stringify({ calls_today: phoneNumbers[usedIdx].calls_today }),
-				}).catch(() => {});
+				}).catch((err) => { console.error('[calls_today increment]', err); });
 			}
 			// Keep global store in sync
 			activeCallStore.set(activeCall);
@@ -519,14 +533,17 @@
 		// Save to DB if we have a call record
 		if (currentCallId) {
 			try {
-				await apiFetch(`/api/calls/${currentCallId}`, {
+				const saveRes = await apiFetch(`/api/calls/${currentCallId}`, {
 					method: 'PATCH',
 					body: JSON.stringify({
 						...saveData,
 						contact_id: calledContact?.id,
 					}),
 				});
-			} catch { /* non-fatal */ }
+				if (!saveRes.ok) toastError('Call outcome failed to save — your logged outcome may be lost');
+			} catch {
+				toastError('Call outcome failed to save — your logged outcome may be lost');
+			}
 		}
 		// Notify session bar of completed call
 		window.dispatchEvent(new CustomEvent('leados:call-completed'));
@@ -599,9 +616,9 @@
 	function numReputation(n: typeof phoneNumbers[0]) {
 		const limit = n.daily_limit || 200;
 		const ratio = n.calls_today / limit;
-		if (ratio >= 0.9) return { icon: '🚫', cls: 'text-red-400',    tip: `${n.calls_today}/${limit} — spam risk, rotating` };
+		if (ratio >= 0.9) return { icon: '🚫', cls: 'text-[var(--end-text)]',    tip: `${n.calls_today}/${limit} — spam risk, rotating` };
 		if (ratio >= 0.7) return { icon: '⚠',  cls: 'text-yellow-400', tip: `${n.calls_today}/${limit} — approaching limit` };
-		return             { icon: '●',  cls: 'text-green-500',   tip: `${n.calls_today}/${limit} — healthy` };
+		return             { icon: '●',  cls: 'text-[var(--call)]',   tip: `${n.calls_today}/${limit} — healthy` };
 	}
 
 	function pickBestNumber(contactPhone: string): string {
@@ -743,12 +760,12 @@
 		{/if}
 		<!-- Power dialer toggle + delay selector -->
 		<button onclick={togglePowerDialer}
-			class="flex items-center gap-1.5 rounded-lg h-8 px-3 text-xs transition-colors {powerDialer ? 'bg-green-900/30 border border-green-800 text-green-400' : 'border border-[var(--c-border-subtle)] text-[var(--c-text-faint)] hover:text-white'}">
+			class="flex items-center gap-1.5 rounded-lg h-8 px-3 text-xs transition-colors {powerDialer ? 'bg-[var(--call)]/12 border border-[var(--call)]/40 text-[var(--call)]' : 'border border-[var(--c-border-subtle)] text-[var(--c-text-faint)] hover:text-white'}">
 			<span>{powerDialer ? '⚡ ON' : '⚡ Power'}</span>
 		</button>
 		{#if powerDialer}
 			<select bind:value={powerDialDelay}
-				class="rounded-lg border border-green-800 bg-green-950/20 px-2 h-8 text-xs text-green-400 focus:outline-none"
+				class="rounded-lg border border-[var(--call)]/40 bg-[var(--call)]/12 px-2 h-8 text-xs text-[var(--call)] focus:outline-none"
 				title="Seconds between calls">
 				{#each [3,5,10,15] as s}
 					<option value={s}>{s}s</option>
@@ -762,13 +779,13 @@
 			</span>
 		{/if}
 		<div class="flex items-center gap-1.5 shrink-0">
-			<div class="w-2 h-2 rounded-full {twilioReady ? 'bg-green-500' : twilioError ? 'bg-red-500' : 'bg-yellow-500 animate-pulse'}"></div>
+			<div class="w-2 h-2 rounded-full {twilioReady ? 'bg-[var(--call)]' : twilioError ? 'bg-[var(--end)]' : 'bg-yellow-500 animate-pulse'}"></div>
 			<span class="text-xs text-[var(--c-text-faint)]">{twilioReady ? 'Ready' : twilioError ? 'Error' : 'Connecting...'}</span>
 		</div>
 		<!-- Keyboard shortcut hint — shown once per session -->
 		{#if showShortcutHint}
 			<button
-				onclick={() => { showShortcutHint = false; sessionStorage.setItem('leados_hint_seen','1'); }}
+				onclick={() => { showShortcutHint = false; sessionStorage.setItem('rogueos_hint_seen','1'); }}
 				class="shrink-0 flex items-center gap-1 rounded-lg border border-[#1e1e1e] px-2 h-7 text-[10px] text-[#444] hover:text-white hover:border-[#333] transition-colors animate-pulse"
 				title="Press ? to see all keyboard shortcuts">
 				⌨ Press <kbd class="font-mono mx-0.5 text-[#555]">?</kbd> for shortcuts
@@ -777,15 +794,15 @@
 	</div>
 
 	{#if twilioError}
-		<div class="px-8 py-2 bg-red-950/30 border-b border-red-900/30 flex items-start justify-between gap-4">
+		<div class="px-8 py-2 bg-[var(--end)]/12 border-b border-[var(--end)]/40 flex items-start justify-between gap-4">
 			<div class="flex-1 min-w-0">
-				<p class="text-xs text-red-400">⚠ {twilioError}</p>
-				<p class="text-xs text-red-900 mt-0.5">
+				<p class="text-xs text-[var(--end-text)]">⚠ {twilioError}</p>
+				<p class="text-xs text-[var(--end-text)] mt-0.5">
 					Need help? See the
-					<a href="https://www.twilio.com/docs/voice/sdks/javascript/troubleshooting" target="_blank" rel="noopener noreferrer" class="underline hover:text-red-400 transition-colors">Twilio Voice SDK troubleshooting guide</a>.
+					<a href="https://www.twilio.com/docs/voice/sdks/javascript/troubleshooting" target="_blank" rel="noopener noreferrer" class="underline hover:text-[var(--end-text)] transition-colors">Twilio Voice SDK troubleshooting guide</a>.
 				</p>
 			</div>
-			<button onclick={initTwilio} class="shrink-0 text-xs text-red-400 underline hover:text-red-300 transition-colors">Retry</button>
+			<button onclick={initTwilio} class="shrink-0 text-xs text-[var(--end-text)] underline hover:text-[var(--end-text)] transition-colors">Retry</button>
 		</div>
 	{/if}
 
@@ -798,7 +815,7 @@
 		<div class="flex-1 flex items-start justify-center p-8 overflow-y-auto">
 			<div class="w-full max-w-lg">
 
-			{#if state === 'idle'}
+			{#if callPhase === 'idle'}
 				{#if countdown > 0}
 					<div class="text-center py-20">
 						<p class="text-xs text-[var(--c-text-faint)] uppercase tracking-widest mb-4">Next call in</p>
@@ -813,8 +830,8 @@
 					{#if callBrief || loadingBrief}
 						<div class="mx-0 mt-3 rounded-xl bg-[#111] border border-[#1e2a1e] p-4">
 							<div class="flex items-center gap-2 mb-2">
-								<span class="text-green-400 text-xs">✦</span>
-								<p class="text-[10px] text-green-400 uppercase tracking-widest font-semibold">Pre-Call Brief</p>
+								<span class="text-[var(--call)] text-xs">✦</span>
+								<p class="text-[10px] text-[var(--call)] uppercase tracking-widest font-semibold">Pre-Call Brief</p>
 								{#if loadingBrief}<span class="text-[10px] text-[#333] ml-1">Generating...</span>{/if}
 							</div>
 							{#if !loadingBrief}
@@ -852,21 +869,21 @@
 					</div>
 				{/if}
 
-			{:else if state === 'ringing'}
+			{:else if callPhase === 'ringing'}
 				<div class="text-center py-20">
-					<div class="w-16 h-16 rounded-full bg-[#111] border border-[#2a2a2a] flex items-center justify-center mx-auto mb-6 animate-pulse">
-						<span class="text-2xl">📞</span>
+					<div class="flex justify-center mb-6">
+						<DialButtonRenderer callState="calling" onclick={() => {}} size={104} />
 					</div>
 					<p class="text-white font-medium mb-1">{calledContact?.name ?? 'Unknown'}</p>
 					{#if calledContact?.company}<p class="text-xs text-[var(--c-text-faint)] mb-6">{calledContact.company}</p>{/if}
 					<p class="text-xs text-[var(--c-text-ghost)] uppercase tracking-widest mb-8">Ringing…</p>
-					<button onclick={handleEndCall}
-						class="rounded-full bg-red-700 hover:bg-red-600 w-14 h-14 text-xl flex items-center justify-center mx-auto transition-colors">
-						📵
+					<button onclick={handleEndCall} aria-label="End call"
+						class="rounded-full bg-[var(--end)] hover:bg-[var(--end-hi)] text-white w-14 h-14 flex items-center justify-center mx-auto transition-colors">
+						<Icon name="phoneOff" size={22} />
 					</button>
 				</div>
 
-			{:else if state === 'calling'}
+			{:else if callPhase === 'calling'}
 				<div class="space-y-4">
 					<!-- Contact info header -->
 
@@ -880,7 +897,7 @@
 						{#if calledContact?.company}<p class="text-xs text-[var(--c-text-faint)] truncate">{calledContact.company}</p>{/if}
 					</div>
 					<div class="text-right shrink-0">
-						<p class="text-sm font-semibold text-green-400 tabular-nums" style="font-family:var(--font-mono)">{formatDuration(callDuration)}</p>
+						<p class="text-sm font-semibold text-[var(--call)] tabular-nums" style="font-family:var(--font-mono)">{formatDuration(callDuration)}</p>
 						<p class="text-[10px] text-[var(--c-text-ghost)]">Live call</p>
 					</div>
 				</div>
@@ -888,25 +905,25 @@
 				<!-- Call controls -->
 				<div class="grid grid-cols-4 gap-2">
 					<button onclick={toggleMute}
-						class="rounded-xl border {muted ? 'border-red-800 bg-red-950/20 text-red-400' : 'border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white'} p-3 flex flex-col items-center gap-1 transition-colors">
-						<span class="text-lg">{muted ? '🔇' : '🎙'}</span>
+						class="rounded-xl border {muted ? 'border-[var(--end)]/40 bg-[var(--end)]/12 text-[var(--end-text)]' : 'border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white'} p-3 flex flex-col items-center gap-1 transition-colors">
+						<Icon name={muted ? 'micOff' : 'mic'} size={18} />
 						<span class="text-[9px]">{muted ? 'Unmute' : 'Mute'}</span>
 					</button>
 					<button onclick={() => showNotePanel = !showNotePanel}
 						class="rounded-xl border {showNotePanel ? 'border-blue-800 bg-blue-950/20 text-blue-400' : 'border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white'} p-3 flex flex-col items-center gap-1 transition-colors">
-						<span class="text-lg">📝</span>
+						<Icon name="fileText" size={18} />
 						<span class="text-[9px]">Notes</span>
 					</button>
 					<button onclick={() => showDialerAppointment = true}
 						class="rounded-xl border border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white p-3 flex flex-col items-center gap-1 transition-colors">
-						<span class="text-lg">📅</span>
+						<Icon name="calendar" size={18} />
 						<span class="text-[9px]">Book</span>
 					</button>
 					{#if tierFeatures.voicemailDrops && vmDrops.length > 0}
 						<div class="relative vm-menu-container">
 							<button onclick={() => showVmMenu = !showVmMenu} disabled={vmDropped}
-								class="w-full rounded-xl border {vmDropped ? 'border-green-800 bg-green-950/20 text-green-400' : 'border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white'} p-3 flex flex-col items-center gap-1 transition-colors disabled:opacity-60">
-								<span class="text-lg">{vmDropped ? '✓' : droppingVm ? '⏳' : '📬'}</span>
+								class="w-full rounded-xl border {vmDropped ? 'border-[var(--call)]/40 bg-[var(--call)]/12 text-[var(--call)]' : 'border-[var(--c-border)] bg-[var(--c-surface)] text-[var(--c-text-dim)] hover:text-white'} p-3 flex flex-col items-center gap-1 transition-colors disabled:opacity-60">
+								<Icon name={vmDropped ? 'check' : 'voicemail'} size={18} />
 								<span class="text-[9px]">{vmDropped ? 'Dropped' : 'VM Drop'}</span>
 							</button>
 							{#if showVmMenu}
@@ -922,8 +939,8 @@
 						</div>
 					{:else}
 						<button onclick={handleEndCall}
-							class="rounded-xl border border-red-900/50 bg-red-950/20 text-red-400 hover:bg-red-950/40 p-3 flex flex-col items-center gap-1 transition-colors">
-							<span class="text-lg">📵</span>
+							class="rounded-xl border border-[var(--end)]/40 bg-[var(--end)]/12 text-[var(--end-text)] hover:bg-[var(--end-hi)] p-3 flex flex-col items-center gap-1 transition-colors">
+							<Icon name="phoneOff" size={18} />
 							<span class="text-[9px]">End</span>
 						</button>
 					{/if}
@@ -938,13 +955,13 @@
 
 				{#if tierFeatures.voicemailDrops && vmDrops.length > 0}
 					<button onclick={handleEndCall}
-						class="w-full rounded-xl border border-red-900/50 bg-red-950/20 text-red-400 hover:bg-red-950/40 py-3 text-xs font-medium transition-colors">
-						📵 End Call
+						class="w-full rounded-xl border border-[var(--end)]/40 bg-[var(--end)]/12 text-[var(--end-text)] hover:bg-[var(--end-hi)] hover:text-white py-3 text-xs font-medium transition-colors flex items-center justify-center gap-2">
+						<Icon name="phoneOff" size={15} /> End Call
 					</button>
 				{/if}
 			</div>
 
-		{:else if state === 'processing'}
+		{:else if callPhase === 'processing'}
 			<div class="text-center py-16">
 				<div class="w-12 h-12 rounded-full border-2 border-[var(--c-border)] border-t-white animate-spin mx-auto mb-6"></div>
 				<p class="text-sm text-white font-medium mb-1">Processing call…</p>
@@ -954,7 +971,7 @@
 				</button>
 			</div>
 
-		{:else if state === 'postmortem'}
+		{:else if callPhase === 'postmortem'}
 			<CallPostMortem
 				contact={calledContact}
 				callId={currentCallId}
@@ -1000,6 +1017,6 @@
 			class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20 transition-colors font-medium">
 			Undo
 		</button>
-		<button onclick={() => { showUndoToast = false; }} class="text-[#444] hover:text-white text-xs transition-colors">✕</button>
+		<button onclick={() => { showUndoToast = false; }} class="text-[#444] hover:text-white text-xs transition-colors"><Icon name="x" size={14} /></button>
 	</div>
 {/if}

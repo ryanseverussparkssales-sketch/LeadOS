@@ -5,8 +5,8 @@
 
     let data = $state<any>(null);
     let loading = $state(true);
-    let activeTab = $state<'overview' | 'wins' | 'approvals' | 'invoices' | 'messages' | 'docs'>('overview');
-    let agencyName = $state('Sparks Curiosity Studio');
+    let activeTab = $state<'dashboard' | 'overview' | 'wins' | 'approvals' | 'invoices' | 'messages' | 'docs'>('dashboard');
+    let agencyName = $state('RogueLeads');
 
     interface WinEntry { id: string; outcome: string; created_at: string; contact: { name: string; company: string; phone: string } | null; call_duration_seconds: number | null; summary: string | null; recording_url: string | null; raw_transcript: string | null; }
     let wins = $state<WinEntry[]>([]);
@@ -176,9 +176,9 @@
                 <p class="text-white text-2xl font-bold font-mono">{connectRate()}%</p>
                 <p class="text-[#444] text-[10px] mt-0.5">{stats.answeredCalls ?? 0} answered</p>
             </div>
-            <div class="bg-[#111] border border-emerald-900/40 rounded-xl p-4">
+            <div class="bg-[#111] border border-[var(--accent)]/40 rounded-xl p-4">
                 <p class="text-[#555] text-[10px] uppercase tracking-widest mb-1">Appointments Set</p>
-                <p class="text-emerald-400 text-2xl font-bold font-mono">{wins.length}</p>
+                <p class="text-[var(--accent)] text-2xl font-bold font-mono">{wins.length}</p>
                 <p class="text-[#444] text-[10px] mt-0.5">this month</p>
             </div>
             <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
@@ -192,12 +192,13 @@
         <!-- Tabs -->
         <div class="max-w-6xl mx-auto px-6 flex gap-0 border-t border-[#1a1a1a]">
             {#each [
+                ['dashboard', 'Dashboard'],
                 ['overview', 'Overview'],
                 ['wins', `Wins ${wins.length ? `(${wins.length})` : ''}`],
                 ['approvals', pendingApprovals.length ? `Approvals 🔴` : 'Approvals'],
                 ['invoices', 'Invoices'],
-                ['docs', '📁 Docs'],
-                ['messages', '💬 Messages'],
+                ['docs', 'Docs'],
+                ['messages', 'Messages'],
             ] as [val, label]}
                 <button onclick={() => activeTab = val as any}
                     class="px-5 py-3 text-xs font-medium transition-colors border-b-2 {activeTab === val ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-white'}">
@@ -215,13 +216,75 @@
             </div>
         {:else}
 
+        <!-- DASHBOARD -->
+        {#if activeTab === 'dashboard'}
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-[#111] border border-[var(--accent)]/40 rounded-xl p-6">
+                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Appointments set</p>
+                        <p class="text-[var(--accent)] text-4xl font-bold font-mono">{wins.length}</p>
+                        <p class="text-[#444] text-xs mt-1">this month</p>
+                    </div>
+                    <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-6">
+                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Connect rate</p>
+                        <p class="text-white text-4xl font-bold font-mono">{connectRate()}%</p>
+                        <p class="text-[#444] text-xs mt-1">{stats.answeredCalls ?? 0} of {stats.totalCalls ?? 0} answered</p>
+                    </div>
+                    <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-6">
+                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Calls made</p>
+                        <p class="text-white text-4xl font-bold font-mono">{stats.totalCalls ?? 0}</p>
+                        <p class="text-[#444] text-xs mt-1">last 30 days</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-5">
+                        <p class="text-xs text-[#444] uppercase tracking-widest mb-4">Campaign progress</p>
+                        {#each projects as project}
+                            {#each (project.campaigns ?? []) as c}
+                                {#if c.target_wins}
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-xs mb-1"><span class="text-white truncate mr-2">{c.name}</span><span class="text-[var(--accent)] font-mono shrink-0">{c.win_count ?? 0}/{c.target_wins}</span></div>
+                                        <div class="w-full h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden"><div class="h-full bg-[var(--accent)] rounded-full" style="width:{winPct(c)}%"></div></div>
+                                    </div>
+                                {/if}
+                            {/each}
+                        {/each}
+                        {#if !projects.some((p: any) => (p.campaigns ?? []).some((c: any) => c.target_wins))}
+                            <p class="text-xs text-[#555]">No active campaign targets yet.</p>
+                        {/if}
+                    </div>
+                    <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-xs text-[#444] uppercase tracking-widest">Recent wins</p>
+                            <button onclick={() => activeTab = 'wins'} class="text-[10px] text-[#555] hover:text-white transition-colors">View all →</button>
+                        </div>
+                        {#if wins.length === 0}
+                            <p class="text-xs text-[#555]">No appointments logged yet.</p>
+                        {:else}
+                            <div class="space-y-2.5">
+                                {#each wins.slice(0, 5) as win}
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="min-w-0">
+                                            <p class="text-sm text-white truncate">{win.contact?.name ?? 'Unknown'}</p>
+                                            <p class="text-[10px] text-[var(--accent)]">{winLabel(win.outcome)}</p>
+                                        </div>
+                                        <span class="text-[10px] text-[#444] shrink-0">{timeAgo(win.created_at)}</span>
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+
         <!-- OVERVIEW -->
-        {#if activeTab === 'overview'}
+        {:else if activeTab === 'overview'}
             {#if insights}
                 <div class="bg-[#111] border border-[#1e2a1e] rounded-xl p-6 mb-6">
                     <div class="flex items-center gap-2 mb-3">
-                        <span class="text-green-400 text-sm">✦</span>
-                        <p class="text-xs text-green-400 uppercase tracking-widest font-semibold">Campaign Intelligence</p>
+                        <span class="text-[var(--accent)] text-sm">✦</span>
+                        <p class="text-xs text-[var(--accent)] uppercase tracking-widest font-semibold">Campaign Intelligence</p>
                     </div>
                     {#each insights.split('\n').filter((l: string) => l.trim()) as line}
                         <p class="text-sm text-[#ccc] leading-relaxed">{line}</p>
@@ -240,7 +303,7 @@
                                         <p class="text-xs text-[#444]">{project.name}</p>
                                         <p class="text-sm text-white font-semibold mt-0.5">{campaign.name}</p>
                                     </div>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full capitalize {campaign.status === 'active' ? 'bg-green-950 text-green-400 border border-green-900' : campaign.status === 'pending_approval' ? 'bg-yellow-950 text-yellow-400 border border-yellow-900' : 'bg-[#1a1a1a] text-[#555]'}">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full capitalize {campaign.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40' : campaign.status === 'pending_approval' ? 'bg-yellow-950 text-yellow-400 border border-yellow-900' : 'bg-[#1a1a1a] text-[#555]'}">
                                         {campaign.status === 'pending_approval' ? '⏳ Awaiting your approval' : campaign.status}
                                     </span>
                                 </div>
@@ -259,10 +322,10 @@
                                         <div>
                                             <p class="text-[10px] text-[#444] mb-1">{campaign.win_label ?? 'Wins'}</p>
                                             <div class="flex items-center gap-2">
-                                                <p class="text-sm text-emerald-400 font-mono">{campaign.win_count ?? 0}/{campaign.target_wins}</p>
+                                                <p class="text-sm text-[var(--accent)] font-mono">{campaign.win_count ?? 0}/{campaign.target_wins}</p>
                                             </div>
                                             <div class="w-full h-1 bg-[#1a1a1a] rounded-full mt-1 overflow-hidden">
-                                                <div class="h-full bg-emerald-500 rounded-full" style="width:{winPct(campaign)}%"></div>
+                                                <div class="h-full bg-[var(--accent)] rounded-full" style="width:{winPct(campaign)}%"></div>
                                             </div>
                                         </div>
                                     {/if}
@@ -296,7 +359,7 @@
                                         <p class="text-sm text-white font-medium">{win.contact?.name ?? 'Unknown contact'}</p>
                                         {#if win.contact?.company}<p class="text-xs text-[#555]">at {win.contact.company}</p>{/if}
                                     </div>
-                                    <p class="text-xs text-emerald-400">{winLabel(win.outcome)}</p>
+                                    <p class="text-xs text-[var(--accent)]">{winLabel(win.outcome)}</p>
                                     {#if win.summary}<p class="text-xs text-[#555] mt-1 leading-relaxed">{win.summary.slice(0, 120)}{win.summary.length > 120 ? '…' : ''}</p>{/if}
                                 </div>
                                 <div class="text-right shrink-0">
@@ -329,6 +392,157 @@
                         </div>
                     {/each}
                 {/if}
+            </div>
+
+        <!-- APPROVALS -->
+        {:else if activeTab === 'approvals'}
+            <div class="space-y-3">
+                <h2 class="text-xs text-[#444] uppercase tracking-widest mb-2">Campaigns Awaiting Your Approval</h2>
+                {#if pendingApprovals.length === 0}
+                    <div class="text-center py-20">
+                        <p class="text-3xl mb-3">✓</p>
+                        <p class="text-white text-sm">Nothing to approve</p>
+                        <p class="text-xs text-[#555] mt-1">New campaigns from your agency will appear here for sign-off.</p>
+                    </div>
+                {:else}
+                    {#each pendingApprovals as camp}
+                        <div class="bg-[#111] border border-yellow-900/40 rounded-xl p-5">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="min-w-0">
+                                    <p class="text-sm text-white font-semibold">{camp.name}</p>
+                                    <p class="text-xs text-yellow-400 mt-0.5">⏳ Awaiting your approval</p>
+                                    {#if camp.reps && camp.reps.length}
+                                        <p class="text-xs text-[#555] mt-2">Assigned reps: {camp.reps.map(r => r.member_email).filter(Boolean).join(', ')}</p>
+                                    {/if}
+                                </div>
+                                <div class="flex gap-2 shrink-0">
+                                    <button onclick={() => approveScript(camp.id, true)} disabled={approving === camp.id}
+                                        class="rounded-lg bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors">
+                                        {approving === camp.id ? '…' : 'Approve'}
+                                    </button>
+                                    <button onclick={() => approveScript(camp.id, false)} disabled={approving === camp.id}
+                                        class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#888] hover:border-red-900 hover:text-red-400 disabled:opacity-40 transition-colors">
+                                        Send back
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {/each}
+                {/if}
+            </div>
+
+        <!-- INVOICES -->
+        {:else if activeTab === 'invoices'}
+            <div class="space-y-3">
+                <h2 class="text-xs text-[#444] uppercase tracking-widest mb-2">Invoices</h2>
+                {#if invoices.length === 0}
+                    <div class="text-center py-20">
+                        <p class="text-3xl mb-3">🧾</p>
+                        <p class="text-white text-sm">No invoices yet</p>
+                        <p class="text-xs text-[#555] mt-1">Invoices from your agency will appear here.</p>
+                    </div>
+                {:else}
+                    <div class="overflow-x-auto rounded-xl border border-[#1a1a1a]">
+                        <table class="w-full text-sm min-w-[560px]">
+                            <thead>
+                                <tr class="text-left text-xs text-[#555] border-b border-[#1a1a1a]">
+                                    <th class="px-4 py-2.5 font-medium">Period</th>
+                                    <th class="px-4 py-2.5 font-medium text-right">Base</th>
+                                    <th class="px-4 py-2.5 font-medium text-right">Bonus</th>
+                                    <th class="px-4 py-2.5 font-medium text-right">Total</th>
+                                    <th class="px-4 py-2.5 font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each invoices as inv}
+                                    <tr class="border-b border-[#141414]">
+                                        <td class="px-4 py-2.5 text-white">{inv.period ?? new Date(inv.created_at).toLocaleDateString()}</td>
+                                        <td class="px-4 py-2.5 text-right text-[#aaa] font-mono">${(inv.base_fee ?? 0).toLocaleString()}</td>
+                                        <td class="px-4 py-2.5 text-right text-[#aaa] font-mono">${(inv.appointment_bonus ?? 0).toLocaleString()}</td>
+                                        <td class="px-4 py-2.5 text-right text-white font-mono">${(inv.total ?? 0).toLocaleString()}</td>
+                                        <td class="px-4 py-2.5"><span class="text-xs px-2 py-0.5 rounded-full {inv.status === 'paid' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-yellow-500/10 text-yellow-400'}">{inv.status}</span></td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
+                {/if}
+            </div>
+
+        <!-- DOCS -->
+        {:else if activeTab === 'docs'}
+            <div class="space-y-5">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs text-[#444] uppercase tracking-widest">Documents</h2>
+                    <button onclick={() => showUploadForm = !showUploadForm}
+                        class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#888] hover:border-white hover:text-white transition-colors">
+                        {showUploadForm ? '✕ Cancel' : '+ Share a document'}
+                    </button>
+                </div>
+
+                {#if showUploadForm}
+                    <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-4 space-y-3">
+                        <input bind:value={uploadTitle} placeholder="Document title"
+                            class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+                        <input bind:value={uploadUrl} placeholder="Link / URL (Google Drive, Dropbox, etc.)"
+                            class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+                        <input bind:value={uploadDesc} placeholder="Description (optional)"
+                            class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+                        <div class="flex items-center gap-3">
+                            <button onclick={submitDoc} disabled={uploading || !uploadTitle.trim() || !uploadUrl.trim()}
+                                class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-white/90 disabled:opacity-40 transition-colors">
+                                {uploading ? 'Submitting…' : 'Submit'}
+                            </button>
+                            {#if uploadMsg}<span class="text-xs {uploadMsg.startsWith('✓') ? 'text-[var(--accent)]' : 'text-red-400'}">{uploadMsg}</span>{/if}
+                        </div>
+                    </div>
+                {/if}
+
+                <div>
+                    <p class="text-[10px] text-[#555] uppercase tracking-widest mb-2">From your agency</p>
+                    {#if agencyDocs.length === 0}
+                        <p class="text-xs text-[#444]">No documents shared yet.</p>
+                    {:else}
+                        <div class="space-y-2">
+                            {#each agencyDocs as doc}
+                                <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                                    class="flex items-center justify-between rounded-lg bg-[#111] border border-[#1a1a1a] px-4 py-3 hover:border-[#2a2a2a] transition-colors">
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-white truncate">{doc.title}</p>
+                                        {#if doc.description}<p class="text-xs text-[#555] truncate">{doc.description}</p>{/if}
+                                    </div>
+                                    <span class="text-xs text-[#444] shrink-0 ml-3">↗ open</span>
+                                </a>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+
+                <div>
+                    <p class="text-[10px] text-[#555] uppercase tracking-widest mb-2">Shared by you</p>
+                    {#if myDocs.length === 0}
+                        <p class="text-xs text-[#444]">You haven't shared any documents yet.</p>
+                    {:else}
+                        <div class="space-y-2">
+                            {#each myDocs as doc}
+                                <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                                    class="flex items-center justify-between rounded-lg bg-[#111] border border-[#1a1a1a] px-4 py-3 hover:border-[#2a2a2a] transition-colors">
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-white truncate">{doc.title}</p>
+                                        {#if doc.description}<p class="text-xs text-[#555] truncate">{doc.description}</p>{/if}
+                                    </div>
+                                    <span class="text-xs text-[#444] shrink-0 ml-3">↗ open</span>
+                                </a>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+
+        <!-- MESSAGES -->
+        {:else if activeTab === 'messages'}
+            <div class="h-[70vh]">
+                <Inbox currentUserRole="client" currentUserName={client?.name ?? ''} />
             </div>
         {/if}
 {/if}

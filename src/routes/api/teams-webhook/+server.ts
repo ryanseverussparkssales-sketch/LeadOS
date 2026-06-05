@@ -17,9 +17,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		'@type': 'MessageCard',
 		'@context': 'http://schema.org/extensions',
 		themeColor: color ?? '0078D4',
-		summary: title ?? 'LeadOS Notification',
+		summary: title ?? 'RogueOS Notification',
 		sections: [{
-			activityTitle: title ?? 'LeadOS',
+			activityTitle: title ?? 'RogueOS',
 			activityText: text,
 			facts: facts ?? [],
 		}],

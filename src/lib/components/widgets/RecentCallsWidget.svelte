@@ -6,7 +6,7 @@
 	let calls = $state<Call[]>([]);
 
 	const outcomeColors: Record<string,string> = {
-		answered:'text-green-400', voicemail:'text-yellow-400', callback:'text-blue-400',
+		answered:'text-[var(--accent)]', voicemail:'text-yellow-400', callback:'text-blue-400',
 		not_interested:'text-[#555]', do_not_call:'text-red-400', no_answer:'text-[#444]'
 	};
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { callState, currentContact } from '$lib/stores';
@@ -103,7 +104,7 @@
 		<div class="bg-[#111111] border border-[#2a2a2a] rounded-xl w-[520px] max-h-[70vh] overflow-y-auto" onclick={(e) => e.stopPropagation()}>
 			<div class="px-5 py-4 border-b border-[#2a2a2a] flex items-center justify-between">
 				<p class="text-white font-medium text-sm">Keyboard Shortcuts</p>
-				<button onclick={() => showHelp = false} class="text-[#666] hover:text-white">✕</button>
+				<button onclick={() => showHelp = false} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				{#each ['Global', 'Dialer', 'Dialer (postmortem)'] as ctx}

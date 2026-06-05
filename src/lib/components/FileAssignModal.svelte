@@ -1,5 +1,6 @@
 <script lang="ts">
     import { apiFetch } from '$lib/api';
+    import Icon from '$lib/components/Icon.svelte';
     import { getSession } from '$lib/services/auth';
     import { onMount } from 'svelte';
 
@@ -103,7 +104,7 @@
     <div class="modal-card" onclick={(e) => e.stopPropagation()}>
         <div class="modal-header">
             <h3 class="modal-title">{files.length === 1 ? 'Assign Document' : `Assign ${files.length} Documents`}</h3>
-            <button onclick={onclose} class="close-btn" aria-label="Close">✕</button>
+            <button onclick={onclose} class="close-btn" aria-label="Close"><Icon name="x" size={14} /></button>
         </div>
 
         <!-- File list preview -->

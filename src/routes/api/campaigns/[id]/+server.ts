@@ -60,20 +60,12 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 		throw error(400, e.message);
 	}
 
-	// Auto-create messaging channel when campaign goes active
-	if (allowed.status === 'active' && data) {
-		try {
-			const ownerId = (await import('$lib/server/supabase')).then ? null : null; // dynamic import below
-			
-		} catch { /* non-fatal */ }
-	}
-
 	return json(data);
 };
 
 export const DELETE: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
-	const ownerId = await getEffectiveUserId(user.id);
+	await verifyCampaignOwner(params.id, user.id);
 	const { error: e } = await supabaseAdmin
 		.from('campaigns')
 		.update({ deleted_at: new Date().toISOString() })

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	interface AppError {
 		id: string;
@@ -29,7 +30,11 @@
 
 		// Catch unhandled promise rejections
 		const rejectionHandler = (e: PromiseRejectionEvent) => {
-			if (e.reason?.message?.includes('Failed to fetch') || e.reason?.name === 'TypeError') {
+			// Only treat genuine network failures as a connection issue. A broad
+			// `name === 'TypeError'` check would mislabel real code bugs as network
+			// errors AND collide with ErrorBoundary's toast for the same rejection.
+			const m: string = e.reason?.message ?? '';
+			if (m.includes('Failed to fetch') || m.includes('NetworkError') || m.includes('Load failed')) {
 				window.dispatchEvent(new CustomEvent('leados:error', {
 					detail: {
 						type: 'network',
@@ -77,7 +82,7 @@
 			{/if}
 		</div>
 		{#if err.dismissible}
-			<button onclick={() => dismiss(err.id)} class="ml-4 opacity-50 hover:opacity-100">✕</button>
+			<button onclick={() => dismiss(err.id)} class="ml-4 opacity-50 hover:opacity-100"><Icon name="x" size={14} /></button>
 		{/if}
 	</div>
 {/each}

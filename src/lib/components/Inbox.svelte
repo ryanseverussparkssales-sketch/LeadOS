@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	let {
 		currentUserRole = 'admin',
@@ -102,6 +103,8 @@
 			);
 			await tick();
 			messagesEl?.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+		} else {
+			toastError('Failed to send message — try again');
 		}
 		sending = false;
 	}
@@ -121,6 +124,9 @@
 			await loadChannels();
 			showForm = false;
 			newName = ''; newType = 'general'; newParticipants = [];
+			toastSuccess('Channel created');
+		} else {
+			toastError('Failed to create channel — try again');
 		}
 		creating = false;
 	}
@@ -135,7 +141,7 @@
 	}
 
 	function roleColor(role: string) {
-		return role === 'admin' ? 'text-purple-400' : role === 'client' ? 'text-blue-400' : 'text-green-400';
+		return role === 'admin' ? 'text-[var(--accent)]' : role === 'client' ? 'text-blue-400' : 'text-[var(--accent)]';
 	}
 
 	const CHANNEL_ICONS: Record<string, string> = { campaign: '📣', direct: '💬', general: '🗣' };

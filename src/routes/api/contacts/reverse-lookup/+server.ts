@@ -1,10 +1,12 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin, getEffectiveUserId, normalizePhone } from '$lib/server/supabase';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	const ownerId = await getEffectiveUserId(user.id);
 	const { lookupType, items, enrichWithAI } = await request.json();
 	// lookupType: 'phone' | 'email' | 'company' | 'domain'

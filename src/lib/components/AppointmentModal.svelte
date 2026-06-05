@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { apiFetch } from '$lib/api';
+	import Icon from '$lib/components/Icon.svelte';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	let {
@@ -162,7 +163,7 @@
 				<h2 class="text-white font-semibold">Book Appointment</h2>
 				<p class="text-xs text-[#555] mt-0.5">{contact.name}{contact.company ? ` · ${contact.company}` : ''}</p>
 			</div>
-			<button onclick={onClose} class="text-[#444] hover:text-white transition-colors text-lg">✕</button>
+			<button onclick={onClose} class="text-[#444] hover:text-white transition-colors text-lg"><Icon name="x" size={14} /></button>
 		</div>
 
 		<!-- Quick-load template packs -->
@@ -182,7 +183,7 @@
 
 		<!-- Tabs -->
 		<div class="flex border-b border-[#1a1a1a] shrink-0">
-			{#each [['details','📅 Details'],['qualify','📋 Qualify']] as [tab, label]}
+			{#each [['details','Details'],['qualify','Qualify']] as [tab, label]}
 				<button onclick={() => activeTab = tab as any}
 					class="flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 {activeTab === tab ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-white'}">
 					{label}
@@ -298,7 +299,7 @@
 				Cancel
 			</button>
 			<button onclick={save} disabled={saving || !scheduledDate}
-				class="flex-1 rounded-lg bg-green-700 hover:bg-green-600 py-2.5 text-xs font-semibold text-white disabled:opacity-40 transition-colors">
+				class="flex-1 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hi)] py-2.5 text-xs font-semibold text-[var(--accent-ink)] disabled:opacity-40 transition-colors">
 				{saving ? 'Booking…' : '📅 Book Appointment'}
 			</button>
 		</div>

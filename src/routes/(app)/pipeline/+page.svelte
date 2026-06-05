@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { get } from 'svelte/store';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
-	import { toastSuccess } from '$lib/stores/toast';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Contact { id:string; name:string; company:string; }
 	interface Client { id:string; name:string; }
@@ -49,6 +50,7 @@
 		importingDeals = true;
 		const res = await apiFetch('/api/deals/import', { method:'POST', body: JSON.stringify({ csv: importCsv }) });
 		if (res.ok) { importResult = await res.json(); if (importResult!.created > 0) { const dr = await apiFetch('/api/deals'); if (dr.ok) deals = await dr.json(); } }
+		else { toastError('Failed to import deals'); }
 		importingDeals = false;
 	}
 	let showLostModal = $state(false);
@@ -99,6 +101,7 @@
 		saving = true;
 		const res = await apiFetch('/api/deals', { method: 'POST', body: JSON.stringify({ title: nTitle, value: nValue, contactId: nContact || null, clientId: nClient || null, expectedClose: nClose || null, notes: nNotes || null }) });
 		if (res.ok) { deals = [await res.json(), ...deals]; showNew = false; nTitle = ''; nValue = 0; nContact = ''; nClose = ''; toastSuccess('Deal added'); }
+		else { toastError('Failed to add deal'); }
 		saving = false;
 	}
 
@@ -107,11 +110,13 @@
 		const extra = newStage === 'won' ? { won_at: new Date().toISOString() } : {};
 		const res = await apiFetch(`/api/deals/${dealId}`, { method: 'PATCH', body: JSON.stringify({ stage: newStage, ...extra }) });
 		if (res.ok) { const updated = await res.json(); deals = deals.map(d => d.id === dealId ? updated : d); toastSuccess('Deal updated'); }
+		else { toastError('Failed to move deal'); }
 	}
 
 	async function confirmLost() {
 		const res = await apiFetch(`/api/deals/${pendingLostDealId}`, { method: 'PATCH', body: JSON.stringify({ stage: 'lost', lost_reason: lostReason, lost_at: new Date().toISOString() }) });
 		if (res.ok) { const updated = await res.json(); deals = deals.map(d => d.id === pendingLostDealId ? updated : d); toastSuccess('Deal updated'); }
+		else { toastError('Failed to update deal'); }
 		showLostModal = false;
 	}
 
@@ -149,16 +154,22 @@
 			deals = deals.map(d => d.id === selectedDeal!.id ? { ...d, ...updated } : d);
 			editingDeal = false;
 			toastSuccess('Deal updated');
+		} else {
+			toastError('Failed to save deal');
 		}
 	}
 
 	let confirmDeleteId = $state<string | null>(null);
 
 	async function deleteDeal(id: string) {
-		await apiFetch(`/api/deals/${id}`, { method: 'DELETE' });
-		deals = deals.filter(d => d.id !== id);
-		if (selectedDeal?.id === id) selectedDeal = null;
-		toastSuccess('Deal deleted');
+		const res = await apiFetch(`/api/deals/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			deals = deals.filter(d => d.id !== id);
+			if (selectedDeal?.id === id) selectedDeal = null;
+			toastSuccess('Deal deleted');
+		} else {
+			toastError('Failed to delete deal');
+		}
 		confirmDeleteId = null;
 	}
 
@@ -182,13 +193,13 @@
 	function fmtDate(s: string | null) { return s ? new Date(s).toLocaleDateString() : '—'; }
 </script>
 
-<svelte:head><title>Pipeline — LeadOS</title></svelte:head>
+<svelte:head><title>Pipeline — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Deal Pipeline</h2>
-			<p class="text-xs text-[#444] mt-0.5">Weighted forecast: <span class="text-green-400">{fmt$(Math.round(totalPipeline()))}</span></p>
+			<p class="text-xs text-[#444] mt-0.5">Weighted forecast: <span class="text-[var(--accent)]">{fmt$(Math.round(totalPipeline()))}</span></p>
 		</div>
 		<button onclick={() => window.open('/api/export?type=deals', '_blank')} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Export</button>
 		<button onclick={() => showImportDeals = !showImportDeals} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↑ Import CSV</button>
@@ -209,7 +220,7 @@
 			{/if}
 			{#if importResult}
 				<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-3 text-xs space-y-1">
-					<p class="text-green-400">✓ {importResult.created} deals imported</p>
+					<p class="text-[var(--accent)]">✓ {importResult.created} deals imported</p>
 					{#if importResult.errors > 0}<p class="text-red-400">{importResult.errors} errors</p>{/if}
 				</div>
 			{/if}
@@ -225,7 +236,7 @@
 				<div><DatePicker bind:value={nClose} onchange={(v) => nClose = v} /></div>
 				<div class="flex gap-2">
 					<button onclick={createDeal} disabled={saving || !nTitle.trim()} class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? '...' : 'Add'}</button>
-					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-2">✕</button>
+					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-2"><Icon name="x" size={14} /></button>
 				</div>
 				<div class="relative">
 					<input
@@ -336,7 +347,7 @@
 			{:else}
 				<p class="text-white font-semibold flex-1">{selectedDeal.title}</p>
 				<button onclick={startEditDeal} class="text-xs text-[#444] hover:text-white border border-[#2a2a2a] rounded-lg px-2.5 py-1 transition-colors mr-2">Edit</button>
-				<button onclick={() => { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }} class="text-[#555] hover:text-white">✕</button>
+				<button onclick={() => { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }} class="text-[#555] hover:text-white"><Icon name="x" size={14} /></button>
 			{/if}
 		</div>
 
@@ -349,7 +360,7 @@
 			</div>
 			<div class="flex gap-2">
 				<button onclick={saveDealEdit} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Save</button>
-				<button onclick={() => editingDeal = null} class="rounded-lg border border-[#333] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
+				<button onclick={() => editingDeal = false} class="rounded-lg border border-[#333] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
 			</div>
 		</div>
 	{/if}

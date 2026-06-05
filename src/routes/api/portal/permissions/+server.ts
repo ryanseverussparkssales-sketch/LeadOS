@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types';
 
 // Default permissions — all ON unless explicitly disabled by admin
 const SDR_DEFAULTS = {
-	coaching: true, interview: true, profile: true, marketplace: true,
+	coaching: true, interview: true, profile: true,
 	bonus_visible: true, performance: true, dossier: true,
 	scripts: true, callbacks: true, messages: true,
 };

@@ -4,6 +4,9 @@ import { sendEmail } from '$lib/server/email';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
+const esc = (s: unknown) =>
+	String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 // Public endpoint — no auth required
 export const POST: RequestHandler = async ({ request }) => {
 	const { name, email, company, vertical, budget, message } = await request.json();
@@ -36,12 +39,12 @@ export const POST: RequestHandler = async ({ request }) => {
 			to: 'ryanseverussparkssales@gmail.com',
 			subject: `New Hire Inquiry — ${name} @ ${company || 'Unknown'}`,
 			html: `
-				<p><strong>New inquiry from ${name}</strong></p>
-				<p><strong>Email:</strong> ${email}</p>
-				<p><strong>Company:</strong> ${company || '—'}</p>
-				<p><strong>Vertical:</strong> ${vertical || '—'}</p>
-				<p><strong>Budget:</strong> ${budget || '—'}</p>
-				<p><strong>Message:</strong><br>${message || '—'}</p>
+				<p><strong>New inquiry from ${esc(name)}</strong></p>
+				<p><strong>Email:</strong> ${esc(email)}</p>
+				<p><strong>Company:</strong> ${esc(company) || '—'}</p>
+				<p><strong>Vertical:</strong> ${esc(vertical) || '—'}</p>
+				<p><strong>Budget:</strong> ${esc(budget) || '—'}</p>
+				<p><strong>Message:</strong><br>${esc(message) || '—'}</p>
 			`,
 			text: `New inquiry from ${name} (${email}) at ${company || 'N/A'}. Budget: ${budget || 'N/A'}. Message: ${message || 'N/A'}`,
 		});

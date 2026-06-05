@@ -6,7 +6,7 @@
     let inputUrl = $state('');
 
     onMount(() => {
-        calendlyUrl = localStorage.getItem('leados_calendly_url') ?? '';
+        calendlyUrl = localStorage.getItem('rogueos_calendly_url') ?? '';
         inputUrl = calendlyUrl;
         if (!calendlyUrl) editing = true;
     });
@@ -15,7 +15,7 @@
         let url = inputUrl.trim();
         if (url && !url.startsWith('http')) url = 'https://' + url;
         calendlyUrl = url;
-        localStorage.setItem('leados_calendly_url', url);
+        localStorage.setItem('rogueos_calendly_url', url);
         editing = false;
     }
 

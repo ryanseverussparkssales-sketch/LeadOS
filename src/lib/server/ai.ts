@@ -86,7 +86,7 @@ export async function processCallRecording(callId: string, recordingUrl: string)
 	// ── 4. Persist to database ───────────────────────────────────────────────
 	const { error: dbErr } = await supabaseAdmin
 		.from('calls')
-		.update({ raw_transcript: transcript, summary })
+		.update({ raw_transcript: transcript, summary, processed_at: new Date().toISOString() })
 		.eq('id', callId);
 
 	if (dbErr) console.error('[AI] Failed to save transcript to DB:', dbErr);

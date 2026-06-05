@@ -2,10 +2,12 @@
 	import { onMount, onDestroy, tick } from 'svelte';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError, toastInfo } from '$lib/stores/toast';
 	import { currentUser } from '$lib/stores';
 	import { supabase } from '$lib/services/auth';
 	import DialerWidgetPanel from '$lib/components/DialerWidgetPanel.svelte';
 	import DialButtonRenderer from '$lib/components/DialButtonRenderer.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	let number = $state('');
 	let callState = $state<'idle' | 'calling' | 'connected'>('idle');
@@ -14,6 +16,19 @@
 	let twilioError = $state('');
 	let muted = $state(false);
 	let onHold = $state(false);
+	let aiCalling = $state(false);
+
+	// AI practice calls (rep rehearses against an AI buyer persona). Price-gated.
+	let practiceEnabled = $state(false);     // tier feature flag from /api/portal/tier
+	let practiceStarting = $state(false);
+	let practicePersona = $state('default');
+	const PERSONAS = [
+		{ id: 'default', label: 'Typical prospect (mild skeptic)' },
+		{ id: 'skeptical_cfo', label: 'Skeptical CFO (price/ROI focus)' },
+		{ id: 'busy_owner', label: 'Busy owner (almost hangs up)' },
+		{ id: 'friendly_noncommittal', label: 'Friendly but non-committal' },
+		{ id: 'gatekeeper', label: 'Gatekeeper (screens the call)' },
+	];
 
 	let phoneNumbers = $state<{id:string; phone_number:string; friendly_name:string; client_id:string|null; is_primary:boolean; status:string}[]>([]);
 	let selectedFromNumber = $state('');
@@ -106,8 +121,8 @@
 	let loadingVm = $state(false);
 	let selectedVm = $state<Voicemail | null>(null);
 
-	const OUTCOME_COLORS: Record<string,string> = { answered:'text-green-400', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#666]', do_not_call:'text-red-400', no_answer:'text-[#444]' };
-	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-red-400 bg-red-400/10', high:'text-orange-400 bg-orange-400/10', medium:'text-yellow-400 bg-yellow-400/10', low:'text-[#666] bg-[#1a1a1a]' };
+	const OUTCOME_COLORS: Record<string,string> = { answered:'text-[var(--call)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#666]', do_not_call:'text-[var(--end-text)]', no_answer:'text-[#444]' };
+	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-[var(--end-text)] bg-[var(--end)]/12', high:'text-orange-400 bg-orange-400/10', medium:'text-yellow-400 bg-yellow-400/10', low:'text-[#666] bg-[#1a1a1a]' };
 
 	function fmtDur(s: number|null) { if (!s) return '—'; return `${Math.floor(s/60)}m ${s%60}s`; }
 	function fmtDate(d: string) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
@@ -147,13 +162,13 @@
 
 	function intentColor(intent: string): string {
 		const map: Record<string, string> = {
-			interested: 'bg-green-950 text-green-400',
-			positive_reply: 'bg-green-950 text-green-400',
+			interested: 'bg-[var(--call)]/12 text-[var(--call)]',
+			positive_reply: 'bg-[var(--call)]/12 text-[var(--call)]',
 			callback_request: 'bg-blue-950 text-blue-400',
 			objection: 'bg-yellow-950 text-yellow-400',
 			question: 'bg-yellow-950 text-yellow-400',
-			opt_out: 'bg-red-950 text-red-400',
-			referral: 'bg-purple-950 text-purple-400',
+			opt_out: 'bg-[var(--end)]/12 text-[var(--end-text)]',
+			referral: 'bg-[var(--accent)]/12 text-[var(--accent)]',
 		};
 		return map[intent] ?? 'bg-[#1a1a1a] text-[#555]';
 	}
@@ -165,6 +180,12 @@
 		await Promise.all([initTwilio(), loadCalls(), loadTasks(), loadThreads(), loadVoicemails(), loadPhoneNumbers()]);
 		const pRes = await apiFetch('/api/projects');
 		if (pRes.ok) projects = await pRes.json();
+
+		// Resolve whether AI practice calls are available to this account (price gate).
+		try {
+			const tRes = await apiFetch('/api/portal/tier');
+			if (tRes.ok) practiceEnabled = !!(await tRes.json())?.features?.practiceCalls;
+		} catch {}
 
 		// Set up realtime with current user's ID
 		const user = $currentUser;
@@ -184,7 +205,7 @@
 			const res = await apiFetch('/api/twilio/token', { method: 'POST' });
 			if (!res.ok) { twilioError = 'Could not get Twilio token'; return; }
 			const { token } = await res.json();
-			device = new Device(token, { logLevel: 1, codecPreferences: ['opus', 'pcmu'] });
+			device = new Device(token, { logLevel: 1, codecPreferences: ['opus', 'pcmu'] as any });
 			device.on('error', (err: {message:string}) => { twilioError = err.message; });
 			twilioReady = true;
 		} catch (err) { twilioError = err instanceof Error ? err.message : 'Twilio init failed'; }
@@ -201,11 +222,119 @@
 				: digits.length === 10 ? '+1' + digits
 				: digits.length === 11 && digits.startsWith('1') ? '+' + digits
 				: '+' + digits;
-			activeCall = await device.connect({ params: { To: e164, CallerId: selectedFromNumber || undefined } });
+			// Create a call row first so status/recording/transcript correlate (was missing → desk calls recorded nothing).
+			let callId: string | undefined;
+			try {
+				const startRes = await apiFetch('/api/calls/start', {
+					method: 'POST',
+					body: JSON.stringify({ phone_number: e164, call_type: 'manual' }),
+				});
+				if (startRes.ok) callId = (await startRes.json()).call_id;
+			} catch { /* non-fatal — call still places, just untracked */ }
+			const connectParams: Record<string, string> = { To: e164 };
+			if (callId) connectParams.CallId = callId;
+			if (selectedFromNumber) connectParams.CallerId = selectedFromNumber;
+			activeCall = await device.connect({ params: connectParams });
 			activeCall.on('accept', () => { callState='connected'; callDuration=0; durationInterval=setInterval(()=>callDuration++,1000); });
 			activeCall.on('disconnect', () => { if(durationInterval){clearInterval(durationInterval);durationInterval=null;} callState='idle'; activeCall=null; muted=false; onHold=false; setTimeout(() => loadCalls(), 2000); });
 			activeCall.on('error', (err:{message:string}) => { twilioError=err.message; callState='idle'; });
 		} catch (err) { twilioError = err instanceof Error ? err.message : 'Call failed'; callState='idle'; }
+	}
+
+	// Hand the call to the server-side ConversationRelay AI agent (no browser device needed).
+	async function aiCall() {
+		const target = formatDialInput(number.trim());
+		if (!target || aiCalling) return;
+		aiCalling = true;
+		try {
+			const digits = target.replace(/\D/g, '');
+			const e164 = target.startsWith('+') ? target
+				: digits.length === 10 ? '+1' + digits
+				: digits.length === 11 && digits.startsWith('1') ? '+' + digits
+				: '+' + digits;
+			const res = await apiFetch('/api/twilio/conversation-relay/start', {
+				method: 'POST',
+				body: JSON.stringify({ phone_number: e164, from: selectedFromNumber || undefined }),
+			});
+			if (res.ok) {
+				toastSuccess('AI is placing the call — it will qualify and log the outcome');
+				number = '';
+				setTimeout(() => loadCalls(), 3000);
+			} else {
+				const e = await res.json().catch(() => ({}));
+				toastError(e.message ?? 'AI call failed');
+			}
+		} catch {
+			toastError('AI call failed');
+		}
+		aiCalling = false;
+	}
+
+	// Start an AI practice call. The relay rings THIS browser (to: client:<identity>);
+	// the rep answers and pitches the AI buyer persona; on hang-up the relay logs coaching.
+	//
+	// The device is normally NOT registered for inbound (so it can't steal real customer
+	// calls). We arm it only for the practice window and auto-accept the practice leg, then
+	// disarm — keeping the inbound-ring-theft fix intact for everyday use.
+	let practiceArmed = false;
+	let practiceDisarmTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function onPracticeIncoming(call: any) {
+		if (!practiceArmed) return;          // only the practice window auto-accepts
+		practiceArmed = false;
+		if (practiceDisarmTimer) { clearTimeout(practiceDisarmTimer); practiceDisarmTimer = null; }
+		activeCall = call;
+		callState = 'connected'; muted = false; onHold = false;
+		callDuration = 0;
+		if (durationInterval) clearInterval(durationInterval);
+		durationInterval = setInterval(() => callDuration++, 1000);
+		call.on('disconnect', () => {
+			if (durationInterval) { clearInterval(durationInterval); durationInterval = null; }
+			callState = 'idle'; activeCall = null; muted = false; onHold = false;
+			disarmPractice();
+			setTimeout(() => loadCalls(), 2500);   // surface the coaching summary once persisted
+		});
+		call.on('error', (err: { message: string }) => { twilioError = err.message; callState = 'idle'; disarmPractice(); });
+		try { call.accept(); } catch (e) { twilioError = e instanceof Error ? e.message : 'Could not answer'; }
+	}
+
+	function disarmPractice() {
+		practiceArmed = false;
+		if (practiceDisarmTimer) { clearTimeout(practiceDisarmTimer); practiceDisarmTimer = null; }
+		try { device?.off('incoming', onPracticeIncoming); } catch {}
+		try { device?.unregister(); } catch {}
+	}
+
+	async function startPractice() {
+		if (practiceStarting || callState !== 'idle') return;
+		if (!device || !twilioReady) { toastError('Phone not ready yet — wait a moment and retry'); return; }
+		practiceStarting = true;
+		try {
+			// Arm the browser to receive the inbound practice leg.
+			practiceArmed = true;
+			device.on('incoming', onPracticeIncoming);
+			try { await device.register(); } catch {}
+			// Safety net: disarm if the call never arrives (e.g. server rejected it).
+			practiceDisarmTimer = setTimeout(() => { if (callState === 'idle') disarmPractice(); }, 30000);
+
+			const res = await apiFetch('/api/twilio/practice/start', {
+				method: 'POST',
+				body: JSON.stringify({ persona: practicePersona, from: selectedFromNumber || undefined }),
+			});
+			if (res.ok) {
+				toastSuccess('Your phone will ring — answer it and start your pitch');
+			} else {
+				disarmPractice();
+				const e = await res.json().catch(() => ({}));
+				if (res.status === 402) toastError('AI practice calls require a Pro plan');
+				else if (res.status === 503) toastError('AI practice calls are not enabled');
+				else toastError(e.message ?? 'Could not start practice call');
+			}
+		} catch {
+			disarmPractice();
+			toastError('Could not start practice call');
+		}
+		practiceStarting = false;
 	}
 
 	function hangUp() { if(activeCall){activeCall.disconnect();activeCall=null;} callState='idle'; if(durationInterval){clearInterval(durationInterval);durationInterval=null;} }
@@ -236,7 +365,11 @@
 
 	async function loadCalls() { callsLoading=true; const r=await apiFetch('/api/calls?limit=30'); recentCalls=r.ok?await r.json():[]; callsLoading=false; }
 	async function loadTasks() { tasksLoading=true; const r=await apiFetch('/api/tasks?status=pending'); tasks=r.ok?await r.json():[]; tasksLoading=false; }
-	async function completeTask(id: string) { await apiFetch(`/api/tasks/${id}`,{method:'PATCH',body:JSON.stringify({status:'completed'})}); tasks=tasks.filter(t=>t.id!==id); }
+	async function completeTask(id: string) {
+		const res = await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
+		if (res.ok) tasks = tasks.filter(t => t.id !== id);
+		else toastError('Failed to complete task');
+	}
 	async function loadVoicemails() { vmLoading=true; const r=await apiFetch('/api/phone/voicemails?limit=20'); voicemails=r.ok?await r.json():[]; vmLoading=false; }
 	async function markRead(id: string) { await apiFetch(`/api/phone/voicemails/${id}`,{method:'PATCH',body:JSON.stringify({status:'read'})}); voicemails=voicemails.map(v=>v.id===id?{...v,status:'read'}:v); }
 
@@ -323,6 +456,8 @@
 			replyBody = '';
 			await tick();
 			if (messagesEl) messagesEl.scrollTop = messagesEl.scrollHeight;
+		} else {
+			toastError('Failed to send message');
 		}
 		sending = false;
 	}
@@ -356,7 +491,9 @@
 			});
 			threads = threads.map(t => t.id === thread.id ? { ...t, contact_id: c.id, contacts: c } : t);
 			selectedThread = { ...selectedThread!, contact_id: c.id, contacts: c };
-			window.dispatchEvent(new CustomEvent('leados:toast', { detail: { type: 'success', message: 'Contact created' } }));
+			toastSuccess('Contact created');
+		} else {
+			toastError('Failed to create contact');
 		}
 	}
 
@@ -385,6 +522,8 @@
 			showNewThread = false;
 			newThreadTo = ''; newThreadBody = ''; newThreadSelectedContact = null;
 			await loadThreads();
+		} else {
+			toastError('Failed to send message');
 		}
 		sendingNew = false;
 	}
@@ -415,16 +554,14 @@
 					// Notify for background thread
 					const thread = threads.find(t => t.id === msg.sms_thread_id);
 					const fromName = thread?.contacts?.name ?? msg.from_number ?? 'Unknown';
-					window.dispatchEvent(new CustomEvent('leados:toast', {
-						detail: { type: 'info', message: `SMS from ${fromName}: ${(msg.body ?? '').slice(0, 60)}` }
-					}));
+					toastInfo(`SMS from ${fromName}: ${(msg.body ?? '').slice(0, 60)}`);
 				}
 			})
 			.subscribe();
 	}
 </script>
 
-<svelte:head><title>Phone — LeadOS</title></svelte:head>
+<svelte:head><title>Phone — RogueOS</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 
@@ -434,7 +571,7 @@
 		<div class="px-8 py-4 border-b border-[#1e1e1e] flex items-center justify-between">
 			<span class="text-xs text-[#555] uppercase tracking-widest">Phone</span>
 			<div class="flex items-center gap-1.5">
-				<div class="w-2 h-2 rounded-full {twilioReady?'bg-green-500':twilioError?'bg-red-500':'bg-yellow-500 animate-pulse'}"></div>
+				<div class="w-2 h-2 rounded-full {twilioReady?'bg-[var(--call)]':twilioError?'bg-[var(--end)]':'bg-yellow-500 animate-pulse'}"></div>
 				<span class="text-xs text-[#555]">{twilioReady?'Ready':twilioError?'Error':'Connecting…'}</span>
 				{#if twilioError}<button onclick={initTwilio} class="text-xs text-[#555] underline hover:text-white ml-1">Retry</button>{/if}
 			</div>
@@ -444,15 +581,18 @@
 			<!-- Number display -->
 			<div class="w-full rounded-xl border border-[#2a2a2a] bg-[#111] px-4 h-[52px] flex items-center hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				{#if callState === 'connected'}
-					<span class="flex-1 text-center text-green-400 text-xl font-mono leading-none">{formatDuration(callDuration)}</span>
-					<span class="text-sm leading-none">{muted?'🔇':''}{onHold?'⏸':''}</span>
+					<span class="flex-1 text-center text-[var(--call)] text-xl font-mono leading-none">{formatDuration(callDuration)}</span>
+					<span class="flex items-center gap-1.5 text-[#777]">
+						{#if muted}<Icon name="micOff" size={14} />{/if}
+						{#if onHold}<Icon name="pause" size={14} />{/if}
+					</span>
 				{:else if callState === 'calling'}
 					<span class="flex-1 text-center text-yellow-400 text-sm font-mono animate-pulse leading-none">Calling {number}…</span>
 				{:else}
 					<input bind:value={number} placeholder="+1 555 000 0000"
 						class="flex-1 bg-transparent text-white text-center text-xl outline-none placeholder-[#333] font-mono leading-none" style="line-height:1" />
 					{#if number}
-						<button onclick={() => number=number.slice(0,-1)} class="text-[#555] hover:text-white text-sm px-1 leading-none">⌫</button>
+						<button onclick={() => number=number.slice(0,-1)} class="text-[#555] hover:text-white px-1 leading-none flex items-center" aria-label="Delete digit"><Icon name="backspace" size={18} /></button>
 					{/if}
 				{/if}
 			</div>
@@ -484,7 +624,7 @@
 							{/each}
 						</select>
 					{:else}
-						<a href="/numbers" class="block text-xs text-yellow-600 hover:text-yellow-400 transition-colors">⚠ No numbers — add one in Numbers</a>
+						<a href="/numbers" class="flex items-center gap-1.5 text-xs text-yellow-600 hover:text-yellow-400 transition-colors"><Icon name="alert" size={13} /> No numbers — add one in Numbers</a>
 					{/if}
 				</div>
 			{/if}
@@ -495,25 +635,51 @@
 					{#if twilioReady && number.trim()}
 						<DialButtonRenderer callState={callState} onclick={() => dial()} size={90} />
 					{:else}
-						<button onclick={() => dial()} disabled={!twilioReady||!number.trim()}
-							class="w-full rounded-xl bg-green-600 py-3.5 text-white font-semibold hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg">
-							📞 Call
+						<button onclick={() => dial()} disabled={!twilioReady||!number.trim()||callState!=='idle'}
+							class="w-full rounded-xl bg-[var(--call)] py-3.5 text-[var(--call-ink)] font-semibold hover:bg-[var(--call-hi)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg flex items-center justify-center gap-2">
+							<Icon name="phone" size={20} /> Call
 						</button>
 					{/if}
 				</div>
+				<button onclick={aiCall} disabled={!number.trim()||aiCalling}
+					title="Let the AI agent place this call, qualify the prospect, and log the outcome"
+					class="w-full rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 py-2.5 text-[var(--accent)] text-sm font-medium hover:bg-[var(--accent-hi)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+					<Icon name="sparkle" size={15} /> {aiCalling ? 'Starting AI call…' : 'AI Call (auto-qualify)'}
+				</button>
+
+				<!-- AI practice calls — price-gated; only shown when the tier enables it -->
+				{#if practiceEnabled}
+					<div class="rounded-xl border border-[var(--call)]/40 bg-[var(--call)]/12 p-3 space-y-2">
+						<div class="flex items-center gap-2 text-xs text-[var(--call)] font-medium">
+							<Icon name="target" size={14} /> Practice with AI
+							<span class="text-[var(--call)]/60 font-normal">— rehearse your pitch, get coached</span>
+						</div>
+						<select bind:value={practicePersona}
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white focus:outline-none focus:border-[#444]">
+							{#each PERSONAS as p}
+								<option value={p.id}>{p.label}</option>
+							{/each}
+						</select>
+						<button onclick={startPractice} disabled={practiceStarting||!twilioReady}
+							title="The AI plays a prospect and rings your phone — answer it and pitch. You'll get coaching after you hang up."
+							class="w-full rounded-lg bg-[var(--call)] py-2.5 text-[var(--call-ink)] text-sm font-semibold hover:bg-[var(--call-hi)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+							<Icon name="mic" size={15} /> {practiceStarting ? 'Calling your phone…' : 'Start practice call'}
+						</button>
+					</div>
+				{/if}
 			{:else}
 				<div class="grid grid-cols-3 gap-2 w-full">
 					<button onclick={toggleMute}
-						class="rounded-xl border py-3 text-xs font-medium transition-colors {muted?'border-red-500 text-red-400 bg-red-500/10':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
-						{muted?'🔇 Unmute':'🎤 Mute'}
+						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {muted?'border-[var(--end)]/40 text-[var(--end-text)] bg-[var(--end)]/12':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
+						<Icon name={muted?'micOff':'mic'} size={14} /> {muted?'Unmute':'Mute'}
 					</button>
 					<button onclick={hangUp}
-						class="rounded-xl bg-red-700 py-3 text-white font-semibold hover:bg-red-600 transition-colors text-sm">
-						{callState==='calling'?'✕ Cancel':'📵 End'}
+						class="rounded-xl bg-[var(--end)] py-3 text-white font-semibold hover:bg-[var(--end-hi)] transition-colors text-sm flex items-center justify-center gap-1.5">
+						<Icon name={callState==='calling'?'x':'phoneOff'} size={15} /> {callState==='calling'?'Cancel':'End'}
 					</button>
 					<button onclick={toggleHold}
-						class="rounded-xl border py-3 text-xs font-medium transition-colors {onHold?'border-yellow-500 text-yellow-400 bg-yellow-500/10':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
-						{onHold?'▶ Resume':'⏸ Hold'}
+						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {onHold?'border-yellow-500 text-yellow-400 bg-yellow-500/10':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
+						<Icon name={onHold?'play':'pause'} size={14} /> {onHold?'Resume':'Hold'}
 					</button>
 				</div>
 				{#if callState==='connected'}
@@ -522,15 +688,15 @@
 			{/if}
 
 			{#if twilioError}
-				<p class="text-xs text-red-400 text-center">{twilioError}</p>
+				<p class="text-xs text-[var(--end-text)] text-center">{twilioError}</p>
 			{/if}
 		</div>
 
 		<!-- Quick SMS shortcut -->
 		<div class="border-t border-[#1e1e1e] p-4">
 			<button onclick={() => rightTab='sms'}
-				class="w-full text-xs text-[#555] hover:text-white border border-[#222] hover:border-[#444] rounded-lg py-2 transition-colors">
-				💬 SMS Inbox {#if totalUnread > 0}<span class="ml-1 bg-green-600 text-white rounded-full px-1.5 py-0.5 text-[9px] font-bold">{totalUnread > 9 ? '9+' : totalUnread}</span>{/if}
+				class="w-full text-xs text-[#555] hover:text-white border border-[#222] hover:border-[#444] rounded-lg py-2 transition-colors flex items-center justify-center gap-2">
+				<Icon name="message" size={14} /> SMS Inbox {#if totalUnread > 0}<span class="ml-1 bg-[var(--call)] text-[var(--call-ink)] rounded-full px-1.5 py-0.5 text-[9px] font-bold">{totalUnread > 9 ? '9+' : totalUnread}</span>{/if}
 			</button>
 		</div>
 	</div>
@@ -576,7 +742,7 @@
 												<input bind:value={quickContactName} placeholder="Name *" class="flex-1 rounded border border-[#2a2a2a] bg-[#111] px-2 py-1 text-xs text-white placeholder-[#333] focus:outline-none" />
 												<input bind:value={quickContactCompany} placeholder="Company" class="flex-1 rounded border border-[#2a2a2a] bg-[#111] px-2 py-1 text-xs text-white placeholder-[#333] focus:outline-none" />
 												<button onclick={() => quickAddContact(call.phone_number!)} class="text-xs bg-white text-black px-2 py-1 rounded font-medium">+</button>
-												<button onclick={() => addingContact = null} class="text-xs text-[#444] px-1">✕</button>
+												<button onclick={() => addingContact = null} aria-label="Cancel" class="text-[#444] hover:text-white px-1"><Icon name="x" size={13} /></button>
 											</div>
 										{:else}
 											<button onclick={() => { addingContact = call.phone_number; quickContactName = ''; }}
@@ -587,11 +753,11 @@
 								<div class="flex gap-1.5 shrink-0">
 									{#if call.contact?.phone || call.phone_number}
 										<button onclick={() => dial(call.contact?.phone ?? call.phone_number ?? '')}
-											class="w-8 h-8 rounded-full bg-green-600/20 hover:bg-green-600/40 text-green-400 flex items-center justify-center transition-colors" title="Call back">📞</button>
+											class="w-8 h-8 rounded-full bg-[var(--call)]/12 hover:bg-[var(--call)]/25 text-[var(--call)] flex items-center justify-center transition-colors" title="Call back" aria-label="Call back"><Icon name="phone" size={15} /></button>
 									{/if}
 									{#if call.contact?.phone}
 										<button onclick={() => { rightTab='sms'; }}
-											class="w-8 h-8 rounded-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition-colors" title="SMS">💬</button>
+											class="w-8 h-8 rounded-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 flex items-center justify-center transition-colors" title="SMS" aria-label="SMS"><Icon name="message" size={15} /></button>
 									{/if}
 								</div>
 							</div>
@@ -626,8 +792,8 @@
 						{#each filteredTasks as task}
 							<div class="bg-[#111] border border-[#2a2a2a] rounded-lg px-4 py-3 flex items-start gap-3 hover:bg-[#141414] transition-colors">
 								<button onclick={() => completeTask(task.id)}
-									class="w-5 h-5 rounded border border-[#444] flex-shrink-0 mt-0.5 hover:border-green-400 hover:bg-green-400/10 transition-colors flex items-center justify-center text-[#444] hover:text-green-400 text-xs"
-									title="Mark complete">✓</button>
+									class="w-5 h-5 rounded border border-[#444] flex-shrink-0 mt-0.5 hover:border-[var(--call)]/40 hover:bg-[var(--call)]/12 transition-colors flex items-center justify-center text-[#444] hover:text-[var(--call)] text-xs"
+									title="Mark complete" aria-label="Mark complete"><Icon name="check" size={13} /></button>
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2 flex-wrap mb-0.5">
 										<span class="text-sm text-white font-medium">{task.title}</span>
@@ -635,16 +801,16 @@
 									</div>
 									{#if task.contact}<div class="text-xs text-[#666]">{task.contact.name}{task.contact.company?` · ${task.contact.company}`:''}</div>{/if}
 									<div class="text-xs mt-0.5 flex gap-3">
-										<span class="{isOverdue(task.due_date)?'text-red-400 font-medium':'text-[#555]'}">{fmtDue(task.due_date)}</span>
+										<span class="{isOverdue(task.due_date)?'text-[var(--end-text)] font-medium':'text-[#555]'}">{fmtDue(task.due_date)}</span>
 										<span class="text-[#444] capitalize">{task.task_type.replace(/_/g,' ')}</span>
 									</div>
 								</div>
 								<div class="flex gap-1.5 shrink-0">
 									{#if task.contact?.phone}
 										<button onclick={() => dial(task.contact?.phone??'')}
-											class="w-7 h-7 rounded-full bg-green-600/15 hover:bg-green-600/30 text-green-400 flex items-center justify-center text-sm transition-colors" title="Call">📞</button>
+											class="w-7 h-7 rounded-full bg-[var(--call)]/12 hover:bg-[var(--call)]/25 text-[var(--call)] flex items-center justify-center transition-colors" title="Call" aria-label="Call"><Icon name="phone" size={14} /></button>
 										<button onclick={() => { rightTab='sms'; }}
-											class="w-7 h-7 rounded-full bg-blue-600/15 hover:bg-blue-600/30 text-blue-400 flex items-center justify-center text-sm transition-colors" title="SMS">💬</button>
+											class="w-7 h-7 rounded-full bg-blue-600/15 hover:bg-blue-600/30 text-blue-400 flex items-center justify-center transition-colors" title="SMS" aria-label="SMS"><Icon name="message" size={14} /></button>
 									{/if}
 								</div>
 							</div>
@@ -689,7 +855,7 @@
 														{thread.contacts?.name ?? thread.remote_number}
 													</p>
 													{#if thread.is_opted_out}
-														<span class="text-[9px] bg-red-950 text-red-400 px-1.5 py-0.5 rounded flex-shrink-0">OPT-OUT</span>
+														<span class="text-[9px] bg-[var(--end)]/12 text-[var(--end-text)] px-1.5 py-0.5 rounded flex-shrink-0">OPT-OUT</span>
 													{/if}
 												</div>
 												{#if thread.contacts?.company}
@@ -729,7 +895,7 @@
 								<!-- Header -->
 								<div class="border-b border-[var(--c-border)] px-8 py-4 flex items-center justify-between flex-shrink-0">
 									<p class="text-white font-semibold text-sm">New Message</p>
-									<button onclick={() => showNewThread = false} class="text-[#555] hover:text-white text-sm">✕</button>
+									<button onclick={() => showNewThread = false} aria-label="Close" class="text-[#555] hover:text-white"><Icon name="x" size={15} /></button>
 								</div>
 
 								<!-- Compose body -->
@@ -767,23 +933,141 @@
 							</div>
 						{:else if !selectedThread}
 							<div class="flex flex-col items-center justify-center flex-1 text-center">
-								<p class="text-[#333] text-4xl mb-4">💬</p>
+								<div class="text-[#333] mb-4"><Icon name="message" size={40} /></div>
 								<p class="text-[#555] text-sm">Select a conversation</p>
 							</div>
 						{:else}
 							<!-- Thread header -->
 							<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between flex-shrink-0">
-								<div>
+								<div class="min-w-0">
 									<div class="flex items-center gap-2">
-										<p class="text-white font-semibold text-sm">{selectedThread.contacts?.name ?? selectedThread.remote_number}</p>
+										<p class="text-white font-semibold text-sm truncate">{selectedThread.contacts?.name ?? selectedThread.remote_number}</p>
 										{#if selectedThread.contacts?.contact_score}
-											<span class="text-xs font-mono {selectedThread.contacts.contact_score >= 70 ? 'text-green-400' : 'text-[#555]'}">{selectedThread.contacts.contact_score}</span>
+											<span class="text-xs font-mono {selectedThread.contacts.contact_score >= 70 ? 'text-[var(--call)]' : 'text-[#555]'}">{selectedThread.contacts.contact_score}</span>
+										{/if}
+										{#if selectedThread.is_opted_out}
+											<span class="text-[9px] bg-[var(--end)]/12 text-[var(--end-text)] px-1.5 py-0.5 rounded flex-shrink-0">OPT-OUT</span>
+										{/if}
+									</div>
+									<p class="text-xs text-[#555] font-mono mt-0.5">{selectedThread.remote_number}</p>
+								</div>
+								<div class="flex items-center gap-1.5 flex-shrink-0">
+									<button onclick={() => dial(selectedThread.remote_number)}
+										class="w-8 h-8 rounded-full bg-[var(--call)]/12 hover:bg-[var(--call)]/25 text-[var(--call)] flex items-center justify-center transition-colors" title="Call" aria-label="Call"><Icon name="phone" size={15} /></button>
+									{#if !selectedThread.contact_id}
+										<button onclick={() => createContactFromThread(selectedThread!)}
+											class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] hover:border-[#444] rounded-lg px-2.5 py-1.5 transition-colors flex items-center gap-1"><Icon name="plus" size={12} /> Add contact</button>
 									{/if}
 								</div>
 							</div>
-						</div>
+
+							<!-- Messages -->
+							<div bind:this={messagesEl} class="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+								{#if loadingMessages}
+									<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
+								{:else if threadMessages.length === 0}
+									<div class="text-center py-12 text-[#555] text-sm">No messages yet</div>
+								{:else}
+									{#each threadMessages as msg}
+										<div class="flex {msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}">
+											<div class="max-w-[78%] space-y-1">
+												<div class="rounded-2xl px-4 py-2.5 text-sm leading-relaxed {msg.direction === 'outbound' ? 'bg-[var(--call)] text-[var(--call-ink)] rounded-br-sm' : 'bg-[#1a1a1a] text-white border border-[#2a2a2a] rounded-bl-sm'}">
+													{msg.body}
+												</div>
+												<div class="flex items-center gap-2 px-1 {msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}">
+													<span class="text-[10px] text-[#444]">{timeAgo(msg.sent_at)}</span>
+													{#if msg.intent_label}
+														<span class="text-[9px] px-1.5 py-0.5 rounded-full {intentColor(msg.intent_label)}">{msg.intent_label.replace(/_/g,' ')}</span>
+													{/if}
+													{#if msg.direction === 'outbound' && msg.status && msg.status !== 'sent' && msg.status !== 'delivered'}
+														<span class="text-[9px] text-[var(--end-text)]">{msg.status}</span>
+													{/if}
+												</div>
+											</div>
+										</div>
+									{/each}
+								{/if}
+							</div>
+
+							<!-- Composer -->
+							<div class="border-t border-[#1e1e1e] p-4 flex-shrink-0 space-y-2">
+								{#if selectedThread.is_opted_out}
+									<p class="text-xs text-[var(--end-text)] text-center py-2">This contact has opted out — replies are blocked.</p>
+								{:else}
+									{#if aiDraft}
+										<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/10 p-2.5 text-xs text-[#bbb] space-y-1.5">
+											<p class="leading-relaxed">{aiDraft}</p>
+											<div class="flex gap-2">
+												<button onclick={() => { replyBody = aiDraft; aiDraft = ''; }} class="text-[var(--accent)] hover:underline font-medium">Use this</button>
+												<button onclick={() => aiDraft = ''} class="text-[#555] hover:text-white">Dismiss</button>
+											</div>
+										</div>
+									{/if}
+									<div class="flex items-end gap-2">
+										<textarea bind:value={replyBody} rows="1" placeholder="Type a message…"
+											onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
+											class="flex-1 resize-none rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-2.5 text-sm text-white placeholder-[#444] focus:border-[#444] focus:outline-none"></textarea>
+										<button onclick={loadAiDraft} disabled={loadingDraft}
+											title="Draft a reply with AI"
+											class="w-10 h-10 rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/10 text-[var(--accent)] flex items-center justify-center hover:bg-[var(--accent)]/20 disabled:opacity-40 transition-colors flex-shrink-0">
+											{#if loadingDraft}<div class="w-4 h-4 border-2 border-[var(--accent)]/40 border-t-[var(--accent)] rounded-full animate-spin"></div>{:else}<Icon name="sparkle" size={16} />{/if}
+										</button>
+										<button onclick={sendReply} disabled={sending || !replyBody.trim()}
+											class="w-10 h-10 rounded-xl bg-[var(--call)] text-[var(--call-ink)] flex items-center justify-center hover:bg-[var(--call-hi)] disabled:opacity-40 transition-colors flex-shrink-0" aria-label="Send">
+											{#if sending}<div class="w-4 h-4 border-2 border-[var(--call-ink)]/40 border-t-[var(--call-ink)] rounded-full animate-spin"></div>{:else}<Icon name="send" size={16} />{/if}
+										</button>
+									</div>
+								{/if}
+							</div>
 					{/if}
 				</div>
+			</div>
+
+		<!-- VOICEMAILS -->
+		{:else if rightTab === 'voicemails'}
+			<div class="p-4 space-y-2 overflow-y-auto h-full">
+				{#if vmLoading}
+					<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
+				{:else if voicemails.length === 0}
+					<div class="text-center py-12 text-[#555] text-sm">No voicemails</div>
+				{:else}
+					{#each voicemails as vm}
+						{@const unread = vm.status === 'unread' || vm.is_read === false}
+						<div class="bg-[#111] border rounded-lg px-4 py-3 transition-colors {unread ? 'border-[var(--call)]/40' : 'border-[#2a2a2a]'} hover:bg-[#141414]">
+							<div class="flex items-start gap-3">
+								<div class="flex-1 min-w-0">
+									<div class="flex items-center gap-2">
+										{#if unread}<span class="w-1.5 h-1.5 rounded-full bg-[var(--call)] flex-shrink-0"></span>{/if}
+										<span class="text-sm font-medium text-white truncate">{vm.contact_name ?? vm.caller_name ?? vm.from_number ?? vm.caller_id ?? 'Unknown'}</span>
+									</div>
+									<div class="text-xs text-[#444] mt-0.5 flex gap-3">
+										<span>{fmtDate(vm.received_at ?? vm.created_at ?? '')}</span>
+										{#if vm.duration_seconds}<span>{fmtDur(vm.duration_seconds)}</span>{/if}
+									</div>
+									{#if vm.transcript}
+										<p class="text-xs text-[#999] mt-1.5 leading-relaxed italic">"{vm.transcript}"</p>
+									{/if}
+									{#if vm.recording_url}
+										<!-- svelte-ignore a11y_media_has_caption -->
+										<audio src={vm.recording_url} controls preload="none" onplay={() => unread && markVmRead(vm.id)} class="mt-2 w-full h-8"></audio>
+									{/if}
+								</div>
+								<div class="flex flex-col gap-1.5 shrink-0">
+									{#if vm.from_number || vm.caller_id}
+										<button onclick={() => dial(vm.from_number ?? vm.caller_id)}
+											class="w-8 h-8 rounded-full bg-[var(--call)]/12 hover:bg-[var(--call)]/25 text-[var(--call)] flex items-center justify-center transition-colors" title="Call back" aria-label="Call back"><Icon name="phone" size={15} /></button>
+									{/if}
+									{#if unread}
+										<button onclick={() => markVmRead(vm.id)}
+											class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[#444] text-[#555] hover:text-white flex items-center justify-center transition-colors" title="Mark read" aria-label="Mark read"><Icon name="check" size={14} /></button>
+									{/if}
+									<button onclick={() => deleteVm(vm.id)}
+										class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[var(--end)]/40 text-[#555] hover:text-[var(--end-text)] flex items-center justify-center transition-colors" title="Delete" aria-label="Delete"><Icon name="trash" size={14} /></button>
+								</div>
+							</div>
+						</div>
+					{/each}
+				{/if}
 			</div>
 		{/if}
 	</div>

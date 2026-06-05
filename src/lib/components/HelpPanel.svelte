@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 
 	let open = $state(false);
@@ -68,7 +69,7 @@
 			<!-- Header -->
 			<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 				<p class="text-white font-semibold text-sm">Help & Support</p>
-				<button onclick={() => open = false} class="text-[#555] hover:text-white text-lg leading-none">✕</button>
+				<button onclick={() => open = false} class="text-[#555] hover:text-white text-lg leading-none"><Icon name="x" size={14} /></button>
 			</div>
 
 			<!-- Status indicators -->
@@ -76,11 +77,11 @@
 				<p class="text-[10px] text-[#444] uppercase tracking-widest mb-2">System Status</p>
 				<div class="flex gap-4">
 					<div class="flex items-center gap-1.5">
-						<span class="w-2 h-2 rounded-full {supabaseStatus === 'ok' ? 'bg-green-500' : supabaseStatus === 'checking' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}"></span>
+						<span class="w-2 h-2 rounded-full {supabaseStatus === 'ok' ? 'bg-[var(--accent)]' : supabaseStatus === 'checking' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}"></span>
 						<span class="text-xs text-[#666]">Database</span>
 					</div>
 					<div class="flex items-center gap-1.5">
-						<span class="w-2 h-2 rounded-full bg-green-500"></span>
+						<span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
 						<span class="text-xs text-[#666]">API</span>
 					</div>
 				</div>
@@ -130,7 +131,7 @@
 
 			<!-- Footer -->
 			<div class="px-5 py-3 border-t border-[#1e1e1e]">
-				<p class="text-[10px] text-[#333]">Press ? to open this panel · Version: LeadOS MVP</p>
+				<p class="text-[10px] text-[#333]">Press ? to open this panel · Version: RogueOS MVP</p>
 			</div>
 		</div>
 	</div>

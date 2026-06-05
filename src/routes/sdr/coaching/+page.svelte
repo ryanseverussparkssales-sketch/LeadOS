@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import UpgradePrompt from '$lib/components/UpgradePrompt.svelte';
 
 	let data = $state<any>(null);
@@ -23,16 +24,21 @@
 
 	async function generateSupercut() {
 		generating = true;
-		await apiFetch('/api/rep-profile/supercut', { method: 'POST' });
+		const res = await apiFetch('/api/rep-profile/supercut', { method: 'POST' });
+		if (res.ok) {
+			toastSuccess('Supercut updated');
+		} else {
+			toastError('Failed to update supercut — try again');
+		}
 		generating = false;
 	}
 
 	function fmtDur(s: number) { return `${Math.floor(s/60)}m ${s%60}s`; }
 	const trendIcon = (t: string) => t === 'up' ? '↑' : t === 'down' ? '↓' : '→';
-	const trendColor = (t: string) => t === 'up' ? 'text-green-400' : t === 'down' ? 'text-red-400' : 'text-[#555]';
+	const trendColor = (t: string) => t === 'up' ? 'text-[var(--accent)]' : t === 'down' ? 'text-red-400' : 'text-[#555]';
 </script>
 
-<svelte:head><title>Coaching — LeadOS SDR</title></svelte:head>
+<svelte:head><title>Coaching — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto">
 
@@ -43,7 +49,7 @@
 			<p class="text-xs text-[#444]">You vs. your personal best — not a leaderboard</p>
 		</div>
 		<button onclick={generateSupercut} disabled={generating}
-			class="rounded-lg border border-purple-800/40 px-3 py-2 text-xs text-purple-400 hover:bg-purple-900/20 disabled:opacity-40 transition-colors shrink-0">
+			class="rounded-lg border border-[var(--accent)]/40 px-3 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors shrink-0">
 			{generating ? '✦ Mining calls…' : '✦ Update supercut'}
 		</button>
 	</div>
@@ -129,7 +135,7 @@
 					<p style="font-family:var(--font-label);font-size:9px;letter-spacing:.18em;color:#4a4a8a">AI Coaching Notes</p>
 					{#each data.insights as insight}
 						<div class="flex gap-3">
-							<span class="text-purple-500 mt-0.5 shrink-0 text-xs">✦</span>
+							<span class="text-[var(--accent)] mt-0.5 shrink-0 text-xs">✦</span>
 							<p class="text-sm text-[#aaa] leading-relaxed">{insight}</p>
 						</div>
 					{/each}
@@ -177,12 +183,5 @@
 		{/if}
 	{/if}
 
-	<!-- Link to public coaching page -->
-	<div class="mt-8 pt-6 border-t border-[#111] text-center">
-		<a href="/coaching" target="_blank" rel="noopener noreferrer"
-			class="text-[10px] text-[#333] hover:text-white transition-colors">
-			Learn how the coaching system works →
-		</a>
-	</div>
 
 </div>

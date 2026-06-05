@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import type { RequestHandler } from './$types';
@@ -53,6 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	if (!calls?.length) return json({ clips: [], message: 'No recorded calls with transcripts yet' });
 
+	await assertAiAccess(user.id);
 	const { env } = await import('$env/dynamic/private');
 	const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 

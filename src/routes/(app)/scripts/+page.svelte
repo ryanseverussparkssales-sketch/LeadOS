@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Objection { id:string; objection:string; response:string; follow_up:string|null; sort_order:number; }
 	interface Script { id:string; title:string; opener:string|null; elevator_pitch:string|null; discovery:string|null; closing:string|null; is_default:boolean; client:{id:string;name:string}|null; campaign:{id:string;name:string}|null; objections:Objection[]; }
@@ -114,7 +116,7 @@
 		generatedScript = '';
 		try {
 			const res = await apiFetch('/api/scripts/generate', { method:'POST', body: JSON.stringify({ product:genProduct, persona:genPersona, keyBenefits:genBenefits, commonObjections:genObjections, tone:genTone, additionalContext:genContext }) });
-			if (!res.ok || !res.body) { generating = false; return; }
+			if (!res.ok || !res.body) { toastError('Failed to generate script — please try again'); generating = false; return; }
 
 			const reader = res.body.getReader();
 			const decoder = new TextDecoder();
@@ -155,6 +157,9 @@
 					selectScript(scripts[0]);
 					showAIGenerator = false;
 					genProduct = ''; genPersona = ''; generatedScript = ''; streamComplete = false;
+					toastSuccess('Script generated and saved');
+				} else {
+					toastError('Generated the script but failed to save it — please try again');
 				}
 			} else {
 				generatedScript = '⚠ AI response did not contain a valid script. Please try again.';
@@ -179,6 +184,7 @@
 		improvement = null;
 		const res = await apiFetch(`/api/scripts/${selected.id}/improve`, { method:'POST' });
 		if (res.ok) { const d = await res.json(); improvement = d.analysis; improvementStats = d.stats; }
+		else { toastError('Failed to analyze script — please try again'); }
 		loadingImprovement = false;
 		showImprovement = true;
 		scriptView = 'performance';
@@ -208,15 +214,23 @@
 			}
 			selected = { ...saved, objections: selected?.objections ?? [] };
 			editing = false;
+			toastSuccess('Script saved');
+		} else {
+			toastError('Failed to save script — please try again');
 		}
 		saving = false;
 	}
 
 	async function deleteScript() {
 		if (!selected || !confirm('Delete this script?')) return;
-		await apiFetch(`/api/scripts/${selected.id}`, { method: 'DELETE' });
-		scripts = scripts.filter(s => s.id !== selected!.id);
-		selected = scripts[0] ?? null;
+		const res = await apiFetch(`/api/scripts/${selected.id}`, { method: 'DELETE' });
+		if (res.ok) {
+			scripts = scripts.filter(s => s.id !== selected!.id);
+			selected = scripts[0] ?? null;
+			toastSuccess('Script deleted');
+		} else {
+			toastError('Failed to delete script — please try again');
+		}
 	}
 
 	async function addObjection() {
@@ -231,26 +245,32 @@
 			selected = { ...selected, objections: [...(selected.objections ?? []), obj] };
 			scripts = scripts.map(s => s.id === selected!.id ? selected! : s);
 			newObjection = ''; newResponse = ''; newFollowUp = '';
+		} else {
+			toastError('Failed to add objection handler — please try again');
 		}
 		addingObj = false;
 	}
 
 	async function deleteObjection(oid: string) {
 		if (!selected) return;
-		await apiFetch(`/api/scripts/${selected.id}/objections/${oid}`, { method: 'DELETE' });
-		selected = { ...selected, objections: selected.objections.filter(o => o.id !== oid) };
-		scripts = scripts.map(s => s.id === selected!.id ? selected! : s);
+		const res = await apiFetch(`/api/scripts/${selected.id}/objections/${oid}`, { method: 'DELETE' });
+		if (res.ok) {
+			selected = { ...selected, objections: selected.objections.filter(o => o.id !== oid) };
+			scripts = scripts.map(s => s.id === selected!.id ? selected! : s);
+		} else {
+			toastError('Failed to delete objection handler — please try again');
+		}
 	}
 </script>
 
-<svelte:head><title>Scripts — LeadOS</title></svelte:head>
+<svelte:head><title>Scripts — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Call Scripts</h2>
 		<div class="flex gap-2">
 			<button onclick={() => showAIGenerator = true}
-				class="rounded-lg border border-purple-800 px-4 py-1.5 text-xs text-purple-400 hover:bg-purple-900/20 transition-colors">
+				class="rounded-lg border border-[var(--accent)]/40 px-4 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 				✦ Generate with AI
 			</button>
 			<button onclick={newScript} class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
@@ -262,13 +282,13 @@
 	<!-- AI Script Generator Modal -->
 	{#if showAIGenerator}
 		<div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onclick={() => showAIGenerator = false} role="dialog">
-			<div class="rounded-xl border border-purple-800/40 bg-[#0d0d0d] p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick={(e) => e.stopPropagation()}>
+			<div class="rounded-xl border border-[var(--accent)]/40 bg-[#0d0d0d] p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick={(e) => e.stopPropagation()}>
 				<div class="flex items-center justify-between mb-5">
 					<div>
 						<h3 class="text-white font-semibold">✦ Generate Script with AI</h3>
 						<p class="text-xs text-[#555] mt-0.5">Claude writes a complete cold call playbook with objection handlers</p>
 					</div>
-					<button onclick={() => showAIGenerator = false} class="text-[#555] hover:text-white text-sm">✕</button>
+					<button onclick={() => showAIGenerator = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 
 				<div class="space-y-4">
@@ -319,21 +339,21 @@
 							Cancel
 						</button>
 						<button onclick={generateScript} disabled={generating || !genProduct.trim() || !genPersona.trim()}
-							class="flex-1 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-500 disabled:opacity-40 transition-colors">
+							class="flex-1 rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors">
 							{generating ? '✦ Writing your script...' : '✦ Generate Full Script'}
 						</button>
 					</div>
 
 					{#if generating || (streamComplete && generatedScript)}
-						<div class="rounded-lg bg-purple-950/20 border border-purple-800/20 p-3">
+						<div class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 p-3">
 							{#if streamComplete && generatedScript}
 								<!-- Error message from failed parse — show it clearly -->
 								<p class="text-xs text-red-400 text-center">{generatedScript}</p>
 							{:else}
 								<!-- While streaming: show animated indicator, not raw partial JSON -->
 								<div class="flex items-center justify-center gap-2">
-									<span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
-									<p class="text-xs text-purple-400">Generating script...</p>
+									<span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"></span>
+									<p class="text-xs text-[var(--accent)]">Generating script...</p>
 								</div>
 							{/if}
 						</div>
@@ -444,7 +464,7 @@
 						</div>
 						<div class="flex gap-2">
 							<button onclick={getImprovements} disabled={loadingImprovement}
-								class="rounded-lg border border-purple-800/40 px-3 py-1.5 text-xs text-purple-400 hover:bg-purple-900/20 transition-colors disabled:opacity-40">
+								class="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors disabled:opacity-40">
 								{loadingImprovement ? '✦ Analyzing...' : '✦ AI Improve'}
 							</button>
 							<button onclick={() => { editing = true; }}
@@ -456,18 +476,18 @@
 					</div>
 
 					{#if showImprovement && improvement}
-						<div class="rounded-xl border border-purple-800/30 bg-purple-950/10 p-5 space-y-4">
+						<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-5 space-y-4">
 							<div class="flex items-center justify-between">
 								<div class="flex items-center gap-3">
-									<span class="text-2xl font-bold {improvement.overallScore >= 80 ? 'text-green-400' : improvement.overallScore >= 60 ? 'text-yellow-400' : 'text-red-400'}">{improvement.overallScore}/100</span>
+									<span class="text-2xl font-bold {improvement.overallScore >= 80 ? 'text-[var(--accent)]' : improvement.overallScore >= 60 ? 'text-yellow-400' : 'text-red-400'}">{improvement.overallScore}/100</span>
 									<p class="text-sm text-white font-medium">Script Analysis</p>
 								</div>
-								<button onclick={() => showImprovement = false} class="text-[#444] hover:text-white text-xs">✕</button>
+								<button onclick={() => showImprovement = false} class="text-[#444] hover:text-white text-xs"><Icon name="x" size={14} /></button>
 							</div>
 							<p class="text-sm text-[#ccc] leading-relaxed">{improvement.diagnosis}</p>
 							{#if improvement.quickWins?.length}
-								<div class="rounded-lg bg-green-950/20 border border-green-800/20 p-3">
-									<p class="text-xs text-green-400 font-medium mb-2">⚡ Quick Wins</p>
+								<div class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 p-3">
+									<p class="text-xs text-[var(--accent)] font-medium mb-2">⚡ Quick Wins</p>
 									{#each improvement.quickWins as win}
 										<p class="text-xs text-[#ccc] mb-1">• {win}</p>
 									{/each}

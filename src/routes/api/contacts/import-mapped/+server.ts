@@ -113,5 +113,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 	}
 
-	return json({ created, updated, skipped, errors });
+	// This path only creates (dedup handled in preview), so updated/skipped are always 0.
+	return json({ created, updated: 0, skipped: 0, errors });
 };

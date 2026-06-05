@@ -10,14 +10,14 @@
       t = ts/1000; ctx.clearRect(0,0,size,size);
       const calling = callState === 'calling', connected = callState === 'connected';
       const mid = size/2, r = size/2-2;
-      ctx.fillStyle='#020a04'; ctx.beginPath(); ctx.arc(mid,mid,r,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle=connected?'#00ff44':calling?'#00cc33':'#1a3010'; ctx.lineWidth=3;
+      ctx.fillStyle='#0a0702'; ctx.beginPath(); ctx.arc(mid,mid,r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=connected?'#d4af37':calling?'#c8a24a':'#3a2c10'; ctx.lineWidth=3;
       ctx.beginPath(); ctx.arc(mid,mid,r-4,0,Math.PI*2); ctx.stroke();
       const n = connected ? Math.floor(t%60) : Math.floor(t*(calling?8:3))%100;
-      ctx.fillStyle=calling||connected?'#00ff44':'#0a4';
+      ctx.fillStyle=calling||connected?'#d4af37':'#a8842f';
       ctx.font=`bold ${size*0.25}px monospace`; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(String(n).padStart(2,'0'), mid, mid*0.92);
-      ctx.font=`${size*0.1}px monospace`; ctx.fillStyle='#0a3';
+      ctx.font=`${size*0.1}px monospace`; ctx.fillStyle='#a8842f';
       ctx.fillText(connected?'LIVE':calling?'RING':'DIAL', mid, mid*1.35);
       raf = requestAnimationFrame(draw);
     };

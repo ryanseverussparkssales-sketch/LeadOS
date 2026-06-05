@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { getSession } from '$lib/services/auth';
 	import DropZone from '$lib/components/DropZone.svelte';
@@ -143,7 +144,7 @@
 	}
 </script>
 
-<svelte:head><title>Docs — LeadOS</title></svelte:head>
+<svelte:head><title>Docs — RogueOS</title></svelte:head>
 
 {#if showAssignModal}
 	<FileAssignModal files={pendingFiles} onclose={() => { showAssignModal = false; pendingFiles = []; }} onsaved={onDocsSaved} />
@@ -175,7 +176,7 @@
 	<!-- Upload status -->
 	{#if uploadMsg}
 		<div class="px-8 py-2 bg-[#0d0d0d] border-b border-[#1e1e1e]">
-			<p class="text-xs {uploadMsg.startsWith('✓') ? 'text-green-400' : 'text-red-400'}">{uploadMsg}</p>
+			<p class="text-xs {uploadMsg.startsWith('✓') ? 'text-[var(--accent)]' : 'text-red-400'}">{uploadMsg}</p>
 		</div>
 	{/if}
 
@@ -258,7 +259,7 @@
 										<a href={doc.file_url} target="_blank" class="rounded p-1 text-[#555] hover:text-white hover:bg-white/5 transition-colors text-xs" title="Open">↗</a>
 									{/if}
 									{#if !doc.id.startsWith('report-')}
-										<button onclick={() => deleteDoc(doc.id)} class="rounded p-1 text-red-700 hover:text-red-400 hover:bg-red-950/20 transition-colors text-xs" title="Delete">✕</button>
+										<button onclick={() => deleteDoc(doc.id)} class="rounded p-1 text-red-700 hover:text-red-400 hover:bg-red-950/20 transition-colors text-xs" title="Delete"><Icon name="x" size={14} /></button>
 									{/if}
 								</div>
 							</div>

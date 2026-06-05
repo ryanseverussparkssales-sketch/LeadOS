@@ -27,7 +27,7 @@
 		</div>
 		<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-2.5">
 			<p class="text-xs text-[#555] mb-0.5">Won</p>
-			<p class="text-green-400 text-base font-semibold">{fmt$(won)}</p>
+			<p class="text-[var(--accent)] text-base font-semibold">{fmt$(won)}</p>
 		</div>
 	</div>
 	<div class="space-y-1.5">

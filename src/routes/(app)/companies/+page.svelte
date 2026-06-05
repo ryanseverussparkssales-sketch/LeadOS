@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import Icon from '$lib/components/Icon.svelte';
     import { apiFetch } from '$lib/api';
+    import { toastSuccess, toastError } from '$lib/stores/toast';
 
     interface Contact { id: string; name: string; phone: string|null; email: string|null; title: string|null; status: string; }
     interface Company {
@@ -14,9 +16,9 @@
     const TYPES = ['prospect','customer','partner','investor','vendor'];
     const TYPE_COLORS: Record<string,string> = {
         prospect: 'text-yellow-400 bg-yellow-400/10',
-        customer: 'text-green-400 bg-green-400/10',
+        customer: 'text-[var(--accent)] bg-[var(--accent)]/12',
         partner: 'text-blue-400 bg-blue-400/10',
-        investor: 'text-purple-400 bg-purple-400/10',
+        investor: 'text-[var(--accent)] bg-[var(--accent)]/12',
         vendor: 'text-[#888] bg-[#1a1a1a]',
     };
 
@@ -53,7 +55,8 @@
         if (!newForm.name.trim()) return;
         saving = true;
         const r = await apiFetch('/api/companies', { method: 'POST', body: JSON.stringify(newForm) });
-        if (r.ok) { companies = [await r.json(), ...companies]; showNew = false; newForm = { name: '', phone: '', email: '', website: '', industry: '', city: '', state: '', company_type: 'prospect', client_id: '' }; }
+        if (r.ok) { companies = [await r.json(), ...companies]; showNew = false; newForm = { name: '', phone: '', email: '', website: '', industry: '', city: '', state: '', company_type: 'prospect', client_id: '' }; toastSuccess('Company created'); }
+        else { toastError('Failed to create company'); }
         saving = false;
     }
 
@@ -71,14 +74,22 @@
             selected = { ...selected, ...updated };
             companies = companies.map(c => c.id === selected!.id ? { ...c, ...updated } : c);
             editing = false;
+            toastSuccess('Company updated');
+        } else {
+            toastError('Failed to save changes');
         }
     }
 
     async function deleteCompany(id: string) {
-        if (!confirm('Delete this company?')) return;
-        await apiFetch(`/api/companies/${id}`, { method: 'DELETE' });
-        companies = companies.filter(c => c.id !== id);
-        if (selected?.id === id) selected = null;
+        if (!confirm('Delete this company? This cannot be undone.')) return;
+        const r = await apiFetch(`/api/companies/${id}`, { method: 'DELETE' });
+        if (r.ok) {
+            companies = companies.filter(c => c.id !== id);
+            if (selected?.id === id) selected = null;
+            toastSuccess('Company deleted');
+        } else {
+            toastError('Failed to delete company');
+        }
     }
 
     function startEdit() {
@@ -98,7 +109,7 @@
     }
 </script>
 
-<svelte:head><title>Companies — LeadOS</title></svelte:head>
+<svelte:head><title>Companies — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
     <div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -224,7 +235,7 @@
                             <div class="flex flex-wrap gap-1.5 mb-2">
                                 {#each editForm.tags ?? [] as tag}
                                     <span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-[#888]">
-                                        {tag}<button onclick={() => removeTag(tag)} class="text-[#444] hover:text-white ml-0.5">✕</button>
+                                        {tag}<button onclick={() => removeTag(tag)} class="text-[#444] hover:text-white ml-0.5"><Icon name="x" size={14} /></button>
                                     </span>
                                 {/each}
                             </div>
@@ -246,7 +257,7 @@
                     <!-- Info display -->
                     <div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
                         <div class="grid grid-cols-2 gap-3 text-xs">
-                            {#if selected.phone}<div><span class="text-[#555]">Phone</span><p><a href="/phone?number={selected.phone}" class="text-green-400 hover:underline">{selected.phone}</a></p></div>{/if}
+                            {#if selected.phone}<div><span class="text-[#555]">Phone</span><p><a href="/phone?number={selected.phone}" class="text-[var(--accent)] hover:underline">{selected.phone}</a></p></div>{/if}
                             {#if selected.email}<div><span class="text-[#555]">Email</span><p><a href="mailto:{selected.email}" class="text-blue-400 hover:underline">{selected.email}</a></p></div>{/if}
                             {#if selected.website}<div><span class="text-[#555]">Website</span><p><a href={selected.website} target="_blank" rel="noopener" class="text-blue-400 hover:underline">{selected.website} ↗</a></p></div>{/if}
                             {#if selected.industry}<div><span class="text-[#555]">Industry</span><p class="text-white">{selected.industry}</p></div>{/if}
@@ -281,7 +292,7 @@
                                 </div>
                                 <div class="flex gap-2">
                                     {#if contact.phone}
-                                        <a href="/phone?number={contact.phone}" class="text-xs text-green-400 hover:text-green-300 transition-colors">📞</a>
+                                        <a href="/phone?number={contact.phone}" class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] transition-colors">📞</a>
                                     {/if}
                                     <a href="/contacts/{contact.id}" class="text-xs text-[#444] hover:text-white transition-colors">→</a>
                                 </div>

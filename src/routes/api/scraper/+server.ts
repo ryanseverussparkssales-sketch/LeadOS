@@ -1,5 +1,7 @@
 // Migration note: run supabase-scraper-upgrade.sql to add campaign_id, call_list_id, source_query, notes columns
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
+import { safeFetch } from '$lib/server/ssrf';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
@@ -19,6 +21,7 @@ export const GET: RequestHandler = async ({ request }) => {
 // POST: scrape a URL, extract from screenshot, enrich, search, streamer lookup, or CSV import
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	const body = await request.json();
 	const { mode, url, imageBase64, imageType, contactId, contactName, contactTitle, contactCompany } = body;
 
@@ -27,8 +30,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!url) throw error(400, 'url required');
 		let html = '';
 		try {
-			const res = await fetch(url, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LeadOS/1.0)' },
+			const res = await safeFetch(url, {
+				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RogueOS/1.0)' },
 				signal: AbortSignal.timeout(10000),
 			});
 			html = (await res.text()).slice(0, 50000);
@@ -183,7 +186,7 @@ Return ONLY the JSON.`;
 		let searchHtml = '';
 		try {
 			const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query + ' contact phone')}`, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LeadOS/1.0)' },
+				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; RogueOS/1.0)' },
 				signal: AbortSignal.timeout(10000),
 			});
 			searchHtml = await ddgRes.text();
@@ -215,7 +218,7 @@ HTML: ${searchHtml.slice(0, 20000)}`;
 		const allContacts: Array<Record<string, unknown>> = [];
 		for (const pageUrl of urls.slice(0, 5)) {
 			try {
-				const pageRes = await fetch(pageUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(8000) });
+				const pageRes = await safeFetch(pageUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(8000) });
 				const pageHtml = (await pageRes.text()).slice(0, 30000);
 
 				const extractPrompt = `Extract contact information from this business webpage. Return a JSON array of contacts.
@@ -260,6 +263,98 @@ HTML: ${pageHtml.slice(0, 20000)}`;
 		return json({ found: saved.length, contacts: saved, searched: urls.length });
 	}
 
+	// ── MODE: places (Google Maps geo search — cities × queries × radius) ──────
+	if (mode === 'places') {
+		const apiKey = env.GOOGLE_MAPS_API_KEY;
+		if (!apiKey) throw error(400, 'GOOGLE_MAPS_API_KEY is not configured on the server.');
+
+		const { cities, queries, radius, campaignId, callListId } = body as {
+			cities?: Array<{ name: string; lat: number; lng: number }>;
+			queries?: string[];
+			radius?: number;
+			campaignId?: string;
+			callListId?: string;
+		};
+		if (!Array.isArray(cities) || cities.length === 0) throw error(400, 'cities required');
+		if (!Array.isArray(queries) || queries.length === 0) throw error(400, 'queries required');
+		const searchRadius = Number(radius) > 0 ? Number(radius) : 15000;
+
+		const PLACES = 'https://maps.googleapis.com/maps/api/place';
+		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		const seen = new Set<string>();
+		const collected: Array<Record<string, unknown>> = [];
+
+		// Text Search across every city × query, following next_page_token pagination.
+		for (const city of cities) {
+			for (const query of queries) {
+				let pageToken: string | null = null;
+				let page = 0;
+				do {
+					const params = new URLSearchParams(
+						pageToken
+							? { pagetoken: pageToken, key: apiKey }
+							: { query, location: `${city.lat},${city.lng}`, radius: String(searchRadius), key: apiKey },
+					);
+					if (pageToken) await sleep(2000); // token needs a moment to become valid
+					let data: { status?: string; results?: Array<Record<string, unknown>>; next_page_token?: string } = {};
+					try {
+						const res = await fetch(`${PLACES}/textsearch/json?${params}`, { signal: AbortSignal.timeout(15000) });
+						data = await res.json();
+					} catch { break; }
+					if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') break;
+					for (const p of (data.results ?? []) as Array<Record<string, any>>) {
+						if (!p.place_id || seen.has(p.place_id)) continue;
+						seen.add(p.place_id);
+						collected.push({
+							placeId: p.place_id,
+							name: p.name ?? '',
+							address: p.formatted_address ?? '',
+							city: city.name,
+							rating: p.rating ?? null,
+							searchType: query,
+						});
+					}
+					pageToken = data.next_page_token ?? null;
+					page++;
+				} while (pageToken && page < 3);
+			}
+		}
+
+		// Best-effort phone enrichment via Place Details — bounded concurrency (was 60 sequential).
+		const detailLimit = 60;
+		const toDetail = collected.slice(0, detailLimit);
+		const DETAIL_CONCURRENCY = 10;
+		for (let i = 0; i < toDetail.length; i += DETAIL_CONCURRENCY) {
+			await Promise.all(toDetail.slice(i, i + DETAIL_CONCURRENCY).map(async (c) => {
+				try {
+					const dParams = new URLSearchParams({ place_id: String(c.placeId), fields: 'formatted_phone_number', key: apiKey });
+					const dRes = await fetch(`${PLACES}/details/json?${dParams}`, { signal: AbortSignal.timeout(10000) });
+					const dData = await dRes.json() as { result?: { formatted_phone_number?: string } };
+					c.phone = dData?.result?.formatted_phone_number ?? '';
+				} catch { c.phone = ''; }
+			}));
+		}
+
+		// Single bulk insert (was up to 100 sequential .insert().single() round-trips).
+		const placeRows = collected.slice(0, 100).map((c) => ({
+			user_id: user.id,
+			source: 'places',
+			source_url: `https://www.google.com/maps/place/?q=place_id:${c.placeId}`,
+			source_query: c.searchType as string,
+			raw_name: c.name as string,
+			raw_phone: (c.phone as string) || null,
+			raw_company: c.name as string,
+			raw_title: c.address as string,
+			confidence: 0.9,
+			campaign_id: campaignId ?? null,
+			call_list_id: callListId ?? null,
+			notes: `${c.city as string}${c.rating ? ` · ★${c.rating}` : ''}`,
+		}));
+		const { data: saved } = await supabaseAdmin.from('scraped_contacts').insert(placeRows).select();
+
+		return json({ found: saved?.length ?? 0, contacts: saved ?? [], scanned: collected.length });
+	}
+
 	// ── MODE: streamer ────────────────────────────────────────────────────────
 	if (mode === 'streamer') {
 		const { handle, platform, callListId } = body;
@@ -273,7 +368,7 @@ HTML: ${pageHtml.slice(0, 20000)}`;
 
 		let pageHtml = '';
 		try {
-			const res = await fetch(platformUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
+			const res = await safeFetch(platformUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(10000) });
 			pageHtml = (await res.text()).slice(0, 40000);
 		} catch { return json({ error: 'Could not fetch streamer page' }); }
 
@@ -372,7 +467,7 @@ HTML: ${pageHtml.slice(0, 30000)}`;
 		const headers = parseRow(lines[0]);
 		const rows = lines.slice(1);
 
-		const saved = [];
+		const records = [];
 		for (const line of rows) {
 			const vals = parseRow(line);
 			const row_obj: Record<string, string> = Object.fromEntries(headers.map((h: string, i: number) => [h, vals[i] ?? '']));
@@ -385,7 +480,7 @@ HTML: ${pageHtml.slice(0, 30000)}`;
 
 			if (!name && !phone && !email) continue;
 
-			const { data: scraped } = await supabaseAdmin.from('scraped_contacts').insert({
+			records.push({
 				user_id: user.id,
 				source: 'csv_import',
 				raw_name: name || null,
@@ -396,12 +491,23 @@ HTML: ${pageHtml.slice(0, 30000)}`;
 				confidence: 1.0,
 				campaign_id: campaignId ?? null,
 				call_list_id: callListId ?? null,
-			}).select().single();
-			if (scraped) saved.push(scraped);
+			});
 		}
 
-		return json({ imported: saved.length, skipped: rows.length - saved.length });
+		// Chunked bulk insert (was one .insert().single() round-trip per row).
+		let imported = 0;
+		const IMPORT_CHUNK = 500;
+		for (let i = 0; i < records.length; i += IMPORT_CHUNK) {
+			const { data, error: e } = await supabaseAdmin
+				.from('scraped_contacts')
+				.insert(records.slice(i, i + IMPORT_CHUNK))
+				.select('id');
+			if (e) { console.error('[scraper csv_import]', e.message); continue; }
+			imported += data?.length ?? 0;
+		}
+
+		return json({ imported, skipped: rows.length - imported });
 	}
 
-	throw error(400, 'Invalid mode. Use: web | screenshot | enrich | search | streamer | csv_preview | csv_import');
+	throw error(400, 'Invalid mode. Use: web | screenshot | enrich | search | places | streamer | csv_preview | csv_import');
 };

@@ -1,10 +1,12 @@
 import { json } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '$env/dynamic/private';
 
 export const POST = async ({ request }) => {
     const user = await requireAuth(request);
+    await assertAiAccess(user.id);
     const ownerId = await getEffectiveUserId(user.id);
     const { threadId, contactId, lastMessages } = await request.json();
 

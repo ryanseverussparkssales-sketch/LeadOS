@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
+    import Icon from '$lib/components/Icon.svelte';
     import { apiFetch } from '$lib/api';
 
     let device: any = null;
-    let activeCall: any = null;
+    let activeCall: any = $state(null);
     let callState = $state<'idle' | 'calling' | 'connected' | 'incoming'>('idle');
     let twilioReady = $state(false);
     let twilioError = $state('');
@@ -41,7 +42,16 @@
             : digits.length === 11 ? '+' + digits : '+' + digits;
         callState = 'calling'; twilioError = '';
         try {
-            activeCall = await device.connect({ params: { To: e164 } });
+            let callId: string | undefined;
+            try {
+                const startRes = await apiFetch('/api/calls/start', { method: 'POST', body: JSON.stringify({ phone_number: e164, call_type: 'manual' }) });
+                if (startRes.ok) callId = (await startRes.json()).call_id;
+            } catch { /* non-fatal */ }
+            const callerId = phoneNumbers.find(n => n.is_primary)?.phone_number ?? phoneNumbers[0]?.phone_number;
+            const params: Record<string, string> = { To: e164 };
+            if (callId) params.CallId = callId;
+            if (callerId) params.CallerId = callerId;
+            activeCall = await device.connect({ params });
             activeCall.on('accept', () => { callState = 'connected'; durationInterval = setInterval(() => callDuration++, 1000); });
             activeCall.on('disconnect', () => { callState = 'idle'; activeCall = null; muted = false; if(durationInterval){clearInterval(durationInterval);durationInterval=null;} callDuration = 0; });
             activeCall.on('error', (e:any) => { twilioError = e.message; callState = 'idle'; });
@@ -72,16 +82,9 @@
             const { token } = await res.json();
             device = new Device(token, { logLevel: 1, codecPreferences: ['opus', 'pcmu'] as any });
             device.on('error', (e:any) => { twilioError = e.message; });
-            device.on('incoming', (call:any) => {
-                incomingCall = call;
-                incomingFrom = call.parameters?.From ?? 'Unknown';
-                const toNum = call.parameters?.To ?? '';
-                incomingLine = phoneNumbers.find(n => n.phone_number === toNum)?.friendly_name ?? toNum;
-                callState = 'incoming';
-                call.on('cancel', () => { incomingCall = null; callState = 'idle'; });
-                call.on('disconnect', () => { callState = 'idle'; activeCall = null; if(durationInterval){clearInterval(durationInterval);durationInterval=null;} callDuration = 0; });
-            });
-            await device.register();
+            // Outbound-only: do NOT register() for incoming here. Inbound is owned by the
+            // global Twilio store + IncomingCallBanner — a second registration on the same
+            // identity stole inbound ring and tore down the shared device on unmount.
             twilioReady = true;
         } catch(e) { twilioError = String(e); }
     }
@@ -117,7 +120,7 @@
             </div>
             <div class="pw-inc-btns">
                 <button onclick={answer} class="pw-ans">Answer</button>
-                <button onclick={reject} class="pw-rej">✕</button>
+                <button onclick={reject} class="pw-rej"><Icon name="x" size={14} /></button>
             </div>
         </div>
     {/if}

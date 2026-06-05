@@ -4,6 +4,21 @@ import { supabaseAdmin } from '$lib/server/supabase';
 import { getValidToken, fetchNewMessages, parseGmailMessage } from '$lib/server/gmail';
 import type { RequestHandler } from './$types';
 
+// Thread grouping + address parsing — mirrors the inbound email webhook.
+function normalizeThreadKey(subject: string): string {
+	return (subject ?? '')
+		.replace(/^(Re:|Fwd:|RE:|FWD:|Fw:)\s*/gi, '')
+		.trim()
+		.toLowerCase()
+		.replace(/\s+/g, ' ');
+}
+
+function extractEmail(address: string): string {
+	const a = address ?? '';
+	const match = a.match(/<([^>]+)>/) ?? a.match(/([^\s,]+@[^\s,]+)/);
+	return (match?.[1] ?? a).toLowerCase().trim();
+}
+
 /**
  * POST /api/gmail/sync
  *

@@ -60,7 +60,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!member.stripe_connect_account_id) throw error(400, 'Rep has not connected Stripe yet');
 	if (member.stripe_connect_status !== 'active') throw error(400, 'Rep Stripe account is not fully set up');
 
-	// Check for duplicate payout on this call
+	// ── Reserve before paying ──────────────────────────────────────────────────
+	// Any non-failed payout for this call+member means it's already in flight or done.
 	const { data: existing } = await supabaseAdmin
 		.from('payouts')
 		.select('id, status')
@@ -68,60 +69,76 @@ export const POST: RequestHandler = async ({ request }) => {
 		.eq('team_member_id', team_member_id)
 		.maybeSingle();
 
-	if (existing && existing.status === 'paid') throw error(409, 'This call has already been paid out');
-
-	// Create Stripe Transfer
-	let stripeTransferId: string | null = null;
-	let status = 'paid';
-
-	if (env.STRIPE_SECRET_KEY) {
-		const transferRes = await fetch('https://api.stripe.com/v1/transfers', {
-			method: 'POST',
-			headers: {
-				'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			body: new URLSearchParams({
-				amount: String(amount_cents),
-				currency: 'usd',
-				destination: member.stripe_connect_account_id,
-				description: `LeadOS payout — call ${call_id}`,
-				'metadata[call_id]': call_id,
-				'metadata[team_member_id]': team_member_id,
-			}),
-		});
-
-		if (!transferRes.ok) {
-			const err = await transferRes.json() as { error?: { message?: string } };
-			// Record as failed but don't throw — let admin see the failed state
-			status = 'failed';
-			const { data: failedPayout } = await supabaseAdmin.from('payouts').insert({
-				owner_user_id: ownerId, team_member_id, call_id,
-				amount_cents, status: 'failed',
-				notes: err.error?.message ?? 'Stripe transfer failed',
-			}).select().single();
-			return json(failedPayout, { status: 200 });
-		}
-
-		const transfer = await transferRes.json() as { id: string };
-		stripeTransferId = transfer.id;
-	} else {
-		// Stripe not configured — record as manual pending
-		status = 'pending';
+	if (existing && existing.status !== 'failed') {
+		throw error(409, 'A payout for this call already exists');
 	}
 
-	const { data: payout, error: dbErr } = await supabaseAdmin
-		.from('payouts')
-		.upsert({
+	// Reserve a 'processing' row BEFORE moving money. The unique index on
+	// (call_id, team_member_id) is the concurrency gate: a racing duplicate insert
+	// fails with 23505 → 409, so only one request reaches the Stripe transfer.
+	let payoutId: string;
+	if (existing) {
+		// Retrying a previously-failed payout — reuse its row.
+		payoutId = existing.id;
+		await supabaseAdmin.from('payouts')
+			.update({ status: 'processing', amount_cents, notes: notes ?? null })
+			.eq('id', payoutId);
+	} else {
+		const { data: reserved, error: resErr } = await supabaseAdmin.from('payouts').insert({
 			owner_user_id: ownerId, team_member_id, call_id,
-			amount_cents, currency: 'usd',
-			stripe_transfer_id: stripeTransferId,
-			status,
-			notes: notes ?? null,
-			paid_at: status === 'paid' ? new Date().toISOString() : null,
-		}, { onConflict: 'call_id,team_member_id' })
-		.select()
-		.single();
+			amount_cents, currency: 'usd', status: 'processing', notes: notes ?? null,
+		}).select('id').single();
+		if (resErr) {
+			if (resErr.code === '23505') throw error(409, 'A payout for this call already exists');
+			throw error(500, resErr.message);
+		}
+		payoutId = reserved.id;
+	}
+
+	// Stripe not configured — leave the reserved row as a manual 'pending' payout.
+	if (!env.STRIPE_SECRET_KEY) {
+		const { data: payout } = await supabaseAdmin.from('payouts')
+			.update({ status: 'pending' }).eq('id', payoutId).select().single();
+		return json(payout, { status: 201 });
+	}
+
+	// Deterministic idempotency key — a retry or double-submit of the SAME payout
+	// returns Stripe's cached transfer instead of creating a second one.
+	const idempotencyKey = `payout_${call_id}_${team_member_id}`;
+	const transferRes = await fetch('https://api.stripe.com/v1/transfers', {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Idempotency-Key': idempotencyKey,
+		},
+		body: new URLSearchParams({
+			amount: String(amount_cents),
+			currency: 'usd',
+			destination: member.stripe_connect_account_id,
+			description: `RogueOS payout — call ${call_id}`,
+			'metadata[call_id]': call_id,
+			'metadata[team_member_id]': team_member_id,
+		}),
+	});
+
+	if (!transferRes.ok) {
+		const err = await transferRes.json() as { error?: { message?: string } };
+		// Mark the reserved row failed (retryable) — don't throw, let admin see it.
+		const { data: failedPayout } = await supabaseAdmin.from('payouts')
+			.update({ status: 'failed', notes: err.error?.message ?? 'Stripe transfer failed' })
+			.eq('id', payoutId).select().single();
+		return json(failedPayout, { status: 200 });
+	}
+
+	const transfer = await transferRes.json() as { id: string };
+	const { data: payout, error: dbErr } = await supabaseAdmin.from('payouts')
+		.update({
+			status: 'paid',
+			stripe_transfer_id: transfer.id,
+			paid_at: new Date().toISOString(),
+		})
+		.eq('id', payoutId).select().single();
 
 	if (dbErr) throw error(500, dbErr.message);
 	return json(payout, { status: 201 });

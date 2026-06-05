@@ -73,8 +73,8 @@
 		</div>
 		{#if sessionActive}
 			<div class="flex items-center gap-2">
-				<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-				<span class="text-green-400 font-mono text-sm">{formatTime(sessionSeconds)}</span>
+				<span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"></span>
+				<span class="text-[var(--accent)] font-mono text-sm">{formatTime(sessionSeconds)}</span>
 				<span class="text-[var(--c-text-ghost)] text-xs">session</span>
 			</div>
 		{/if}
@@ -88,7 +88,7 @@
 				▶ Dialer
 			</button>
 		{:else if sessionActive}
-			<span class="text-xs text-green-500">● Power Dialer Active</span>
+			<span class="text-xs text-[var(--accent)]">● Power Dialer Active</span>
 		{:else}
 			<span class="text-xs text-[var(--c-text-ghost)]">In Power Dialer</span>
 		{/if}

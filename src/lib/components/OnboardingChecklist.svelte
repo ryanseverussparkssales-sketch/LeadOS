@@ -77,12 +77,12 @@
 				class="flex items-center gap-3 flex-1 text-left">
 				<div class="flex items-center gap-2">
 					<div class="w-24 h-1.5 bg-[var(--c-surface-2)] rounded-full overflow-hidden">
-						<div class="h-full bg-green-500 transition-all rounded-full"
+						<div class="h-full bg-[var(--accent)] transition-all rounded-full"
 							style="width: {Math.round(completedCount / items.length * 100)}%"></div>
 					</div>
 					<span class="text-xs text-[#555]">{completedCount}/{items.length} complete</span>
 				</div>
-				<span class="text-xs text-white font-medium">Get LeadOS set up</span>
+				<span class="text-xs text-white font-medium">Get RogueOS set up</span>
 				<span class="text-[10px] text-[#444]">{expanded ? '▲' : '▼'}</span>
 			</button>
 			<button onclick={dismiss} class="text-[#333] hover:text-white text-xs ml-4">Dismiss</button>
@@ -91,7 +91,7 @@
 			<div class="px-6 pb-4 flex flex-wrap gap-3">
 				{#each items as item}
 					<a href={item.href}
-						class="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors {item.done ? 'border-green-900/50 bg-green-950/20 text-green-400' : 'border-[var(--c-border-subtle)] text-[#666] hover:border-white hover:text-white'}">
+						class="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors {item.done ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12 text-[var(--accent)]' : 'border-[var(--c-border-subtle)] text-[#666] hover:border-white hover:text-white'}">
 						<span>{item.done ? '✓' : '○'}</span>
 						<span>{item.label}</span>
 					</a>

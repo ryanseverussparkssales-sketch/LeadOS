@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { apiFetch } from '$lib/api';
 	import { supabase } from '$lib/services/auth';
+	import { toastError } from '$lib/stores/toast';
 
 	let data = $state<any>(null);
 	let loading = $state(true);
@@ -11,6 +12,7 @@
 	async function load() {
 		const r = await apiFetch('/api/agency');
 		if (r.ok) data = await r.json();
+		else toastError('Failed to load agency dashboard — try refreshing');
 		lastRefresh = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 		loading = false;
 	}
@@ -54,7 +56,7 @@
 	};
 </script>
 
-<svelte:head><title>Agency — LeadOS</title></svelte:head>
+<svelte:head><title>Agency — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
@@ -82,7 +84,7 @@
 					{#each [
 						{ label: 'Dials',        value: data.teamTotals.dials,                      color: 'text-white' },
 						{ label: 'Connect Rate', value: `${data.teamTotals.connectRate}%`,           color: 'text-blue-400' },
-						{ label: 'Appointments', value: data.teamTotals.wins,                       color: 'text-green-400' },
+						{ label: 'Appointments', value: data.teamTotals.wins,                       color: 'text-[var(--accent)]' },
 						{ label: 'Answered',     value: data.teamTotals.answered,                   color: 'text-[#888]' },
 					] as stat, i}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors stat-value-animate"
@@ -131,7 +133,7 @@
 											<p class="text-[9px] text-[#444]">connect</p>
 										</div>
 										<div>
-											<p class="text-sm font-semibold text-green-400">{rep.todayWins}</p>
+											<p class="text-sm font-semibold text-[var(--accent)]">{rep.todayWins}</p>
 											<p class="text-[9px] text-[#444]">wins</p>
 										</div>
 									</div>
@@ -156,7 +158,7 @@
 									<p class="text-sm text-white font-medium">{client.name}</p>
 									<div class="flex gap-1.5">
 										{#if activeCamps.length > 0}
-											<span class="text-[9px] bg-green-950 text-green-400 px-1.5 py-0.5 rounded">{activeCamps.length} active</span>
+											<span class="text-[9px] bg-[var(--accent)]/12 text-[var(--accent)] px-1.5 py-0.5 rounded">{activeCamps.length} active</span>
 										{/if}
 										{#if pendingCamps.length > 0}
 											<span class="text-[9px] bg-orange-950 text-orange-400 px-1.5 py-0.5 rounded animate-pulse">{pendingCamps.length} pending</span>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import Icon from '$lib/components/Icon.svelte';
 	import { goto } from '$app/navigation';
 	import { activeCall } from '$lib/stores/twilio';
 	import { callState } from '$lib/stores';
@@ -73,7 +74,7 @@
 		<div class="flex items-center gap-2 min-w-[64px]">
 			<span class="w-2 h-2 rounded-full flex-shrink-0 {$callState === 'ringing'
 				? 'bg-yellow-500 animate-pulse'
-				: 'bg-green-500 animate-pulse'}"></span>
+				: 'bg-[var(--call)] animate-pulse'}"></span>
 			{#if $callState === 'calling'}
 				<span class="text-xs text-white font-mono tabular-nums">{formatDuration(duration)}</span>
 			{:else}
@@ -100,11 +101,9 @@
 		<button
 			onclick={endCall}
 			title="End call"
-			class="w-8 h-8 rounded-xl bg-red-600 hover:bg-red-500
+			class="w-8 h-8 rounded-xl bg-[var(--end)] hover:bg-[var(--end-hi)]
 			       flex items-center justify-center transition-colors text-white font-bold text-sm"
-		>
-			✕
-		</button>
+		><Icon name="x" size={14} /></button>
 
 		<!-- Divider -->
 		<div class="w-px h-5 bg-[#2a2a2a] flex-shrink-0"></div>

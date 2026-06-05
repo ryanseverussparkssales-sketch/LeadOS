@@ -1,5 +1,5 @@
 {
-	"name": "leadosuite-mvp",
+	"name": "rogueos-mvp",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -9,7 +9,9 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
@@ -22,12 +24,14 @@
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.3.0",
 		"typescript": "^6.0.2",
-		"vite": "^8.0.7"
+		"vite": "^8.0.7",
+		"vitest": "^3.2.4"
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.100.1",
 		"@supabase/supabase-js": "^2.106.2",
 		"@twilio/voice-sdk": "^2.18.3",
+		"dompurify": "^3.4.8",
 		"groq-sdk": "^1.2.1",
 		"nodemailer": "^6.9.14",
 		"twilio": "^6.0.2"

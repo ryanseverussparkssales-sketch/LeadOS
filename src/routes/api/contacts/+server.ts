@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	// ── 2. Batch duplicate check — one query per 500-row chunk ─────────────────
 	const allNorms     = prepared.map(r => r.phoneNorm);
-	gMap  = new Map<string, string>(); // phoneNorm → contact_id
+	const existingMap = new Map<string, string>(); // phoneNorm → contact_id
 
 	for (const normChunk of chunk(allNorms, BATCH_SIZE)) {
 		const { data } = await supabaseAdmin

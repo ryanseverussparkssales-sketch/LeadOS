@@ -17,12 +17,8 @@ export async function requireAuth(request: Request) {
 	return data.user;
 }
 
-export function normalizePhone(phone: string): string {
-	const digits = phone.replace(/\D/g, '');
-	if (digits.length === 10) return `+1${digits}`;
-	if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
-	return `+${digits}`;
-}
+// Single source of truth lives in $lib/utils/phone (pure + unit-tested).
+export { normalizePhone } from '$lib/utils/phone';
 
 export function parseCSV(text: string): string[][] {
 	return text.trim().split('\n').map(row =>

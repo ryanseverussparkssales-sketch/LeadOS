@@ -17,8 +17,8 @@
 	let searchEl = $state<HTMLInputElement | undefined>(undefined);
 	let debounce: ReturnType<typeof setTimeout> | null = null;
 
-	const TYPE_COLORS: Record<string,string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-green-400', creator:'text-pink-400', partner:'text-purple-400', vendor:'text-[#888]' };
-	const STAGE_COLORS: Record<string,string> = { prospect:'text-[#666]', qualified:'text-blue-400', demo:'text-yellow-400', proposal:'text-orange-400', negotiation:'text-purple-400', won:'text-green-400', lost:'text-red-400' };
+	const TYPE_COLORS: Record<string,string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-[var(--accent)]', creator:'text-pink-400', partner:'text-[var(--accent)]', vendor:'text-[#888]' };
+	const STAGE_COLORS: Record<string,string> = { prospect:'text-[#666]', qualified:'text-blue-400', demo:'text-yellow-400', proposal:'text-orange-400', negotiation:'text-[var(--accent)]', won:'text-[var(--accent)]', lost:'text-red-400' };
 
 	function openPalette() { open = true; query = ''; results = null; setTimeout(() => searchEl?.focus(), 50); }
 	function closePalette() { open = false; query = ''; results = null; selectedIdx = 0; }

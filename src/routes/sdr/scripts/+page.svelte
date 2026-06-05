@@ -19,7 +19,7 @@
 	});
 </script>
 
-<svelte:head><title>Scripts — LeadOS SDR</title></svelte:head>
+<svelte:head><title>Scripts — RogueOS SDR</title></svelte:head>
 
 <div class="flex flex-1 overflow-hidden">
 	<!-- Script list -->

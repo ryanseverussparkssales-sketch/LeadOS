@@ -74,7 +74,7 @@
 	}
 </script>
 
-<svelte:head><title>Set up LeadOS</title></svelte:head>
+<svelte:head><title>Set up RogueOS</title></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-4">
 	<div class="w-full max-w-lg">
@@ -84,11 +84,11 @@
 			<div class="flex items-center gap-2 mb-3">
 				{#each STEPS as s, i}
 					<div class="flex items-center gap-2">
-						<div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold {i < step ? 'bg-green-500 text-black' : i === step ? 'bg-white text-black' : 'bg-[#1a1a1a] text-[#444]'}">
+						<div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold {i < step ? 'bg-[var(--accent)] text-[var(--accent-ink)]' : i === step ? 'bg-white text-black' : 'bg-[#1a1a1a] text-[#444]'}">
 							{i < step ? '✓' : i + 1}
 						</div>
 						{#if i < STEPS.length - 1}
-							<div class="h-px w-8 {i < step ? 'bg-green-500' : 'bg-[#2a2a2a]'}"></div>
+							<div class="h-px w-8 {i < step ? 'bg-[var(--accent)]' : 'bg-[#2a2a2a]'}"></div>
 						{/if}
 					</div>
 				{/each}
@@ -99,7 +99,7 @@
 		<!-- Step 0: Welcome -->
 		{#if step === 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<h1 class="text-2xl font-semibold">Welcome to LeadOS 👋</h1>
+				<h1 class="text-2xl font-semibold">Welcome to RogueOS 👋</h1>
 				<p class="text-sm text-[#666] leading-relaxed">
 					Let's get you set up in about 3 minutes. You'll need:
 				</p>
@@ -110,7 +110,7 @@
 						['Anthropic key (optional)', 'For AI brief, email drafts, call summaries — skip if you want'],
 					] as [title, desc]}
 						<li class="flex gap-3 text-sm">
-							<span class="text-green-500 mt-0.5">→</span>
+							<span class="text-[var(--accent)] mt-0.5">→</span>
 							<div>
 								<p class="text-white font-medium">{title}</p>
 								<p class="text-xs text-[#555] mt-0.5">{desc}</p>
@@ -220,10 +220,10 @@
 
 		<!-- Step 4: Done -->
 		{:else if step === 4}
-			<div class="rounded-xl border border-green-800/40 bg-green-950/10 p-8 text-center space-y-4">
+			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-8 text-center space-y-4">
 				<p class="text-5xl">🎉</p>
 				<h2 class="text-2xl font-semibold">You're all set</h2>
-				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">LeadOS is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
+				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">RogueOS is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
 				<a href="/dashboard" class="inline-block rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Go to Dashboard →</a>
 			</div>
 		{/if}

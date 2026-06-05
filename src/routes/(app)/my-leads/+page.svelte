@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface FlaggedContact {
 		id:string; name:string; phone:string; company:string; title:string; email:string|null;
@@ -19,8 +20,14 @@
 	});
 
 	async function unflag(id: string) {
-		await apiFetch('/api/contacts/flag-own', { method:'POST', body: JSON.stringify({ contactId: id, flagged: false }) });
-		contacts = contacts.filter(c => c.id !== id);
+		if (!confirm('Remove this contact from your personal leads?')) return;
+		const res = await apiFetch('/api/contacts/flag-own', { method:'POST', body: JSON.stringify({ contactId: id, flagged: false }) });
+		if (res.ok) {
+			contacts = contacts.filter(c => c.id !== id);
+			toastSuccess('Removed from your leads');
+		} else {
+			toastError('Failed to remove lead');
+		}
 	}
 
 	const filtered = $derived(
@@ -37,7 +44,7 @@
 	}
 </script>
 
-<svelte:head><title>My Leads — LeadOS</title></svelte:head>
+<svelte:head><title>My Leads — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -93,7 +100,7 @@
 					</div>
 					<div class="text-right shrink-0 space-y-1">
 						<p class="text-xs text-[#444]">{fmtDate(contact.own_pipeline_flagged_at)}</p>
-						<a href="/phone?number={encodeURIComponent(contact.phone)}" class="block text-xs text-[#555] hover:text-green-400 transition-colors">{contact.phone}</a>
+						<a href="/phone?number={encodeURIComponent(contact.phone)}" class="block text-xs text-[#555] hover:text-[var(--accent-hi)] transition-colors">{contact.phone}</a>
 						<div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
 							<a href="/contacts/{contact.id}" class="text-xs text-[#555] hover:text-white">View →</a>
 							<button onclick={() => unflag(contact.id)} class="text-xs text-red-700 hover:text-red-400">Remove</button>

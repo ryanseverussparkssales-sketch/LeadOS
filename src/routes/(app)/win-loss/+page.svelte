@@ -22,7 +22,7 @@
 	const PERIOD_LABELS: Record<Period,string> = { month:'This Month', quarter:'This Quarter', year:'This Year' };
 </script>
 
-<svelte:head><title>Win/Loss — LeadOS</title></svelte:head>
+<svelte:head><title>Win/Loss — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -47,8 +47,8 @@
 			<!-- KPIs -->
 			<div class="grid grid-cols-5 gap-4">
 				{#each [
-					{ label:'Win Rate', value: data.winRate + '%', color: data.winRate >= 30 ? 'text-green-400' : data.winRate >= 15 ? 'text-yellow-400' : 'text-red-400' },
-					{ label:'Deals Won', value: data.wonCount.toString(), color:'text-green-400' },
+					{ label:'Win Rate', value: data.winRate + '%', color: data.winRate >= 30 ? 'text-[var(--accent)]' : data.winRate >= 15 ? 'text-yellow-400' : 'text-red-400' },
+					{ label:'Deals Won', value: data.wonCount.toString(), color:'text-[var(--accent)]' },
 					{ label:'Deals Lost', value: data.lostCount.toString(), color:'text-red-400' },
 					{ label:'Revenue Won', value: fmt$(data.wonRevenue), color:'text-white' },
 					{ label:'Avg Deal Size', value: fmt$(Math.round(data.avgDealSize)), color:'text-white' },
@@ -91,7 +91,7 @@
 					<table class="w-full text-sm">
 						<thead><tr class="border-b border-[#1e1e1e]">
 							<th class="text-left text-xs text-[#555] font-medium py-2">Month</th>
-							<th class="text-right text-xs text-[#555] font-medium py-2 text-green-400">Won</th>
+							<th class="text-right text-xs text-[#555] font-medium py-2 text-[var(--accent)]">Won</th>
 							<th class="text-right text-xs text-[#555] font-medium py-2 text-red-400">Lost</th>
 							<th class="text-right text-xs text-[#555] font-medium py-2">Revenue</th>
 							<th class="text-right text-xs text-[#555] font-medium py-2">Win %</th>
@@ -100,7 +100,7 @@
 							{#each data.monthly as row}
 								<tr class="border-b border-[#1a1a1a]">
 									<td class="py-2 text-[#888]">{row.month}</td>
-									<td class="py-2 text-right text-green-400">{row.won}</td>
+									<td class="py-2 text-right text-[var(--accent)]">{row.won}</td>
 									<td class="py-2 text-right text-red-400">{row.lost}</td>
 									<td class="py-2 text-right text-white">{fmt$(row.revenue)}</td>
 									<td class="py-2 text-right text-[#666]">{row.won+row.lost ? Math.round(row.won/(row.won+row.lost)*100) : 0}%</td>

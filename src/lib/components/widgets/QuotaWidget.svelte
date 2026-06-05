@@ -14,7 +14,7 @@
 	});
 
 	function pct(current: number, target: number) { return Math.min(100, Math.round(current / target * 100)); }
-	function color(p: number) { return p >= 100 ? 'bg-green-500' : p >= 70 ? 'bg-yellow-400' : 'bg-white/30'; }
+	function color(p: number) { return p >= 100 ? 'bg-[var(--accent)]' : p >= 70 ? 'bg-yellow-400' : 'bg-white/30'; }
 	function fmt$(n: number) { return n >= 1000 ? `$${(n/1000).toFixed(0)}k` : `$${n}`; }
 </script>
 

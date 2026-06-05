@@ -1,10 +1,10 @@
-# LeadOS — Project Brief for AI Sessions
+# RogueOS — Project Brief for AI Sessions
 
 ## What this is
-LeadOS is a full-stack sales outreach platform built for Sparks Curiosity Studio (Ryan Sparks).
+RogueOS is a full-stack sales outreach platform built for RogueLeads (Ryan Sparks).
 Two brands, one codebase:
-- **LeadOS** — SaaS platform ($20/mo basic, $40+$5/seat pro). Power dialer, CRM, agency tools.
-- **Sparks Curiosity Studio** — Managed SDR agency. $1/contact + $200/appointment setting.
+- **RogueOS** — SaaS platform ($20/mo basic, $40+$5/seat pro). Power dialer, CRM, agency tools.
+- **RogueLeads** — Managed SDR agency. $1/contact + $200/appointment setting.
 
 ## Tech stack
 - SvelteKit (Svelte 5 runes) + TypeScript + Tailwind CSS
@@ -62,7 +62,7 @@ Contacts list: `src/routes/api/contacts/filtered/+server.ts` (paginated, is_test
 - `/pricing` — $20 basic / $40+$5/seat / managed services tiers
 - `/join` — SDR recruitment (verbal call required before dialing)
 - `/coaching` — Sales coaching landing page
-- `/about` — About Sparks Curiosity Studio
+- `/about` — About RogueLeads
 - `/marketplace` — Rep discovery for brands
 - `/contact` — Brand inquiry form
 - `/terms` + `/privacy` — Legal pages
@@ -95,7 +95,7 @@ Run these in order if not already done:
 
 ## Deployment
 **DO NOT build locally** — `.svelte-kit` EPERM issue in sandbox.
-Deploy from Windows terminal: `cd "C:\Users\Ryan\Lead Os\LeadOS\leadosuite-mvp" && vercel deploy --prod`
+Deploy from Windows terminal: `cd "C:\Users\Ryan\Lead Os\RogueOS\rogueos-mvp" && vercel deploy --prod`
 Vercel project: `lead-os` / team: `ryanseverussparkssales-8247s-projects`
 Live URL: `https://lead-os-livid.vercel.app`
 

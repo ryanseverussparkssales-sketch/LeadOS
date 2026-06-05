@@ -21,9 +21,9 @@
 			<div class="flex items-center gap-3">
 				<p class="text-xs text-white w-24 shrink-0">{DAYS[slot.day]} {slot.hour}:00</p>
 				<div class="flex-1 h-1.5 rounded-full bg-[#1a1a1a]">
-					<div class="h-full rounded-full bg-green-500/60" style="width:{slot.answerRate}%"></div>
+					<div class="h-full rounded-full bg-[var(--accent)]/12" style="width:{slot.answerRate}%"></div>
 				</div>
-				<p class="text-xs text-green-400 w-8 text-right shrink-0">{slot.answerRate}%</p>
+				<p class="text-xs text-[var(--accent)] w-8 text-right shrink-0">{slot.answerRate}%</p>
 			</div>
 		{/each}
 	{/if}

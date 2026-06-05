@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	type Tab = 'numbers' | 'voicemail' | 'missed';
 	let tab = $state<Tab>('numbers');
@@ -199,14 +200,14 @@
 	}
 
 	async function deleteNumber(id: string) {
-		if (!confirm('Remove this number from LeadOS? (It will not be released from Twilio — use Release for that.)')) return;
+		if (!confirm('Remove this number from RogueOS? (It will not be released from Twilio — use Release for that.)')) return;
 		await apiFetch(`/api/phone/numbers/${id}`, { method: 'DELETE' });
 		numbers = numbers.filter(n => n.id !== id);
 	}
 
 	async function releaseNumber(num: PhoneNumber) {
 		if (!num.twilio_phone_sid) {
-			if (!confirm(`Remove ${num.phone_number} from LeadOS? (No Twilio SID on record — will only remove from LeadOS.)`)) return;
+			if (!confirm(`Remove ${num.phone_number} from RogueOS? (No Twilio SID on record — will only remove from RogueOS.)`)) return;
 			await apiFetch(`/api/phone/numbers/${num.id}`, { method: 'DELETE' });
 			numbers = numbers.filter(n => n.id !== num.id);
 			return;
@@ -218,7 +219,7 @@
 			numbers = numbers.filter(n => n.id !== num.id);
 		} else {
 			const d = await r.json().catch(() => ({}));
-			alert('Release failed: ' + ((d as any).message ?? (d as any).error ?? 'Unknown error'));
+			toastError('Release failed: ' + ((d as any).message ?? (d as any).error ?? 'Unknown error'));
 		}
 		releasingId = null;
 	}
@@ -283,7 +284,7 @@
 			setTimeout(() => { purchaseTarget = null; }, 3500);
 		} else if (r.status === 207 && d.purchased) {
 			// Twilio purchase OK but DB save failed — auto-retry via /api/phone/numbers
-			purchaseMsg = 'Purchased from Twilio — saving to LeadOS...';
+			purchaseMsg = 'Purchased from Twilio — saving to RogueOS...';
 			const retryRes = await apiFetch('/api/phone/numbers', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -337,8 +338,6 @@
 	let audioPreviewUrl = $state<string | null>(null);
 	let uploadingGreeting = $state(false);
 
-	function toastSuccess(msg: string) { window.dispatchEvent(new CustomEvent('leados:toast', { detail: { type: 'success', message: msg } })); }
-	function toastError(msg: string) { window.dispatchEvent(new CustomEvent('leados:toast', { detail: { type: 'error', message: msg } })); }
 
 	async function startRecording() {
 		try {
@@ -410,7 +409,7 @@
 	}
 </script>
 
-<svelte:head><title>Phone Manager — LeadOS</title></svelte:head>
+<svelte:head><title>Phone Manager — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -454,8 +453,8 @@
 					<!-- Overall status banner -->
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
-							<div class="w-2 h-2 rounded-full {a2pStatus.overallStatus === 'registered' ? 'bg-green-500' : a2pStatus.overallStatus === 'pending' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}"></div>
-							<span class="text-xs font-medium {a2pStatus.overallStatus === 'registered' ? 'text-green-400' : a2pStatus.overallStatus === 'pending' ? 'text-yellow-400' : 'text-red-400'}">
+							<div class="w-2 h-2 rounded-full {a2pStatus.overallStatus === 'registered' ? 'bg-[var(--accent)]' : a2pStatus.overallStatus === 'pending' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}"></div>
+							<span class="text-xs font-medium {a2pStatus.overallStatus === 'registered' ? 'text-[var(--accent)]' : a2pStatus.overallStatus === 'pending' ? 'text-yellow-400' : 'text-red-400'}">
 								{a2pStatus.overallStatus === 'registered' ? 'A2P 10DLC Registered' : a2pStatus.overallStatus === 'pending' ? 'A2P Registration Pending' : 'A2P Registration Required'}
 							</span>
 						</div>
@@ -490,7 +489,7 @@
 								<p class="text-[#444] uppercase tracking-widest text-xs mb-1.5">Brand</p>
 								{#each a2pStatus.brands as brand}
 									<p class="text-[#888] mb-0.5">{brand.brandName}</p>
-									<span class="text-xs px-1.5 py-0.5 rounded {brand.status === 'APPROVED' ? 'bg-green-900/30 text-green-400' : brand.status === 'FAILED' ? 'bg-red-900/30 text-red-400' : 'bg-yellow-900/30 text-yellow-400'}">
+									<span class="text-xs px-1.5 py-0.5 rounded {brand.status === 'APPROVED' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : brand.status === 'FAILED' ? 'bg-red-900/30 text-red-400' : 'bg-yellow-900/30 text-yellow-400'}">
 										{brand.status}
 									</span>
 									{#if brand.failureReason}<p class="text-red-400 mt-1">{brand.failureReason}</p>{/if}
@@ -503,7 +502,7 @@
 								{:else}
 									{#each a2pStatus.campaigns as camp}
 										<p class="text-[#888] mb-0.5">{camp.name}</p>
-										<span class="text-xs text-green-400">Active</span>
+										<span class="text-xs text-[var(--accent)]">Active</span>
 									{/each}
 								{/if}
 							</div>
@@ -544,7 +543,7 @@
 										</div>
 									</div>
 								{/each}
-								{#if cnamMsg}<p class="text-xs {cnamMsg.startsWith('Saved') ? 'text-green-400' : 'text-red-400'} mt-1">{cnamMsg}</p>{/if}
+								{#if cnamMsg}<p class="text-xs {cnamMsg.startsWith('Saved') ? 'text-[var(--accent)]' : 'text-red-400'} mt-1">{cnamMsg}</p>{/if}
 								<p class="text-xs text-[#333] mt-1">Max 15 chars · All caps · Propagates to carriers in 2-4 weeks</p>
 							</div>
 						</div>
@@ -555,7 +554,7 @@
 			<!-- Buy Numbers Panel -->
 			{#if showBuy}
 				<div class="border-b border-[#1e1e1e] bg-[#0a0a0a] p-6">
-					<p class="text-xs text-[#555] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with LeadOS webhooks.</p>
+					<p class="text-xs text-[#555] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with RogueOS webhooks.</p>
 
 					<!-- Type toggle -->
 					<div class="flex gap-2 mb-4">
@@ -687,7 +686,7 @@
 											{#if num.is_primary}
 												<span class="text-xs bg-white/10 text-white px-1.5 py-0.5 rounded">Primary</span>
 											{/if}
-											<span class="text-xs px-1.5 py-0.5 rounded {num.status === 'active' ? 'text-green-400 bg-green-900/20' : 'text-yellow-400 bg-yellow-900/20'}">
+											<span class="text-xs px-1.5 py-0.5 rounded {num.status === 'active' ? 'text-[var(--accent)] bg-[var(--accent)]/12' : 'text-yellow-400 bg-yellow-900/20'}">
 												{num.status}
 											</span>
 										</div>

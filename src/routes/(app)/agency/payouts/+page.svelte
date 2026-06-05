@@ -97,7 +97,7 @@
 	};
 </script>
 
-<svelte:head><title>Payouts — LeadOS</title></svelte:head>
+<svelte:head><title>Payouts — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
@@ -111,7 +111,7 @@
 				<p class="text-[#444]">pending</p>
 			</div>
 			<div class="text-center">
-				<p class="text-green-400 font-semibold">{fmtCents(totalPaid)}</p>
+				<p class="text-[var(--accent)] font-semibold">{fmtCents(totalPaid)}</p>
 				<p class="text-[#444]">paid out</p>
 			</div>
 		</div>
@@ -151,7 +151,7 @@
 								<p class="text-xs text-[#555]">{win.contact?.company ?? ''} · {new Date(win.created_at).toLocaleDateString()}</p>
 							</div>
 							<button onclick={() => openPayModal(win)}
-								class="rounded-lg bg-green-800 hover:bg-green-700 px-3 py-1.5 text-xs font-medium text-white transition-colors shrink-0">
+								class="rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hi)] px-3 py-1.5 text-xs font-medium text-[var(--accent-ink)] transition-colors shrink-0">
 								💸 Pay Rep
 							</button>
 						</div>
@@ -171,13 +171,13 @@
 							<div class="flex-1 min-w-0">
 								<div class="flex items-center gap-2">
 									<p class="text-sm text-white font-medium">{p.team_member?.member_email?.split('@')[0] ?? '—'}</p>
-									<span class="text-[9px] px-1.5 py-0.5 rounded {p.status === 'paid' ? 'bg-green-900/40 text-green-400' : p.status === 'failed' ? 'bg-red-900/40 text-red-400' : 'bg-yellow-900/40 text-yellow-400'}">
+									<span class="text-[9px] px-1.5 py-0.5 rounded {p.status === 'paid' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : p.status === 'failed' ? 'bg-red-900/40 text-red-400' : 'bg-yellow-900/40 text-yellow-400'}">
 										{p.status}
 									</span>
 								</div>
 								<p class="text-xs text-[#555]">{p.call?.contact?.name ?? '—'} · {new Date(p.created_at).toLocaleDateString()}</p>
 							</div>
-							<p class="text-sm font-semibold text-green-400 shrink-0">{fmtCents(p.amount_cents)}</p>
+							<p class="text-sm font-semibold text-[var(--accent)] shrink-0">{fmtCents(p.amount_cents)}</p>
 						</div>
 					{/each}
 				</div>
@@ -234,7 +234,7 @@
 					Cancel
 				</button>
 				<button onclick={approvePay} disabled={processing || !selectedMemberId || !payAmount}
-					class="flex-1 rounded-lg bg-green-700 hover:bg-green-600 py-2.5 text-xs font-semibold text-white disabled:opacity-40 transition-colors">
+					class="flex-1 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hi)] py-2.5 text-xs font-semibold text-[var(--accent-ink)] disabled:opacity-40 transition-colors">
 					{processing ? 'Sending…' : `💸 Send $${payAmount || '0'}`}
 				</button>
 			</div>

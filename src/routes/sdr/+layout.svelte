@@ -6,6 +6,7 @@
 	import { apiFetch } from '$lib/api';
 	import { toasts } from '$lib/stores/toast';
 	import Toast from '$lib/components/Toast.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	let { children } = $props();
 
@@ -43,17 +44,18 @@
 
 	// All possible nav items — filtered by permissions below
 	const ALL_NAV = [
-		{ href: '/sdr',                    label: 'Queue',           icon: '📞', key: null },
-		{ href: '/sdr/getting-started',    label: 'Getting Started', icon: '🚀', key: null },
-		{ href: '/sdr/messages',           label: 'Messages',        icon: '💬', key: 'messages' },
-		{ href: '/sdr/dossier',     label: 'Client Brief', icon: '📋', key: 'dossier' },
-		{ href: '/sdr/scripts',     label: 'Scripts',      icon: '📝', key: 'scripts' },
-		{ href: '/sdr/coaching',    label: 'Coaching',     icon: '🎯', key: 'coaching' },
-		{ href: '/sdr/performance', label: 'Performance',  icon: '📊', key: 'performance' },
-		{ href: '/sdr/callbacks',   label: 'Callbacks',    icon: '📅', key: 'callbacks' },
-		{ href: '/sdr/profile',     label: 'My Profile',   icon: '👤', key: 'profile' },
-		{ href: '/sdr/portfolio',   label: 'Portfolio',    icon: '🎬', key: 'profile' },
-		{ href: '/sdr/interview',   label: 'AI Interview', icon: '🎤', key: 'interview' },
+		{ href: '/sdr',                    label: 'Queue',           icon: 'phone',     key: null },
+		{ href: '/sdr/dashboard',          label: 'Dashboard',       icon: 'dashboard', key: null },
+		{ href: '/sdr/getting-started',    label: 'Getting Started', icon: 'rocket',    key: null },
+		{ href: '/sdr/messages',           label: 'Messages',        icon: 'message',   key: 'messages' },
+		{ href: '/sdr/dossier',     label: 'Client Brief', icon: 'report',    key: 'dossier' },
+		{ href: '/sdr/scripts',     label: 'Scripts',      icon: 'fileText',  key: 'scripts' },
+		{ href: '/sdr/coaching',    label: 'Coaching',     icon: 'target',    key: 'coaching' },
+		{ href: '/sdr/performance', label: 'Performance',  icon: 'chart',     key: 'performance' },
+		{ href: '/sdr/callbacks',   label: 'Callbacks',    icon: 'calendar',  key: 'callbacks' },
+		{ href: '/sdr/profile',     label: 'My Profile',   icon: 'user',      key: 'profile' },
+		{ href: '/sdr/portfolio',   label: 'Portfolio',    icon: 'film',      key: 'portfolio' },
+		{ href: '/sdr/interview',   label: 'AI Interview', icon: 'mic',       key: 'interview' },
 	];
 
 	// Only show items where permission is null (always-on) or explicitly true
@@ -62,6 +64,16 @@
 	));
 
 	const currentPath = $derived($page.url.pathname);
+
+	// Prefix-match so deep routes (e.g. /sdr/messages/123) keep their nav highlight;
+	// /sdr (Queue) stays exact so it isn't always active.
+	function isActive(href: string) {
+		return href === '/sdr' ? currentPath === '/sdr' : (currentPath === href || currentPath.startsWith(href + '/'));
+	}
+
+	let sidebarOpen = $state(false);
+	// Close the mobile drawer whenever the route changes.
+	$effect(() => { void currentPath; sidebarOpen = false; });
 
 	onMount(async () => {
 		const session = await getSession();
@@ -84,41 +96,60 @@
 	});
 </script>
 
-<svelte:head><title>LeadOS — SDR</title></svelte:head>
+<svelte:head><title>RogueOS — SDR</title></svelte:head>
 
 {#if loading}
 	<div class="flex items-center justify-center h-screen bg-[#0a0a0a]">
 		<div class="w-4 h-4 rounded-full bg-white animate-pulse"></div>
 	</div>
 {:else}
-<div class="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
-	<!-- Slim sidebar -->
-	<div class="w-52 shrink-0 flex flex-col border-r border-[#1e1e1e] bg-[#050505]">
-		<div class="px-4 py-5 border-b border-[#1e1e1e]">
-			<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:13px;letter-spacing:.28em;color:#fff">LEADOS</p>
-			<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:8px;letter-spacing:.18em;color:#2a2a2a;margin-top:2px">SDR PORTAL</p>
-		</div>
-
-		<nav class="flex-1 py-3 space-y-0.5 px-2">
-			{#each NAV as item}
-				<a href={item.href}
-					class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors {currentPath === item.href ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white hover:bg-white/5'}">
-					<span class="text-base">{item.icon}</span>
-					{item.label}
-				</a>
-			{/each}
-		</nav>
-
-		<div class="px-4 py-4 border-t border-[#1e1e1e]">
-			<p class="text-xs text-[#555] truncate">{sdrName}</p>
-			<a href="/" class="text-[10px] text-[#333] hover:text-white transition-colors">← Exit</a>
-		</div>
+{#snippet sidebarInner()}
+	<div class="px-4 py-5 border-b border-[#1e1e1e]">
+		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:13px;letter-spacing:.28em;color:#fff">ROGUEOS</p>
+		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:8px;letter-spacing:.18em;color:#2a2a2a;margin-top:2px">SDR PORTAL</p>
 	</div>
+
+	<nav class="rogue-nav flex-1 py-3 space-y-0.5 px-2 overflow-y-auto">
+		{#each NAV as item}
+			<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
+				class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#666] hover:text-white hover:bg-white/5'}">
+				<Icon name={item.icon} size={17} class="flex-shrink-0" />
+				{item.label}
+			</a>
+		{/each}
+	</nav>
+
+	<div class="px-4 py-4 border-t border-[#1e1e1e]">
+		<p class="text-xs text-[#555] truncate">{sdrName}</p>
+		<a href="/" class="text-[10px] text-[#333] hover:text-white transition-colors">← Exit</a>
+	</div>
+{/snippet}
+
+<div class="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
+	<!-- Desktop sidebar -->
+	<div class="hidden md:flex w-52 shrink-0 flex-col border-r border-[#1e1e1e] bg-[#050505]">
+		{@render sidebarInner()}
+	</div>
+
+	<!-- Mobile drawer -->
+	{#if sidebarOpen}
+		<button class="fixed inset-0 z-40 bg-black/60 md:hidden" aria-label="Close menu" onclick={() => sidebarOpen = false}></button>
+		<div class="fixed inset-y-0 left-0 z-50 w-52 flex flex-col border-r border-[#1e1e1e] bg-[#050505] md:hidden">
+			{@render sidebarInner()}
+		</div>
+	{/if}
 
 	<!-- Main content -->
 	<div class="flex-1 overflow-hidden flex flex-col">
+		<!-- Mobile top bar -->
+		<div class="md:hidden flex items-center gap-3 px-4 py-2.5 border-b border-[#111] bg-[#050505] shrink-0">
+			<button onclick={() => sidebarOpen = true} aria-label="Open menu"
+				class="p-1 rounded text-[#888] hover:text-white transition-colors">☰</button>
+			<span class="text-xs font-bold tracking-widest text-[#f5f5f5]">ROGUEOS · SDR</span>
+		</div>
+
 		<!-- Today's stats strip -->
-		<div class="shrink-0 border-b border-[#111] bg-[#040404] px-5 flex items-center gap-6 h-9">
+		<div class="shrink-0 border-b border-[#111] bg-[#040404] px-5 flex items-center gap-6 h-9 overflow-x-auto">
 			{#each [
 				{ label: 'Dials', value: todayStats.calls, color: '#fff' },
 				{ label: 'Connect', value: todayStats.answered > 0 ? `${Math.round((todayStats.answered / todayStats.calls) * 100)}%` : '—', color: '#3b82f6' },

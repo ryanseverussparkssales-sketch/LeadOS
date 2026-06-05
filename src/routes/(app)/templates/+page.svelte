@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	type TType = 'email' | 'sms';
 	type TCategory = 'general' | 'follow_up' | 'thank_you' | 'intro' | 'proposal' | 'breakup' | 'custom';
@@ -61,6 +62,9 @@
 			if (selected?.id) templates = templates.map(t => t.id === saved.id ? saved : t);
 			else templates = [saved, ...templates];
 			selected = saved; editing = false;
+			toastSuccess('Template saved');
+		} else {
+			toastError('Failed to save template — please try again');
 		}
 		saving = false;
 	}
@@ -74,15 +78,23 @@
 			templates = [saved, ...templates];
 			selectTemplate(saved);
 			fGenerateDesc = ''; showGenerateForm = false;
+			toastSuccess('Template generated');
+		} else {
+			toastError('Failed to generate template — please try again');
 		}
 		generating = false;
 	}
 
 	async function deleteTemplate(id: string) {
 		if (!confirm('Delete this template?')) return;
-		await apiFetch(`/api/templates/${id}`, { method:'DELETE' });
-		templates = templates.filter(t => t.id !== id);
-		if (selected?.id === id) selected = null;
+		const res = await apiFetch(`/api/templates/${id}`, { method:'DELETE' });
+		if (res.ok) {
+			templates = templates.filter(t => t.id !== id);
+			if (selected?.id === id) selected = null;
+			toastSuccess('Template deleted');
+		} else {
+			toastError('Failed to delete template — please try again');
+		}
 	}
 
 	function insertVar(v: string) {
@@ -96,7 +108,7 @@
 	}));
 </script>
 
-<svelte:head><title>Templates — LeadOS</title></svelte:head>
+<svelte:head><title>Templates — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -106,26 +118,26 @@
 			<select bind:value={filterType} onchange={load} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-white focus:border-white focus:outline-none">
 				<option value="">All types</option><option value="email">Email</option><option value="sms">SMS</option>
 			</select>
-			<button onclick={() => showGenerateForm = !showGenerateForm} class="rounded-lg border border-purple-800 bg-purple-900/20 px-3 py-1.5 text-xs text-purple-400 hover:bg-purple-900/40 transition-colors">✨ Generate</button>
+			<button onclick={() => showGenerateForm = !showGenerateForm} class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-3 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">✨ Generate</button>
 			<button onclick={newTemplate} class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">+ New Template</button>
 		</div>
 	</div>
 
 	{#if showGenerateForm}
-		<div class="border-b border-[#1e1e1e] bg-purple-950/10 px-8 py-4">
+		<div class="border-b border-[#1e1e1e] bg-[var(--accent)]/12 px-8 py-4">
 			<div class="max-w-2xl space-y-3">
-				<p class="text-xs text-purple-400 font-medium">✨ AI Template Generator</p>
+				<p class="text-xs text-[var(--accent)] font-medium">✨ AI Template Generator</p>
 				<div class="flex gap-3">
-					<select bind:value={fType} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-purple-600 focus:outline-none">
+					<select bind:value={fType} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-[var(--accent)]/40 focus:outline-none">
 						<option value="email">Email</option><option value="sms">SMS</option>
 					</select>
-					<select bind:value={fCat} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-purple-600 focus:outline-none">
+					<select bind:value={fCat} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-[var(--accent)]/40 focus:outline-none">
 						{#each CATEGORIES as [v,l]}<option value={v}>{l}</option>{/each}
 					</select>
-					<input bind:value={fName} placeholder="Template name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-purple-600 focus:outline-none" />
+					<input bind:value={fName} placeholder="Template name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[var(--accent)]/40 focus:outline-none" />
 				</div>
-				<textarea bind:value={fGenerateDesc} rows="2" placeholder="Describe what this template should do: e.g. 'Follow up after a no-answer call, mention we tried to reach them and invite them to book a time'" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-purple-600 focus:outline-none resize-none"></textarea>
-				<button onclick={generateTemplate} disabled={generating || !fGenerateDesc.trim()} class="rounded-lg bg-purple-600 px-5 py-2 text-xs font-semibold text-white hover:bg-purple-500 disabled:opacity-40 transition-colors">
+				<textarea bind:value={fGenerateDesc} rows="2" placeholder="Describe what this template should do: e.g. 'Follow up after a no-answer call, mention we tried to reach them and invite them to book a time'" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-[var(--accent)]/40 focus:outline-none resize-none"></textarea>
+				<button onclick={generateTemplate} disabled={generating || !fGenerateDesc.trim()} class="rounded-lg bg-[var(--accent)] px-5 py-2 text-xs font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors">
 					{generating ? '✨ Writing...' : '✨ Generate Template'}
 				</button>
 			</div>
@@ -150,7 +162,7 @@
 					<button onclick={() => selectTemplate(t)}
 						class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === t.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 						<div class="flex items-center gap-2 mb-0.5">
-							<span class="text-xs {t.type === 'email' ? 'text-blue-400' : 'text-green-400'}">{t.type === 'email' ? '✉' : '💬'}</span>
+							<span class="text-xs {t.type === 'email' ? 'text-blue-400' : 'text-[var(--accent)]'}">{t.type === 'email' ? '✉' : '💬'}</span>
 							<p class="text-sm text-white font-medium truncate">{t.name}</p>
 						</div>
 						<p class="text-xs text-[#555] capitalize">{t.category.replace(/_/g,' ')} · {t.use_count} uses</p>

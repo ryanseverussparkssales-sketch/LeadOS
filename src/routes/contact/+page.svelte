@@ -42,23 +42,22 @@
 	}
 </script>
 
-<svelte:head><title>Hire SDRs — LeadOS by Sparks Curiosity Studio</title>
-	<meta property="og:title" content="Hire SDRs — Sparks Curiosity Studio" />
+<svelte:head><title>Hire SDRs — RogueOS by RogueLeads</title>
+	<meta property="og:title" content="Hire SDRs — RogueLeads" />
 	<meta property="og:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="LeadOS" />
+	<meta property="og:site_name" content="RogueOS" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Hire SDRs — Sparks Curiosity Studio" />
+	<meta name="twitter:title" content="Hire SDRs — RogueLeads" />
 	<meta name="twitter:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" /></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white">
 
 	<nav class="border-b border-[#1a1a1a] px-8 py-5 flex items-center justify-between">
-		<a href="/" class="font-semibold">LeadOS</a>
+		<a href="/" class="font-semibold">RogueOS</a>
 		<div class="flex items-center gap-5">
-			<a href="/marketplace" class="text-xs text-[#555] hover:text-white transition-colors">Browse Reps</a>
 			<a href="/?mode=login" class="text-xs text-[#555] hover:text-white transition-colors">Log in</a>
 		</div>
 	</nav>
@@ -67,7 +66,7 @@
 
 		<!-- Hero -->
 		<div class="text-center mb-16">
-			<p class="text-xs text-[#444] uppercase tracking-widest mb-4">Sparks Curiosity Studio</p>
+			<p class="text-xs text-[#444] uppercase tracking-widest mb-4">RogueLeads</p>
 			<h1 class="text-5xl font-bold tracking-tight mb-5">Hire vetted SDRs.<br/><span class="text-[#444]">Pay per appointment.</span></h1>
 			<p class="text-[#555] text-lg max-w-xl mx-auto leading-relaxed">
 				We source, screen, and manage sales reps for your outbound campaigns.
@@ -118,10 +117,9 @@
 				<h2 class="text-2xl font-semibold mb-6">{submitted ? '✓ Got it' : "Let's talk"}</h2>
 
 				{#if submitted}
-					<div class="rounded-xl border border-green-800/40 bg-green-950/10 p-6 space-y-2">
+					<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-6 space-y-2">
 						<p class="text-white font-medium">We'll reach out within 24 hours.</p>
-						<p class="text-xs text-[#555]">In the meantime, browse available reps on the marketplace.</p>
-						<a href="/marketplace" class="inline-block mt-3 rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white transition-colors">Browse Reps →</a>
+						<p class="text-xs text-[#555]">We'll review your goals and follow up with how we can run your outreach.</p>
 					</div>
 				{:else}
 					<form onsubmit={submit} class="space-y-4">
@@ -217,6 +215,6 @@
 	</div>
 
 	<footer class="border-t border-[#1a1a1a] px-8 py-6 text-center">
-		<p class="text-xs text-[#333]">LeadOS · Sparks Curiosity Studio · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
+		<p class="text-xs text-[#333]">RogueOS · RogueLeads · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
 	</footer>
 </div>

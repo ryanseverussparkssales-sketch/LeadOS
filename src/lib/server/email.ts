@@ -12,12 +12,14 @@ export interface EmailAttachment {
 
 export interface SendEmailOptions {
     to: string | string[];
+    cc?: string | string[];
     subject: string;
     html: string;
     text?: string;
     from?: string;
     replyTo?: string;
-    userId: string;
+    /** Tenant whose sending account to use. Omit for system/transactional email (sends via the default Resend sender). */
+    userId?: string;
     clientId?: string;
     accountId?: string;
     attachments?: EmailAttachment[];
@@ -32,7 +34,8 @@ export interface EmailResult {
 }
 
 // Find the best email account to use
-async function resolveEmailAccount(userId: string, clientId?: string, accountId?: string) {
+async function resolveEmailAccount(userId?: string, clientId?: string, accountId?: string) {
+    if (!userId) return null; // system/transactional email → Resend default sender
     if (accountId) {
         const { data } = await supabaseAdmin
             .from('email_accounts')
@@ -88,6 +91,7 @@ async function sendViaSMTP(account: Record<string, unknown>, options: SendEmailO
     const info = await transporter.sendMail({
         from: options.from ?? `${account.label} <${account.email_address}>`,
         to: toArray.join(', '),
+        cc: options.cc ? (Array.isArray(options.cc) ? options.cc.join(', ') : options.cc) : undefined,
         subject: options.subject,
         html: options.html,
         text: options.text,
@@ -107,7 +111,7 @@ async function sendViaResend(options: SendEmailOptions): Promise<EmailResult> {
     const apiKey = env.RESEND_API_KEY;
     if (!apiKey) return { success: false, error: 'RESEND_API_KEY not configured' };
 
-    const fromAddress = options.from ?? env.RESEND_FROM ?? 'LeadOS <noreply@leados.app>';
+    const fromAddress = options.from ?? env.RESEND_FROM ?? 'RogueOS <noreply@leados.app>';
     const toArray = Array.isArray(options.to) ? options.to : [options.to];
 
     const res = await fetch('https://api.resend.com/emails', {
@@ -119,6 +123,7 @@ async function sendViaResend(options: SendEmailOptions): Promise<EmailResult> {
         body: JSON.stringify({
             from: fromAddress,
             to: toArray,
+            cc: options.cc ? (Array.isArray(options.cc) ? options.cc : [options.cc]) : undefined,
             subject: options.subject,
             html: options.html,
             text: options.text,

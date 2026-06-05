@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import { requireAuth } from '$lib/server/supabase';
 import Anthropic from '@anthropic-ai/sdk';
@@ -9,6 +10,7 @@ const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	if (await rateLimitUser(user.id, { max: 30, windowMs: 60_000 })) throw error(429, "Rate limit exceeded — max 30 AI requests/minute");
 	void user;
 

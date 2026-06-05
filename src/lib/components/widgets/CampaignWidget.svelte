@@ -9,7 +9,7 @@
         total_calls: number; calls_per_lead: number; followup_count: number;
     }
 
-    const SETTINGS_KEY = 'leados_campaign_widget';
+    const SETTINGS_KEY = 'rogueos_campaign_widget';
 
     let campaigns = $state<Campaign[]>([]);
     let selectedId = $state('');

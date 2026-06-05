@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 
 	interface Client { id: string; name: string; }
@@ -48,14 +50,20 @@
 
 	async function load() {
 		loading = true;
-		const params = new URLSearchParams();
-		if (filterClient) params.set('client_id', filterClient);
-		if (filterProject) params.set('project_id', filterProject);
-		if (filterDateFrom) params.set('date_from', filterDateFrom);
-		if (filterDateTo) params.set('date_to', filterDateTo);
-		const res = await apiFetch(`/api/time-entries?${params}`);
-		entries = res.ok ? await res.json() : [];
-		loading = false;
+		try {
+			const params = new URLSearchParams();
+			if (filterClient) params.set('client_id', filterClient);
+			if (filterProject) params.set('project_id', filterProject);
+			if (filterDateFrom) params.set('date_from', filterDateFrom);
+			if (filterDateTo) params.set('date_to', filterDateTo);
+			const res = await apiFetch(`/api/time-entries?${params}`);
+			entries = res.ok ? await res.json() : [];
+			if (!res.ok) toastError('Failed to load time entries — try refreshing');
+		} catch (e) {
+			toastError('Failed to load time entries — try refreshing');
+		} finally {
+			loading = false;
+		}
 	}
 
 	async function addEntry() {
@@ -80,13 +88,22 @@
 			entries = [entry, ...entries];
 			newDesc = ''; newHours = 1; newMins = 0;
 			newClient = ''; newProject = ''; newCampaign = '';
+			toastSuccess('Time entry logged');
+		} else {
+			toastError('Failed to log time entry — try again');
 		}
 		saving = false;
 	}
 
 	async function deleteEntry(id: string) {
-		await apiFetch(`/api/time-entries/${id}`, { method: 'DELETE' });
-		entries = entries.filter(e => e.id !== id);
+		if (!confirm('Delete this time entry? This cannot be undone.')) return;
+		const res = await apiFetch(`/api/time-entries/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			entries = entries.filter(e => e.id !== id);
+			toastSuccess('Time entry deleted');
+		} else {
+			toastError('Failed to delete time entry — try again');
+		}
 	}
 
 	function fmtDuration(mins: number) {
@@ -109,7 +126,7 @@
 	);
 </script>
 
-<svelte:head><title>Time — LeadOS</title></svelte:head>
+<svelte:head><title>Time — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -147,7 +164,7 @@
 				</div>
 				<div class="rounded-lg bg-[#111] border border-[#2a2a2a] p-3">
 					<p class="text-xs text-[#555] mb-1">Billable</p>
-					<p class="text-green-400 text-sm font-medium">{fmtDuration(billableMins)}</p>
+					<p class="text-[var(--accent)] text-sm font-medium">{fmtDuration(billableMins)}</p>
 				</div>
 			</div>
 
@@ -229,7 +246,7 @@
 							<div class="w-16 shrink-0 text-right">
 								<p class="text-white text-sm font-medium" style="font-family: var(--font-mono)">{fmtDuration(entry.duration_minutes)}</p>
 								{#if entry.billable}
-									<p class="text-xs text-green-400">{fmtEarning(entry)}</p>
+									<p class="text-xs text-[var(--accent)]">{fmtEarning(entry)}</p>
 								{:else}
 									<p class="text-xs text-[#444]">non-billable</p>
 								{/if}
@@ -244,9 +261,7 @@
 								<p class="text-xs text-[#555]">{new Date(entry.entry_date).toLocaleDateString()}</p>
 							</div>
 							<button onclick={() => deleteEntry(entry.id)}
-								class="opacity-0 group-hover:opacity-100 text-xs text-red-700 hover:text-red-400 transition-all shrink-0">
-								✕
-							</button>
+								class="opacity-0 group-hover:opacity-100 text-xs text-red-700 hover:text-red-400 transition-all shrink-0"><Icon name="x" size={14} /></button>
 						</div>
 					{/each}
 				</div>

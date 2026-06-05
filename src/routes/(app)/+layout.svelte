@@ -33,6 +33,9 @@
 	let { children } = $props();
 
 	let sidebarOpen = $state(false);
+	// Gate the shell until session + role checks resolve, so client-portal/SDR users
+	// don't flash the admin UI before being redirected to their own view.
+	let checking = $state(true);
 
 	const isPortal = $derived($page.url.pathname === '/client-portal');
 
@@ -91,6 +94,9 @@
 			console.error('[layout] Auth check threw unexpectedly:', err);
 		}
 
+		// Reached here without redirecting → this user belongs on the admin shell.
+		checking = false;
+
 		// Global keyboard shortcut: ? opens help panel
 		const keyHandler = (e: KeyboardEvent) => {
 			const tag = (e.target as HTMLElement)?.tagName;
@@ -108,6 +114,8 @@
 	});
 </script>
 
+<a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[1000] focus:top-2 focus:left-2 focus:bg-white focus:text-black focus:px-3 focus:py-1.5 focus:rounded focus:text-sm">Skip to content</a>
+
 <OfflineBanner />
 <ErrorRecoveryBar />
 <Toast />
@@ -117,6 +125,11 @@
 <IncomingCallBanner />
 <FloatingCallBar />
 
+{#if checking}
+	<div class="flex h-screen items-center justify-center bg-[var(--c-surface-0)]">
+		<div class="w-6 h-6 rounded-full border-2 border-[#333] border-t-white animate-spin"></div>
+	</div>
+{:else}
 <div class="flex h-screen bg-[var(--c-surface-0)] text-[#f5f5f5] overflow-hidden">
 
 	{#if !isPortal}
@@ -143,7 +156,7 @@
 	{/if}
 
 	<!-- Main content -->
-	<main class="flex-1 overflow-auto scroll-smooth {isPortal ? '' : 'pb-10'}">
+	<main id="main-content" class="flex-1 overflow-auto scroll-smooth {isPortal ? '' : 'pb-10'}">
 		{#if !isPortal}
 			<!-- Mobile top bar -->
 			<div class="md:hidden flex items-center gap-3 px-4 py-3 border-b border-[#1e1e1e] bg-[#0a0a0a]">
@@ -154,7 +167,7 @@
 				>
 					☰
 				</button>
-				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">LEADOS</span>
+				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">ROGUEOS</span>
 			</div>
 
 			<OnboardingChecklist />
@@ -168,3 +181,4 @@
 		<GlobalAIAssistant />
 	{/if}
 </div>
+{/if}

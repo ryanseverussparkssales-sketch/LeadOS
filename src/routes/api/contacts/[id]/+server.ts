@@ -4,12 +4,13 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 
 	const { data, error: dbErr } = await supabaseAdmin
 		.from('contacts')
 		.select('*, tags:contact_tag_mappings(tag:contact_tags(*))')
 		.eq('id', params.id)
-		.eq('user_id', user.id)
+		.eq('user_id', ownerId)
 		.is('deleted_at', null)
 		.single();
 
@@ -29,6 +30,7 @@ export const GET: RequestHandler = async ({ request, params }) => {
 
 export const PATCH: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const body = await request.json();
 
 	if (body.restore === true) {
@@ -36,7 +38,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 			.from('contacts')
 			.update({ deleted_at: null })
 			.eq('id', params.id)
-			.eq('user_id', user.id)
+			.eq('user_id', ownerId)
 			.select()
 			.single();
 		if (e) throw error(400, e.message);
@@ -47,7 +49,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 		.from('contacts')
 		.update(body)
 		.eq('id', params.id)
-		.eq('user_id', user.id)
+		.eq('user_id', ownerId)
 		.select()
 		.single();
 	if (e) throw error(400, e.message);
@@ -61,5 +63,17 @@ export const DELETE: RequestHandler = async ({ request, params, url }) => {
 	if (role !== 'owner') throw error(403, 'Only account owners can delete contacts');
 	const ownerId = await getEffectiveUserId(user.id);
 	const permanent = url.searchParams.get('permanent') === 'true';
+
+	if (permanent) {
+		const { error: e } = await supabaseAdmin
+			.from('contacts').delete()
+			.eq('id', params.id).eq('user_id', ownerId);
+		if (e) throw error(400, e.message);
+	} else {
+		const { error: e } = await supabaseAdmin
+			.from('contacts').update({ deleted_at: new Date().toISOString() })
+			.eq('id', params.id).eq('user_id', ownerId);
+		if (e) throw error(400, e.message);
+	}
 	return json({ success: true });
 };

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { apiFetch } from '$lib/api';
+    import { toastSuccess, toastError } from '$lib/stores/toast';
 
     interface NotifData {
         totalCount: number;
@@ -30,18 +31,29 @@
     }
 
     async function completeTask(id: string) {
-        await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
-        if (data) data = { ...data, overdueTasks: { ...data.overdueTasks, items: data.overdueTasks.items.filter(t => t.id !== id), count: data.overdueTasks.count - 1 }, totalCount: data.totalCount - 1 };
+        const res = await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
+        if (res.ok) {
+            if (data) data = { ...data, overdueTasks: { ...data.overdueTasks, items: data.overdueTasks.items.filter(t => t.id !== id), count: data.overdueTasks.count - 1 }, totalCount: data.totalCount - 1 };
+            toastSuccess('Task completed');
+        } else {
+            toastError('Failed to complete task — try again');
+        }
     }
 
     onMount(async () => {
-        const r = await apiFetch('/api/notifications');
-        if (r.ok) data = await r.json();
-        loading = false;
+        try {
+            const r = await apiFetch('/api/notifications');
+            if (r.ok) data = await r.json();
+            else toastError('Failed to load notifications — try refreshing');
+        } catch (e) {
+            toastError('Failed to load notifications — try refreshing');
+        } finally {
+            loading = false;
+        }
     });
 </script>
 
-<svelte:head><title>Notifications — LeadOS</title></svelte:head>
+<svelte:head><title>Notifications — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
     <div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -50,7 +62,7 @@
             {#if data?.totalCount}<p class="text-xs text-[#555] mt-0.5">{data.totalCount} items need attention</p>{/if}
         </div>
         {#if data?.totalCount === 0}
-            <span class="text-xs text-green-400">✓ All clear</span>
+            <span class="text-xs text-[var(--accent)]">✓ All clear</span>
         {/if}
     </div>
 
@@ -86,7 +98,7 @@
                                 </div>
                                 <div class="flex gap-2 ml-4">
                                     <a href="/tasks" class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-2.5 py-1.5 rounded-lg transition-colors">Open</a>
-                                    <button onclick={() => completeTask(task.id)} class="text-xs text-green-400 hover:text-green-300 border border-green-400/20 px-2.5 py-1.5 rounded-lg transition-colors">Done ✓</button>
+                                    <button onclick={() => completeTask(task.id)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 px-2.5 py-1.5 rounded-lg transition-colors">Done ✓</button>
                                 </div>
                             </div>
                         {/each}

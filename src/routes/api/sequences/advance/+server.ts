@@ -4,7 +4,7 @@ import { sendEmail } from '$lib/server/email';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import type { RequestHandler } from './$types';
 
-async function advanceSequences(ownerId: string) {
+async function advanceSequences(ownerId: string): Promise<number> {
 	const now = new Date().toISOString();
 	const { data: dueEnrollments } = await supabaseAdmin
 		.from('contact_sequences')
@@ -104,11 +104,44 @@ async function advanceSequences(ownerId: string) {
 		advanced++;
 	}
 
-	return json({ advanced });
+	return advanced;
 }
 
+// Cron entrypoint — schedule in vercel.json (e.g. every 15 min). Finds every owner
+// with a due, active enrollment and advances their sequences. Previously this was a
+// no-op stub, so no follow-up email in any sequence ever sent.
 export const GET: RequestHandler = async ({ request }) => {
-	const authHeader = request.headers.get('authorization');
 	const { env } = await import('$env/dynamic/private');
-	return json({ success: true });
+	const authHeader = request.headers.get('authorization');
+	if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const now = new Date().toISOString();
+	const { data: due } = await supabaseAdmin
+		.from('contact_sequences')
+		.select('user_id')
+		.eq('status', 'active')
+		.lte('next_step_at', now)
+		.limit(1000);
+
+	const ownerIds = [...new Set((due ?? []).map((d) => d.user_id))];
+	let advanced = 0;
+	for (const ownerId of ownerIds) {
+		try {
+			advanced += await advanceSequences(ownerId);
+		} catch (err) {
+			console.error('[sequences/advance] owner', ownerId, 'failed:', err);
+		}
+	}
+	return json({ success: true, owners: ownerIds.length, advanced });
+};
+
+// Manual trigger for the logged-in owner (advance my own due sequences now).
+export const POST: RequestHandler = async ({ request }) => {
+	const user = await requireAuth(request);
+	if (await rateLimitUser(user.id, { max: 6, windowMs: 60000 })) throw error(429, 'Rate limit exceeded — slow down');
+	const ownerId = await getEffectiveUserId(user.id);
+	const advanced = await advanceSequences(ownerId);
+	return json({ success: true, advanced });
 };

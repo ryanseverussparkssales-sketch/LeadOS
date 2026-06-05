@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 
 	interface Report {
@@ -23,7 +25,9 @@
 		if (res.ok) {
 			const d = await res.json();
 			shareUrl = window.location.origin + d.url;
-			navigator.clipboard.writeText(shareUrl).catch(() => {});
+			navigator.clipboard.writeText(shareUrl).then(() => toastSuccess('Share link copied')).catch(() => {});
+		} else {
+			toastError('Failed to create share link');
 		}
 		sharing = false;
 	}
@@ -77,6 +81,9 @@
 			selected = r;
 			showModal = null;
 			reportTitle = ''; reportContext = '';
+			toastSuccess('Report generated');
+		} else {
+			toastError('Failed to generate report');
 		}
 		generating = false;
 	}
@@ -99,20 +106,29 @@
 		if (res.ok) {
 			await load();
 			showModal = null;
+			toastSuccess('Invoice created');
+		} else {
+			toastError('Failed to create invoice');
 		}
 		generating = false;
 	}
 
 	async function deleteReport(id: string) {
 		if (!confirm('Delete this report?')) return;
-		await apiFetch(`/api/reports/${id}`, { method: 'DELETE' });
-		if (selected?.id === id) selected = null;
-		reports = reports.filter(r => r.id !== id);
+		const res = await apiFetch(`/api/reports/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			if (selected?.id === id) selected = null;
+			reports = reports.filter(r => r.id !== id);
+			toastSuccess('Report deleted');
+		} else {
+			toastError('Failed to delete report');
+		}
 	}
 
 	function printReport() {
 		if (!selected?.html_content) return;
-		const w = window.open('', '_blank')!;
+		const w = window.open('', '_blank');
+		if (!w) { toastError('Allow pop-ups to print'); return; }
 		w.document.write(selected.html_content);
 		w.document.close();
 		w.print();
@@ -123,7 +139,7 @@
 	}
 </script>
 
-<svelte:head><title>Reports — LeadOS</title></svelte:head>
+<svelte:head><title>Reports — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -208,7 +224,7 @@
 			onclick={(e) => e.stopPropagation()}>
 			<div class="p-5 border-b border-[#2a2a2a] flex justify-between">
 				<p class="text-white font-medium">Generate Action Report</p>
-				<button onclick={() => showModal = null} class="text-[#666] hover:text-white">✕</button>
+				<button onclick={() => showModal = null} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				<div>
@@ -250,7 +266,7 @@
 			onclick={(e) => e.stopPropagation()}>
 			<div class="p-5 border-b border-[#2a2a2a] flex justify-between">
 				<p class="text-white font-medium">Create Invoice</p>
-				<button onclick={() => showModal = null} class="text-[#666] hover:text-white">✕</button>
+				<button onclick={() => showModal = null} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				<div>

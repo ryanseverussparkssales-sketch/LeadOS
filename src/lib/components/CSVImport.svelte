@@ -123,7 +123,7 @@
 
 	{#if result}
 		<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-4 text-sm space-y-1">
-			<p class="text-green-400">✓ {result.created} contacts imported{callListId ? ' and added to list' : ''}</p>
+			<p class="text-[var(--accent)]">✓ {result.created} contacts imported{callListId ? ' and added to list' : ''}</p>
 			{#if result.duplicates > 0}<p class="text-[#666]">{result.duplicates} duplicates skipped</p>{/if}
 			{#if result.errors > 0}<p class="text-red-400">{result.errors} errors</p>{/if}
 		</div>

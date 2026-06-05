@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 
-	const STORAGE_KEY = 'leados_timer';
+	const STORAGE_KEY = 'rogueos_timer';
 
 	interface TimerState {
 		running: boolean;
@@ -125,7 +126,7 @@
 			{fmtElapsed(elapsed)}
 		</p>
 		{#if timerState.running}
-			<p class="text-xs text-green-400 mt-1 animate-pulse">● Running</p>
+			<p class="text-xs text-[var(--accent)] mt-1 animate-pulse">● Running</p>
 		{:else if elapsed > 0}
 			<p class="text-xs text-yellow-400 mt-1">◼ Paused</p>
 		{:else}
@@ -170,7 +171,7 @@
 	<!-- Controls -->
 	<div class="flex gap-2 mt-auto">
 		{#if saved}
-			<div class="flex-1 rounded-lg bg-green-700 py-2 text-center text-xs text-white">✓ Logged!</div>
+			<div class="flex-1 rounded-lg bg-[var(--accent)] py-2 text-center text-xs text-[var(--accent-ink)]">✓ Logged!</div>
 		{:else if !timerState.running && elapsed === 0}
 			<button onclick={start}
 				class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
@@ -182,7 +183,7 @@
 				Pause
 			</button>
 			<button onclick={stop} disabled={saving}
-				class="flex-1 rounded-lg bg-green-700 py-2 text-xs font-semibold text-white hover:bg-green-600 disabled:opacity-50 transition-colors">
+				class="flex-1 rounded-lg bg-[var(--accent)] py-2 text-xs font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-50 transition-colors">
 				{saving ? 'Saving...' : 'Stop & Log'}
 			</button>
 		{:else}
@@ -191,10 +192,10 @@
 				Resume
 			</button>
 			<button onclick={stop} disabled={saving}
-				class="flex-1 rounded-lg bg-green-700 py-2 text-xs font-semibold text-white hover:bg-green-600 disabled:opacity-50 transition-colors">
+				class="flex-1 rounded-lg bg-[var(--accent)] py-2 text-xs font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-50 transition-colors">
 				{saving ? 'Saving...' : 'Log & Reset'}
 			</button>
-			<button onclick={reset} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#555] hover:text-white transition-colors">✕</button>
+			<button onclick={reset} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#555] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
 		{/if}
 	</div>
 </div>

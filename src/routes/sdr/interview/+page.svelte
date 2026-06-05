@@ -99,7 +99,7 @@
 	}
 </script>
 
-<svelte:head><title>AI Interview — LeadOS SDR</title></svelte:head>
+<svelte:head><title>AI Interview — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 	<div class="mb-6">
@@ -116,7 +116,7 @@
 		<div class="rounded-xl border border-yellow-800/40 bg-yellow-950/10 p-6 text-center space-y-3">
 			<p class="text-3xl">🔒</p>
 			<p class="text-white font-semibold">AI Interview is a Pro feature</p>
-			<p class="text-xs text-[#666] leading-relaxed">Complete your AI interview to earn a score badge on your marketplace profile and unlock Live Roleplay certification. Available on Pro and Agency plans.</p>
+			<p class="text-xs text-[#666] leading-relaxed">Complete your AI interview to earn your score badge and unlock Live Roleplay certification. Available on Pro and Agency plans.</p>
 			<a href="/#pricing" target="_blank" class="inline-block rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Upgrade to Pro →</a>
 		</div>
 	{:else}
@@ -126,17 +126,17 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-6 flex items-center gap-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
 					<p class="text-xs text-[#555] uppercase tracking-widest mb-1">Interview Score</p>
-					<p class="text-3xl font-bold {overallScore && overallScore >= 85 ? 'text-green-400' : overallScore && overallScore >= 70 ? 'text-yellow-400' : 'text-white'}">{overallScore ?? '—'}</p>
+					<p class="text-3xl font-bold {overallScore && overallScore >= 85 ? 'text-[var(--accent)]' : overallScore && overallScore >= 70 ? 'text-yellow-400' : 'text-white'}">{overallScore ?? '—'}</p>
 				</div>
 				<div class="flex-1">
 					<div class="flex gap-1 mb-2">
 						{#each QUESTIONS as _, i}
-							<div class="flex-1 h-1.5 rounded-full {answers.find(a => a.question_index === i)?.score !== null ? 'bg-green-500' : 'bg-[#2a2a2a]'}"></div>
+							<div class="flex-1 h-1.5 rounded-full {answers.find(a => a.question_index === i)?.score !== null ? 'bg-[var(--accent)]' : 'bg-[#2a2a2a]'}"></div>
 						{/each}
 					</div>
 					<p class="text-xs text-[#555]">{completedCount}/{QUESTIONS.length} questions answered</p>
 					{#if completedCount === QUESTIONS.length && overallScore && overallScore >= 70}
-						<p class="text-xs text-green-400 mt-1">🎯 Live Roleplay unlocked!</p>
+						<p class="text-xs text-[var(--accent)] mt-1">🎯 Live Roleplay unlocked!</p>
 					{/if}
 				</div>
 			</div>
@@ -147,7 +147,7 @@
 			{#each QUESTIONS as _, i}
 				{@const done = answers.find(a => a.question_index === i)?.score !== null}
 				<button onclick={() => { activeQ = i; audioUrl = null; transcript = ''; }}
-					class="flex-1 py-2 rounded-lg text-xs font-medium transition-colors {activeQ === i ? 'bg-white text-black' : done ? 'bg-green-900/30 text-green-400 border border-green-800/40' : 'bg-[#111] text-[#555] border border-[#2a2a2a] hover:border-white hover:text-white'}">
+					class="flex-1 py-2 rounded-lg text-xs font-medium transition-colors {activeQ === i ? 'bg-white text-black' : done ? 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40' : 'bg-[#111] text-[#555] border border-[#2a2a2a] hover:border-white hover:text-white'}">
 					{done ? '✓' : i + 1}
 				</button>
 			{/each}
@@ -159,9 +159,9 @@
 
 			<!-- Previous score if answered -->
 			{#if currentAnswer?.score !== null && currentAnswer?.score !== undefined}
-				<div class="rounded-lg border border-green-800/30 bg-green-950/10 p-3">
+				<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3">
 					<div class="flex items-center gap-2 mb-1">
-						<p class="text-lg font-bold text-green-400">{currentAnswer.score}/100</p>
+						<p class="text-lg font-bold text-[var(--accent)]">{currentAnswer.score}/100</p>
 						<p class="text-xs text-[#555]">Claude's score</p>
 					</div>
 					{#if currentAnswer.feedback}<p class="text-xs text-[#888]">{currentAnswer.feedback}</p>{/if}
@@ -194,6 +194,18 @@
 						</button>
 					</div>
 				{/if}
+			</div>
+
+			<!-- Typed answer + submit -->
+			<div class="space-y-3 pt-3 border-t border-[#1e1e1e]">
+				<p class="text-xs text-[#555] uppercase tracking-widest">Your answer</p>
+				<textarea bind:value={transcript} rows="5" placeholder="Type your answer here (or transcribe what you recorded)…"
+					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+				<button onclick={submitAnswer} disabled={submitting || !transcript.trim()}
+					class="w-full rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-white/90 disabled:opacity-40 transition-colors">
+					{submitting ? 'Scoring…' : (currentAnswer?.score != null ? 'Resubmit answer' : 'Submit answer')}
+				</button>
+				<p class="text-[10px] text-[#444]">Claude scores your typed answer; the recording is for your own review.</p>
 			</div>
 		</div>
 {/if}

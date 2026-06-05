@@ -82,7 +82,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			name, project_id, campaign_type, description, goal, target_contacts, status,
 			win_outcome, win_label, target_wins, daily_call_goal, custom_outcomes, win_conditions,
 			email_sequence_id, from_email_account_id, from_phone_number_id,
-		} = body_raw as Record<string, unknown>;
+		} = body;
 
 		if (!name || !project_id) throw error(400, 'name and project_id required');
 

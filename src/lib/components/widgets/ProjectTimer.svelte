@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import Icon from '$lib/components/Icon.svelte';
   import { apiFetch } from '$lib/api';
 
   interface ProjectTimerSettings {
@@ -18,8 +19,8 @@
     created_at: string;
   }
 
-  const STORAGE_KEY = 'leados_project_timer_settings';
-  const STATE_KEY   = 'leados_project_timer_state';
+  const STORAGE_KEY = 'rogueos_project_timer_settings';
+  const STATE_KEY   = 'rogueos_project_timer_state';
 
   const DEFAULTS: ProjectTimerSettings = {
     defaultProjectId: '',
@@ -406,7 +407,7 @@
     <div class="settings-drawer">
       <div class="drawer-header">
         <span class="drawer-title">TIMER SETTINGS</span>
-        <button class="close-btn" onclick={cancelSettings}>✕</button>
+        <button class="close-btn" onclick={cancelSettings}><Icon name="x" size={14} /></button>
       </div>
 
       <div class="setting-group">

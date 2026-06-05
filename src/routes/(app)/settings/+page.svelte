@@ -188,7 +188,7 @@
 	// ── Tier / Plan ────────────────────────────────────────────
 	let currentTier = $state<'free'|'pro'|'agency'>('free');
 	const TIER_LABELS: Record<string, string> = { free: 'Free', pro: 'Pro — $39/mo', agency: 'Agency — $99/mo' };
-	const TIER_COLORS: Record<string, string> = { free: 'text-[#666]', pro: 'text-yellow-400', agency: 'text-purple-400' };
+	const TIER_COLORS: Record<string, string> = { free: 'text-[#666]', pro: 'text-yellow-400', agency: 'text-[var(--accent)]' };
 
 	// ── Password change ───────────────────────────────────────
 	let newPassword = $state(''); let confirmPassword = $state(''); let passwordMsg = $state(''); let changingPw = $state(false);
@@ -237,8 +237,11 @@
 			notif_sounds: notifSounds,
 			sidebar_hidden_items: [...hiddenItems],
 		};
-		const res = await apiFetch('/api/settings', { method:'PUT', body: JSON.stringify(body) });
-		if (res.ok) { savedSection = section; setTimeout(() => savedSection = '', 2000); }
+		try {
+			const res = await apiFetch('/api/settings', { method:'PUT', body: JSON.stringify(body) });
+			if (res.ok) { savedSection = section; setTimeout(() => savedSection = '', 2000); }
+			else toastError('Could not save settings — please try again');
+		} catch { toastError('Could not save settings — check your connection'); }
 		saving = false;
 	}
 
@@ -296,17 +299,19 @@
 
 	const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 	const SECTIONS = [
-		{ group:'Account', items:[['profile','👤 Profile'],['agency','🏢 Agency / Brand'],['appearance','🎨 Appearance']] },
-		{ group:'Calling', items:[['calling','📞 Calling Rules'],['communication','✉ Communication'],['voice','🎙 Voice & Device']] },
-		{ group:'Defaults', items:[['contacts','👥 Contact Settings'],['productivity','⚡ Productivity'],['widgets','🧩 Widget Settings']] },
-		{ group:'Integrations', items:[['connections','🔌 Connections'],['integrations','🔗 Integrations'],['email-accounts','✉ Email Accounts'],['api-keys','🔑 API Key Vault'],['passwords','🔒 Password Vault']] },
-		{ group:'Notifications', items:[['notifications','🔔 Notifications']] },
-		{ group:'Tokens & Webhooks', items:[['tokens','🪙 API Tokens'],['webhooks','⚡ Webhooks']] },
-		{ group:'Security & Data', items:[['security','🛡 Security'],['data','📦 Data & Privacy']] },
+		{ group:'Account', items:[['profile','Profile'],['agency','Agency / Brand'],['appearance','Appearance']] },
+		{ group:'Calling', items:[['calling','Calling Rules'],['communication','Communication'],['voice','Voice & Device']] },
+		{ group:'Defaults', items:[['contacts','Contact Settings'],['productivity','Productivity'],['widgets','Widget Settings']] },
+		{ group:'Integrations', items:[['connections','Connections'],['integrations','Integrations'],['email-accounts','Email Accounts'],['api-keys','API Key Vault'],['passwords','Password Vault']] },
+		{ group:'Notifications', items:[['notifications','Notifications']] },
+		{ group:'Tokens & Webhooks', items:[['tokens','API Tokens'],['webhooks','Webhooks']] },
+		{ group:'Security & Data', items:[['security','Security'],['data','Data & Privacy']] },
 	];
+	// Sections whose fields persist via saveSettings() (the rest have their own save actions).
+	const SETTINGS_BACKED = new Set(['profile','agency','appearance','calling','communication','voice','contacts','productivity','widgets','notifications','data']);
 </script>
 
-<svelte:head><title>Settings — LeadOS</title></svelte:head>
+<svelte:head><title>Settings — RogueOS</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 	<!-- Left sidebar nav -->
@@ -348,7 +353,7 @@
 					<div><label class="text-xs text-[#555] block mb-1">New Password</label><input type="password" bind:value={newPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 					<div><label class="text-xs text-[#555] block mb-1">Confirm</label><input type="password" bind:value={confirmPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 				</div>
-				{#if passwordMsg}<p class="text-xs {passwordMsg.startsWith('✓') ? 'text-green-400' : 'text-red-400'}">{passwordMsg}</p>{/if}
+				{#if passwordMsg}<p class="text-xs {passwordMsg.startsWith('✓') ? 'text-[var(--accent)]' : 'text-red-400'}">{passwordMsg}</p>{/if}
 				<button onclick={changePassword} disabled={changingPw || !newPassword} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{changingPw ? 'Updating...' : 'Update Password'}</button>
 			</div>
 
@@ -375,7 +380,7 @@
 						{currentTier === 'free' ? 'Upgrade to Pro →' : 'Upgrade to Agency →'}
 					</a>
 				{:else}
-					<span class="text-xs text-purple-400 border border-purple-800/40 px-3 py-1.5 rounded-lg">✓ Max plan</span>
+					<span class="text-xs text-[var(--accent)] border border-[var(--accent)]/40 px-3 py-1.5 rounded-lg">✓ Max plan</span>
 				{/if}
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
@@ -570,7 +575,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Dashboard Layout</p>
 				<p class="text-xs text-[#555] mb-4">Your dashboard widgets are configured per-session. To reset to defaults, clear your browser's localStorage.</p>
-				<button onclick={() => { localStorage.removeItem('leados_dashboard_layout'); window.location.reload(); }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">Reset Dashboard to Default</button>
+				<button onclick={() => { localStorage.removeItem('rogueos_dashboard_layout'); window.location.reload(); }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">Reset Dashboard to Default</button>
 			</div>
 
 		<!-- ── CONNECTIONS ────────────────────────────────── -->
@@ -589,7 +594,7 @@
 							<p class="text-xs text-[#555]">{conn.desc}</p>
 						</div>
 						<div class="text-right">
-							<span class="text-xs text-green-400 bg-green-950/30 px-2 py-0.5 rounded-full">✓ {conn.status}</span>
+							<span class="text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded-full">✓ {conn.status}</span>
 						</div>
 					</div>
 				{/each}
@@ -709,7 +714,7 @@
 										<p class="text-sm text-white truncate">{acc.label}</p>
 										<p class="text-xs text-[#555] truncate">
 											{acc.email_address}
-											{#if acc.provider === 'gmail'}<span class="text-green-600"> · OAuth</span>{/if}
+											{#if acc.provider === 'gmail'}<span class="text-[var(--accent)]"> · OAuth</span>{/if}
 											{#if acc.client?.name} · {acc.client.name}{/if}
 											{#if acc.is_default} · Default{/if}
 											{#if acc.last_synced_at}<span class="text-[#444]"> · synced {new Date(acc.last_synced_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>{/if}
@@ -725,7 +730,7 @@
 										</button>
 									{/if}
 									{#if testResults[acc.id]}
-										<span class="text-[10px] {testResults[acc.id].success ? 'text-green-400' : 'text-red-400'}">
+										<span class="text-[10px] {testResults[acc.id].success ? 'text-[var(--accent)]' : 'text-red-400'}">
 											{testResults[acc.id].success ? '✓ Connected' : '✗ ' + testResults[acc.id].error}
 										</span>
 									{/if}
@@ -807,14 +812,14 @@
 		<!-- ── TOKENS ──────────────────────────────────────── -->
 		{:else if section === 'tokens'}
 			<h2 class="text-white text-sm font-medium mb-6">API Tokens</h2>
-			<p class="text-xs text-[#555]">Tokens let external tools access LeadOS via API.</p>
+			<p class="text-xs text-[#555]">Tokens let external tools access RogueOS via API.</p>
 			<div class="flex gap-3">
 				<input bind:value={newTokenName} placeholder="Token name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<button onclick={createToken} disabled={creatingToken || !newTokenName.trim()} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Create</button>
 			</div>
 			{#if createdToken}
-				<div class="rounded-lg border border-green-800 bg-green-950/20 p-3 space-y-1">
-					<p class="text-xs text-green-400 font-medium">Copy now — won't be shown again</p>
+				<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 space-y-1">
+					<p class="text-xs text-[var(--accent)] font-medium">Copy now — won't be shown again</p>
 					<div class="flex gap-2"><code class="flex-1 text-xs text-white break-all" style="font-family:var(--font-mono)">{createdToken}</code><button onclick={() => navigator.clipboard.writeText(createdToken)} class="text-xs text-[#444] hover:text-white shrink-0">Copy</button></div>
 				</div>
 			{/if}
@@ -830,7 +835,7 @@
 			<h2 class="text-white text-sm font-medium mb-6">Outbound Webhooks</h2>
 			{#each oWebhooks as wh}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 flex items-start gap-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-					<button onclick={() => toggleWebhook(wh.id, !wh.enabled)} class="w-10 h-6 rounded-full shrink-0 mt-0.5 transition-colors {wh.enabled ? 'bg-green-600' : 'bg-[#2a2a2a]'} relative">
+					<button onclick={() => toggleWebhook(wh.id, !wh.enabled)} class="w-10 h-6 rounded-full shrink-0 mt-0.5 transition-colors {wh.enabled ? 'bg-[var(--accent)]' : 'bg-[#2a2a2a]'} relative">
 						<span class="absolute top-1 w-4 h-4 rounded-full bg-white transition-all {wh.enabled ? 'left-5' : 'left-1'}"></span>
 					</button>
 					<div class="flex-1 min-w-0">
@@ -862,8 +867,8 @@
 						{dncLoading ? 'Processing…' : 'Mark as Do Not Call'}
 					</button>
 				{:else}
-					<div class="rounded-lg border border-green-800/30 bg-green-950/10 p-3">
-						<p class="text-xs text-green-400">✓ {dncResult.updated} contacts marked Do Not Call · {dncResult.notFound} not found</p>
+					<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3">
+						<p class="text-xs text-[var(--accent)]">✓ {dncResult.updated} contacts marked Do Not Call · {dncResult.notFound} not found</p>
 					</div>
 					<button onclick={() => { dncResult = null; dncInput = ''; }} class="text-xs text-[#444] hover:text-white transition-colors">Upload another batch</button>
 				{/if}
@@ -913,5 +918,15 @@
 		<!-- ── VOICE & DEVICE ───────── -->
 		{/if}
 		</div>
+
+		{#if SETTINGS_BACKED.has(section)}
+			<div class="sticky bottom-0 -mx-8 -mb-8 mt-8 px-8 py-4 border-t border-[#1e1e1e] bg-[#0a0a0a]/95 backdrop-blur flex items-center justify-end gap-3">
+				{#if savedSection}<span class="text-xs text-[var(--accent)]">✓ Saved</span>{/if}
+				<button onclick={saveSettings} disabled={saving}
+					class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black hover:bg-white/90 disabled:opacity-50 transition-colors">
+					{saving ? 'Saving…' : 'Save Changes'}
+				</button>
+			</div>
+		{/if}
 	</div>
 </div>

@@ -5,6 +5,14 @@ import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 export const GET = async ({ request, params }: { request: Request; params: { id: string } }) => {
 	const user = await requireAuth(request);
 
+	// The team member must belong to the caller — otherwise this leaks which clients
+	// any team member (in any tenant) is assigned to. Mirrors the POST/DELETE guard.
+	const { data: tm } = await supabaseAdmin
+		.from('team_members').select('owner_user_id').eq('id', params.id).maybeSingle();
+	if (!tm || tm.owner_user_id !== user.id) {
+		return json({ error: 'Forbidden' }, { status: 403 });
+	}
+
 	const { data } = await supabaseAdmin
 		.from('team_member_clients')
 		.select('id, client_id, access_level, granted_at, clients(id, name)')

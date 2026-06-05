@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import Icon from '$lib/components/Icon.svelte';
   import { apiFetch } from '$lib/api';
 
   interface CallbackSettings {
@@ -19,7 +20,7 @@
     contact: { id: string; name: string; company: string | null; phone: string | null } | null;
   }
 
-  const STORAGE_KEY = 'leados_callbacks_settings';
+  const STORAGE_KEY = 'rogueos_callbacks_settings';
 
   const DEFAULTS: CallbackSettings = {
     warningMinutes: 30,
@@ -225,7 +226,7 @@
     <div class="settings-drawer">
       <div class="drawer-header">
         <span class="drawer-title">CALLBACK SETTINGS</span>
-        <button class="close-btn" onclick={cancelSettings}>✕</button>
+        <button class="close-btn" onclick={cancelSettings}><Icon name="x" size={14} /></button>
       </div>
 
       <div class="setting-group">

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import FilterSidebar from '$lib/components/FilterSidebar.svelte';
 	import ContactRow from '$lib/components/ContactRow.svelte';
 	import CSVImport from '$lib/components/CSVImportAdvanced.svelte';
@@ -128,6 +129,7 @@
 
 	async function sendBulkSms() {
 		if (!bulkSmsBody.trim()) return;
+		if (!window.confirm(`Send this SMS to ${selectedIds.size} contact${selectedIds.size !== 1 ? 's' : ''}? This sends real text messages.`)) return;
 		sendingBulkSms = true; bulkSmsResult = '';
 		let sent = 0, failed = 0;
 		const ids = [...selectedIds];
@@ -177,6 +179,8 @@
 			const d = await res.json();
 			bulkActivityDone = `✓ Logged activity for ${d.created} contact${d.created !== 1 ? 's' : ''}`;
 			setTimeout(() => { showBulkActivity = false; bulkActivityDone = ''; bulkActivityTitle = ''; bulkActivityDesc = ''; }, 2000);
+		} else {
+			toastError('Failed to log activity');
 		}
 		bulkActivitySaving = false;
 	}
@@ -266,7 +270,7 @@
 	}
 </script>
 
-<svelte:head><title>Contacts — LeadOS</title></svelte:head>
+<svelte:head><title>Contacts — RogueOS</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.export-container')) showExport = false; }} />
 
 <div class="flex flex-col flex-1 h-full">
@@ -424,12 +428,12 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-6 w-full max-w-md" onclick={(e) => e.stopPropagation()}>
 				<div class="flex items-center justify-between mb-4">
 					<h3 class="text-white font-medium">Send SMS to {selectedIds.size} Contact{selectedIds.size !== 1 ? 's' : ''}</h3>
-					<button onclick={() => showBulkSms = false} class="text-[#555] hover:text-white text-sm">✕</button>
+					<button onclick={() => showBulkSms = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 				<textarea bind:value={bulkSmsBody} placeholder="Message..." rows="4"
 					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none mb-3"></textarea>
 				<p class="text-xs text-[#444] mb-3">Contacts without a phone number will be skipped.</p>
-				{#if bulkSmsResult}<p class="text-xs text-green-400 mb-2">{bulkSmsResult}</p>{/if}
+				{#if bulkSmsResult}<p class="text-xs text-[var(--accent)] mb-2">{bulkSmsResult}</p>{/if}
 				<div class="flex gap-2">
 					<button onclick={() => showBulkSms = false} class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#777] hover:border-white hover:text-white transition-colors">Cancel</button>
 					<button onclick={sendBulkSms} disabled={sendingBulkSms || !bulkSmsBody.trim()}
@@ -449,7 +453,7 @@
 				onclick={(e) => e.stopPropagation()}>
 				<div class="flex items-center justify-between mb-4">
 					<h3 class="text-white font-medium text-sm">Log Activity for {selectedIds.size} Contact{selectedIds.size !== 1 ? 's' : ''}</h3>
-					<button onclick={() => showBulkActivity = false} class="text-[#555] hover:text-white text-sm">✕</button>
+					<button onclick={() => showBulkActivity = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 
 				<div class="flex flex-wrap gap-1.5 mb-4">
@@ -471,7 +475,7 @@
 				</div>
 
 				{#if bulkActivityDone}
-					<p class="text-xs text-green-400 mt-3">{bulkActivityDone}</p>
+					<p class="text-xs text-[var(--accent)] mt-3">{bulkActivityDone}</p>
 				{/if}
 
 				<div class="flex gap-2 mt-5">
@@ -497,7 +501,7 @@
 			<p class="text-xs text-[#555]">Create follow-up tasks for {selectedIds.size} selected contact{selectedIds.size === 1 ? '' : 's'}.</p>
 			<div class="flex gap-2 mt-4">
 				<button onclick={() => showBulkTask = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
-				<button onclick={createBulkTasks} class="px-4 py-2 bg-white text-black rounded text-xs font-semibold hover:bg-[#e5e5e5] transition-colors">Create Tasks</button>
+				<button onclick={createBulkTasks} disabled={bulkTaskSaving} class="px-4 py-2 bg-white text-black rounded text-xs font-semibold hover:bg-[#e5e5e5] disabled:opacity-50 transition-colors">{bulkTaskSaving ? 'Creating…' : 'Create Tasks'}</button>
 			</div>
 		</div>
 	</div>

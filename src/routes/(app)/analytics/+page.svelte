@@ -100,7 +100,7 @@
 	}
 </script>
 
-<svelte:head><title>Analytics — LeadOS</title></svelte:head>
+<svelte:head><title>Analytics — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4 flex-wrap">
@@ -189,12 +189,12 @@
 					</div>
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
 						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Win Rate</p>
-						<p class="text-2xl font-bold font-mono {pipelineData.winRate >= 50 ? 'text-green-400' : 'text-white'}">{pipelineData.winRate}%</p>
+						<p class="text-2xl font-bold font-mono {pipelineData.winRate >= 50 ? 'text-[var(--accent)]' : 'text-white'}">{pipelineData.winRate}%</p>
 						<p class="text-[10px] text-[#444] mt-0.5">closed deals</p>
 					</div>
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
 						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Won Value</p>
-						<p class="text-2xl text-green-400 font-bold font-mono">${(pipelineData.wonValue / 1000).toFixed(0)}k</p>
+						<p class="text-2xl text-[var(--accent)] font-bold font-mono">${(pipelineData.wonValue / 1000).toFixed(0)}k</p>
 						<p class="text-[10px] text-[#444] mt-0.5">this period</p>
 					</div>
 				</div>
@@ -234,10 +234,31 @@
 						] as row}
 							<div class="flex items-center justify-between">
 								<p class="text-sm text-white">{row.label}</p>
-								<p class="text-sm" style="font-familyvar(--font-mono);color:#ccc">{typeof row.cost === 'number' ? `$${row.cost.toFixed(4)}` : '—'}</p>
+								<p class="text-sm" style="font-family:var(--font-mono);color:#ccc">{typeof row.cost === 'number' ? `$${row.cost.toFixed(4)}` : '—'}</p>
 						</div>
 					{/each}
 				</div>
+			</div>
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
+				<p class="text-xs text-[#999] uppercase tracking-widest mb-4">Call Outcomes</p>
+				{#if !data.outcomes || Object.keys(data.outcomes).length === 0}
+					<p class="text-sm text-[#555] py-4">No calls in this period yet.</p>
+				{:else}
+					{@const totalOutcomes = Object.values(data.outcomes).reduce((a, b) => a + b, 0)}
+					<div class="space-y-2.5">
+						{#each Object.entries(data.outcomes).sort((a, b) => b[1] - a[1]) as [outcome, count]}
+							<div>
+								<div class="flex items-center justify-between mb-1">
+									<span class="text-sm text-white capitalize">{outcome.replace(/_/g, ' ')}</span>
+									<span class="text-xs text-[#777]">{count} ({totalOutcomes ? Math.round((count / totalOutcomes) * 100) : 0}%)</span>
+								</div>
+								<div class="h-1.5 rounded-full bg-[#1a1a1a] overflow-hidden">
+									<div class="h-full rounded-full" style="width:{totalOutcomes ? (count / totalOutcomes) * 100 : 0}%;background:{outcomeColors[outcome] ?? '#6b7280'}"></div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
 			</div>
 		</div>
 		</div>

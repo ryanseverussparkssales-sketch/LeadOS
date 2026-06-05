@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import Icon from '$lib/components/Icon.svelte';
 
   interface SprintSettings {
     durationMinutes: number;
@@ -10,7 +11,7 @@
     autoReset: boolean;
   }
 
-  const STORAGE_KEY = 'leados_sprint_settings';
+  const STORAGE_KEY = 'rogueos_sprint_settings';
 
   const DEFAULTS: SprintSettings = {
     durationMinutes: 10,
@@ -256,7 +257,7 @@
     <div class="settings-drawer">
       <div class="drawer-header">
         <span class="drawer-title">SPRINT SETTINGS</span>
-        <button class="close-btn" onclick={cancelSettings}>✕</button>
+        <button class="close-btn" onclick={cancelSettings}><Icon name="x" size={14} /></button>
       </div>
 
       <div class="setting-group">

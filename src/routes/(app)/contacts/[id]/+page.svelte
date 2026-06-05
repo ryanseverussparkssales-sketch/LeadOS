@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
 	import TemplatePicker from '$lib/components/TemplatePicker.svelte';
@@ -206,9 +207,9 @@
 	let newTagColor = $state('#6366f1');
 
 	const TYPE_LABELS: Record<string, string> = { lead:'Lead', prospect:'Prospect', customer:'Customer', partner:'Partner', vendor:'Vendor', creator:'Creator', other:'Other' };
-	const TYPE_COLORS: Record<string, string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-green-400', partner:'text-purple-400', vendor:'text-[#888]', creator:'text-pink-400', other:'text-[#555]' };
+	const TYPE_COLORS: Record<string, string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-[var(--accent)]', partner:'text-[var(--accent)]', vendor:'text-[#888]', creator:'text-pink-400', other:'text-[#555]' };
 	const SOURCE_LABELS: Record<string, string> = { cold_call:'Cold Call', csv_import:'CSV Import', web_scrape:'Web Scrape', referral:'Referral', manual:'Manual Entry', linkedin:'LinkedIn', website:'Website', trade_show:'Trade Show', other:'Other' };
-	const OUTCOME_COLORS: Record<string, string> = { answered:'text-green-400', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#555]', do_not_call:'text-red-400', no_answer:'text-[#444]' };
+	const OUTCOME_COLORS: Record<string, string> = { answered:'text-[var(--accent)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#555]', do_not_call:'text-red-400', no_answer:'text-[#444]' };
 
 	onMount(async () => {
 		const id = $page.params.id;
@@ -437,7 +438,7 @@
 	}
 </script>
 
-<svelte:head><title>{contact?.name ?? 'Contact'} — LeadOS</title></svelte:head>
+<svelte:head><title>{contact?.name ?? 'Contact'} — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	{#if loading}
@@ -459,7 +460,7 @@
 						{TYPE_LABELS[contact.contact_type] ?? contact.contact_type}
 					</span>
 					{#if contact.is_business}
-						<span class="px-2 py-1 rounded-full text-xs bg-purple-900/30 text-purple-400">B2B</span>
+						<span class="px-2 py-1 rounded-full text-xs bg-[var(--accent)]/12 text-[var(--accent)]">B2B</span>
 					{/if}
 					{#if contact.lead_source}
 						<span class="px-2 py-1 rounded-full text-xs bg-[#1a1a1a] text-[#666]">{SOURCE_LABELS[contact.lead_source] ?? contact.lead_source}</span>
@@ -491,14 +492,14 @@
 
 				<!-- Enrichment panel -->
 				{#if showEnrichment}
-					<div class="rounded-xl border border-purple-800/30 bg-purple-950/10 p-4">
+					<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4">
 						<div class="flex items-center justify-between mb-3">
-							<p class="text-sm text-purple-300 font-medium">✨ AI Enrichment</p>
-							<button onclick={() => showEnrichment = false} class="text-xs text-[#444] hover:text-white">✕</button>
+							<p class="text-sm text-[var(--accent)] font-medium">✨ AI Enrichment</p>
+							<button onclick={() => showEnrichment = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
 						</div>
 						{#if enriching}
 							<div class="flex items-center gap-2 text-xs text-[#555]">
-								<div class="w-3 h-3 rounded-full bg-purple-400 animate-bounce"></div>
+								<div class="w-3 h-3 rounded-full bg-[var(--accent)] animate-bounce"></div>
 								Enriching contact data...
 							</div>
 						{:else if enrichment}
@@ -510,7 +511,7 @@
 									<div><p class="text-[#555] uppercase tracking-widest mb-1">Best Approach</p><p class="text-[#ccc]">{enrichment.outreachAngle}</p></div>
 								{/if}
 								{#if enrichment.personalizedMessage}
-									<div><p class="text-[#555] uppercase tracking-widest mb-1">Opening Line</p><p class="text-purple-300 italic">"{enrichment.personalizedMessage}"</p></div>
+									<div><p class="text-[#555] uppercase tracking-widest mb-1">Opening Line</p><p class="text-[var(--accent)] italic">"{enrichment.personalizedMessage}"</p></div>
 								{/if}
 								{#if enrichment.talkingPoints?.length}
 									<div>
@@ -522,7 +523,7 @@
 										</ul>
 									</div>
 								{/if}
-								<button onclick={enrichContact} class="text-xs text-purple-400 underline">Regenerate</button>
+								<button onclick={enrichContact} class="text-xs text-[var(--accent)] underline">Regenerate</button>
 							</div>
 						{:else}
 							<p class="text-xs text-red-400">Enrichment failed — make sure ANTHROPIC_API_KEY is set</p>
@@ -535,7 +536,7 @@
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 						<div class="flex items-center justify-between">
 							<p class="text-sm text-white font-medium">New Deal</p>
-							<button onclick={() => showNewDeal = false} class="text-xs text-[#444] hover:text-white">✕</button>
+							<button onclick={() => showNewDeal = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
 						</div>
 						<input bind:value={dealForm.name} placeholder="Deal name *" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						<div class="grid grid-cols-2 gap-2">
@@ -644,7 +645,7 @@
 							<p class="text-xs text-[#555] mb-1">Score</p>
 							<div class="flex items-center gap-2 mt-1">
 								<div class="flex-1 bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
-									<div class="h-full rounded-full transition-all duration-500 {(contact.contact_score ?? 0) > 70 ? 'bg-green-500' : (contact.contact_score ?? 0) > 40 ? 'bg-yellow-500' : 'bg-[#333]'}" style="width:{Math.min(contact.contact_score ?? 0, 100)}%"></div>
+									<div class="h-full rounded-full transition-all duration-500 {(contact.contact_score ?? 0) > 70 ? 'bg-[var(--accent)]' : (contact.contact_score ?? 0) > 40 ? 'bg-yellow-500' : 'bg-[#333]'}" style="width:{Math.min(contact.contact_score ?? 0, 100)}%"></div>
 								</div>
 								<span class="text-xs text-[#555] w-8 text-right">{contact.contact_score ?? '—'}</span>
 								<button onclick={rescore} disabled={rescoring} class="text-xs text-[#444] hover:text-white transition-colors" title="Re-score contact">{rescoring ? '...' : '↺'}</button>
@@ -661,7 +662,7 @@
 							<span class="flex items-center gap-1 px-2 py-0.5 rounded text-xs"
 								style="background-color:{tag.color}20;color:{tag.color};border:1px solid {tag.color}40">
 								{tag.name}
-								<button onclick={() => removeTag(tag.id)} class="hover:opacity-60">✕</button>
+								<button onclick={() => removeTag(tag.id)} class="hover:opacity-60"><Icon name="x" size={14} /></button>
 							</span>
 						{/each}
 					</div>
@@ -841,6 +842,70 @@
 						</button>
 					</div>
 					<TemplatePicker type="sms" onSelect={applyTemplate} contactName={contact?.name ?? ''} />
+				</div>
+			</div>
+			{:else if rightTab === 'calls'}
+			<div class="p-4 space-y-3">
+				{#if calls.length === 0}
+					<p class="text-[#444] text-sm text-center py-8">No calls logged yet</p>
+				{:else}
+					{#each calls as call}
+						<div class="rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] p-3 space-y-1.5">
+							<div class="flex items-center justify-between gap-2">
+								<p class="text-sm text-white capitalize">{(call.outcome ?? '').replace(/_/g,' ') || 'Call'}</p>
+								<span class="text-xs text-[#444] shrink-0">{new Date(call.created_at).toLocaleString()}</span>
+							</div>
+							{#if call.call_duration_seconds}
+								<p class="text-xs text-[#555]">Duration: {Math.floor(call.call_duration_seconds / 60)}m {call.call_duration_seconds % 60}s</p>
+							{/if}
+							{#if call.summary}<p class="text-xs text-[#888] whitespace-pre-wrap">{call.summary}</p>{/if}
+							{#if call.notes}<p class="text-xs text-[#666] whitespace-pre-wrap">{call.notes}</p>{/if}
+							{#if call.recording_url}
+								<audio controls preload="none" src={call.recording_url} class="w-full h-8 mt-1"></audio>
+							{/if}
+						</div>
+					{/each}
+				{/if}
+			</div>
+			{:else if rightTab === 'email'}
+			<div class="flex flex-col">
+				<div class="border-b border-[#1e1e1e] p-4 space-y-2">
+					{#if !contact?.email}
+						<p class="text-xs text-yellow-600/80">This contact has no email address — add one to send email.</p>
+					{/if}
+					<div class="flex gap-2">
+						<input bind:value={emailPrompt} placeholder="Optional: tell the AI what to write about…"
+							class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						<button onclick={generateEmail} disabled={generatingEmail || !contact}
+							class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-3 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors shrink-0">
+							{generatingEmail ? 'Writing…' : '✨ Draft with AI'}
+						</button>
+					</div>
+					<input bind:value={emailSubject} placeholder="Subject"
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					<textarea bind:value={emailBody} placeholder="Write your email…" rows="6"
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+					<button onclick={sendEmail} disabled={sendingEmail || !contact?.email || !emailSubject.trim() || !emailBody.trim()}
+						class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors">
+						{sendingEmail ? 'Sending…' : 'Send Email'}
+					</button>
+				</div>
+				<div class="flex-1 overflow-y-auto p-4 space-y-2">
+					{#if loadingEmails}
+						<p class="text-[#444] text-sm text-center py-8">Loading…</p>
+					{:else if emails.length === 0}
+						<p class="text-[#444] text-sm text-center py-8">No emails yet</p>
+					{:else}
+						{#each emails as email}
+							<div class="rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] p-3 space-y-1">
+								<div class="flex items-center justify-between gap-2">
+									<p class="text-sm text-white truncate">{email.subject ?? '(no subject)'}</p>
+									<span class="text-xs text-[#444] shrink-0">{email.created_at ? new Date(email.created_at).toLocaleDateString() : ''}</span>
+								</div>
+								<p class="text-xs text-[#555] capitalize">{email.direction ?? 'outbound'} · {email.status ?? 'sent'}</p>
+							</div>
+						{/each}
+					{/if}
 				</div>
 			</div>
 {/if}

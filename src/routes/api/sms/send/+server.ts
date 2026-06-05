@@ -1,13 +1,15 @@
 import { json, error } from '@sveltejs/kit';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
-import { env } from '$env/dynamic/private';
+import { getTwilioCreds, twilioBasicAuth } from '$lib/server/twilio';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
 	if (await rateLimitUser(user.id, { max: 30, windowMs: 60000 })) throw error(429, "Rate limit exceeded — slow down");
 	const ownerId = await getEffectiveUserId(user.id);
+	const creds = await getTwilioCreds(user.id);
+	if (!creds.hasRest) throw error(500, 'Twilio credentials not configured');
 	const { to, body, contactId, fromNumber } = await request.json();
 	if (!to || !body) throw error(400, 'to and body required');
 
@@ -26,17 +28,17 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 	}
 
-	const from = fromNumber ?? env.TWILIO_PHONE_NUMBER;
+	const from = fromNumber ?? creds.phoneNumber;
 	if (!from) throw error(500, 'No from number configured');
 
 	// Send via Twilio SMS REST API
 	const formData = new URLSearchParams({ To: to, From: from, Body: resolvedBody });
 	const res = await fetch(
-		`https://api.twilio.com/2010-04-01/Accounts/${env.TWILIO_ACCOUNT_SID}/Messages.json`,
+		`https://api.twilio.com/2010-04-01/Accounts/${creds.accountSid}/Messages.json`,
 		{
 			method: 'POST',
 			headers: {
-				Authorization: 'Basic ' + Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64'),
+				Authorization: twilioBasicAuth(creds),
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body: formData.toString(),

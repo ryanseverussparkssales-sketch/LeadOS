@@ -89,7 +89,7 @@ export const GET = async ({ request }: { request: Request }) => {
             if ((count ?? 0) > 0) {
                 // The scoring endpoint scores 500 at a time — kick it off via a self-call
                 // This runs in the background after the cron response is sent
-                fetch(`${env.PUBLIC_SITE_URL ?? 'https://leadosuite.vercel.app'}/api/contacts/score`, {
+                fetch(`${env.PUBLIC_SITE_URL ?? 'https://rogueos.vercel.app'}/api/contacts/score`, {
                     method: 'GET',
                     headers: { authorization: `Bearer ${env.CRON_SECRET}` }
                 }).catch(e => console.error('[cron] scoring trigger failed:', e));

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { apiFetch } from '$lib/api';
+    import { toastSuccess, toastError } from '$lib/stores/toast';
 
     type Company = { id: string; name: string; phone: string|null; city: string|null; company_type: string; };
     let groups = $state<Company[][]>([]);
@@ -14,15 +15,17 @@
     });
 
     async function merge(group: Company[], keepId: string) {
+        if (!confirm('Merge these duplicates into the selected company? This cannot be undone.')) return;
         merging = keepId;
         const mergeIds = group.filter(c => c.id !== keepId).map(c => c.id);
         const r = await apiFetch('/api/companies/merge', { method: 'POST', body: JSON.stringify({ keepId, mergeIds }) });
-        if (r.ok) groups = groups.filter(g => !g.some(c => c.id === keepId));
+        if (r.ok) { groups = groups.filter(g => !g.some(c => c.id === keepId)); toastSuccess('Companies merged'); }
+        else { toastError('Failed to merge companies'); }
         merging = null;
     }
 </script>
 
-<svelte:head><title>Company Dedup — LeadOS</title></svelte:head>
+<svelte:head><title>Company Dedup — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
     <div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -37,7 +40,7 @@
             <p class="text-xs text-[#444]">Scanning for duplicates...</p>
         {:else if groups.length === 0}
             <div class="text-center py-12">
-                <p class="text-green-400 text-sm">✓ No duplicate companies found</p>
+                <p class="text-[var(--accent)] text-sm">✓ No duplicate companies found</p>
             </div>
         {:else}
             <p class="text-xs text-[#555]">{groups.length} potential duplicate group{groups.length !== 1 ? 's' : ''} found</p>

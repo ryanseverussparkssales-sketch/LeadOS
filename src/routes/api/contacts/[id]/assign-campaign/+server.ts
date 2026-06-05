@@ -1,21 +1,36 @@
 import { json } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, params }) => {
     const user = await requireAuth(request);
+    const ownerId = await getEffectiveUserId(user.id);
     const { campaign_id } = await request.json();
 
     if (!campaign_id) return json({ error: 'campaign_id required' }, { status: 400 });
 
-    // Get campaign + verify it belongs to this user's data
+    // Service role bypasses RLS — verify BOTH the contact and the campaign belong
+    // to the caller's org before linking them (prevents cross-tenant IDOR).
+    const { data: contact } = await supabaseAdmin
+        .from('contacts')
+        .select('id')
+        .eq('id', params.id)
+        .eq('user_id', ownerId)
+        .maybeSingle();
+
+    if (!contact) return json({ error: 'Contact not found' }, { status: 404 });
+
+    // Campaign ownership is resolved through project → client → user_id.
     const { data: campaign } = await supabaseAdmin
         .from('campaigns')
-        .select('id, project_id')
+        .select('id, project_id, project:projects(client:clients(user_id))')
         .eq('id', campaign_id)
         .single();
 
-    if (!campaign) return json({ error: 'Campaign not found' }, { status: 404 });
+    const campaignOwner = (campaign?.project as { client?: { user_id?: string } } | null)?.client?.user_id;
+    if (!campaign || campaignOwner !== ownerId) {
+        return json({ error: 'Campaign not found' }, { status: 404 });
+    }
 
     // Find or create a call list for this campaign
     let { data: callList } = await supabaseAdmin

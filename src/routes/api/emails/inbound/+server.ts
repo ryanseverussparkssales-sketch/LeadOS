@@ -214,8 +214,8 @@ export const POST = async ({ request }) => {
 			subject,
 			body: textBody,
 			html_body: htmlBody,
-			from_address: fromAddr ?? null,
-			to_address: toAddr ?? null,
+			from_address: fromAddress,
+			to_address: toAddresses[0] ?? null,
 			sent_at: new Date().toISOString(),
 			direction: 'inbound',
 		});

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Snippet { id:string; trigger:string; title:string; content:string; }
 	let snippets = $state<Snippet[]>([]);
@@ -18,17 +20,24 @@
 		if (!nTrigger.trim() || !nContent.trim()) return;
 		saving = true;
 		const res = await apiFetch('/api/snippets', { method:'POST', body: JSON.stringify({ trigger:nTrigger, title:nTitle||nTrigger, content:nContent }) });
-		if (res.ok) { snippets = [await res.json(), ...snippets]; nTrigger = ''; nTitle = ''; nContent = ''; }
+		if (res.ok) { snippets = [await res.json(), ...snippets]; nTrigger = ''; nTitle = ''; nContent = ''; toastSuccess('Snippet added'); }
+		else { toastError('Failed to add snippet — please try again'); }
 		saving = false;
 	}
 
 	async function del(id: string) {
-		await apiFetch(`/api/snippets/${id}`, { method:'DELETE' });
-		snippets = snippets.filter(s => s.id !== id);
+		if (!confirm('Delete this snippet?')) return;
+		const res = await apiFetch(`/api/snippets/${id}`, { method:'DELETE' });
+		if (res.ok) {
+			snippets = snippets.filter(s => s.id !== id);
+			toastSuccess('Snippet deleted');
+		} else {
+			toastError('Failed to delete snippet — please try again');
+		}
 	}
 </script>
 
-<svelte:head><title>Snippets — LeadOS</title></svelte:head>
+<svelte:head><title>Snippets — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -51,7 +60,7 @@
 			</div>
 			<div>
 				<label class="text-xs text-[#555] block mb-1">Content *</label>
-				<textarea bind:value={nContent} rows="4" placeholder="Hi, my name is Ryan from LeadOS. I'm reaching out because..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+				<textarea bind:value={nContent} rows="4" placeholder="Hi, my name is Ryan from RogueOS. I'm reaching out because..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 			</div>
 			<button onclick={addSnippet} disabled={saving || !nTrigger.trim() || !nContent.trim()} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? 'Saving...' : 'Add Snippet'}</button>
 		</div>
@@ -76,7 +85,7 @@
 							<p class="text-sm text-white font-medium">{snippet.title}</p>
 							<p class="text-xs text-[#666] mt-0.5 whitespace-pre-wrap">{snippet.content}</p>
 						</div>
-						<button onclick={() => del(snippet.id)} class="opacity-0 group-hover:opacity-100 text-xs text-red-700 hover:text-red-400 transition-all shrink-0">✕</button>
+						<button onclick={() => del(snippet.id)} class="opacity-0 group-hover:opacity-100 text-xs text-red-700 hover:text-red-400 transition-all shrink-0"><Icon name="x" size={14} /></button>
 					</div>
 				{/each}
 			</div>

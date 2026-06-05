@@ -1,17 +1,24 @@
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { assertTwilioSignature } from '$lib/server/twilioVerify';
 import type { RequestHandler } from './$types';
 
-// Twilio webhook — no auth header (Twilio signs requests differently)
-export const POST: RequestHandler = async ({ request }) => {
+// Twilio status/recording webhook. Twilio signs requests with X-Twilio-Signature;
+// we verify it before trusting any field — otherwise anyone could POST a CallSid
+// with an arbitrary RecordingUrl/duration and overwrite call records.
+export const POST: RequestHandler = async ({ request, url }) => {
 	const formData = await request.formData();
-	const callSid = formData.get('CallSid') as string;
-	const recordingUrl = formData.get('RecordingUrl') as string;
-	const duration = parseInt(formData.get('CallDuration') as string ?? '0');
+	const params: Record<string, string> = {};
+	for (const [k, v] of formData.entries()) params[k] = typeof v === 'string' ? v : '';
+
+	assertTwilioSignature(request, url, params);
+
+	const callSid = params.CallSid;
+	const recordingUrl = params.RecordingUrl;
+	const duration = parseInt(params.CallDuration ?? '0');
 
 	if (!callSid) return json({ success: false });
 
-	// Update call record
 	await supabaseAdmin
 		.from('calls')
 		.update({

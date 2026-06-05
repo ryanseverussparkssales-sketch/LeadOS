@@ -20,7 +20,6 @@ export const GET: RequestHandler = async ({ request }) => {
 		coaching: true,
 		interview: true,
 		profile: true,
-		marketplace: true,
 		bonus_visible: true,
 		performance: true,
 		dossier: true,

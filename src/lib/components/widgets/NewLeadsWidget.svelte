@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
+    import Icon from '$lib/components/Icon.svelte';
     import { apiFetch } from '$lib/api';
 
     interface Lead {
@@ -24,8 +25,8 @@
         facebook: 'text-blue-300 bg-blue-300/10',
         google: 'text-yellow-400 bg-yellow-400/10',
         linkedin: 'text-blue-500 bg-blue-500/10',
-        website: 'text-green-400 bg-green-400/10',
-        web_scrape: 'text-purple-400 bg-purple-400/10',
+        website: 'text-[var(--accent)] bg-[var(--accent)]/12',
+        web_scrape: 'text-[var(--accent)] bg-[var(--accent)]/12',
         csv_import: 'text-[#888] bg-[#1a1a1a]',
         manual: 'text-[#666] bg-[#1a1a1a]',
     };
@@ -129,7 +130,7 @@
                         {/if}
                         <button onclick={() => { assigningId = assigningId === lead.id ? null : lead.id; assignCampaignId = ''; }}
                             class="lw-btn lw-btn-campaign" title="Add to campaign">📣</button>
-                        <button onclick={() => dismiss(lead.id)} class="lw-btn lw-btn-dismiss" title="Dismiss">✕</button>
+                        <button onclick={() => dismiss(lead.id)} class="lw-btn lw-btn-dismiss" title="Dismiss"><Icon name="x" size={14} /></button>
                     </div>
                     {#if assigningId === lead.id}
                         <div class="lw-assign">

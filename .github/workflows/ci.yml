@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      # Unit tests are the hard gate — they must pass.
+      - run: npm test
+      # Type/Svelte check is informational for now (there is a pre-existing error
+      # backlog). Flip continue-on-error to false once `npm run check` is clean.
+      - run: npm run check
+        continue-on-error: true

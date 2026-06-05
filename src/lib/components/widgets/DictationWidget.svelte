@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
+    import Icon from '$lib/components/Icon.svelte';
     import { apiFetch } from '$lib/api';
 
     interface DictationEntry {
@@ -33,7 +34,7 @@
     let brainstorming = $state(false);
     let brainstormResult = $state<BrainstormResult | null>(null);
 
-    const STORAGE_KEY = 'leados_dictation_entries';
+    const STORAGE_KEY = 'rogueos_dictation_entries';
 
     onMount(() => {
         // Load saved entries
@@ -235,10 +236,10 @@
 
                 <!-- Brainstorm result -->
                 {#if brainstormResult}
-                    <div class="rounded-xl border border-[#1e2a1e] bg-green-950/10 p-3 flex-shrink-0">
+                    <div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 flex-shrink-0">
                         <div class="flex items-center gap-1.5 mb-2">
-                            <span class="text-green-400 text-xs">✦</span>
-                            <p class=" text-green-400 font-semibold " style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Brainstorm</p>
+                            <span class="text-[var(--accent)] text-xs">✦</span>
+                            <p class=" text-[var(--accent)] font-semibold " style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Brainstorm</p>
                         </div>
                         <p class="text-xs text-[#ccc] mb-2 leading-relaxed">{brainstormResult.summary}</p>
                         {#if brainstormResult.actionItems?.length}
@@ -260,7 +261,7 @@
                 {#if transcript.trim()}
                     <div class="flex gap-2 flex-shrink-0">
                         <button onclick={runBrainstorm} disabled={brainstorming}
-                            class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#666] hover:border-green-900 hover:text-green-400 disabled:opacity-40 transition-colors">
+                            class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#666] hover:border-[var(--accent)]/40 hover:text-[var(--accent)] disabled:opacity-40 transition-colors">
                             {brainstorming ? '✦ Thinking...' : '✦ Brainstorm'}
                         </button>
                         <button onclick={saveEntry}
@@ -268,9 +269,7 @@
                             Save
                         </button>
                         <button onclick={clearTranscript}
-                            class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#444] hover:text-red-400 hover:border-red-900 transition-colors">
-                            ✕
-                        </button>
+                            class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#444] hover:text-red-400 hover:border-red-900 transition-colors"><Icon name="x" size={14} /></button>
                     </div>
                 {/if}
             {/if}
@@ -295,8 +294,8 @@
                         <p class="text-[10px] text-[#444] mb-2">{formatTime(activeEntry.createdAt)}</p>
                         <p class="text-xs text-[#ccc] leading-relaxed whitespace-pre-wrap mb-3" style="font-family: var(--font-mono)">{activeEntry.text}</p>
                         {#if activeEntry.brainstorm}
-                            <div class="rounded-xl border border-[#1e2a1e] bg-green-950/10 p-3">
-                                <p class="text-[10px] text-green-400 font-semibold mb-2">✦ Brainstorm</p>
+                            <div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3">
+                                <p class="text-[10px] text-[var(--accent)] font-semibold mb-2">✦ Brainstorm</p>
                                 <p class="text-xs text-[#ccc] mb-2">{activeEntry.brainstorm.summary}</p>
                                 {#each activeEntry.brainstorm.actionItems ?? [] as item}
                                     <p class="text-xs text-[#888] mb-0.5">→ {item}</p>
@@ -311,13 +310,11 @@
                                 <p class="text-xs text-white truncate">{entry.text.slice(0, 60)}{entry.text.length > 60 ? '...' : ''}</p>
                                 <div class="flex items-center gap-2 mt-0.5">
                                     <p class="text-[10px] text-[#444]">{formatTime(entry.createdAt)}</p>
-                                    {#if entry.brainstorm}<span class="text-[9px] text-green-400">✦ brainstorm</span>{/if}
+                                    {#if entry.brainstorm}<span class="text-[9px] text-[var(--accent)]">✦ brainstorm</span>{/if}
                                 </div>
                             </button>
                             <button onclick={() => deleteEntry(entry.id)}
-                                class="text-[#222] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all ml-2 text-xs flex-shrink-0">
-                                ✕
-                            </button>
+                                class="text-[#222] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all ml-2 text-xs flex-shrink-0"><Icon name="x" size={14} /></button>
                         </div>
                     {/each}
                 {/if}

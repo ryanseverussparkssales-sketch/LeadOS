@@ -233,9 +233,9 @@
 
 	const approvedCount = $derived(previewRows.filter(r => r.approved).length);
 
-	const CONFIDENCE_COLORS: Record<string,string> = { high:'text-green-400', medium:'text-yellow-400', low:'text-orange-400' };
-	const STATUS_COLORS: Record<string,string> = { new:'border-green-800 bg-green-950/10', duplicate:'border-yellow-800 bg-yellow-950/10', invalid:'border-red-900 bg-red-950/10 opacity-60' };
-	const STATUS_BADGES: Record<string,string> = { new:'text-green-400', duplicate:'text-yellow-400', invalid:'text-red-400' };
+	const CONFIDENCE_COLORS: Record<string,string> = { high:'text-[var(--accent)]', medium:'text-yellow-400', low:'text-orange-400' };
+	const STATUS_COLORS: Record<string,string> = { new:'border-[var(--accent)]/40 bg-[var(--accent)]/12', duplicate:'border-yellow-800 bg-yellow-950/10', invalid:'border-red-900 bg-red-950/10 opacity-60' };
+	const STATUS_BADGES: Record<string,string> = { new:'text-[var(--accent)]', duplicate:'text-yellow-400', invalid:'text-red-400' };
 </script>
 
 <div class="space-y-4">
@@ -267,7 +267,7 @@
 		<div class="space-y-3">
 			<div class="flex items-center justify-between">
 				<p class="text-sm text-white font-medium">{headers.length} columns detected</p>
-				<button onclick={runAIMapping} disabled={aiMapping} class="rounded-lg border border-purple-800 px-3 py-1.5 text-xs text-purple-400 hover:bg-purple-900/20 disabled:opacity-40 transition-colors">
+				<button onclick={runAIMapping} disabled={aiMapping} class="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors">
 					{aiMapping ? '✨ Mapping...' : '✨ AI Auto-Map'}
 				</button>
 			</div>
@@ -371,8 +371,8 @@
 
 			<!-- Suggested custom fields -->
 			{#if suggestedCustomFields.length > 0}
-				<div class="rounded-xl border border-purple-800/30 bg-purple-950/10 p-4 space-y-3">
-					<p class="text-xs text-purple-400 font-medium">✨ AI suggests creating custom fields for:</p>
+				<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4 space-y-3">
+					<p class="text-xs text-[var(--accent)] font-medium">✨ AI suggests creating custom fields for:</p>
 					{#each suggestedCustomFields as cf}
 						<label class="flex items-start gap-3 cursor-pointer">
 							<input type="checkbox"
@@ -401,8 +401,8 @@
 		<div class="space-y-3">
 			<!-- Summary -->
 			<div class="flex gap-4">
-				<div class="rounded-lg bg-green-950/20 border border-green-800/30 px-4 py-2 flex-1 text-center">
-					<p class="text-lg font-semibold text-green-400">{counts.new}</p>
+				<div class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 px-4 py-2 flex-1 text-center">
+					<p class="text-lg font-semibold text-[var(--accent)]">{counts.new}</p>
 					<p class="text-xs text-[#555]">New contacts</p>
 				</div>
 				<div class="rounded-lg bg-yellow-950/20 border border-yellow-800/30 px-4 py-2 flex-1 text-center">
@@ -453,8 +453,8 @@
 	{:else if step === 'done'}
 		<div class="space-y-5">
 			<!-- Result summary -->
-			<div class="rounded-xl border border-green-800/30 bg-green-950/10 p-5 text-center">
-				<p class="text-2xl font-semibold text-green-400 mb-1">{importResult?.created ?? 0}</p>
+			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-5 text-center">
+				<p class="text-2xl font-semibold text-[var(--accent)] mb-1">{importResult?.created ?? 0}</p>
 				<p class="text-xs text-[#555]">contacts imported{importResult?.errors ? ` · ${importResult.errors} errors` : ''}</p>
 			</div>
 
@@ -500,7 +500,7 @@
 				</div>
 			{:else if routingDone}
 				<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4 text-center">
-					<p class="text-xs text-green-400">✓ Contacts added to call queue</p>
+					<p class="text-xs text-[var(--accent)]">✓ Contacts added to call queue</p>
 					<a href="/dialer" class="text-[10px] text-[#444] hover:text-white mt-1 block transition-colors">Open dialer →</a>
 				</div>
 			{/if}

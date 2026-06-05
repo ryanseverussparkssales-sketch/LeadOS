@@ -1,4 +1,5 @@
 import { supabaseAdmin, normalizePhone } from '$lib/server/supabase';
+import { assertTwilioSignature } from '$lib/server/twilioVerify';
 import type { RequestHandler } from './$types';
 
 // ── Intent classification (fire-and-forget) ──────────────────────────────────
@@ -85,9 +86,15 @@ Return: {"intent": "<one of: interested|objection|opt_out|question|callback_requ
 	}
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
+	// Verify signature BEFORE the try/catch (which returns 200 on error and would
+	// otherwise mask a 403 for a forged request).
+	const form = await request.formData();
+	const sigParams: Record<string, string> = {};
+	for (const [k, v] of form.entries()) sigParams[k] = v as string;
+	assertTwilioSignature(request, url, sigParams);
+
 	try {
-		const form = await request.formData();
 		const from    = form.get('From') as string;
 		const to      = form.get('To') as string;
 		const body    = form.get('Body') as string ?? '';

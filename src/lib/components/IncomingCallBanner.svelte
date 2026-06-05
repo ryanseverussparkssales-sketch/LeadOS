@@ -66,14 +66,14 @@
 		aria-label="Incoming call"
 	>
 		<!-- Animated top accent bar -->
-		<div class="h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent"
+		<div class="h-0.5 bg-gradient-to-r from-transparent via-[var(--call)] to-transparent"
 			style="animation: banner-pulse 0.8s ease-in-out infinite;"></div>
 
 		<!-- Header row -->
 		<div class="px-4 pt-3 pb-1 flex items-center justify-between">
 			<div class="flex items-center gap-2">
-				<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-				<p class="text-[10px] text-green-400 font-semibold uppercase tracking-widest">Incoming Call</p>
+				<span class="w-2 h-2 rounded-full bg-[var(--call)] animate-pulse"></span>
+				<p class="text-[10px] text-[var(--call)] font-semibold uppercase tracking-widest">Incoming Call</p>
 			</div>
 			<p class="text-[10px] text-[#444] font-mono tabular-nums">{timeLeft}s</p>
 		</div>
@@ -96,7 +96,7 @@
 			<!-- Decline -->
 			<button
 				onclick={handleReject}
-				class="flex flex-col items-center gap-1 py-3 text-red-400 hover:bg-red-950/30 transition-colors border-r border-[#1a1a1a] cursor-pointer"
+				class="flex flex-col items-center gap-1 py-3 text-[var(--end-text)] hover:bg-[var(--end)]/12 transition-colors border-r border-[#1a1a1a] cursor-pointer"
 			>
 				<span class="text-xl leading-none">⊘</span>
 				<span class="text-[10px] font-medium">Decline</span>
@@ -106,7 +106,7 @@
 			<!-- Answer -->
 			<button
 				onclick={handleAnswer}
-				class="flex flex-col items-center gap-1 py-3 text-green-400 hover:bg-green-950/30 transition-colors cursor-pointer"
+				class="flex flex-col items-center gap-1 py-3 text-[var(--call)] hover:bg-[var(--call)]/12 transition-colors cursor-pointer"
 			>
 				<span class="text-xl leading-none">✆</span>
 				<span class="text-[10px] font-medium">Answer</span>

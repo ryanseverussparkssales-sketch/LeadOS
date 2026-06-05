@@ -3,7 +3,17 @@ import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import { encryptValue, decryptValue } from '$lib/server/crypto';
 import type { RequestHandler } from './$types';
 
-const SENSITIVE_FIELDS = ['smtp_pass_encrypted'];
+const SENSITIVE_FIELDS = ['smtp_pass_encrypted', 'twilio_auth_token', 'twilio_api_key_secret'];
+
+// Decrypt tolerantly — historical values may be stored as plaintext.
+function safeDecrypt(v: unknown): string {
+	if (!v || typeof v !== 'string') return v as string;
+	try {
+		return decryptValue(v);
+	} catch {
+		return v;
+	}
+}
 
 export const GET: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
@@ -16,7 +26,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
 	const result: Record<string, unknown> = { ...data };
 	for (const field of SENSITIVE_FIELDS) {
-		if (result[field]) result[field] = decryptValue(result[field] as string);
+		if (result[field]) result[field] = safeDecrypt(result[field]);
 	}
 	return json(result);
 };
@@ -45,7 +55,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 	// Decrypt for client response
 	const result: Record<string, unknown> = { ...data };
 	for (const field of SENSITIVE_FIELDS) {
-		if (result[field]) result[field] = decryptValue(result[field] as string);
+		if (result[field]) result[field] = safeDecrypt(result[field]);
 	}
 	return json(result);
 };

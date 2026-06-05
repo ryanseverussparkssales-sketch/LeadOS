@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount, tick } from 'svelte';
+    import Icon from '$lib/components/Icon.svelte';
     import { apiFetch } from '$lib/api';
-    import { toastSuccess } from '$lib/stores/toast';
+    import { toastSuccess, toastError } from '$lib/stores/toast';
 
     type Channel = 'all' | 'sms' | 'email';
     type Thread = {
@@ -51,6 +52,7 @@
 
     async function loadAll() {
         loading = true;
+        try {
         const [smsRes, emailRes] = await Promise.all([
             apiFetch('/api/sms/threads?limit=100'),
             apiFetch('/api/emails/threads?limit=100'),
@@ -98,7 +100,11 @@
 
         // Sort by last activity
         threads = combined.sort((a, b) => new Date(b.lastAt).getTime() - new Date(a.lastAt).getTime());
-        loading = false;
+        } catch (e) {
+            toastError('Failed to load inbox — try refreshing');
+        } finally {
+            loading = false;
+        }
     }
 
     async function selectThread(t: Thread) {
@@ -110,6 +116,7 @@
         if (t.channel === 'sms') {
             const r = await apiFetch(`/api/sms?thread_id=${t.id}&limit=100`);
             if (r.ok) messages = await r.json();
+            else toastError('Failed to load conversation — try again');
             if (t.unreadCount > 0) {
                 await apiFetch(`/api/sms/threads/${t.id}/read`, { method: 'POST' });
             }
@@ -117,6 +124,7 @@
         } else {
             const r = await apiFetch(`/api/emails/threads/${t.id}`);
             if (r.ok) messages = await r.json();
+            else toastError('Failed to load conversation — try again');
             await apiFetch(`/api/emails/threads/${t.id}`, { method: 'POST' }); // mark read
             replySubject = `Re: ${t.subject ?? ''}`;
         }
@@ -150,6 +158,9 @@
                 messages = [...messages, { direction: 'outbound', body: replyBody, sent_at: new Date().toISOString() }];
                 threads = threads.map(t => t.id === selected!.id ? { ...t, lastBody: replyBody, lastDirection: 'outbound', lastAt: new Date().toISOString() } : t);
                 replyBody = '';
+                toastSuccess('Message sent');
+            } else {
+                toastError('Failed to send message — try again');
             }
         } else {
             // Find the from_address from messages or use the thread's to_address
@@ -163,6 +174,8 @@
                 messages = [...messages, { direction: 'outbound', body: replyBody, subject: replySubject, created_at: new Date().toISOString(), from_address: 'you' }];
                 replyBody = '';
                 toastSuccess('Email sent');
+            } else {
+                toastError('Failed to send email — try again');
             }
         }
         sending = false;
@@ -179,12 +192,14 @@
                 body: JSON.stringify({ threadId: selected.id, contactId: selected.contactId, lastMessages: messages.slice(-5).map(m => ({ direction: m.direction, body: m.body })) })
             });
             if (r.ok) { const d = await r.json(); aiDraft = d.draft ?? ''; }
+            else toastError('Failed to generate draft — try again');
         } else {
             const r = await apiFetch('/api/emails/draft-reply', {
                 method: 'POST',
                 body: JSON.stringify({ threadId: selected.id, contactId: selected.contactId, inboundBody: lastInbound?.body, inboundSubject: selected.subject })
             });
             if (r.ok) { const d = await r.json(); aiDraft = d.draft ?? ''; replySubject = d.subject ?? replySubject; }
+            else toastError('Failed to generate draft — try again');
         }
         loadingDraft = false;
     }
@@ -202,16 +217,16 @@
 
     function intentBadge(label: string) {
         const map: Record<string,string> = {
-            interested: 'bg-green-950 text-green-400', positive_reply: 'bg-green-950 text-green-400',
+            interested: 'bg-[var(--accent)]/12 text-[var(--accent)]', positive_reply: 'bg-[var(--accent)]/12 text-[var(--accent)]',
             callback_request: 'bg-blue-950 text-blue-400', objection: 'bg-yellow-950 text-yellow-400',
             question: 'bg-yellow-950 text-yellow-400', opt_out: 'bg-red-950 text-red-400',
-            referral: 'bg-purple-950 text-purple-400',
+            referral: 'bg-[var(--accent)]/12 text-[var(--accent)]',
         };
         return map[label] ?? 'bg-[#1a1a1a] text-[#555]';
     }
 </script>
 
-<svelte:head><title>Inbox — LeadOS</title></svelte:head>
+<svelte:head><title>Inbox — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
     <!-- Header -->
@@ -263,7 +278,7 @@
                                 <p class="text-xs text-[#444] truncate">{t.lastDirection === 'outbound' ? '→ ' : ''}{t.lastBody}</p>
                                 {#if t.intentLabel}
                                     <span class="text-[9px] px-1.5 py-0.5 rounded mt-0.5 inline-block
-                                        {t.intentLabel === 'interested' || t.intentLabel === 'positive_reply' ? 'bg-green-950/50 text-green-400' :
+                                        {t.intentLabel === 'interested' || t.intentLabel === 'positive_reply' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
                                          t.intentLabel === 'callback_request' ? 'bg-blue-950/50 text-blue-400' :
                                          t.intentLabel === 'opt_out' ? 'bg-red-950/50 text-red-400' :
                                          'bg-[#1a1a1a] text-[#444]'}">
@@ -292,7 +307,7 @@
                             <span>{selected.channel === 'sms' ? '💬' : '✉️'}</span>
                             <p class="text-white font-semibold text-sm">{selected.contactName ?? selected.remoteNumber ?? 'Unknown'}</p>
                             {#if selected.contactScore}
-                                <span class="text-xs font-mono {selected.contactScore >= 70 ? 'text-green-400' : 'text-[#555]'}">{selected.contactScore}</span>
+                                <span class="text-xs font-mono {selected.contactScore >= 70 ? 'text-[var(--accent)]' : 'text-[#555]'}">{selected.contactScore}</span>
                             {/if}
                         </div>
                         {#if selected.subject}<p class="text-xs text-[#555] mt-0.5">{selected.subject}</p>{/if}
@@ -303,6 +318,7 @@
                         <button onclick={async () => {
                             const r = await apiFetch('/api/contacts/create', { method:'POST', body: JSON.stringify({ phone: selected!.remoteNumber, lead_source:'inbound_reply' }) });
                             if (r.ok) { const c = await r.json(); selected = { ...selected!, contactId: c.id, contactName: c.name }; toastSuccess('Contact created'); }
+                            else { toastError('Failed to create contact — try again'); }
                         }} class="text-xs border border-[var(--c-border-subtle)] rounded-lg px-3 py-1.5 text-[#555] hover:text-white transition-colors">+ Create Contact</button>
                     {/if}
                 </div>
@@ -337,7 +353,7 @@
                     <div class="mx-4 mb-2 rounded-xl bg-[var(--c-surface-1)] border border-[var(--c-border-subtle)] p-3">
                         <div class="flex justify-between items-center mb-1">
                             <p class="text-[10px] text-[#555] uppercase tracking-widest">✦ AI Draft</p>
-                            <button onclick={() => aiDraft = ''} class="text-[#333] hover:text-white text-xs">✕</button>
+                            <button onclick={() => aiDraft = ''} class="text-[#333] hover:text-white text-xs"><Icon name="x" size={14} /></button>
                         </div>
                         <p class="text-xs text-[#888] mb-2 whitespace-pre-wrap">{aiDraft}</p>
                         <button onclick={() => { replyBody = aiDraft; aiDraft = ''; }} class="text-xs bg-[var(--c-surface-2)] border border-[var(--c-border-subtle)] rounded-lg px-3 py-1 hover:border-white text-white transition-colors">Use draft</button>
@@ -354,9 +370,9 @@
                         {/if}
                         <textarea bind:value={replyBody} placeholder="Type a reply..." rows="3"
                             class="w-full rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-surface-2)] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
-                        <button onclick={sendReply} disabled={sendingReply}
+                        <button onclick={send} disabled={sending}
                             class="self-end rounded-lg bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-[#e5e5e5] disabled:opacity-50 transition-colors">
-                            {sendingReply ? 'Sending…' : 'Send'}
+                            {sending ? 'Sending…' : 'Send'}
                         </button>
                     </div>
                 {/if}

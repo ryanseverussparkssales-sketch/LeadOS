@@ -29,13 +29,13 @@
 
 	function qualityColor(q: number | null) {
 		if (!q) return 'text-[#444]';
-		if (q >= 8) return 'text-green-400';
+		if (q >= 8) return 'text-[var(--accent)]';
 		if (q >= 6) return 'text-yellow-400';
 		return 'text-red-400';
 	}
 </script>
 
-<svelte:head><title>Leaderboard — LeadOS</title></svelte:head>
+<svelte:head><title>Leaderboard — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
@@ -80,7 +80,7 @@
 							</div>
 						</div>
 						<p class="text-right text-white font-semibold">{agent.totalCalls}</p>
-						<p class="text-right {agent.answerRate >= 30 ? 'text-green-400' : agent.answerRate >= 15 ? 'text-yellow-400' : 'text-[#666]'}">{agent.answerRate}%</p>
+						<p class="text-right {agent.answerRate >= 30 ? 'text-[var(--accent)]' : agent.answerRate >= 15 ? 'text-yellow-400' : 'text-[#666]'}">{agent.answerRate}%</p>
 						<p class="text-right text-[#888]">{agent.callbackRate}%</p>
 						<p class="text-right text-[#666]">{agent.avgDuration ? fmtDur(agent.avgDuration) : '—'}</p>
 						<p class="text-right {qualityColor(agent.avgQuality)}">{agent.avgQuality ?? '—'}</p>
@@ -100,9 +100,9 @@
 							<div class="flex items-center gap-4">
 								<p class="text-sm text-white w-32 shrink-0">{DAYS[slot.day]} {slot.hour}:00–{slot.hour+1}:00</p>
 								<div class="flex-1 h-2 rounded-full bg-[#1a1a1a]">
-									<div class="h-full rounded-full bg-green-500/60" style="width:{slot.answerRate}%"></div>
+									<div class="h-full rounded-full bg-[var(--accent)]/60" style="width:{slot.answerRate}%"></div>
 								</div>
-								<p class="text-sm text-green-400 w-12 text-right shrink-0">{slot.answerRate}%</p>
+								<p class="text-sm text-[var(--accent)] w-12 text-right shrink-0">{slot.answerRate}%</p>
 								<p class="text-xs text-[#444] w-16 text-right shrink-0">{slot.total} calls</p>
 							</div>
 						{/each}

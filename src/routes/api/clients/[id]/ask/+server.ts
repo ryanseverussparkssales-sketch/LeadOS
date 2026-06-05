@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { assertAiAccess } from '$lib/server/tier';
 import { error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import { env } from '$env/dynamic/private';
@@ -6,6 +7,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	const ownerId = await getEffectiveUserId(user.id);
 
 	const { question, conversationHistory } = await request.json();

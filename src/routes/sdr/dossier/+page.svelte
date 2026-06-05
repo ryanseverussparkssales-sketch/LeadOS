@@ -64,7 +64,7 @@
 	}
 </script>
 
-<svelte:head><title>Client Dossier — LeadOS SDR</title></svelte:head>
+<svelte:head><title>Client Dossier — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-hidden flex flex-col">
 	<!-- Client selector header -->

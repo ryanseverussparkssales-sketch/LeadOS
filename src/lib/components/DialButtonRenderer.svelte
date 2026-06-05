@@ -1,39 +1,34 @@
 <script lang="ts">
   import { browser } from '$app/environment';
-  import CounterDial from './dial-buttons/CounterDial.svelte';
   import OrbDial from './dial-buttons/OrbDial.svelte';
-  import LogoDial from './dial-buttons/LogoDial.svelte';
   import CoinDial from './dial-buttons/CoinDial.svelte';
-  import WaveformDial from './dial-buttons/WaveformDial.svelte';
-  import RadarDial from './dial-buttons/RadarDial.svelte';
-  import PlasmaDial from './dial-buttons/PlasmaDial.svelte';
-  import HexDial from './dial-buttons/HexDial.svelte';
-  import NeuralDial from './dial-buttons/NeuralDial.svelte';
-  import SpeedDial from './dial-buttons/SpeedDial.svelte';
+  import MandalaDial from './dial-buttons/MandalaDial.svelte';
+  import LotusDial from './dial-buttons/LotusDial.svelte';
+  import FleurDial from './dial-buttons/FleurDial.svelte';
+  import OnyxDial from './dial-buttons/OnyxDial.svelte';
+  import SilverDial from './dial-buttons/SilverDial.svelte';
 
   let { callState, onclick, size = 90 }: Props = $props();
   type Props = { callState: string; onclick: () => void; size?: number; }
 
+  // Curated elegant gallery (metals, stone + symbol crests). Older garish skins retired.
   const MAP: Record<string, any> = {
-    counter:  CounterDial,
-    orb:      OrbDial,
-    logo:     LogoDial,
-    coin:     CoinDial,
-    waveform: WaveformDial,
-    radar:    RadarDial,
-    plasma:   PlasmaDial,
-    hex:      HexDial,
-    neural:   NeuralDial,
-    speed:    SpeedDial,
+    mandala: MandalaDial,
+    lotus:   LotusDial,
+    fleur:   FleurDial,
+    onyx:    OnyxDial,
+    silver:  SilverDial,
+    orb:     OrbDial,
+    coin:    CoinDial,
   };
 
-  let selected = $state('orb');
+  let selected = $state('mandala');
 
   if (browser) {
-    selected = localStorage.getItem('leados_dial_button') ?? 'orb';
+    selected = localStorage.getItem('rogueos_dial_button') ?? 'mandala';
   }
 
-  const Component = $derived(MAP[selected] ?? OrbDial);
+  const Component = $derived(MAP[selected] ?? MandalaDial);
 </script>
 
 <Component {callState} {onclick} {size} />

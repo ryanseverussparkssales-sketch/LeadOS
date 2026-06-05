@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import Icon from '$lib/components/Icon.svelte';
 
   interface PomodoroSettings {
     focusMinutes: number;
@@ -12,7 +13,7 @@
     tickSound: boolean;
   }
 
-  const STORAGE_KEY = 'leados_pomodoro_settings';
+  const STORAGE_KEY = 'rogueos_pomodoro_settings';
 
   const DEFAULTS: PomodoroSettings = {
     focusMinutes: 25,
@@ -307,7 +308,7 @@
     <div class="settings-drawer">
       <div class="drawer-header">
         <span class="drawer-title">POMODORO SETTINGS</span>
-        <button class="close-btn" onclick={cancelSettings}>✕</button>
+        <button class="close-btn" onclick={cancelSettings}><Icon name="x" size={14} /></button>
       </div>
 
       <div class="setting-group">

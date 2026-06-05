@@ -26,8 +26,8 @@ export const POST: RequestHandler = async ({ request }) => {
             uid: ownerId,
             cid: campaignId ?? undefined,
             pid: projectId ?? undefined,
-            lid: leadId ?? undefined,
-        });
+            lid: contactId ?? undefined,
+        }, inboundDomain);
     }
 
     const result = await sendEmail({

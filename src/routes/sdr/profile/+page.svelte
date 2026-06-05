@@ -99,24 +99,16 @@
 		saving = false;
 	}
 
-	const profileUrl = $derived(username ? `${typeof window !== 'undefined' ? window.location.origin : ''}/rep/${username}` : null);
-	const canPublish = $derived(profile?.interview_score !== null && profile?.interview_score !== undefined);
 </script>
 
-<svelte:head><title>My Profile — LeadOS SDR</title></svelte:head>
+<svelte:head><title>My Profile — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 	<div class="flex items-center justify-between mb-6">
 		<div>
 			<h2 class="text-white text-xl font-semibold">My Rep Profile</h2>
-			<p class="text-xs text-[#555] mt-0.5">Your public profile is shown to brands looking to hire.</p>
+			<p class="text-xs text-[#555] mt-0.5">Your internal rep profile and certification.</p>
 		</div>
-		{#if profileUrl && isPublic}
-			<a href={profileUrl} target="_blank" rel="noopener noreferrer"
-				class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">
-				↗ View public profile
-			</a>
-		{/if}
 	</div>
 
 	{#if loading}
@@ -126,8 +118,8 @@
 
 			<!-- Interview badge -->
 			{#if profile?.interview_score !== null && profile?.interview_score !== undefined}
-				<div class="rounded-xl border {profile.interview_score >= 70 ? 'border-green-800/40 bg-green-950/10' : 'border-[#2a2a2a] bg-[#111]'} p-4 flex items-center gap-3">
-					<p class="text-2xl font-bold {profile.interview_score >= 85 ? 'text-green-400' : profile.interview_score >= 70 ? 'text-yellow-400' : 'text-[#666]'}">{profile.interview_score}</p>
+				<div class="rounded-xl border {profile.interview_score >= 70 ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} p-4 flex items-center gap-3">
+					<p class="text-2xl font-bold {profile.interview_score >= 85 ? 'text-[var(--accent)]' : profile.interview_score >= 70 ? 'text-yellow-400' : 'text-[#666]'}">{profile.interview_score}</p>
 					<div>
 						<p class="text-xs text-white font-medium">AI Interview Score</p>
 						<p class="text-[10px] text-[#555]">
@@ -153,14 +145,6 @@
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Username (profile URL)</label>
-						<div class="flex items-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] overflow-hidden">
-							<span class="px-2 text-xs text-[#333]">/rep/</span>
-							<input bind:value={username} placeholder="yourname"
-								class="flex-1 bg-transparent py-2 pr-3 text-sm text-white placeholder-[#333] focus:outline-none" />
-						</div>
-					</div>
-					<div>
 						<label class="block text-xs text-[#555] mb-1">Location</label>
 						<input bind:value={location} placeholder="New York, NY"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
@@ -179,7 +163,7 @@
 				<div>
 					<label class="block text-xs text-[#555] mb-2">Availability</label>
 					<div class="flex gap-2">
-						{#each [['available','🟢 Available'],['busy','🟡 Busy'],['unavailable','⚫ Unavailable']] as [val, label]}
+						{#each [['available','Available'],['busy','Busy'],['unavailable','Unavailable']] as [val, label]}
 							<button onclick={() => availability = val}
 								class="px-3 py-1.5 rounded-lg text-xs border transition-colors {availability === val ? 'border-white text-white bg-white/10' : 'border-[#2a2a2a] text-[#555] hover:border-white hover:text-white'}">
 								{label}
@@ -203,10 +187,42 @@
 			</div>
 
 			<!-- Work history & credentials -->
-			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3">
-				<p class="text-xs text-[#999] uppercase tracking-widest">Work History</p>
-				<textarea bind:value={previousRoles} rows="3" placeholder="Previous roles and experience..."
-					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
+				<p class="text-xs text-[#555] uppercase tracking-widest">Work History & Credentials</p>
+				<div>
+					<label class="block text-xs text-[#555] mb-1">Years of Experience</label>
+					<input type="number" bind:value={yearsExperience} placeholder="5" min="0"
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
+				</div>
+				<div>
+					<label class="block text-xs text-[#555] mb-1">Previous Roles</label>
+					<textarea bind:value={previousRoles} rows="3" placeholder="Previous roles and experience..."
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+				</div>
+				<div>
+					<label class="block text-xs text-[#555] mb-1">Top Achievement</label>
+					<input bind:value={topAchievement} placeholder="Closed $1.2M in new ARR in 2024"
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
+				</div>
+				<div>
+					<label class="block text-xs text-[#555] mb-2">Certifications</label>
+					<div class="flex flex-wrap gap-2">
+						{#each CERT_OPTIONS as cert}
+							<button onclick={() => certifications = certifications.includes(cert) ? certifications.filter(c => c !== cert) : [...certifications, cert]}
+								class="px-3 py-1.5 rounded-full text-xs border transition-colors {certifications.includes(cert) ? 'border-white bg-white/10 text-white' : 'border-[#2a2a2a] text-[#555] hover:border-white hover:text-white'}">
+								{cert}
+							</button>
+						{/each}
+					</div>
+				</div>
+			</div>
+
+			<!-- Save -->
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5">
+				<button onclick={save} disabled={saving}
+					class="w-full rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-white/90 disabled:opacity-50 transition-colors">
+					{saving ? 'Saving…' : 'Save Profile'}
+				</button>
 			</div>
 		</div>
 {/if}

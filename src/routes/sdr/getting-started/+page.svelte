@@ -67,7 +67,7 @@
 	const totalChecks = 4;
 </script>
 
-<svelte:head><title>Getting Started — LeadOS SDR</title></svelte:head>
+<svelte:head><title>Getting Started — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 
@@ -84,10 +84,10 @@
 			<p class="text-xs text-white">{completedCount}/{totalChecks} done</p>
 		</div>
 		<div class="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
-			<div class="h-full bg-green-500 rounded-full transition-all" style="width:{(completedCount/totalChecks)*100}%"></div>
+			<div class="h-full bg-[var(--accent)] rounded-full transition-all" style="width:{(completedCount/totalChecks)*100}%"></div>
 		</div>
 		{#if completedCount === totalChecks}
-			<p class="text-xs text-green-400 mt-2">✓ You're all set — start dialing!</p>
+			<p class="text-xs text-[var(--accent)] mt-2">✓ You're all set — start dialing!</p>
 		{/if}
 	</div>
 
@@ -97,18 +97,18 @@
 		<div class="space-y-4">
 
 			<!-- Step 0: Verbal call -->
-			<div class="rounded-xl border {verbalApproved ? 'border-green-800/30 bg-green-950/10' : 'border-yellow-900/30 bg-yellow-950/10'} p-5">
+			<div class="rounded-xl border {verbalApproved ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-yellow-900/30 bg-yellow-950/10'} p-5">
 				<div class="flex items-start gap-4">
-					<div class="w-8 h-8 rounded-full {verbalApproved ? 'bg-green-500' : 'bg-yellow-900/40 border border-yellow-800/40'} flex items-center justify-center text-sm shrink-0 mt-0.5">
+					<div class="w-8 h-8 rounded-full {verbalApproved ? 'bg-[var(--accent)]' : 'bg-yellow-900/40 border border-yellow-800/40'} flex items-center justify-center text-sm shrink-0 mt-0.5">
 						{verbalApproved ? '✓' : '0'}
 					</div>
 					<div class="flex-1">
 						<p class="text-sm text-white font-medium mb-1">Verbal intro call with Ryan</p>
 						{#if verbalApproved}
-							<p class="text-xs text-green-400">✓ Approved — you're cleared to dial live campaigns</p>
+							<p class="text-xs text-[var(--accent)]">✓ Approved — you're cleared to dial live campaigns</p>
 						{:else}
 							<p class="text-xs text-[#666] mb-3">Before your first live dial we do a quick 15-minute call. You talk, Ryan listens. If it's a fit you're in the same day.</p>
-							<a href="mailto:ryanseverussparkssales@gmail.com?subject=Verbal call request — LeadOS&body=Hi Ryan, I'd like to schedule my intro call."
+							<a href="mailto:ryanseverussparkssales@gmail.com?subject=Verbal call request — RogueOS&body=Hi Ryan, I'd like to schedule my intro call."
 								class="inline-block rounded-lg border border-yellow-800/40 bg-yellow-950/10 px-4 py-2 text-xs text-yellow-400 hover:bg-yellow-950/20 transition-colors">
 								Request your call →
 							</a>
@@ -118,9 +118,9 @@
 			</div>
 
 			<!-- Step 1: Campaign -->
-			<div class="rounded-xl border {checks.hasCampaign ? 'border-green-800/30 bg-green-950/10' : 'border-[#2a2a2a] bg-[#111]'} p-5">
+			<div class="rounded-xl border {checks.hasCampaign ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} p-5">
 				<div class="flex items-start gap-4">
-					<div class="w-8 h-8 rounded-full {checks.hasCampaign ? 'bg-green-500' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
+					<div class="w-8 h-8 rounded-full {checks.hasCampaign ? 'bg-[var(--accent)]' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
 						{checks.hasCampaign ? '✓' : '1'}
 					</div>
 					<div class="flex-1">
@@ -132,12 +132,12 @@
 							<div class="space-y-2 mt-2">
 								{#each campaigns as c}
 									<div class="flex items-center gap-3 rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] px-3 py-2">
-										<div class="w-2 h-2 rounded-full bg-green-500 shrink-0"></div>
+										<div class="w-2 h-2 rounded-full bg-[var(--accent)] shrink-0"></div>
 										<div class="flex-1 min-w-0">
 											<p class="text-xs text-white font-medium truncate">{c.name}</p>
 											<p class="text-[10px] text-[#444]">{c.project?.client?.name} · {c.project?.name}</p>
 										</div>
-										<a href="/sdr?listId={c.call_lists?.[0]?.id ?? ''}" class="text-[10px] text-green-400 hover:text-green-300 transition-colors shrink-0">Start dialing →</a>
+										<a href="/sdr?listId={c.call_lists?.[0]?.id ?? ''}" class="text-[10px] text-[var(--accent)] hover:text-[var(--accent-hi)] transition-colors shrink-0">Start dialing →</a>
 									</div>
 								{/each}
 							</div>
@@ -147,9 +147,9 @@
 			</div>
 
 			<!-- Step 2: Script -->
-			<div class="rounded-xl border {checks.hasScript ? 'border-green-800/30 bg-green-950/10' : 'border-[#2a2a2a] bg-[#111]'} p-5">
+			<div class="rounded-xl border {checks.hasScript ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} p-5">
 				<div class="flex items-start gap-4">
-					<div class="w-8 h-8 rounded-full {checks.hasScript ? 'bg-green-500' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
+					<div class="w-8 h-8 rounded-full {checks.hasScript ? 'bg-[var(--accent)]' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
 						{checks.hasScript ? '✓' : '2'}
 					</div>
 					<div class="flex-1">
@@ -202,18 +202,18 @@
 			</div>
 
 			<!-- Step 4: AI Interview -->
-			<div class="rounded-xl border {checks.hasInterview ? 'border-green-800/30 bg-green-950/10' : 'border-[#2a2a2a] bg-[#111]'} p-5">
+			<div class="rounded-xl border {checks.hasInterview ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} p-5">
 				<div class="flex items-start gap-4">
-					<div class="w-8 h-8 rounded-full {checks.hasInterview ? 'bg-green-500' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
+					<div class="w-8 h-8 rounded-full {checks.hasInterview ? 'bg-[var(--accent)]' : 'bg-[#1a1a1a] border border-[#2a2a2a]'} flex items-center justify-center text-sm shrink-0 mt-0.5">
 						{checks.hasInterview ? '✓' : '3'}
 					</div>
 					<div class="flex-1">
-						<p class="text-sm text-white font-medium mb-1">AI Interview — build your marketplace profile</p>
+						<p class="text-sm text-white font-medium mb-1">AI Interview — get certified</p>
 						{#if checks.hasInterview}
-							<p class="text-xs text-green-400">Score: {profile?.interview_score}/100 {profile?.interview_score >= 70 ? '· Live Roleplay unlocked ✓' : '· Score ≥70 to unlock Live Roleplay'}</p>
+							<p class="text-xs text-[var(--accent)]">Score: {profile?.interview_score}/100 {profile?.interview_score >= 70 ? '· Live Roleplay unlocked ✓' : '· Score ≥70 to unlock Live Roleplay'}</p>
 						{:else}
-							<p class="text-xs text-[#555] mb-3">Answer 5 sales questions to get an AI score. Score ≥70 unlocks your marketplace listing so brands can hire you directly.</p>
-							<a href="/sdr/interview" class="inline-block rounded-lg border border-purple-800/40 bg-purple-950/10 px-4 py-2 text-xs text-purple-400 hover:bg-purple-950/20 transition-colors">
+							<p class="text-xs text-[#555] mb-3">Answer 5 sales questions to get an AI score. Score ≥70 unlocks Live Roleplay certification.</p>
+							<a href="/sdr/interview" class="inline-block rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-4 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 								Start AI Interview →
 							</a>
 						{/if}

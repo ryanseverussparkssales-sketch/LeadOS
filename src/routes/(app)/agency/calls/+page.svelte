@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Call {
 		id: string; created_at: string; outcome: string | null;
@@ -67,14 +69,23 @@
 		if (r.ok) {
 			feedback = [...feedback, await r.json()];
 			newNote = ''; newRating = null; noteTimestamp = '';
+			toastSuccess('Coaching note saved');
+		} else {
+			toastError('Failed to save coaching note — try again');
 		}
 		savingNote = false;
 	}
 
 	async function deleteNote(id: string) {
 		if (!selectedCall) return;
-		await apiFetch(`/api/calls/${selectedCall.id}/feedback?feedback_id=${id}`, { method: 'DELETE' });
-		feedback = feedback.filter(f => f.id !== id);
+		if (!confirm('Delete this coaching note?')) return;
+		const r = await apiFetch(`/api/calls/${selectedCall.id}/feedback?feedback_id=${id}`, { method: 'DELETE' });
+		if (r.ok) {
+			feedback = feedback.filter(f => f.id !== id);
+			toastSuccess('Coaching note deleted');
+		} else {
+			toastError('Failed to delete coaching note — try again');
+		}
 	}
 
 	function fmtSecs(s: number | null) {
@@ -99,7 +110,7 @@
 	);
 </script>
 
-<svelte:head><title>Call Review — LeadOS</title></svelte:head>
+<svelte:head><title>Call Review — RogueOS</title></svelte:head>
 
 <div class="flex h-full overflow-hidden">
 
@@ -209,7 +220,7 @@
 
 				{#if selectedCall.summary}
 					<div class="rounded-xl border border-[#1e2a1e] bg-[#0d150d] p-4">
-						<p class="text-[10px] text-green-500 uppercase tracking-widest mb-2">✦ AI Summary</p>
+						<p class="text-[10px] text-[var(--accent)] uppercase tracking-widest mb-2">✦ AI Summary</p>
 						<p class="text-xs text-[#ccc] leading-relaxed">{selectedCall.summary}</p>
 					</div>
 				{/if}
@@ -247,7 +258,7 @@
 										<p class="text-[9px] text-[#333] mt-1">{new Date(note.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</p>
 									</div>
 									<button onclick={() => deleteNote(note.id)}
-										class="text-[#222] hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0">✕</button>
+										class="text-[#222] hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"><Icon name="x" size={14} /></button>
 								</div>
 							{/each}
 						</div>

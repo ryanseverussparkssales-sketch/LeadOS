@@ -24,13 +24,13 @@
 				<span class="text-xs text-[#444] capitalize">{(contact as Record<string,unknown>).contact_type as string}</span>
 			{/if}
 			{#if (contact as Record<string,unknown>).is_business}
-				<span class="text-xs text-purple-600">B2B</span>
+				<span class="text-xs text-[var(--accent)]">B2B</span>
 			{/if}
 		</div>
 	</div>
 
 	<a href="/phone?number={encodeURIComponent(contact.phone)}" title="Click to call"
-		class="text-[#888] text-xs shrink-0 hover:text-green-400 transition-colors"
+		class="text-[#888] text-xs shrink-0 hover:text-[var(--accent)] transition-colors"
 		style="font-family: var(--font-mono)">
 		{contact.phone}
 	</a>
@@ -45,7 +45,7 @@
 
 	<div class="text-right shrink-0 min-w-[70px]">
 		{#if (contact as Record<string,unknown>).contact_score}
-			<p class="text-xs font-medium {((contact as Record<string,unknown>).contact_score as number) >= 70 ? 'text-green-400' : ((contact as Record<string,unknown>).contact_score as number) >= 40 ? 'text-yellow-400' : 'text-[#555]'}">
+			<p class="text-xs font-medium {((contact as Record<string,unknown>).contact_score as number) >= 70 ? 'text-[var(--accent)]' : ((contact as Record<string,unknown>).contact_score as number) >= 40 ? 'text-yellow-400' : 'text-[#555]'}">
 				{(contact as Record<string,unknown>).contact_score as number}pts
 			</p>
 		{/if}

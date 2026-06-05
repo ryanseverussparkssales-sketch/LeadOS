@@ -1,29 +1,35 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   LeadOS Design System
-   Display: Miller Banner Light → /static/fonts/ (purchase: myfonts.com)
+   RogueOS Design System
+   Display: Bodoni* by indestructible type* (SIL OFL, self-hosted in /static/fonts/)
    Fallback: Playfair Display (Google Fonts — same editorial contrast)
    Labels:   Cormorant SC (section headers, nav groups, widget titles)
    UI:       Inter (all functional text — data, inputs, buttons, metadata)
    ───────────────────────────────────────────────────────────────────────────── */
 
-/* ── Miller Banner — license & place in /static/fonts/ ─────────────────────── */
+/* ── Bodoni* by indestructible type* (SIL OFL) — display face ───────────────── */
+/* Optical size 36, self-hosted from /static/fonts/. See Bodoni-LICENSE.md. */
 @font-face {
-	font-family: 'Miller Banner';
-	font-weight: 300;
+	font-family: 'Bodoni*';
+	font-weight: 300 400;
 	font-style: normal;
 	font-display: swap;
-	src: url('/fonts/MillerBanner-Light.woff2') format('woff2'),
-	     url('/fonts/MillerBanner-Light.woff')  format('woff');
+	src: url('/fonts/Bodoni-Book.otf') format('opentype');
 }
 @font-face {
-	font-family: 'Miller Banner';
-	font-weight: 300;
+	font-family: 'Bodoni*';
+	font-weight: 300 400;
 	font-style: italic;
 	font-display: swap;
-	src: url('/fonts/MillerBanner-LightItalic.woff2') format('woff2'),
-	     url('/fonts/MillerBanner-LightItalic.woff')  format('woff');
+	src: url('/fonts/Bodoni-BookItalic.otf') format('opentype');
+}
+@font-face {
+	font-family: 'Bodoni*';
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	src: url('/fonts/Bodoni-Bold.otf') format('opentype');
 }
 
 :root {
@@ -75,8 +81,20 @@
 	--c-info-bg:        rgba(59,130,246,.08);
 	--c-info-border:    rgba(59,130,246,.2);
 
+	/* ── Signature accent — brass = positive/call, crimson = negative/end ── */
+	--call:     #c8a24a;   /* call / connect / positive (replaces green) */
+	--call-hi:  #d4af37;   /* hover */
+	--call-ink: #1a1408;   /* dark text on a solid brass fill */
+	--end:      #a01e2e;   /* end / hang-up / danger (replaces red) */
+	--end-hi:   #b6293b;   /* hover */
+	--end-text: #c24a59;   /* deepened crimson for text on dark bg */
+	/* semantic aliases — use --accent for ANY positive/success state app-wide */
+	--accent:     #c8a24a;
+	--accent-hi:  #d4af37;
+	--accent-ink: #1a1408;
+
 	/* ── Typography ── */
-	--font-display: 'Miller Banner', 'Playfair Display', Georgia, serif;
+	--font-display: 'Bodoni*', 'Playfair Display', Georgia, serif;
 	--font-label:   'Cormorant SC', 'Cormorant', Georgia, serif;
 	--font-ui:      'Inter', system-ui, -apple-system, sans-serif;
 	--font-mono:    'JetBrains Mono', 'Courier New', monospace;
@@ -116,7 +134,7 @@
 	--color-brand-white:   #ffffff;
 	--color-brand-accent:  #ffffff;
 
-	--font-display: 'Miller Banner', 'Playfair Display', Georgia, serif;
+	--font-display: 'Bodoni*', 'Playfair Display', Georgia, serif;
 	--font-label:   'Cormorant SC', Georgia, serif;
 	--font-sans:    'Inter', system-ui, sans-serif;
 	--font-mono:    'JetBrains Mono', 'Courier New', monospace;
@@ -186,6 +204,70 @@ body {
 ::selection {
 	background: rgba(255,255,255,.1);
 	color: #ffffff;
+}
+
+/* ── Sidebar nav — line-icon micro-motion + active accent ───────────────────── */
+.rogue-nav a { position: relative; }
+.rogue-nav a svg { transition: transform .18s ease, opacity .18s ease; }
+/* gentle icon nudge on hover */
+.rogue-nav a:hover svg { transform: translateX(1.5px); }
+/* thin accent bar on the active row (keys off the aria-current we already set) */
+.rogue-nav a[aria-current="page"]::before {
+	content: "";
+	position: absolute;
+	left: -2px;
+	top: 50%;
+	height: 15px;
+	width: 2px;
+	border-radius: 2px;
+	background: #ffffff;
+	transform: translateY(-50%);
+	animation: nav-accent-in .22s ease;
+}
+@keyframes nav-accent-in {
+	from { opacity: 0; height: 0; }
+	to   { opacity: 1; height: 15px; }
+}
+/* a sprinkle: the active icon draws itself in (paths normalized to length 1) */
+.rogue-nav a[aria-current="page"] svg { transform: none; }
+.rogue-nav a[aria-current="page"] svg :is(path, circle, rect, line, polyline, polygon) {
+	stroke-dasharray: 1;
+	animation: icon-draw .55s ease;
+}
+@keyframes icon-draw {
+	from { stroke-dashoffset: 1; }
+	to   { stroke-dashoffset: 0; }
+}
+
+/* mode switcher — active pill rhymes with the nav via a small accent bar */
+.mode-pill[aria-pressed="true"]::after {
+	content: "";
+	position: absolute;
+	bottom: 2px;
+	left: 50%;
+	width: 14px;
+	height: 2px;
+	border-radius: 2px;
+	background: #ffffff;
+	transform: translateX(-50%);
+	animation: nav-accent-in .22s ease;
+}
+/* collapsed mode buttons are square — accent them on the left edge instead */
+.mode-pill.w-9[aria-pressed="true"]::after {
+	bottom: auto;
+	top: 50%;
+	left: -1px;
+	width: 2px;
+	height: 14px;
+	transform: translateY(-50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rogue-nav a svg,
+	.rogue-nav a[aria-current="page"]::before,
+	.rogue-nav a[aria-current="page"] svg :is(path, circle, rect, line, polyline, polygon),
+	.mode-pill[aria-pressed="true"]::after { transition: none; animation: none; }
+	.rogue-nav a[aria-current="page"] svg :is(path, circle, rect, line, polyline, polygon) { stroke-dasharray: none; }
 }
 
 /* ── Wow: Landing page hero animations ──────────────────────────────────────── */

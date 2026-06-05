@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	// ── tab state ──────────────────────────────────────────────
 	let activeTab = $state<'overview' | 'invoices' | 'balance' | 'budget' | 'growth' | 'stack'>('overview');
@@ -43,18 +45,18 @@
 
 	async function emailInvoice(invoice: any) {
 		if (!invoice.client?.name) {
-			alert('This invoice has no client linked. Edit the invoice to link a client first.');
+			toastError('This invoice has no client linked. Edit the invoice to link a client first.');
 			return;
 		}
 
 		// Get client's primary contact email
 		const clientRes = await apiFetch(`/api/clients/${invoice.client_id}`);
-		if (!clientRes.ok) { alert('Could not load client details'); return; }
+		if (!clientRes.ok) { toastError('Could not load client details'); return; }
 		const client = await clientRes.json();
 
 		const toEmail = client.primary_contact_email;
 		if (!toEmail) {
-			alert(`No email on file for ${client.name}. Add one in Clients → Edit Profile.`);
+			toastError(`No email on file for ${client.name}. Add one in Clients → Edit Profile.`);
 			return;
 		}
 
@@ -75,7 +77,7 @@
 				</table>
 				${invoice.scope_of_work ? `<p style="color:#666;font-style:italic;">${invoice.scope_of_work}</p>` : ''}
 				<p style="color:#666;margin-top:24px;">Thank you for your business.</p>
-				<p style="color:#999;font-size:13px;">Sent via LeadOS · ${agencyName}</p>
+				<p style="color:#999;font-size:13px;">Sent via RogueOS · ${agencyName}</p>
 			</div>
 		`;
 
@@ -156,6 +158,9 @@
 			invoices = [inv, ...invoices];
 			showInvoiceForm = false;
 			invoiceForm = defaultInvoiceForm();
+			toastSuccess('Invoice created');
+		} else {
+			toastError('Failed to create invoice — check the form and try again');
 		}
 		invoiceSaving = false;
 	}
@@ -199,14 +204,14 @@
 
 	const stackCategories = ['calling', 'ai', 'hosting', 'crm', 'banking', 'payments', 'legal', 'storage', 'analytics', 'productivity', 'other'];
 	const stackCatColors: Record<string, string> = {
-		calling: 'text-blue-400', ai: 'text-purple-400', hosting: 'text-gray-400',
-		crm: 'text-cyan-400', banking: 'text-green-400', payments: 'text-emerald-400',
+		calling: 'text-blue-400', ai: 'text-[var(--accent)]', hosting: 'text-gray-400',
+		crm: 'text-cyan-400', banking: 'text-[var(--accent)]', payments: 'text-[var(--accent)]',
 		legal: 'text-yellow-400', storage: 'text-orange-400', analytics: 'text-pink-400',
 		productivity: 'text-indigo-400', other: 'text-[#666]',
 	};
 
 	const stackStatusColor = (s: string) =>
-		s === 'active' ? 'text-green-400 bg-green-400/10' :
+		s === 'active' ? 'text-[var(--accent)] bg-[var(--accent)]/12' :
 		s === 'trial'  ? 'text-yellow-400 bg-yellow-400/10' :
 		s === 'paused' ? 'text-[#666] bg-[#222]' :
 		                 'text-red-400/60 bg-red-400/5';
@@ -286,7 +291,7 @@
 		return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 	}
 	function statusColor(s: string) {
-		if (s === 'paid') return 'text-green-400';
+		if (s === 'paid') return 'text-[var(--accent)]';
 		if (s === 'overdue') return 'text-red-400';
 		return 'text-yellow-400';
 	}
@@ -344,6 +349,9 @@
 			stackForm = defaultStackForm();
 			showStackForm = false;
 			editingStack = null;
+			toastSuccess('Account saved');
+		} else {
+			toastError('Failed to save account — try again');
 		}
 		stackSaving = false;
 	}
@@ -405,6 +413,9 @@
 		if (res.ok) {
 			await loadAll();
 			balForm = { date: today(), income: '', expenses: '', notes: '' };
+			toastSuccess('Balance entry saved');
+		} else {
+			toastError('Failed to save balance entry — try again');
 		}
 		balSaving = false;
 	}
@@ -422,21 +433,34 @@
 			techForm = { name: '', category: 'other', monthlyCost: '', billingCycle: 'monthly', url: '', notes: '' };
 			showTechForm = false;
 			editingTech = null;
+			toastSuccess('Tool saved');
+		} else {
+			toastError('Failed to save tool — try again');
 		}
 		techSaving = false;
 	}
 
 	async function deleteTech(id: string) {
-		await apiFetch(`/api/financials/tech-stack/${id}`, { method: 'DELETE' });
-		await loadAll();
+		if (!confirm('Delete this tool from your stack?')) return;
+		const res = await apiFetch(`/api/financials/tech-stack/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			await loadAll();
+			toastSuccess('Tool deleted');
+		} else {
+			toastError('Failed to delete tool — try again');
+		}
 	}
 
 	async function toggleTechActive(item: any) {
-		await apiFetch(`/api/financials/tech-stack/${item.id}`, {
+		const res = await apiFetch(`/api/financials/tech-stack/${item.id}`, {
 			method: 'PATCH',
 			body: JSON.stringify({ active: !item.active }),
 		});
-		await loadAll();
+		if (res.ok) {
+			await loadAll();
+		} else {
+			toastError('Failed to update tool — try again');
+		}
 	}
 
 	function editTech(item: any) {
@@ -455,23 +479,38 @@
 			await loadAll();
 			budgetForm = { entryType: 'expense', category: '', label: '', amount: '', frequency: 'monthly', notes: '' };
 			showBudgetForm = false;
+			toastSuccess('Budget entry saved');
+		} else {
+			toastError('Failed to save budget entry — try again');
 		}
 		budgetSaving = false;
 	}
 
 	async function deleteBudget(id: string) {
-		await apiFetch(`/api/financials/budget/${id}`, { method: 'DELETE' });
-		await loadAll();
+		if (!confirm('Delete this budget entry?')) return;
+		const res = await apiFetch(`/api/financials/budget/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			await loadAll();
+			toastSuccess('Budget entry deleted');
+		} else {
+			toastError('Failed to delete budget entry — try again');
+		}
 	}
 
 	async function markInvoicePaid(inv: any) {
+		if (!confirm(`Mark invoice ${inv.invoice_number ?? ''} as paid? This records payment of ${fmtD(inv.total ?? 0)}.`)) return;
 		markingPaid = inv.id;
 		// PATCH invoice status — hits the existing invoices API
-		await apiFetch(`/api/invoices/${inv.id}`, {
+		const res = await apiFetch(`/api/invoices/${inv.id}`, {
 			method: 'PATCH',
 			body: JSON.stringify({ status: 'paid', paidAt: new Date().toISOString() }),
 		});
-		await loadAll();
+		if (res.ok) {
+			await loadAll();
+			toastSuccess('Invoice marked as paid');
+		} else {
+			toastError('Failed to mark invoice paid — try again');
+		}
 		markingPaid = null;
 	}
 
@@ -500,7 +539,7 @@
 	let tooltip = $state<{ x: number; y: number; text: string } | null>(null);
 </script>
 
-<svelte:head><title>Financials — LeadOS</title></svelte:head>
+<svelte:head><title>Financials — RogueOS</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 
@@ -560,7 +599,7 @@
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Collected</div>
-					<div class="text-2xl font-semibold text-green-400">{fmt(s?.invoices?.totalPaid ?? 0)}</div>
+					<div class="text-2xl font-semibold text-[var(--accent)]">{fmt(s?.invoices?.totalPaid ?? 0)}</div>
 					<div class="text-[#666] text-xs mt-1">Outstanding: {fmt(s?.invoices?.totalOutstanding ?? 0)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
@@ -585,7 +624,7 @@
 					</div>
 					<div class="w-full h-2 bg-[#222] rounded-full overflow-hidden">
 						<div
-							class="h-full rounded-full transition-all {q.pct >= 100 ? 'bg-green-400' : q.pct >= 70 ? 'bg-yellow-400' : 'bg-red-400'}"
+							class="h-full rounded-full transition-all {q.pct >= 100 ? 'bg-[var(--accent)]' : q.pct >= 70 ? 'bg-yellow-400' : 'bg-red-400'}"
 							style="width:{Math.min(q.pct, 100)}%"
 						></div>
 					</div>
@@ -597,12 +636,12 @@
 			<div class="grid grid-cols-2 gap-4">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Net Cash (period)</div>
-					<div class="text-2xl font-semibold {net >= 0 ? 'text-green-400' : 'text-red-400'}">{fmt(net)}</div>
+					<div class="text-2xl font-semibold {net >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(net)}</div>
 					<div class="text-[#666] text-xs mt-1">In: {fmt(summary?.balance?.totalIncome ?? 0)} · Out: {fmt(summary?.balance?.totalExpenses ?? 0)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Budget Cash Flow / mo</div>
-					<div class="text-2xl font-semibold {monthlyCashFlow >= 0 ? 'text-green-400' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
+					<div class="text-2xl font-semibold {monthlyCashFlow >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
 					<div class="text-[#666] text-xs mt-1">Income: {fmt(monthlyIncome)} · Expenses: {fmt(monthlyExpenses + techMonthlyTotal)}</div>
 				</div>
 			</div>
@@ -807,7 +846,7 @@
 											<button
 												onclick={() => markInvoicePaid(inv)}
 												disabled={markingPaid === inv.id}
-												class="text-xs text-green-400 hover:text-green-300 disabled:opacity-50"
+												class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] disabled:opacity-50"
 											>
 												{markingPaid === inv.id ? '…' : 'Mark Paid'}
 											</button>
@@ -833,7 +872,7 @@
 					</div>
 					<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 flex gap-3 items-center">
 						<span class="text-[#666]">Collected</span>
-						<span class="font-medium text-green-400">{fmtD(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.total ?? 0), 0))}</span>
+						<span class="font-medium text-[var(--accent)]">{fmtD(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.total ?? 0), 0))}</span>
 					</div>
 					<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 flex gap-3 items-center">
 						<span class="text-[#666]">Outstanding</span>
@@ -907,7 +946,7 @@
 						{/each}
 					</svg>
 					<div class="flex gap-4 mt-2 text-xs text-[#666]">
-						<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-green-400 inline-block"></span> Income</span>
+						<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-[var(--accent)] inline-block"></span> Income</span>
 						<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-red-400 inline-block"></span> Expenses</span>
 					</div>
 				</div>
@@ -943,7 +982,7 @@
 							{@const net = (entry.income ?? 0) - (entry.expenses ?? 0)}
 							<tr class="border-b border-[#1a1a1a] hover:bg-[#1a1a1a]">
 								<td class="px-4 py-3 text-[#999]">{fmtDate(entry.entry_date)}</td>
-								<td class="px-4 py-3 text-right text-green-400">{fmtD(entry.income ?? 0)}</td>
+								<td class="px-4 py-3 text-right text-[var(--accent)]">{fmtD(entry.income ?? 0)}</td>
 								<td class="px-4 py-3 text-right text-red-400">{fmtD(entry.expenses ?? 0)}</td>
 								<td class="px-4 py-3 text-right font-medium {net >= 0 ? 'text-white' : 'text-red-400'}">{fmtD(net)}</td>
 								<td class="px-4 py-3 text-[#666] text-xs">{entry.notes ?? ''}</td>
@@ -961,7 +1000,7 @@
 			<div class="grid grid-cols-3 gap-4 mb-6">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Monthly Income</div>
-					<div class="text-xl font-semibold text-green-400">{fmt(monthlyIncome)}</div>
+					<div class="text-xl font-semibold text-[var(--accent)]">{fmt(monthlyIncome)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Monthly Expenses</div>
@@ -970,7 +1009,7 @@
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
 					<div class="text-[#666] text-xs mb-1">Net Cash Flow</div>
-					<div class="text-xl font-semibold {monthlyCashFlow >= 0 ? 'text-green-400' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
+					<div class="text-xl font-semibold {monthlyCashFlow >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
 				</div>
 			</div>
 
@@ -1036,7 +1075,7 @@
 			<div class="grid grid-cols-2 gap-6">
 				<!-- Income -->
 				<div>
-					<div class="text-xs uppercase tracking-wide text-green-400/70 mb-2">Income Sources</div>
+					<div class="text-xs uppercase tracking-wide text-[var(--accent)]/70 mb-2">Income Sources</div>
 					<div class="bg-[#111] border border-[#2a2a2a] rounded-lg overflow-hidden">
 						{#each budgetIncome as entry, i}
 							<div class="flex items-center gap-3 px-8 py-4 {i < budgetIncome.length - 1 ? 'border-b border-[#1a1a1a]' : ''}">
@@ -1044,8 +1083,8 @@
 									<div class="text-sm">{entry.label}</div>
 									<div class="text-xs text-[#666]">{entry.category} · {entry.frequency}</div>
 								</div>
-								<div class="text-sm text-green-400">{fmtD(toMonthly(entry))}/mo</div>
-								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors">✕</button>
+								<div class="text-sm text-[var(--accent)]">{fmtD(toMonthly(entry))}/mo</div>
+								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{:else}
 							<div class="px-4 py-6 text-center text-[#555] text-sm">No income entries</div>
@@ -1064,7 +1103,7 @@
 									<div class="text-xs text-[#666]">{entry.category} · {entry.frequency}</div>
 								</div>
 								<div class="text-sm text-red-400">{fmtD(toMonthly(entry))}/mo</div>
-								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors">✕</button>
+								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{:else}
 							<div class="px-4 py-6 text-center text-[#555] text-sm">No expense entries</div>
@@ -1144,10 +1183,10 @@
 							<div class="mb-2">
 								<div class="flex justify-between text-sm mb-1">
 									<span>{name}</span>
-									<span class="text-green-400">{fmt(val as number)}</span>
+									<span class="text-[var(--accent)]">{fmt(val as number)}</span>
 								</div>
 								<div class="w-full h-1.5 bg-[#222] rounded-full">
-									<div class="h-full bg-green-400 rounded-full" style="width:{((val as number) / maxVal) * 100}%"></div>
+									<div class="h-full bg-[var(--accent)] rounded-full" style="width:{((val as number) / maxVal) * 100}%"></div>
 								</div>
 							</div>
 						{:else}
@@ -1164,7 +1203,7 @@
 							<div class="grid grid-cols-3 gap-4 text-sm">
 								<div class="text-center">
 									<div class="text-[#666] text-xs mb-1">Revenue</div>
-									<div class="font-medium text-green-400">{fmt(totalRev)}</div>
+									<div class="font-medium text-[var(--accent)]">{fmt(totalRev)}</div>
 								</div>
 								<div class="text-center">
 									<div class="text-[#666] text-xs mb-1">API Cost</div>
@@ -1172,7 +1211,7 @@
 								</div>
 								<div class="text-center">
 									<div class="text-[#666] text-xs mb-1">Cost %</div>
-									<div class="font-medium {costPct < 5 ? 'text-green-400' : costPct < 15 ? 'text-yellow-400' : 'text-red-400'}">{costPct.toFixed(1)}%</div>
+									<div class="font-medium {costPct < 5 ? 'text-[var(--accent)]' : costPct < 15 ? 'text-yellow-400' : 'text-red-400'}">{costPct.toFixed(1)}%</div>
 								</div>
 							</div>
 						</div>
@@ -1365,7 +1404,7 @@
 										</div>
 										<div class="text-right flex-shrink-0">
 											{#if acct.billing_cycle === 'free'}
-												<div class="text-sm text-green-400">Free</div>
+												<div class="text-sm text-[var(--accent)]">Free</div>
 											{:else if acct.billing_cycle === 'usage_based'}
 												<div class="text-sm text-[#999]">Usage</div>
 											{:else}

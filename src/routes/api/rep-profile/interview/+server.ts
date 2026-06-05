@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import type { RequestHandler } from './$types';
@@ -36,6 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	let feedback: string | null = null;
 
 	if (transcript?.trim()) {
+		await assertAiAccess(user.id);
 		// Score with Claude
 		try {
 			const { env } = await import('$env/dynamic/private');

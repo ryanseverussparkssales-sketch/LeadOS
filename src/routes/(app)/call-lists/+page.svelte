@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
 	import CSVImport from '$lib/components/CSVImport.svelte';
 	import ContactRow from '$lib/components/ContactRow.svelte';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import type { Contact } from '$lib/stores';
 
 	interface Client { id: string; name: string; }
@@ -49,11 +51,17 @@
 
 	async function removeContact(contactId: string) {
 		if (!selected) return;
-		await apiFetch(`/api/call-lists/${selected.id}/contacts`, {
+		if (!confirm('Remove this contact from the list?')) return;
+		const res = await apiFetch(`/api/call-lists/${selected.id}/contacts`, {
 			method: 'DELETE',
 			body: JSON.stringify({ contact_id: contactId }),
 		});
-		contacts = contacts.filter(c => c.id !== contactId);
+		if (res.ok) {
+			contacts = contacts.filter(c => c.id !== contactId);
+			toastSuccess('Contact removed from list');
+		} else {
+			toastError('Failed to remove contact — try again');
+		}
 	}
 
 	async function loadAllContacts() {
@@ -101,7 +109,7 @@
 	}
 </script>
 
-<svelte:head><title>Call Lists — LeadOS</title></svelte:head>
+<svelte:head><title>Call Lists — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">
@@ -210,7 +218,7 @@
 		<div class="bg-[#111111] border border-[#2a2a2a] rounded-xl w-[560px] max-h-[70vh] flex flex-col" onclick={(e) => e.stopPropagation()}>
 			<div class="p-4 border-b border-[#2a2a2a] flex items-center justify-between">
 				<p class="text-white text-sm font-medium">Add contacts to "{selected?.name}"</p>
-				<button onclick={() => showAddExisting = false} class="text-[#666] hover:text-white">✕</button>
+				<button onclick={() => showAddExisting = false} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-4 border-b border-[#2a2a2a]">
 				<input bind:value={addSearch} placeholder="Search contacts..."

@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { assertAiAccess } from '$lib/server/tier';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import { rateLimitUser } from '$lib/server/rateLimit';
 import { env } from '$env/dynamic/private';
@@ -6,6 +7,7 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
+	await assertAiAccess(user.id);
 	if (await rateLimitUser(user.id, { max: 10, windowMs: 60_000 })) throw error(429, 'Rate limit exceeded — max 10 script improvements/minute');
 	const ownerId = await getEffectiveUserId(user.id);
 

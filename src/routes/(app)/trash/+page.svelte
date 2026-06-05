@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface TrashItem {
 		id: string;
@@ -37,8 +38,8 @@
 
 	const badgeColors: Record<string, string> = {
 		contacts: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-		clients: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
-		campaigns: 'bg-green-500/15 text-green-400 border border-green-500/20',
+		clients: 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40',
+		campaigns: 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40',
 		projects: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
 		deals: 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
 	};
@@ -102,6 +103,9 @@
 		});
 		if (res.ok && data) {
 			data = { ...data, [type]: (data as any)[type].filter((x: TrashItem) => x.id !== id) };
+			toastSuccess('Item restored');
+		} else if (!res.ok) {
+			toastError('Failed to restore — try again');
 		}
 	}
 
@@ -116,6 +120,9 @@
 		const res = await apiFetch(`/api/${type}/${id}?permanent=true`, { method: 'DELETE' });
 		if (res.ok && data) {
 			data = { ...data, [type]: (data as any)[type].filter((x: TrashItem) => x.id !== id) };
+			toastSuccess('Item permanently deleted');
+		} else if (!res.ok) {
+			toastError('Failed to delete — try again');
 		}
 	}
 
@@ -126,7 +133,7 @@
 	}
 </script>
 
-<svelte:head><title>Trash — LeadOS</title></svelte:head>
+<svelte:head><title>Trash — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto bg-[#0a0a0a]">
 	<!-- Header -->

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
-	import { toastSuccess } from '$lib/stores/toast';
+	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface CallList { id: string; name: string; status: string; }
 	interface Project { id: string; name: string; call_lists: CallList[]; }
@@ -50,13 +51,20 @@
 			await loadEngagements(selected.id);
 			showEngForm = false;
 			toastSuccess('Engagement saved');
+		} else {
+			toastError('Failed to save engagement');
 		}
 		savingEng = false;
 	}
 
 	async function deleteEngagement(id: string) {
-		await apiFetch(`/api/engagements?id=${id}`, { method: 'DELETE' });
-		engagements = engagements.filter(e => e.id !== id);
+		const res = await apiFetch(`/api/engagements?id=${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			engagements = engagements.filter(e => e.id !== id);
+			toastSuccess('Engagement removed');
+		} else {
+			toastError('Failed to remove engagement');
+		}
 	}
 
 	// Client docs
@@ -81,12 +89,19 @@
 			method: 'POST',
 			body: JSON.stringify({ clientId: selected.id, title: docTitle.trim(), url: docUrl.trim(), docType, description: docDesc || undefined, isVisibleToClient: docVisible }),
 		});
-		if (res.ok) { await loadDocs(selected.id); docTitle = ''; docUrl = ''; docDesc = ''; showDocForm = false; }
+		if (res.ok) { await loadDocs(selected.id); docTitle = ''; docUrl = ''; docDesc = ''; showDocForm = false; toastSuccess('Document added'); }
+		else { toastError('Failed to add document'); }
 		savingDoc = false;
 	}
 	async function deleteDoc(id: string) {
-		await apiFetch(`/api/client-docs?id=${id}`, { method: 'DELETE' });
-		docs = docs.filter(d => d.id !== id);
+		if (!confirm('Delete this document? This cannot be undone.')) return;
+		const res = await apiFetch(`/api/client-docs?id=${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			docs = docs.filter(d => d.id !== id);
+			toastSuccess('Document deleted');
+		} else {
+			toastError('Failed to delete document');
+		}
 	}
 
 	// Client profile edit
@@ -109,6 +124,9 @@
 			selected = { ...selected, ...updated };
 			clients = clients.map(c => c.id === selected!.id ? { ...c, ...updated } : c);
 			editingClient = false;
+			toastSuccess('Profile saved');
+		} else {
+			toastError('Failed to save profile');
 		}
 	}
 
@@ -161,6 +179,9 @@
 			const item = await res.json();
 			knowledge = [...knowledge, item];
 			kTitle = ''; kContent = ''; kType = 'general';
+			toastSuccess('Knowledge added');
+		} else {
+			toastError('Failed to add knowledge');
 		}
 		savingK = false;
 	}
@@ -233,9 +254,15 @@
 	}
 
 	async function deleteKnowledge(id: string) {
-		await apiFetch(`/api/client-knowledge/${id}`, { method: 'DELETE' });
-		knowledge = knowledge.filter(k => k.id !== id);
-		if (expandedK === id) expandedK = null;
+		if (!confirm('Delete this knowledge entry? This cannot be undone.')) return;
+		const res = await apiFetch(`/api/client-knowledge/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			knowledge = knowledge.filter(k => k.id !== id);
+			if (expandedK === id) expandedK = null;
+			toastSuccess('Knowledge deleted');
+		} else {
+			toastError('Failed to delete knowledge');
+		}
 	}
 
 	let newProjectClientId = $state('');
@@ -260,16 +287,23 @@
 		newClientName = '';
 		adding = false;
 		if (res.ok) { toastSuccess(`${_clientName} added`); }
+		else { toastError('Failed to create client'); }
 		await load();
 	}
 
 	let confirmDeleteId = $state<string | null>(null);
 
 	async function deleteClient(id: string) {
-		await apiFetch(`/api/clients/${id}`, { method: 'DELETE' });
-		if (selected?.id === id) selected = null;
-		confirmDeleteId = null;
-		await load();
+		const res = await apiFetch(`/api/clients/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			if (selected?.id === id) selected = null;
+			confirmDeleteId = null;
+			await load();
+			toastSuccess('Client deleted');
+		} else {
+			confirmDeleteId = null;
+			toastError('Failed to delete client');
+		}
 	}
 
 	async function createProject() {
@@ -277,6 +311,7 @@
 		const res = await apiFetch('/api/projects', { method: 'POST', body: JSON.stringify({ name: newProjectName, client_id: newProjectClientId }) });
 		newProjectName = '';
 		if (res.ok) { toastSuccess('Project created'); }
+		else { toastError('Failed to create project'); }
 		await load();
 		selected = clients.find(c => c.id === newProjectClientId) ?? null;
 	}
@@ -286,7 +321,7 @@
 	}
 </script>
 
-<svelte:head><title>Clients — LeadOS</title></svelte:head>
+<svelte:head><title>Clients — RogueOS</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -335,7 +370,7 @@
 							<button onclick={startEditClient} class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">
 								✎ Edit Profile
 							</button>
-							<button onclick={() => { showKbChat = !showKbChat; if (showKbChat) kbHistory = []; }} class="rounded-lg border border-purple-800 px-3 py-1.5 text-xs text-purple-400 hover:bg-purple-900/20 transition-colors">✨ Ask AI</button>
+							<button onclick={() => { showKbChat = !showKbChat; if (showKbChat) kbHistory = []; }} class="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">✨ Ask AI</button>
 							<button onclick={getInsights} class="rounded-lg border border-blue-800 px-3 py-1.5 text-xs text-blue-400 hover:bg-blue-900/20 transition-colors">
 								📊 Insights
 							</button>
@@ -395,7 +430,7 @@
 								{#if selected.contract_value}<div><span class="text-[#555]">Contract</span><p class="text-white">${selected.contract_value?.toLocaleString()}/mo</p></div>{/if}
 								{#if selected.primary_contact_name}<div><span class="text-[#555]">Contact</span><p class="text-white">{selected.primary_contact_name}</p></div>{/if}
 								{#if selected.primary_contact_email}<div><span class="text-[#555]">Email</span><a href="mailto:{selected.primary_contact_email}" class="text-blue-400 hover:underline">{selected.primary_contact_email}</a></div>{/if}
-								{#if selected.primary_contact_phone}<div><span class="text-[#555]">Phone</span><a href="/phone?number={selected.primary_contact_phone}" class="text-green-400 hover:underline">{selected.primary_contact_phone}</a></div>{/if}
+								{#if selected.primary_contact_phone}<div><span class="text-[#555]">Phone</span><a href="/phone?number={selected.primary_contact_phone}" class="text-[var(--accent)] hover:underline">{selected.primary_contact_phone}</a></div>{/if}
 								{#if selected.website}<div class="col-span-2"><span class="text-[#555]">Website</span><a href={selected.website} target="_blank" rel="noopener" class="text-blue-400 hover:underline ml-2">{selected.website} ↗</a></div>{/if}
 								{#if selected.contract_status && selected.contract_status !== 'active'}<div><span class="text-[#555]">Status</span><span class="text-yellow-400 capitalize ml-1">{selected.contract_status}</span></div>{/if}
 							</div>
@@ -424,7 +459,7 @@
 									<p class="text-xs text-yellow-400">${eng.bonus_rate} per appointment · bills day {eng.billing_day}</p>
 									{#if eng.notes}<p class="text-[10px] text-[#444] mt-0.5">{eng.notes}</p>{/if}
 								</div>
-								<button onclick={() => window.confirm('Remove this engagement?') && deleteEngagement(eng.id)} class="text-[#333] hover:text-red-400 text-xs transition-colors">✕</button>
+								<button onclick={() => window.confirm('Remove this engagement?') && deleteEngagement(eng.id)} class="text-[#333] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{/each}
 					{:else if !showEngForm}
@@ -477,7 +512,7 @@
 										<a href={doc.url} target="_blank" rel="noopener noreferrer" class="text-xs text-white hover:underline truncate block">{doc.title}</a>
 										<p class="text-[9px] text-[#444]">{doc.submitted_by_name ?? 'Client'} · {new Date(doc.created_at).toLocaleDateString()}</p>
 									</div>
-									<button onclick={() => deleteDoc(doc.id)} class="text-[#333] hover:text-red-400 text-xs shrink-0">✕</button>
+									<button onclick={() => deleteDoc(doc.id)} class="text-[#333] hover:text-red-400 text-xs shrink-0"><Icon name="x" size={14} /></button>
 								</div>
 							{/each}
 						</div>
@@ -525,7 +560,7 @@
 							<p class="text-[10px] text-[#444] mt-1 uppercase tracking-wider">Projects</p>
 						</div>
 						<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4">
-							<p class="text-2xl font-semibold text-green-400">${clients.reduce((s, c) => s + (c.contract_value ?? 0), 0).toLocaleString()}</p>
+							<p class="text-2xl font-semibold text-[var(--accent)]">${clients.reduce((s, c) => s + (c.contract_value ?? 0), 0).toLocaleString()}</p>
 							<p class="text-[10px] text-[#444] mt-1 uppercase tracking-wider">Monthly</p>
 						</div>
 					</div>

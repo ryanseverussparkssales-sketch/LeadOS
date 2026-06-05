@@ -25,7 +25,7 @@
 					<p class="text-xs text-[#555]">{agent.totalCalls} calls · {agent.answerRate}% answer</p>
 				</div>
 				{#if agent.avgQuality}
-					<p class="text-xs {agent.avgQuality >= 8 ? 'text-green-400' : 'text-yellow-400'} shrink-0">{agent.avgQuality}</p>
+					<p class="text-xs {agent.avgQuality >= 8 ? 'text-[var(--accent)]' : 'text-yellow-400'} shrink-0">{agent.avgQuality}</p>
 				{/if}
 			</div>
 		{/each}

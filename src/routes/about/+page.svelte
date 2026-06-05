@@ -1,25 +1,24 @@
 <svelte:head>
-	<title>About — Sparks Curiosity Studio</title>
-	<meta property="og:title" content="About — Sparks Curiosity Studio" />
-	<meta property="og:description" content="We built the outreach infrastructure we needed ourselves. LeadOS is our platform. Sparks Curiosity Studio is our agency." />
+	<title>About — RogueLeads</title>
+	<meta property="og:title" content="About — RogueLeads" />
+	<meta property="og:description" content="We built the outreach infrastructure we needed ourselves. RogueOS is our platform. RogueLeads is our agency." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="LeadOS" />
+	<meta property="og:site_name" content="RogueOS" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="About — Sparks Curiosity Studio" />
-	<meta name="twitter:description" content="We built the outreach infrastructure we needed ourselves. LeadOS is our platform. Sparks Curiosity Studio is our agency." />
+	<meta name="twitter:title" content="About — RogueLeads" />
+	<meta name="twitter:description" content="We built the outreach infrastructure we needed ourselves. RogueOS is our platform. RogueLeads is our agency." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" />
-	<meta name="description" content="We built the outreach infrastructure we wish existed. LeadOS is our platform. Sparks Curiosity Studio is our agency. Here's the story." />
+	<meta name="description" content="We built the outreach infrastructure we wish existed. RogueOS is our platform. RogueLeads is our agency. Here's the story." />
 </svelte:head>
 
 <div class="min-h-screen bg-[#000] text-white" style="font-family:var(--font-ui,'Inter',system-ui,sans-serif)">
 
 	<!-- Nav -->
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
-		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">LEADOS</a>
+		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">ROGUEOS</a>
 		<div class="flex items-center gap-6">
 			<a href="/pricing" class="text-xs text-[#444] hover:text-white transition-colors">Pricing</a>
-			<a href="/coaching" class="text-xs text-[#444] hover:text-white transition-colors">Coaching</a>
 			<a href="/contact" class="text-xs text-[#444] hover:text-white transition-colors">Contact</a>
 			<a href="/" class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-4 py-1.5 rounded-lg hover:border-white transition-colors">Log in →</a>
 		</div>
@@ -33,7 +32,7 @@
 			<span style="font-style:italic;color:#444">we needed ourselves.</span>
 		</h1>
 		<p class="text-sm text-[#555] leading-relaxed max-w-2xl">
-			Sparks Curiosity Studio is a managed outreach agency. LeadOS is the platform we built to run it. Both are available to you — together or separately.
+			RogueLeads is a managed outreach agency. RogueOS is the platform we built to run it. Both are available to you — together or separately.
 		</p>
 	</div>
 
@@ -51,14 +50,14 @@
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">What we built</p>
 				<p class="text-sm text-[#666] leading-relaxed">
-					LeadOS started as an internal tool for managing our own SDR team. It needed three things no single platform offered: a fast, AI-enhanced dialer for reps, a transparent client portal that builds trust without weekly report calls, and an agency command center that gives one person full operational visibility across every campaign and client simultaneously.
+					RogueOS started as an internal tool for managing our own SDR team. It needed three things no single platform offered: a fast, AI-enhanced dialer for reps, a transparent client portal that builds trust without weekly report calls, and an agency command center that gives one person full operational visibility across every campaign and client simultaneously.
 				</p>
 			</div>
 
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">Where we are now</p>
 				<p class="text-sm text-[#666] leading-relaxed">
-					Sparks Curiosity Studio operates outbound campaigns for brands in home improvement, B2B services, and adjacent verticals. We run appointment-setting and lead rejuvenation programs, performance-based and retainer models. LeadOS is the infrastructure behind every campaign we run — and now it's available to other teams and agencies too.
+					RogueLeads operates outbound campaigns for brands in home improvement, B2B services, and adjacent verticals. We run appointment-setting and lead rejuvenation programs, performance-based and retainer models. RogueOS is the infrastructure behind every campaign we run — and now it's available to other teams and agencies too.
 				</p>
 			</div>
 		</div>
@@ -92,7 +91,7 @@
 
 	<!-- Who we serve -->
 	<div class="max-w-5xl mx-auto px-8 mb-20">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		<div class="grid grid-cols-1 max-w-xl mx-auto">
 
 			<div class="rounded-2xl border border-[#1a1a1a] bg-[#060606] p-10">
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#333;margin-bottom:14px">For brands & companies</p>
@@ -110,23 +109,6 @@
 					Talk to us →
 				</a>
 			</div>
-
-			<div class="rounded-2xl border border-[#1a1a1a] bg-[#060606] p-10">
-				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#333;margin-bottom:14px">For sales reps</p>
-				<h3 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:400;font-size:22px;color:#fff;margin-bottom:10px">Dial campaigns.<br/>Earn per appointment.</h3>
-				<p class="text-xs text-[#555] leading-relaxed mb-6">We provide the dialer, the scripts, the leads, and the coaching. You dial when you want. You get paid per qualified appointment set — directly to your Stripe account, no invoicing required.</p>
-				<div class="space-y-2 mb-6">
-					{#each ['Performance-based, no hourly floor','AI coaching feedback on every call','Public marketplace profile to attract brands','Stripe Connect payouts per appointment'] as v}
-						<div class="flex items-center gap-2">
-							<div class="w-1 h-1 rounded-full bg-[#2a2a2a] shrink-0"></div>
-							<span class="text-[11px] text-[#444]">{v}</span>
-						</div>
-					{/each}
-				</div>
-				<a href="/marketplace" class="inline-block rounded-xl border border-[#2a2a2a] px-5 py-2 text-xs text-[#888] hover:border-white hover:text-white transition-colors">
-					View open campaigns →
-				</a>
-			</div>
 		</div>
 	</div>
 
@@ -138,9 +120,9 @@
 				<div class="w-12 h-12 rounded-xl border border-[#1a1a1a] bg-[#080808] flex items-center justify-center text-lg font-semibold text-[#444] shrink-0">R</div>
 				<div>
 					<p class="text-white font-medium mb-0.5">Ryan Sparks</p>
-					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.14em;color:#333;margin-bottom:10px">Sparks Curiosity Studio · LeadOS</p>
+					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.14em;color:#333;margin-bottom:10px">RogueLeads · RogueOS</p>
 					<p class="text-xs text-[#444] leading-relaxed max-w-lg">
-						Sales professional, actor, writer, and builder. Spent years doing outbound the hard way before deciding to build the tool that should have existed. LeadOS runs every campaign we run — which means every bug matters and every feature has to earn its place.
+						Sales professional, actor, writer, and builder. Spent years doing outbound the hard way before deciding to build the tool that should have existed. RogueOS runs every campaign we run — which means every bug matters and every feature has to earn its place.
 					</p>
 					<div class="flex items-center gap-4 mt-4">
 						<a href="mailto:ryanseverussparkssales@gmail.com" class="text-[10px] text-[#333] hover:text-white transition-colors">Email</a>
@@ -170,16 +152,14 @@
 
 	<!-- Footer -->
 	<div class="border-t border-[#0a0a0a] px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4 max-w-5xl mx-auto">
-		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">LEADOS</span>
+		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:12px;letter-spacing:.22em;color:#222">ROGUEOS</span>
 		<div class="flex items-center gap-6 text-[10px] text-[#2a2a2a]">
 			<a href="/pricing" class="hover:text-white transition-colors">Pricing</a>
-			<a href="/coaching" class="hover:text-white transition-colors">Coaching</a>
-			<a href="/marketplace" class="hover:text-white transition-colors">Marketplace</a>
 			<a href="/terms" class="hover:text-white transition-colors">Terms</a>
 			<a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
 			<a href="/contact" class="hover:text-white transition-colors">Contact</a>
 		</div>
-		<span class="text-[10px] text-[#1a1a1a]">© 2026 Sparks Curiosity Studio</span>
+		<span class="text-[10px] text-[#1a1a1a]">© 2026 RogueLeads</span>
 	</div>
 
 </div>

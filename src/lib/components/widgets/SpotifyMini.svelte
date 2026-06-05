@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { spotifyState, useSpotify } from '$lib/stores/spotify';
 
@@ -217,7 +218,7 @@
 			<div class="playlist-panel">
 				<div class="playlist-header">
 					<span class="playlist-title">YOUR PLAYLISTS</span>
-					<button onclick={() => showPlaylists = false} class="playlist-close">✕</button>
+					<button onclick={() => showPlaylists = false} class="playlist-close"><Icon name="x" size={14} /></button>
 				</div>
 				{#if loadingPlaylists}
 					<div class="playlist-loading">Loading...</div>

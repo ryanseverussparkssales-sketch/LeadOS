@@ -1,11 +1,11 @@
-# LeadOS — Vercel Launch Checklist
+# RogueOS — Vercel Launch Checklist
 **Complete these steps in order. ~45 minutes total.**
 
 ---
 
 ## STEP 1 — Test the local build first (5 min)
 ```bash
-cd "C:\Users\Ryan\Lead Os\LeadOS\leadosuite-mvp"
+cd "C:\Users\Ryan\Lead Os\RogueOS\rogueos-mvp"
 npm run build
 ```
 Fix any TypeScript or compile errors before pushing. A successful local build means Vercel will build cleanly.
@@ -50,7 +50,7 @@ git push origin main
 
 ## STEP 6 — Create Vercel project (5 min)
 1. Go to vercel.com → New Project → Import from GitHub
-2. Select your LeadOS repo
+2. Select your RogueOS repo
 3. **CRITICAL:** Set framework to **SvelteKit** (not Next.js)
 4. Build command: `npm run build`
 5. Output directory: `.vercel/output`
@@ -80,7 +80,7 @@ Set all to **Production** (and Preview if you want staging).
 ---
 
 ## STEP 8 — Get your Vercel URL, then update CSRF (3 min)
-After adding env vars, Vercel will show your URL (e.g. `leadosuite-mvp.vercel.app`).
+After adding env vars, Vercel will show your URL (e.g. `rogueos-mvp.vercel.app`).
 
 Update `svelte.config.js` → `trustedOrigins`:
 ```js

@@ -52,8 +52,8 @@ export async function getValidToken(account: GmailAccount): Promise<string> {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-            client_id: env.GOOGLE_CLIENT_ID,
-            client_secret: env.GOOGLE_CLIENT_SECRET,
+            client_id: env.GOOGLE_CLIENT_ID ?? '',
+            client_secret: env.GOOGLE_CLIENT_SECRET ?? '',
             refresh_token: account.oauth_refresh_token,
             grant_type: 'refresh_token',
         }),

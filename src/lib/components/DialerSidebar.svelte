@@ -1,20 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import ChronoNexus from './widgets/ChronoNexus.svelte';
-	import SignalArray from './widgets/SignalArray.svelte';
-	import NeuralGrid from './widgets/NeuralGrid.svelte';
-	import MatrixRain from './widgets/MatrixRain.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import TimerPomodoro from './widgets/TimerPomodoro.svelte';
 	import TimerSprint from './widgets/TimerSprint.svelte';
 	import TimerCallbacks from './widgets/TimerCallbacks.svelte';
 	import ProjectTimer from './widgets/ProjectTimer.svelte';
 	import SpotifyMini from './widgets/SpotifyMini.svelte';
-	import TransmissionLog from './widgets/TransmissionLog.svelte';
 	import ScriptPanel from '$lib/components/widgets/ScriptPanel.svelte';
 
 	let { side, campaignId = '' }: { side: 'left' | 'right'; campaignId?: string } = $props();
 
-	const STORAGE_KEY = `leados_dialer_sidebar_${side}`;
+	const STORAGE_KEY = `rogueos_dialer_sidebar_${side}`;
 
 	const AVAILABLE = [
 		{ id: 'script',       label: 'Call Script',        desc: 'View scripts during calls' },
@@ -22,12 +18,7 @@
 		{ id: 'sprint',       label: 'Sprint Timer',      desc: 'X calls in Y min' },
 		{ id: 'callbacks',    label: 'Callback Queue',    desc: 'Upcoming callbacks' },
 		{ id: 'project',      label: 'Project Timer',     desc: 'Track time' },
-		{ id: 'signal',       label: 'Signal Array',      desc: 'Waveform + stats' },
-		{ id: 'chrono',       label: 'Chrono Nexus',      desc: 'Live clock' },
-		{ id: 'neural',       label: 'Neural Grid',       desc: '24h heatmap' },
-		{ id: 'matrix',       label: 'Matrix Rain',       desc: 'Data cascade' },
 		{ id: 'spotify',      label: 'Spotify Mini',      desc: 'Now playing' },
-		{ id: 'transmission', label: 'Transmission Log',  desc: 'Activity feed' },
 	];
 
 	let activeWidgets = $state<string[]>([]);
@@ -37,9 +28,9 @@
 	onMount(() => {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
-			activeWidgets = stored ? JSON.parse(stored) : (side === 'left' ? ['script', 'callbacks'] : ['signal', 'spotify']);
+			activeWidgets = stored ? JSON.parse(stored) : (side === 'left' ? ['script', 'callbacks'] : ['callbacks', 'spotify']);
 		} catch {
-			activeWidgets = side === 'left' ? ['script', 'callbacks'] : ['signal', 'spotify'];
+			activeWidgets = side === 'left' ? ['script', 'callbacks'] : ['callbacks', 'spotify'];
 			localStorage.removeItem(STORAGE_KEY); // clear corrupt data
 		}
 	});
@@ -118,7 +109,7 @@
 						<div class="widget-move-btns">
 							<button onclick={() => moveUp(wid)} class="move-btn">↑</button>
 							<button onclick={() => moveDown(wid)} class="move-btn">↓</button>
-							<button onclick={() => toggle(wid)} class="remove-btn">✕</button>
+							<button onclick={() => toggle(wid)} class="remove-btn"><Icon name="x" size={14} /></button>
 						</div>
 						{#if wid === 'script'}
 							<ScriptPanel campaignId={campaignId ?? undefined} />
@@ -130,18 +121,8 @@
 							<TimerCallbacks />
 						{:else if wid === 'project'}
 							<ProjectTimer />
-						{:else if wid === 'signal'}
-							<SignalArray />
-						{:else if wid === 'chrono'}
-							<ChronoNexus />
-						{:else if wid === 'neural'}
-							<NeuralGrid />
-						{:else if wid === 'matrix'}
-							<MatrixRain />
 						{:else if wid === 'spotify'}
 							<SpotifyMini />
-						{:else if wid === 'transmission'}
-							<TransmissionLog />
 						{/if}
 					</div>
 				{/each}

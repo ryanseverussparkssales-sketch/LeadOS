@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { toastError } from '$lib/stores/toast';
 
 	// Live rates from engagement record
 	let bonusRate = $state(50);
@@ -31,6 +32,7 @@
 			const { url } = await res.json();
 			window.location.href = url;
 		} else {
+			toastError('Could not start Stripe connection — try again');
 			stripeConnecting = false;
 		}
 	}
@@ -85,7 +87,7 @@
 	const totalPay = $derived(monthlyBase + bonusEarned);
 </script>
 
-<svelte:head><title>My Performance — LeadOS SDR</title></svelte:head>
+<svelte:head><title>My Performance — RogueOS SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8">
 	<h2 class="text-white text-lg font-semibold mb-6">My Performance</h2>
@@ -96,7 +98,7 @@
 		</div>
 	{:else}
 		<!-- Monthly earnings -->
-		<div class="rounded-xl border border-emerald-800/40 bg-emerald-950/10 p-6 mb-6">
+		<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-6 mb-6">
 			<p class="text-xs text-[#555] uppercase tracking-widest mb-4">This Month's Earnings</p>
 			<div class="grid grid-cols-3 gap-6">
 				<div>
@@ -108,7 +110,7 @@
 					<p class="text-xs text-[#555] mt-1">{totalThisMonth.appointments} appts × ${bonusRate}</p>
 				</div>
 				<div>
-					<p class="text-2xl font-semibold text-emerald-400">${totalPay.toLocaleString()}</p>
+					<p class="text-2xl font-semibold text-[var(--accent)]">${totalPay.toLocaleString()}</p>
 					<p class="text-xs text-[#555] mt-1">Total earned</p>
 				</div>
 			</div>
@@ -120,7 +122,7 @@
 				{ label: 'Calls made', value: totalThisMonth.calls, color: 'text-white' },
 				{ label: 'Connect rate', value: `${connectRate(totalThisMonth.answered, totalThisMonth.calls)}%`, color: 'text-blue-400' },
 				{ label: 'Appointments', value: totalThisMonth.appointments, color: 'text-yellow-400' },
-				{ label: 'Appt rate', value: `${apptRate(totalThisMonth.appointments, totalThisMonth.answered)}%`, color: 'text-emerald-400' },
+				{ label: 'Appt rate', value: `${apptRate(totalThisMonth.appointments, totalThisMonth.answered)}%`, color: 'text-[var(--accent)]' },
 			] as stat}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<p class="text-2xl font-semibold {stat.color}">{stat.value}</p>
@@ -152,8 +154,8 @@
 									<td class="py-2 text-right text-white">{week.calls}</td>
 									<td class="py-2 text-right text-blue-400">{week.connectRate}%</td>
 									<td class="py-2 text-right text-yellow-400">{week.wins}</td>
-									<td class="py-2 text-right text-emerald-400">{week.winRate}%</td>
-									<td class="py-2 text-right text-emerald-400">${week.wins * bonusRate}</td>
+									<td class="py-2 text-right text-[var(--accent)]">{week.winRate}%</td>
+									<td class="py-2 text-right text-[var(--accent)]">${week.wins * bonusRate}</td>
 								</tr>
 							{/each}
 						</tbody>
@@ -177,8 +179,8 @@
 				<p class="text-[10px] text-[#444] mt-2">{next - totalThisMonth.appointments} more = +${(next - totalThisMonth.appointments) * bonusRate}</p>
 			</div>
 		{:else}
-			<div class="rounded-xl border border-emerald-800/30 bg-emerald-950/10 p-4 text-center">
-				<p class="text-emerald-400 font-semibold">🏆 Milestone hit! {totalThisMonth.appointments} appointments this month</p>
+			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4 text-center">
+				<p class="text-[var(--accent)] font-semibold">🏆 Milestone hit! {totalThisMonth.appointments} appointments this month</p>
 			</div>
 		{/if}
 	{/if}
@@ -204,9 +206,9 @@
 				</div>
 			</div>
 		{:else}
-			<div class="rounded-xl border border-green-800/30 bg-green-950/10 p-3 mb-4 flex items-center gap-2">
-				<span class="text-green-400 text-xs">✓</span>
-				<p class="text-xs text-green-400">Stripe connected — payouts go directly to your bank</p>
+			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 mb-4 flex items-center gap-2">
+				<span class="text-[var(--accent)] text-xs">✓</span>
+				<p class="text-xs text-[var(--accent)]">Stripe connected — payouts go directly to your bank</p>
 			</div>
 		{/if}
 
@@ -219,7 +221,7 @@
 						<div class="flex items-center justify-between text-xs">
 							<span class="text-[#888]">{p.call?.contact?.name ?? '—'} · {new Date(p.created_at).toLocaleDateString()}</span>
 							<div class="flex items-center gap-2">
-								<span class="text-[9px] px-1.5 py-0.5 rounded {p.status === 'paid' ? 'bg-green-900/40 text-green-400' : 'bg-yellow-900/40 text-yellow-400'}">{p.status}</span>
+								<span class="text-[9px] px-1.5 py-0.5 rounded {p.status === 'paid' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-yellow-900/40 text-yellow-400'}">{p.status}</span>
 								<span class="text-white font-semibold">${(p.amount_cents / 100).toFixed(2)}</span>
 							</div>
 						</div>
