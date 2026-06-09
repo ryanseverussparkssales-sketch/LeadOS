@@ -21,6 +21,17 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 export const DELETE: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
 
+	// Verify the tag belongs to the caller BEFORE touching mappings. Previously
+	// the mapping delete ran unscoped by tag_id, so passing another tenant's tag_id
+	// stripped that tag from all of the victim's contacts (cross-tenant data attack).
+	const { data: tag } = await supabaseAdmin
+		.from('contact_tags')
+		.select('id')
+		.eq('id', params.id)
+		.eq('user_id', user.id)
+		.maybeSingle();
+	if (!tag) throw error(404, 'Tag not found');
+
 	await supabaseAdmin
 		.from('contact_tag_mappings')
 		.delete()
