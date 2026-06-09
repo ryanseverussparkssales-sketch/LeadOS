@@ -5,7 +5,8 @@
 	import { toastSuccess, toastError, toastInfo } from '$lib/stores/toast';
 	import { currentUser } from '$lib/stores';
 	import { supabase } from '$lib/services/auth';
-	import { twilioDevice, twilioReady as twReadyStore, twilioError as twErrorStore, initTwilioDevice } from '$lib/stores/twilio';
+	import { twilioDevice, twilioReady as twReadyStore, twilioError as twErrorStore, initTwilioDevice, activeCall as globalActiveCall } from '$lib/stores/twilio';
+	import CallPostMortem from '$lib/components/CallPostMortem.svelte';
 	import DialerWidgetPanel from '$lib/components/DialerWidgetPanel.svelte';
 	import DialButtonRenderer from '$lib/components/DialButtonRenderer.svelte';
 	import Icon from '$lib/components/Icon.svelte';
@@ -39,6 +40,83 @@
 	let selectedFromNumber = $state('');
 	let durationInterval: ReturnType<typeof setInterval> | null = null;
 	let activeCall: any = null;
+
+	// ── Inbound call adoption ────────────────────────────────────────────────────
+	// Calls answered via the IncomingCallBanner live in the global twilio store.
+	// Adopt them into the Desk Phone UI so the rep gets a timer, hang-up, mute,
+	// keypad, and a post-call outcome/notes panel. Without this the call is live
+	// but invisible here.
+	let adoptedInbound = $state(false);
+	let postmortemCall = $state<any>(null);     // LeadOS calls row for the just-ended inbound call
+	let postmortemContact = $state<any>(null);
+
+	$effect(() => {
+		const c = $globalActiveCall;
+		if (c && c !== activeCall) {
+			adoptedInbound = true;
+			activeCall = c;
+			callState = 'connected';
+			muted = false; onHold = false;
+			callDuration = 0;
+			if (durationInterval) clearInterval(durationInterval);
+			durationInterval = setInterval(() => callDuration++, 1000);
+			number = c.parameters?.From ?? '';
+			c.on('disconnect', () => handleInboundDisconnect(c));
+		}
+	});
+
+	async function handleInboundDisconnect(c: any) {
+		if (!adoptedInbound) return;
+		adoptedInbound = false;
+		if (durationInterval) { clearInterval(durationInterval); durationInterval = null; }
+		callState = 'idle'; activeCall = null; muted = false; onHold = false; number = '';
+		// Resolve the LeadOS call row (created by the inbound webhook) so the rep can
+		// log outcome + notes against it. Prefer the parent CallSid passed via the
+		// <Parameter> in the dial TwiML; the answered child leg's own CallSid differs
+		// from the parent SID the webhook stored.
+		const sid = c?.customParameters?.get?.('inboundCallSid') ?? c?.parameters?.CallSid;
+		const fromDigits = (c?.parameters?.From ?? '').replace(/\D/g, '');
+		try {
+			const r = await apiFetch('/api/calls?limit=10');
+			if (r.ok) {
+				const rows = await r.json();
+				const list: any[] = Array.isArray(rows) ? rows : [];
+				let row = list.find((x: any) => x.twilio_call_sid && x.twilio_call_sid === sid);
+				// Fallback: newest inbound row from this caller (covers deployments that
+				// don't pass the inboundCallSid parameter yet).
+				if (!row) {
+					row = list.find((x: any) =>
+						(x.direction === 'inbound' || x.call_type === 'inbound') &&
+						(!fromDigits || ((x.from_number ?? '') as string).replace(/\D/g, '') === fromDigits)
+					);
+				}
+				if (row) {
+					postmortemCall = row;
+					postmortemContact = row.contact ?? {
+						id: '',
+						name: c?.parameters?.From ?? 'Unknown caller',
+						company: '',
+						phone: c?.parameters?.From ?? ''
+					};
+				}
+			}
+		} catch { /* non-fatal — call still appears in recent calls */ }
+		setTimeout(() => loadCalls(), 2000);
+	}
+
+	async function savePostmortem(data: { notes: string; outcome: string }) {
+		if (postmortemCall?.id) {
+			try {
+				const r = await apiFetch(`/api/calls/${postmortemCall.id}`, {
+					method: 'PATCH',
+					body: JSON.stringify(data)
+				});
+				if (!r.ok) toastError('Call outcome failed to save');
+			} catch { toastError('Call outcome failed to save'); }
+		}
+		postmortemCall = null; postmortemContact = null;
+		loadCalls();
+	}
 
 	type RightTab = 'calls' | 'tasks' | 'sms' | 'voicemails';
 	let rightTab = $state<RightTab>('calls');
@@ -1031,3 +1109,27 @@
 	</div>
 </div>
 </div>
+
+<!-- Post-call outcome/notes for inbound calls answered via the IncomingCallBanner -->
+{#if postmortemCall}
+	<div class="fixed inset-0 z-[95] bg-black/70 flex items-center justify-center p-4">
+		<div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[#2a2a2a] bg-[#0d0d0d] shadow-2xl">
+			<div class="flex items-center justify-between px-4 pt-3 pb-1">
+				<p class="text-[10px] text-[#555] font-semibold uppercase tracking-widest">Log inbound call</p>
+				<button
+					onclick={() => { postmortemCall = null; postmortemContact = null; }}
+					class="text-[#555] hover:text-white text-xs transition-colors"
+					aria-label="Skip logging">Skip ✕</button>
+			</div>
+			<div class="p-4 pt-2">
+				<CallPostMortem
+					contact={postmortemContact}
+					callId={postmortemCall.id}
+					transcript={postmortemCall.transcript ?? ''}
+					summary={postmortemCall.summary ?? ''}
+					onSave={savePostmortem}
+				/>
+			</div>
+		</div>
+	</div>
+{/if}

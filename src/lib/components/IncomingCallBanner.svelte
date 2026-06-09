@@ -3,7 +3,10 @@
 	import { page } from '$app/stores';
 	import { incomingCall, answerIncomingCall, rejectIncomingCall } from '$lib/stores/twilio';
 
-	const isOnDialer = $derived($page.url.pathname === '/dialer');
+	// Pages that can host a live call in their own UI — answering from one of these
+	// stays in place; anywhere else routes to the Desk Phone (/phone), which adopts
+	// the call from the global store (timer, hang-up, post-call logging).
+	const isOnCallSurface = $derived($page.url.pathname === '/phone' || $page.url.pathname === '/dialer');
 
 	// Ringing animation tick — cycles 0→1→2→0 for any CSS that wants it
 	let ringCount = $state(0);
@@ -34,8 +37,8 @@
 
 	function handleAnswer() {
 		answerIncomingCall();
-		if (!isOnDialer) {
-			goto('/dialer?incoming=1');
+		if (!isOnCallSurface) {
+			goto('/phone?incoming=1');
 		}
 	}
 
@@ -110,10 +113,10 @@
 			>
 				<span class="text-xl leading-none">✆</span>
 				<span class="text-[10px] font-medium">Answer</span>
-				{#if isOnDialer}
+				{#if isOnCallSurface}
 					<span class="text-[9px] text-[#333]">Pick up</span>
 				{:else}
-					<span class="text-[9px] text-[#333]">→ Opens Dialer</span>
+					<span class="text-[9px] text-[#333]">→ Opens Desk Phone</span>
 				{/if}
 			</button>
 		</div>

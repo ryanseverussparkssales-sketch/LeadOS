@@ -192,18 +192,40 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const calledNum = params['To'] ?? '';
 			const base = event.url.origin.replace('http://', 'https://');
 
-			const COLS = 'id, user_id, phone_number, voicemail_greeting, record_incoming, forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds';
-			let { data: phoneRec } = await supabaseAdmin
-				.from('phone_numbers').select(COLS)
-				.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
+			// MINIMAL_COLS are guaranteed to exist; optional extras are fetched in FULL_COLS
+			// and retried without on error. NEVER put migration-dependent columns in the only
+			// select: a missing column errors the whole query, phoneRec comes back null, and
+			// every inbound call silently falls through to client:agent → straight to
+			// voicemail. (Exactly that took inbound down on 2026-06-05 — forwarding_*,
+			// voicemail_enabled, ring_timeout_seconds didn't exist in prod.)
+			const MINIMAL_COLS = 'id, user_id, phone_number, voicemail_greeting, record_incoming';
+			const FULL_COLS = MINIMAL_COLS + ', forwarding_enabled, forwarding_number, voicemail_enabled, ring_timeout_seconds';
+
+			const findByExact = async (cols: string) => {
+				const { data, error } = await supabaseAdmin
+					.from('phone_numbers').select(cols)
+					.eq('phone_number', calledNum).eq('status', 'active').maybeSingle();
+				if (error) console.error(`[incoming] phone_numbers lookup error (cols=${cols}):`, error.message);
+				return { rec: data as any, err: error };
+			};
+
+			let { rec: phoneRec, err: lookupErr } = await findByExact(FULL_COLS);
+			// Full select errored (e.g. not-yet-migrated column)? Retry with minimal columns
+			// instead of treating it as "number not found".
+			if (!phoneRec && lookupErr) ({ rec: phoneRec } = await findByExact(MINIMAL_COLS));
 
 			// Format-tolerant fallback: if the exact string didn't match (e.g. the number
 			// is stored as (484) 286-5470 vs +14842865470), match on the last 10 digits.
 			if (!phoneRec) {
 				const wanted = calledNum.replace(/\D/g, '').slice(-10);
-				const { data: actives } = await supabaseAdmin
-					.from('phone_numbers').select(COLS).eq('status', 'active');
-				phoneRec = (actives ?? []).find(
+				let { data: actives, error: activesErr } = await supabaseAdmin
+					.from('phone_numbers').select(FULL_COLS).eq('status', 'active');
+				if (activesErr) {
+					console.error('[incoming] actives lookup error, retrying minimal:', activesErr.message);
+					({ data: actives } = await supabaseAdmin
+						.from('phone_numbers').select(MINIMAL_COLS).eq('status', 'active'));
+				}
+				phoneRec = ((actives ?? []) as any[]).find(
 					(p) => ((p.phone_number as string) ?? '').replace(/\D/g, '').slice(-10) === wanted
 				) ?? null;
 			}
@@ -214,22 +236,32 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const inCallSid = params['CallSid'];
 			if (phoneRec?.user_id && inCallSid) {
 				try {
-					const callerNorm = callerNum.replace(/\D/g, '');
-					const { data: c } = await supabaseAdmin
+					// Format-tolerant contact match: phone_normalized is stored WITH a leading
+					// '+' (e.g. "+16124172133") while digits-only was being compared before —
+					// that mismatch made every caller look unknown, and contact_id null then
+					// violated the NOT NULL constraint, killing the insert. Match on the last
+					// 10 digits so any stored format works.
+					const callerLast10 = callerNum.replace(/\D/g, '').slice(-10);
+					const { data: cMatches } = await supabaseAdmin
 						.from('contacts').select('id')
-						.eq('user_id', phoneRec.user_id).eq('phone_normalized', callerNorm).maybeSingle();
-					await supabaseAdmin.from('calls').insert({
+						.eq('user_id', phoneRec.user_id)
+						.like('phone_normalized', `%${callerLast10}`)
+						.limit(1);
+					const c = cMatches?.[0] ?? null;
+					const { error: insErr } = await supabaseAdmin.from('calls').insert({
 						user_id: phoneRec.user_id,
 						phone_number_id: phoneRec.id,
 						contact_id: c?.id ?? null,
 						direction: 'inbound',
 						call_type: 'inbound',
+						phone_number: callerNum, // display column used by Recent Calls list
 						from_number: callerNum,
 						to_number: calledNum,
 						twilio_call_sid: inCallSid,
 						status: 'ringing',
 						started_at: new Date().toISOString(),
 					});
+					if (insErr) console.error('[incoming] call row insert failed:', insErr.message);
 				} catch (e) { console.error('[incoming] call row insert failed:', e); }
 			}
 
@@ -287,7 +319,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 						recordingStatusCallback: base + '/api/twilio/recording',
 						recordingStatusCallbackMethod: 'POST',
 					} as any);
-					for (const t of targets) dial.client(t);
+					for (const t of targets) {
+						const cl = dial.client({});
+						cl.identity(t);
+						// Surface the PARENT inbound CallSid to the browser — the answered
+						// child leg has its own SID, so without this the Desk Phone can't
+						// link the call back to the calls row created above.
+						if (inCallSid) cl.parameter({ name: 'inboundCallSid', value: inCallSid });
+					}
 				}
 			} else {
 				// Number not in DB — ring browser with default identity

@@ -80,7 +80,9 @@
             const res = await apiFetch('/api/twilio/token', { method: 'POST' });
             if (!res.ok) return;
             const { token } = await res.json();
-            device = new Device(token, { logLevel: 1, codecPreferences: ['opus', 'pcmu'] as any });
+            // logLevel 4 (ERROR) — the SDK logger is a shared singleton; level 1 here turns on
+            // debug spam for the global inbound device too and makes console triage misleading.
+            device = new Device(token, { logLevel: 4, codecPreferences: ['opus', 'pcmu'] as any });
             device.on('error', (e:any) => { twilioError = e.message; });
             // Outbound-only: do NOT register() for incoming here. Inbound is owned by the
             // global Twilio store + IncomingCallBanner — a second registration on the same
