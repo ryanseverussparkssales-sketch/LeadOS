@@ -16,16 +16,23 @@ export async function incrementQuota(userId: string, type: 'calls' | 'revenue', 
 	if (!quotas?.length) return;
 
 	for (const quota of quotas) {
-		// TODO: Race condition — concurrent calls can overwrite each other's increments.
-		// Fix: create a Supabase RPC `increment_quota(quota_id, amount)` that runs
-		// `UPDATE quotas SET current_value = current_value + $amount WHERE id = $quota_id`
-		// atomically. For current low-volume usage this is acceptable.
-		await supabaseAdmin
-			.from('quotas')
-			.update({
-				current_value: (quota.current_value ?? 0) + amount,
-				updated_at: new Date().toISOString(),
-			})
-			.eq('id', quota.id);
+		// Atomic increment via the increment_quota RPC (supabase-quota-rpc.sql).
+		// Avoids the read-modify-write race where concurrent calls overwrote each
+		// other's increments. Falls back to the JS add only if the RPC is missing
+		// (e.g. migration not yet applied), so quota tracking degrades gracefully.
+		const { error: rpcErr } = await supabaseAdmin.rpc('increment_quota', {
+			p_quota_id: quota.id,
+			p_amount: amount,
+		});
+		if (rpcErr) {
+			console.error('[quotas] increment_quota RPC failed, falling back:', rpcErr.message);
+			await supabaseAdmin
+				.from('quotas')
+				.update({
+					current_value: (quota.current_value ?? 0) + amount,
+					updated_at: new Date().toISOString(),
+				})
+				.eq('id', quota.id);
+		}
 	}
 }

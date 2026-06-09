@@ -32,7 +32,6 @@
 		"@supabase/supabase-js": "^2.106.2",
 		"@twilio/voice-sdk": "^2.18.3",
 		"dompurify": "^3.4.8",
-		"groq-sdk": "^1.2.1",
 		"nodemailer": "^6.9.14",
 		"twilio": "^6.0.2"
 	}
