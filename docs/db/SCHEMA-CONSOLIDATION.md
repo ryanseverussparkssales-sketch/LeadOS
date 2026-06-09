@@ -1,5 +1,11 @@
 # Schema Consolidation — Runbook & Plan
 
+> **STATUS: EXECUTED 2026-06-09.** This plan has been carried out. The 64 root `.sql`
+> files were moved to `db/legacy/`, seeds to `db/seeds/`, and `supabase/migrations/`
+> is now the source of truth (`0000_baseline.sql` = prod dump, `0001+` = ordered
+> changes). See `supabase/migrations/README.md` and `docs/db/SCHEMA-REFERENCE.md`.
+> The CLI steps below remain the recommended future tooling. Original plan kept for context.
+
 ## Situation
 - **61 `*.sql` files at the repo root**, no ordering, no migration runner, no `schema_migrations` ledger.
 - **All of them have already been applied to prod** (per the owner). So **prod = the complete, correct schema** — the union of every file. The app works because of this.
