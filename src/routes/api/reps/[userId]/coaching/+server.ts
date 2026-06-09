@@ -20,7 +20,7 @@ export const GET = async ({ request, params }: { request: Request; params: { use
 	// Fetch last 30 scored calls
 	const { data: calls } = await supabaseAdmin
 		.from('calls')
-		.select('id, outcome, duration, quality_score, quality_breakdown, created_at, contact_id, contacts(name, company)')
+		.select('id, outcome, call_duration_seconds, quality_score, quality_breakdown, created_at, contact_id, contacts(name, company)')
 		.eq('user_id', targetUserId)
 		.not('quality_score', 'is', null)
 		.order('created_at', { ascending: false })

@@ -344,7 +344,8 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 				const { data } = await supabaseAdmin.from('contacts').select('id, name, company, phone, email, status').eq('user_id', ownerId).is('deleted_at', null).or(`name.ilike.${like},company.ilike.${like},phone.ilike.${like}`).limit(8);
 				results = data ?? [];
 			} else if (entity === 'deals') {
-				const { data } = await supabaseAdmin.from('deals').select('id, name, value, stage, contact:contacts(name)').eq('user_id', ownerId).is('deleted_at', null).ilike('name', like).limit(8);
+				// deals uses `title`, not `name` — alias so the AI sees a consistent shape
+				const { data } = await supabaseAdmin.from('deals').select('id, name:title, value, stage, contact:contacts(name)').eq('user_id', ownerId).is('deleted_at', null).ilike('title', like).limit(8);
 				results = data ?? [];
 			} else if (entity === 'campaigns') {
 				const { data } = await supabaseAdmin.from('campaigns').select('id, name, status').eq('user_id', ownerId).is('deleted_at', null).ilike('name', like).limit(8);
@@ -479,7 +480,7 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 			// Get recent calls
 			const { data: calls } = await supabaseAdmin
 				.from('calls')
-				.select('outcome, duration_seconds, summary, created_at')
+				.select('outcome, call_duration_seconds, summary, created_at')
 				.eq('contact_id', contact.id)
 				.order('created_at', { ascending: false })
 				.limit(5);
@@ -495,7 +496,7 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 			// Get open deals
 			const { data: deals } = await supabaseAdmin
 				.from('deals')
-				.select('name, value, stage')
+				.select('name:title, value, stage')
 				.eq('contact_id', contact.id)
 				.not('stage', 'in', '(won,lost)')
 				.limit(3);

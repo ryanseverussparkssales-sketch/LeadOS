@@ -9,10 +9,13 @@
 	let loading = $state(false);
 
 	async function getPostLoginRoute(userId: string): Promise<string> {
+		// team_members has no user_id column — members are linked via member_user_id
+		// (owner_user_id is the agency owner). The old filter errored silently and
+		// every SDR/portal user fell through to /dashboard.
 		const { data } = await supabase
 			.from('team_members')
 			.select('role, portal_access')
-			.eq('user_id', userId)
+			.eq('member_user_id', userId)
 			.maybeSingle();
 
 		if (!data) return '/dashboard';

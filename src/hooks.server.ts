@@ -218,12 +218,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 			// is stored as (484) 286-5470 vs +14842865470), match on the last 10 digits.
 			if (!phoneRec) {
 				const wanted = calledNum.replace(/\D/g, '').slice(-10);
-				let { data: actives, error: activesErr } = await supabaseAdmin
-					.from('phone_numbers').select(FULL_COLS).eq('status', 'active');
+				let { data: actives, error: activesErr } = (await supabaseAdmin
+					.from('phone_numbers').select(FULL_COLS).eq('status', 'active')) as { data: any[] | null; error: any };
 				if (activesErr) {
 					console.error('[incoming] actives lookup error, retrying minimal:', activesErr.message);
-					({ data: actives } = await supabaseAdmin
-						.from('phone_numbers').select(MINIMAL_COLS).eq('status', 'active'));
+					({ data: actives } = (await supabaseAdmin
+						.from('phone_numbers').select(MINIMAL_COLS).eq('status', 'active')) as { data: any[] | null; error: any });
 				}
 				phoneRec = ((actives ?? []) as any[]).find(
 					(p) => ((p.phone_number as string) ?? '').replace(/\D/g, '').slice(-10) === wanted

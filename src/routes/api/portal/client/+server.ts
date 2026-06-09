@@ -92,9 +92,9 @@ export const GET: RequestHandler = async ({ request }) => {
 		return Math.round((timeData ?? []).reduce((s: number, e: any) => s + (e.duration_minutes ?? 0), 0) / 60);
 	})().catch(() => 0);
 
-	// Get owner's agency name from settings
+	// Get owner's agency name from user_settings (there is no `settings` table)
 	const { data: ownerSettings } = await supabaseAdmin
-		.from('settings')
+		.from('user_settings')
 		.select('agency_name')
 		.eq('user_id', ownerId)
 		.maybeSingle();

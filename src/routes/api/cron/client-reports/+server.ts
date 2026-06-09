@@ -25,10 +25,11 @@ export const GET = async ({ request }: { request: Request }) => {
 
 	const WIN_OUTCOMES = ['appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback','follow_up_agreed'];
 
-	// Get all owners (agency accounts)
+	// Get all owners (agency accounts) — `settings` table doesn't exist; the real
+	// table is user_settings (company_email serves as the from/CC address).
 	const { data: owners } = await supabaseAdmin
-		.from('settings')
-		.select('user_id, agency_name, agency_email_from')
+		.from('user_settings')
+		.select('user_id, agency_name, agency_email_from:company_email')
 		.not('agency_name', 'is', null);
 
 	let sentCount = 0;
@@ -159,7 +160,7 @@ export const GET = async ({ request }: { request: Request }) => {
 
 			// Also CC owner
 			const { data: ownerSettings } = await supabaseAdmin
-				.from('settings').select('email').eq('user_id', owner.user_id).maybeSingle();
+				.from('user_settings').select('email:company_email').eq('user_id', owner.user_id).maybeSingle();
 
 			for (const to of [...new Set(recipients)]) {
 				try {
