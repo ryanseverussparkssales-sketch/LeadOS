@@ -41,6 +41,12 @@ export async function checkLimit(userId: string, feature: keyof typeof TIER_LIMI
 export async function assertAiAccess(userId: string): Promise<Tier> {
 	const ownerId = await getEffectiveUserId(userId);
 	const tier = await getUserTier(ownerId);
+	// Admin override (account_overrides.ai_access) takes precedence over the plan:
+	// 'off' force-disables even for Agency; 'on' force-enables even for Free.
+	const { data: ov } = await supabaseAdmin
+		.from('account_overrides').select('ai_access').eq('user_id', ownerId).maybeSingle();
+	if (ov?.ai_access === 'off') throw error(402, 'AI features are disabled for this account.');
+	if (ov?.ai_access === 'on') return tier;
 	if (!TIER_LIMITS[tier].ai) {
 		throw error(402, 'AI features require a Pro or Agency plan.');
 	}
