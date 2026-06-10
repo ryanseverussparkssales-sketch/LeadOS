@@ -145,7 +145,7 @@
 		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Import Center</h2>
 		<div class="flex gap-1 mt-3">
 			{#each ([['new','New Import'],['sync','Sync Update'],['undo','Undo Import'],['reverse','Reverse Lookup'],['crm','CRM Migration']] as [Mode,string][]) as [m, label]}
-				<button onclick={() => mode = m} class="rounded-lg px-4 py-1.5 text-xs transition-colors {mode === m ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">{label}</button>
+				<button onclick={() => mode = m} class="rounded-lg px-4 py-1.5 text-xs transition-colors {mode === m ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">{label}</button>
 			{/each}
 		</div>
 	</div>
@@ -155,7 +155,7 @@
 		<!-- NEW IMPORT -->
 		{#if mode === 'new'}
 			<div class="max-w-2xl">
-				<p class="text-xs text-[#555] mb-4">Standard CSV import with AI field mapping and dedup detection.</p>
+				<p class="text-xs text-[#7c7c7c] mb-4">Standard CSV import with AI field mapping and dedup detection.</p>
 				<CSVImportAdvanced onImportDone={async () => { const br = await apiFetch('/api/contacts/import-batches'); if (br.ok) batches = await br.json(); }} />
 			</div>
 
@@ -164,11 +164,11 @@
 			<div class="max-w-2xl space-y-4">
 				<div class="rounded-xl border border-blue-800/30 bg-blue-950/10 p-4">
 					<p class="text-sm text-blue-300 font-medium">🔄 Sync Import (Update Mode)</p>
-					<p class="text-xs text-[#555] mt-1">Import a CSV and UPDATE existing contacts instead of skipping them. Perfect for: exporting → editing in Excel → re-importing changes.</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">Import a CSV and UPDATE existing contacts instead of skipping them. Perfect for: exporting → editing in Excel → re-importing changes.</p>
 				</div>
 
 				<div>
-					<label class="text-xs text-[#555] block mb-1.5">Upload CSV to sync</label>
+					<label class="text-xs text-[#7c7c7c] block mb-1.5">Upload CSV to sync</label>
 					<input type="file" accept=".csv" onchange={loadCsvForSync} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white file:mr-3 file:rounded file:border-0 file:bg-white/10 file:text-white file:text-xs file:px-2 file:py-1" />
 				</div>
 
@@ -185,7 +185,7 @@
 						</div>
 					</div>
 
-					<p class="text-xs text-[#444]">Contacts matched by phone or email will have the checked fields updated. New contacts will be created.</p>
+					<p class="text-xs text-[#6e6e6e]">Contacts matched by phone or email will have the checked fields updated. New contacts will be created.</p>
 
 					<button onclick={runSyncImport} disabled={syncing || !syncFile} class="rounded-lg bg-blue-600 px-6 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-40">
 						{syncing ? 'Syncing...' : 'Run Sync Import'}
@@ -196,7 +196,7 @@
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-1 text-sm hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 						<p class="text-[var(--accent)]">✓ {syncResult.created} new contacts created</p>
 						<p class="text-blue-400">↑ {syncResult.updated} existing contacts updated</p>
-						{#if syncResult.skipped > 0}<p class="text-[#555]">{syncResult.skipped} rows skipped</p>{/if}
+						{#if syncResult.skipped > 0}<p class="text-[#7c7c7c]">{syncResult.skipped} rows skipped</p>{/if}
 						{#if syncResult.errors > 0}<p class="text-red-400">{syncResult.errors} errors</p>{/if}
 					</div>
 				{/if}
@@ -207,11 +207,11 @@
 			<div class="max-w-2xl space-y-4">
 				<div class="rounded-xl border border-yellow-800/30 bg-yellow-950/10 p-4">
 					<p class="text-sm text-yellow-300 font-medium">↩ Undo Import</p>
-					<p class="text-xs text-[#555] mt-1">Delete contacts from a specific import batch. Only contacts that haven't been called are removed.</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">Delete contacts from a specific import batch. Only contacts that haven't been called are removed.</p>
 				</div>
 
 				{#if batches.length === 0}
-					<p class="text-[#444] text-sm">No import batches found. Future imports will be tracked here.</p>
+					<p class="text-[#6e6e6e] text-sm">No import batches found. Future imports will be tracked here.</p>
 				{:else}
 					<div class="space-y-2">
 						{#each batches as batch}
@@ -219,12 +219,12 @@
 								<div class="flex items-center justify-between">
 									<div>
 										<p class="text-sm text-white font-medium">{batch.filename ?? 'CSV Import'}</p>
-										<p class="text-xs text-[#555]">{fmtDate(batch.created_at)} · {batch.total_created} created{batch.total_updated > 0 ? ` · ${batch.total_updated} updated` : ''} · {batch.source.toUpperCase()}</p>
+										<p class="text-xs text-[#7c7c7c]">{fmtDate(batch.created_at)} · {batch.total_created} created{batch.total_updated > 0 ? ` · ${batch.total_updated} updated` : ''} · {batch.source.toUpperCase()}</p>
 									</div>
 									{#if batch.can_undo}
 										<span class="text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Can undo</span>
 									{:else}
-										<span class="text-xs text-[#444]">Locked</span>
+										<span class="text-xs text-[#6e6e6e]">Locked</span>
 									{/if}
 								</div>
 							</div>
@@ -238,7 +238,7 @@
 								{#each batchContacts as c}
 									<div class="flex items-center gap-3 text-xs">
 										<p class="text-white flex-1 truncate">{c.name}</p>
-										<p class="text-[#555]">{c.company}</p>
+										<p class="text-[#7c7c7c]">{c.company}</p>
 										<span class="{c.call_count > 0 ? 'text-yellow-400' : 'text-[var(--accent)]'}">{c.call_count > 0 ? `${c.call_count} calls` : 'No calls'}</span>
 									</div>
 								{/each}
@@ -264,12 +264,12 @@
 			<div class="max-w-2xl space-y-4">
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<p class="text-sm text-white font-medium">🔍 Reverse Lookup</p>
-					<p class="text-xs text-[#555] mt-1">Paste a list and find which are already in your CRM — or enrich company domains with AI.</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">Paste a list and find which are already in your CRM — or enrich company domains with AI.</p>
 				</div>
 
 				<div class="flex gap-2">
 					{#each ([['phone','Phone Numbers'],['email','Emails'],['company','Company Names'],['domain','Domains (+ AI)']] as [LookupType,string][]) as [t,l]}
-						<button onclick={() => { lookupType = t; if (t==='domain') enrichWithAI=true; }} class="flex-1 rounded-lg border px-3 py-2 text-xs transition-colors {lookupType===t ? 'border-white text-white' : 'border-[#2a2a2a] text-[#555] hover:text-white'}">{l}</button>
+						<button onclick={() => { lookupType = t; if (t==='domain') enrichWithAI=true; }} class="flex-1 rounded-lg border px-3 py-2 text-xs transition-colors {lookupType===t ? 'border-white text-white' : 'border-[#2a2a2a] text-[#7c7c7c] hover:text-white'}">{l}</button>
 					{/each}
 				</div>
 
@@ -288,9 +288,9 @@
 
 				{#if lookupSummary}
 					<div class="grid grid-cols-3 gap-3">
-						<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-3 text-center"><p class="text-white text-lg font-semibold">{lookupSummary.total}</p><p class="text-xs text-[#555]">Total</p></div>
-						<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 text-center"><p class="text-[var(--accent)] text-lg font-semibold">{lookupSummary.found}</p><p class="text-xs text-[#555]">Found in CRM</p></div>
-						<div class="rounded-lg border border-yellow-800/30 bg-yellow-950/10 p-3 text-center"><p class="text-yellow-400 text-lg font-semibold">{lookupSummary.notFound}</p><p class="text-xs text-[#555]">Not in CRM</p></div>
+						<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-3 text-center"><p class="text-white text-lg font-semibold">{lookupSummary.total}</p><p class="text-xs text-[#7c7c7c]">Total</p></div>
+						<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 text-center"><p class="text-[var(--accent)] text-lg font-semibold">{lookupSummary.found}</p><p class="text-xs text-[#7c7c7c]">Found in CRM</p></div>
+						<div class="rounded-lg border border-yellow-800/30 bg-yellow-950/10 p-3 text-center"><p class="text-yellow-400 text-lg font-semibold">{lookupSummary.notFound}</p><p class="text-xs text-[#7c7c7c]">Not in CRM</p></div>
 					</div>
 
 					<div class="space-y-2 max-h-72 overflow-y-auto">
@@ -300,12 +300,12 @@
 								<div class="flex-1 min-w-0">
 									<p class="text-xs font-mono text-white">{result.input}</p>
 									{#if result.found && result.contact}
-										<p class="text-xs text-[#666] mt-0.5">{(result.contact as {name:string}).name} · {(result.contact as {company:string}).company}</p>
+										<p class="text-xs text-[#8a8a8a] mt-0.5">{(result.contact as {name:string}).name} · {(result.contact as {company:string}).company}</p>
 									{:else if result.enrichment}
 										<p class="text-xs text-[var(--accent)] mt-0.5">✨ {(result.enrichment as {companyName:string}).companyName} — {(result.enrichment as {industry:string}).industry}</p>
-										<p class="text-xs text-[#444]">Target: {(result.enrichment as {likelyDecisionMaker:string}).likelyDecisionMaker}</p>
+										<p class="text-xs text-[#6e6e6e]">Target: {(result.enrichment as {likelyDecisionMaker:string}).likelyDecisionMaker}</p>
 									{:else if !result.found}
-										<p class="text-xs text-[#444] mt-0.5">Not found — could be a new lead</p>
+										<p class="text-xs text-[#6e6e6e] mt-0.5">Not found — could be a new lead</p>
 									{/if}
 								</div>
 							</div>
@@ -317,7 +317,7 @@
 		<!-- CRM MIGRATION -->
 		{:else if mode === 'crm'}
 			<div class="max-w-2xl space-y-4">
-				<p class="text-xs text-[#555]">Pre-configured field mappings for popular CRM exports. Select your source, then import normally.</p>
+				<p class="text-xs text-[#7c7c7c]">Pre-configured field mappings for popular CRM exports. Select your source, then import normally.</p>
 
 				<div class="grid grid-cols-2 gap-3">
 					{#each Object.entries(CRM_TEMPLATES) as [key, tmpl]}
@@ -327,7 +327,7 @@
 								<span class="text-lg">{tmpl.icon}</span>
 								<p class="text-sm text-white font-medium">{tmpl.name}</p>
 							</div>
-							<p class="text-xs text-[#444]">{tmpl.notes}</p>
+							<p class="text-xs text-[#6e6e6e]">{tmpl.notes}</p>
 						</button>
 					{/each}
 				</div>
@@ -346,7 +346,7 @@
 							{/each}
 						</div>
 						<div class="pt-2 border-t border-[#1e1e1e]">
-							<p class="text-xs text-[#555] mb-3">{tmpl.notes}</p>
+							<p class="text-xs text-[#7c7c7c] mb-3">{tmpl.notes}</p>
 							<p class="text-xs text-white font-medium mb-2">After exporting from {tmpl.name}, use the New Import tab — the AI will recognize these columns automatically.</p>
 							<button onclick={() => mode = 'new'} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">Go to Import →</button>
 						</div>

@@ -23,13 +23,13 @@
 </script>
 
 <div class="h-full overflow-y-auto space-y-2">
-	{#if loading}<p class="text-xs text-[#444] text-center py-4">Loading...</p>
+	{#if loading}<p class="text-xs text-[#6e6e6e] text-center py-4">Loading...</p>
 	{:else if error}<p class="text-xs text-red-400 text-center py-4">{error}</p>
 	{:else}
 		{#each items as item}
 			<a href={item.link} target="_blank" class="block hover:bg-white/5 rounded px-1 py-1.5 transition-colors group">
 				<p class="text-xs text-white group-hover:underline leading-snug">{item.title}</p>
-				<p class="text-xs text-[#444] mt-0.5">{new Date(item.pubDate).toLocaleDateString()}</p>
+				<p class="text-xs text-[#6e6e6e] mt-0.5">{new Date(item.pubDate).toLocaleDateString()}</p>
 			</a>
 		{/each}
 	{/if}

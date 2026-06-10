@@ -207,9 +207,9 @@
 	let newTagColor = $state('#6366f1');
 
 	const TYPE_LABELS: Record<string, string> = { lead:'Lead', prospect:'Prospect', customer:'Customer', partner:'Partner', vendor:'Vendor', creator:'Creator', other:'Other' };
-	const TYPE_COLORS: Record<string, string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-[var(--accent)]', partner:'text-[var(--accent)]', vendor:'text-[#888]', creator:'text-pink-400', other:'text-[#555]' };
+	const TYPE_COLORS: Record<string, string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-[var(--accent)]', partner:'text-[var(--accent)]', vendor:'text-[#888]', creator:'text-pink-400', other:'text-[#7c7c7c]' };
 	const SOURCE_LABELS: Record<string, string> = { cold_call:'Cold Call', csv_import:'CSV Import', web_scrape:'Web Scrape', referral:'Referral', manual:'Manual Entry', linkedin:'LinkedIn', website:'Website', trade_show:'Trade Show', other:'Other' };
-	const OUTCOME_COLORS: Record<string, string> = { answered:'text-[var(--accent)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#555]', do_not_call:'text-red-400', no_answer:'text-[#444]' };
+	const OUTCOME_COLORS: Record<string, string> = { answered:'text-[var(--accent)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#7c7c7c]', do_not_call:'text-red-400', no_answer:'text-[#6e6e6e]' };
 
 	onMount(async () => {
 		const id = $page.params.id;
@@ -442,10 +442,10 @@
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	{#if loading}
-		<div class="flex items-center justify-center h-full"><p class="text-[#444] text-sm">Loading...</p></div>
+		<div class="flex items-center justify-center h-full"><p class="text-[#6e6e6e] text-sm">Loading...</p></div>
 	{:else if contact}
 		<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-3">
-			<a href="/contacts" class="text-xs text-[#555] hover:text-white transition-colors">← Contacts</a>
+			<a href="/contacts" class="text-xs text-[#7c7c7c] hover:text-white transition-colors">← Contacts</a>
 			<span class="text-[#333]">/</span>
 			<p class="text-white text-sm font-medium">{contact.name}</p>
 		</div>
@@ -456,14 +456,14 @@
 
 				<!-- Type + Source badges -->
 				<div class="flex flex-wrap gap-2">
-					<span class="px-2 py-1 rounded-full text-xs font-medium bg-white/5 {TYPE_COLORS[contact.contact_type] ?? 'text-[#666]'}">
+					<span class="px-2 py-1 rounded-full text-xs font-medium bg-white/5 {TYPE_COLORS[contact.contact_type] ?? 'text-[#8a8a8a]'}">
 						{TYPE_LABELS[contact.contact_type] ?? contact.contact_type}
 					</span>
 					{#if contact.is_business}
 						<span class="px-2 py-1 rounded-full text-xs bg-[var(--accent)]/12 text-[var(--accent)]">B2B</span>
 					{/if}
 					{#if contact.lead_source}
-						<span class="px-2 py-1 rounded-full text-xs bg-[#1a1a1a] text-[#666]">{SOURCE_LABELS[contact.lead_source] ?? contact.lead_source}</span>
+						<span class="px-2 py-1 rounded-full text-xs bg-[#1a1a1a] text-[#8a8a8a]">{SOURCE_LABELS[contact.lead_source] ?? contact.lead_source}</span>
 					{/if}
 					{#if contact.do_not_email}
 						<span class="px-2 py-1 rounded-full text-xs bg-red-900/20 text-red-500">No Email</span>
@@ -481,11 +481,11 @@
 						{editing ? 'Cancel' : 'Edit'}
 					</button>
 					<button onclick={enrichContact}
-						class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+						class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						✨ Enrich
 					</button>
 					<button onclick={() => showNewDeal = !showNewDeal}
-						class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+						class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						💰 Deal
 					</button>
 				</div>
@@ -495,27 +495,27 @@
 					<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4">
 						<div class="flex items-center justify-between mb-3">
 							<p class="text-sm text-[var(--accent)] font-medium">✨ AI Enrichment</p>
-							<button onclick={() => showEnrichment = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
+							<button onclick={() => showEnrichment = false} class="text-xs text-[#6e6e6e] hover:text-white"><Icon name="x" size={14} /></button>
 						</div>
 						{#if enriching}
-							<div class="flex items-center gap-2 text-xs text-[#555]">
+							<div class="flex items-center gap-2 text-xs text-[#7c7c7c]">
 								<div class="w-3 h-3 rounded-full bg-[var(--accent)] animate-bounce"></div>
 								Enriching contact data...
 							</div>
 						{:else if enrichment}
 							<div class="space-y-3 text-xs">
 								{#if enrichment.companySummary}
-									<div><p class="text-[#555] uppercase tracking-widest mb-1">Company</p><p class="text-[#ccc]">{enrichment.companySummary}</p></div>
+									<div><p class="text-[#7c7c7c] uppercase tracking-widest mb-1">Company</p><p class="text-[#ccc]">{enrichment.companySummary}</p></div>
 								{/if}
 								{#if enrichment.outreachAngle}
-									<div><p class="text-[#555] uppercase tracking-widest mb-1">Best Approach</p><p class="text-[#ccc]">{enrichment.outreachAngle}</p></div>
+									<div><p class="text-[#7c7c7c] uppercase tracking-widest mb-1">Best Approach</p><p class="text-[#ccc]">{enrichment.outreachAngle}</p></div>
 								{/if}
 								{#if enrichment.personalizedMessage}
-									<div><p class="text-[#555] uppercase tracking-widest mb-1">Opening Line</p><p class="text-[var(--accent)] italic">"{enrichment.personalizedMessage}"</p></div>
+									<div><p class="text-[#7c7c7c] uppercase tracking-widest mb-1">Opening Line</p><p class="text-[var(--accent)] italic">"{enrichment.personalizedMessage}"</p></div>
 								{/if}
 								{#if enrichment.talkingPoints?.length}
 									<div>
-										<p class="text-[#555] uppercase tracking-widest mb-1">Talking Points</p>
+										<p class="text-[#7c7c7c] uppercase tracking-widest mb-1">Talking Points</p>
 										<ul class="space-y-1">
 											{#each enrichment.talkingPoints as point}
 												<li class="text-[#888]">• {point}</li>
@@ -536,7 +536,7 @@
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 						<div class="flex items-center justify-between">
 							<p class="text-sm text-white font-medium">New Deal</p>
-							<button onclick={() => showNewDeal = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
+							<button onclick={() => showNewDeal = false} class="text-xs text-[#6e6e6e] hover:text-white"><Icon name="x" size={14} /></button>
 						</div>
 						<input bind:value={dealForm.name} placeholder="Deal name *" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						<div class="grid grid-cols-2 gap-2">
@@ -558,26 +558,26 @@
 					<div class="space-y-3">
 						{#each [['name','Name'],['phone','Phone'],['email','Email'],['company','Company'],['title','Title'],['linkedin_url','LinkedIn URL'],['website','Website']] as [f, l]}
 							<div>
-								<label class="text-xs text-[#555] block mb-1">{l}</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">{l}</label>
 								<input value={(edit as Record<string,unknown>)[f] as string ?? ''} oninput={(e) => { (edit as Record<string,unknown>)[f] = (e.target as HTMLInputElement).value; }}
 									class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 							</div>
 						{/each}
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Contact Type</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Contact Type</label>
 							<select bind:value={edit.contact_type} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								{#each Object.entries(TYPE_LABELS) as [v, l]}<option value={v}>{l}</option>{/each}
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Lead Source</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Lead Source</label>
 							<select bind:value={edit.lead_source} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="">Unknown</option>
 								{#each Object.entries(SOURCE_LABELS) as [v, l]}<option value={v}>{l}</option>{/each}
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Status</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Status</label>
 							<select bind:value={edit.status} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="active">Active</option>
 								<option value="do_not_call">Do Not Call</option>
@@ -595,11 +595,11 @@
 							</label>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Customer Since</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Customer Since</label>
 							<DatePicker bind:value={edit.customer_since} onchange={(v) => edit.customer_since = v} />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Notes</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Notes</label>
 							<textarea bind:value={edit.notes} rows="3"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
@@ -625,7 +625,7 @@
 						] as [label, value]}
 							{#if value}
 								<div>
-									<p class="text-xs text-[#555] mb-0.5">{label}</p>
+									<p class="text-xs text-[#7c7c7c] mb-0.5">{label}</p>
 									{#if label === 'LinkedIn' || label === 'Website'}
 										<a href={value} target="_blank" class="text-sm text-blue-400 hover:underline truncate block">{value}</a>
 									{:else}
@@ -636,19 +636,19 @@
 						{/each}
 						{#if contact.notes}
 							<div>
-								<p class="text-xs text-[#555] mb-0.5">Notes</p>
+								<p class="text-xs text-[#7c7c7c] mb-0.5">Notes</p>
 								<p class="text-sm text-[#ccc] leading-relaxed whitespace-pre-wrap">{contact.notes}</p>
 							</div>
 						{/if}
 						<!-- FIX 1: Contact score bar -->
 						<div>
-							<p class="text-xs text-[#555] mb-1">Score</p>
+							<p class="text-xs text-[#7c7c7c] mb-1">Score</p>
 							<div class="flex items-center gap-2 mt-1">
 								<div class="flex-1 bg-[#1a1a1a] rounded-full h-1.5 overflow-hidden">
 									<div class="h-full rounded-full transition-all duration-500 {(contact.contact_score ?? 0) > 70 ? 'bg-[var(--accent)]' : (contact.contact_score ?? 0) > 40 ? 'bg-yellow-500' : 'bg-[#333]'}" style="width:{Math.min(contact.contact_score ?? 0, 100)}%"></div>
 								</div>
-								<span class="text-xs text-[#555] w-8 text-right">{contact.contact_score ?? '—'}</span>
-								<button onclick={rescore} disabled={rescoring} class="text-xs text-[#444] hover:text-white transition-colors" title="Re-score contact">{rescoring ? '...' : '↺'}</button>
+								<span class="text-xs text-[#7c7c7c] w-8 text-right">{contact.contact_score ?? '—'}</span>
+								<button onclick={rescore} disabled={rescoring} class="text-xs text-[#6e6e6e] hover:text-white transition-colors" title="Re-score contact">{rescoring ? '...' : '↺'}</button>
 							</div>
 						</div>
 					</div>
@@ -656,7 +656,7 @@
 
 				<!-- Tags -->
 				<div>
-					<p class="text-xs text-[#555] uppercase tracking-widest mb-2">Tags</p>
+					<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">Tags</p>
 					<div class="flex flex-wrap gap-1.5 mb-3">
 						{#each contact.tags as tag}
 							<span class="flex items-center gap-1 px-2 py-0.5 rounded text-xs"
@@ -685,13 +685,13 @@
 				<!-- Associations -->
 				{#if contact.associations?.length}
 					<div>
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-2">In Call Lists</p>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">In Call Lists</p>
 						<div class="space-y-1.5">
 							{#each contact.associations as assoc}
 								<div class="rounded-lg bg-[#1a1a1a] border border-[#1e1e1e] px-3 py-2">
 									<p class="text-xs text-white">{assoc.name}</p>
 									{#if assoc.campaign}
-										<p class="text-xs text-[#555] truncate">
+										<p class="text-xs text-[#7c7c7c] truncate">
 											{assoc.campaign.project?.client?.name ?? ''} › {assoc.campaign.name}
 										</p>
 									{/if}
@@ -709,12 +709,12 @@
 					{#each [['timeline','Timeline'],['calls',`Calls (${calls.length})`],['sms','SMS']] as [tab, label]}
 						<button
 							onclick={() => rightTab = tab as RightTab}
-							class="px-4 py-3 text-xs border-b-2 transition-colors {rightTab === tab ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-[#999]'}"
+							class="px-4 py-3 text-xs border-b-2 transition-colors {rightTab === tab ? 'border-white text-white' : 'border-transparent text-[#7c7c7c] hover:text-[#999]'}"
 						>{label}</button>
 					{/each}
 					<button
 						onclick={() => rightTab = 'email'}
-						class="px-3 py-2 text-xs font-medium transition-colors border-b-2 {rightTab === 'email' ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-[#888]'}">
+						class="px-3 py-2 text-xs font-medium transition-colors border-b-2 {rightTab === 'email' ? 'border-white text-white' : 'border-transparent text-[#7c7c7c] hover:text-[#888]'}">
 						Email {emails.length > 0 ? `(${emails.length})` : ''}
 					</button>
 				</div>
@@ -722,9 +722,9 @@
 				{#if rightTab === 'timeline'}
 				<!-- Timeline header with Add button -->
 				<div class="flex items-center justify-between px-8 py-4 border-b border-[#1a1a1a]">
-					<p class="text-xs text-[#555] uppercase tracking-widest">Activity</p>
+					<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Activity</p>
 					<button onclick={() => showActivityForm = !showActivityForm}
-						class="text-xs border border-[#2a2a2a] px-3 py-1 rounded-lg text-[#777] hover:border-white hover:text-white transition-colors">
+						class="text-xs border border-[#2a2a2a] px-3 py-1 rounded-lg text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						{showActivityForm ? '✕ Cancel' : '+ Log Activity'}
 					</button>
 				</div>
@@ -735,7 +735,7 @@
 					<div class="flex flex-wrap gap-1.5">
 						{#each ACTIVITY_TYPES as t}
 							<button onclick={() => activityType = t.value}
-								class="px-2.5 py-1 rounded-full text-xs transition-colors {activityType === t.value ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#666] hover:border-[#555] hover:text-[#ccc]'}">
+								class="px-2.5 py-1 rounded-full text-xs transition-colors {activityType === t.value ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#8a8a8a] hover:border-[#555] hover:text-[#ccc]'}">
 								{t.icon} {t.label}
 							</button>
 						{/each}
@@ -766,9 +766,9 @@
 
 			<div class="p-5 space-y-3">
 				{#if loadingTimeline}
-					<p class="text-[#444] text-xs text-center py-6">Loading...</p>
+					<p class="text-[#6e6e6e] text-xs text-center py-6">Loading...</p>
 				{:else if timeline.length === 0}
-					<p class="text-[#444] text-xs text-center py-8">No activity yet</p>
+					<p class="text-[#6e6e6e] text-xs text-center py-8">No activity yet</p>
 				{:else}
 					{#each timeline as event}
 						<div class="flex gap-3 group">
@@ -778,27 +778,27 @@
 							<div class="flex-1 min-w-0">
 								{#if event.type === 'call'}
 									<p class="text-sm text-white capitalize">{(event.data.outcome as string ?? '').replace(/_/g,' ') || 'Call'}</p>
-									{#if event.data.summary}<p class="text-xs text-[#666] mt-0.5 truncate">{event.data.summary as string}</p>{/if}
+									{#if event.data.summary}<p class="text-xs text-[#8a8a8a] mt-0.5 truncate">{event.data.summary as string}</p>{/if}
 								{:else if event.type === 'sms'}
 									<p class="text-sm text-white">{event.data.direction === 'outbound' ? 'SMS sent' : 'SMS received'}</p>
-									<p class="text-xs text-[#666] truncate">{event.data.body as string}</p>
+									<p class="text-xs text-[#8a8a8a] truncate">{event.data.body as string}</p>
 								{:else if event.type === 'email'}
 									<p class="text-sm text-white">{event.data.subject as string}</p>
-									<p class="text-xs text-[#666]">{event.data.status as string}</p>
+									<p class="text-xs text-[#8a8a8a]">{event.data.status as string}</p>
 								{:else if event.type === 'task'}
-									<p class="text-sm text-white {event.data.status === 'completed' ? 'line-through text-[#555]' : ''}">{event.data.title as string}</p>
-									<p class="text-xs text-[#666] capitalize">{(event.data.task_type as string)?.replace(/_/g,' ')} · {event.data.status as string}</p>
+									<p class="text-sm text-white {event.data.status === 'completed' ? 'line-through text-[#7c7c7c]' : ''}">{event.data.title as string}</p>
+									<p class="text-xs text-[#8a8a8a] capitalize">{(event.data.task_type as string)?.replace(/_/g,' ')} · {event.data.status as string}</p>
 								{:else if event.type === 'deal'}
 									<p class="text-sm text-white">{event.data.title as string}</p>
-									<p class="text-xs text-[#666] capitalize">{event.data.stage as string} · ${event.data.value as number}</p>
+									<p class="text-xs text-[#8a8a8a] capitalize">{event.data.stage as string} · ${event.data.value as number}</p>
 								{:else if event.type === 'activity'}
 									<div class="flex items-center gap-2 flex-wrap">
 										<span class="text-xs font-medium text-white capitalize">{(event.data.activity_type as string).replace('_', ' ')}</span>
 										{#if event.data.title}<span class="text-xs text-[#888]">— {event.data.title as string}</span>{/if}
-										{#if event.data.duration_minutes}<span class="text-xs text-[#555]">{event.data.duration_minutes as number}min</span>{/if}
+										{#if event.data.duration_minutes}<span class="text-xs text-[#7c7c7c]">{event.data.duration_minutes as number}min</span>{/if}
 										{#if event.data.outcome}<span class="text-xs px-2 py-0.5 rounded-full bg-[#1a1a1a] text-[#888]">{event.data.outcome as string}</span>{/if}
 									</div>
-									{#if event.data.description}<p class="text-xs text-[#777] mt-1 whitespace-pre-wrap">{event.data.description as string}</p>{/if}
+									{#if event.data.description}<p class="text-xs text-[#9a9a9a] mt-1 whitespace-pre-wrap">{event.data.description as string}</p>{/if}
 								{/if}
 								<p class="text-xs text-[#333] mt-0.5">{new Date(event.timestamp).toLocaleString()}</p>
 							</div>
@@ -810,13 +810,13 @@
 			<div class="flex flex-col">
 				<div class="flex-1 overflow-y-auto p-4 space-y-2">
 					{#if smsLogs.length === 0}
-						<p class="text-[#444] text-sm text-center py-8">No messages yet</p>
+						<p class="text-[#6e6e6e] text-sm text-center py-8">No messages yet</p>
 					{:else}
 						{#each smsLogs as sms}
 							<div class="flex {sms.direction === 'outbound' ? 'justify-end' : 'justify-start'}">
 								<div class="max-w-xs rounded-xl px-3 py-2 {sms.direction === 'outbound' ? 'bg-white/10 text-white' : 'bg-[#1a1a1a] border border-[#2a2a2a] text-[#ccc]'}">
 									<p class="text-sm">{sms.body}</p>
-									<p class="text-xs mt-1 {sms.direction === 'outbound' ? 'text-white/40' : 'text-[#444]'}">{new Date(sms.sent_at).toLocaleTimeString()}</p>
+									<p class="text-xs mt-1 {sms.direction === 'outbound' ? 'text-white/40' : 'text-[#6e6e6e]'}">{new Date(sms.sent_at).toLocaleTimeString()}</p>
 								</div>
 							</div>
 						{/each}
@@ -847,19 +847,19 @@
 			{:else if rightTab === 'calls'}
 			<div class="p-4 space-y-3">
 				{#if calls.length === 0}
-					<p class="text-[#444] text-sm text-center py-8">No calls logged yet</p>
+					<p class="text-[#6e6e6e] text-sm text-center py-8">No calls logged yet</p>
 				{:else}
 					{#each calls as call}
 						<div class="rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] p-3 space-y-1.5">
 							<div class="flex items-center justify-between gap-2">
 								<p class="text-sm text-white capitalize">{(call.outcome ?? '').replace(/_/g,' ') || 'Call'}</p>
-								<span class="text-xs text-[#444] shrink-0">{new Date(call.created_at).toLocaleString()}</span>
+								<span class="text-xs text-[#6e6e6e] shrink-0">{new Date(call.created_at).toLocaleString()}</span>
 							</div>
 							{#if call.call_duration_seconds}
-								<p class="text-xs text-[#555]">Duration: {Math.floor(call.call_duration_seconds / 60)}m {call.call_duration_seconds % 60}s</p>
+								<p class="text-xs text-[#7c7c7c]">Duration: {Math.floor(call.call_duration_seconds / 60)}m {call.call_duration_seconds % 60}s</p>
 							{/if}
 							{#if call.summary}<p class="text-xs text-[#888] whitespace-pre-wrap">{call.summary}</p>{/if}
-							{#if call.notes}<p class="text-xs text-[#666] whitespace-pre-wrap">{call.notes}</p>{/if}
+							{#if call.notes}<p class="text-xs text-[#8a8a8a] whitespace-pre-wrap">{call.notes}</p>{/if}
 							{#if call.recording_url}
 								<audio controls preload="none" src={call.recording_url} class="w-full h-8 mt-1"></audio>
 							{/if}
@@ -892,17 +892,17 @@
 				</div>
 				<div class="flex-1 overflow-y-auto p-4 space-y-2">
 					{#if loadingEmails}
-						<p class="text-[#444] text-sm text-center py-8">Loading…</p>
+						<p class="text-[#6e6e6e] text-sm text-center py-8">Loading…</p>
 					{:else if emails.length === 0}
-						<p class="text-[#444] text-sm text-center py-8">No emails yet</p>
+						<p class="text-[#6e6e6e] text-sm text-center py-8">No emails yet</p>
 					{:else}
 						{#each emails as email}
 							<div class="rounded-lg border border-[#1e1e1e] bg-[#0d0d0d] p-3 space-y-1">
 								<div class="flex items-center justify-between gap-2">
 									<p class="text-sm text-white truncate">{email.subject ?? '(no subject)'}</p>
-									<span class="text-xs text-[#444] shrink-0">{email.created_at ? new Date(email.created_at).toLocaleDateString() : ''}</span>
+									<span class="text-xs text-[#6e6e6e] shrink-0">{email.created_at ? new Date(email.created_at).toLocaleDateString() : ''}</span>
 								</div>
-								<p class="text-xs text-[#555] capitalize">{email.direction ?? 'outbound'} · {email.status ?? 'sent'}</p>
+								<p class="text-xs text-[#7c7c7c] capitalize">{email.direction ?? 'outbound'} · {email.status ?? 'sent'}</p>
 							</div>
 						{/each}
 					{/if}

@@ -229,7 +229,7 @@
 		<div class="flex gap-1 flex-wrap">
 			{#each ([['web','Web Scraper'],['screenshot','Screenshot OCR'],['enrich','AI Enrichment'],['search','Biz Search'],['streamer','Streamer Lookup'],['csv','CSV Import']] as [Tab,string][]) as [t, label]}
 				<button onclick={() => tab = t}
-					class="rounded-lg px-4 py-1.5 text-xs transition-colors {tab === t ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">
+					class="rounded-lg px-4 py-1.5 text-xs transition-colors {tab === t ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">
 					{label}
 				</button>
 			{/each}
@@ -244,7 +244,7 @@
 			{#if tab === 'web'}
 				<div>
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Scrape Company Website</p>
-					<p class="text-xs text-[#555] mb-4">Enter a company URL. Claude will extract contacts, emails, and titles from the page.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Enter a company URL. Claude will extract contacts, emails, and titles from the page.</p>
 					<div class="flex gap-2">
 						<input bind:value={scrapeUrl} placeholder="https://company.com/team"
 							onkeydown={(e) => e.key === 'Enter' && scrapeWeb()}
@@ -263,7 +263,7 @@
 			{:else if tab === 'screenshot'}
 				<div>
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Extract from Screenshot</p>
-					<p class="text-xs text-[#555] mb-4">Upload a screenshot of a business card, LinkedIn profile, or any page with contact info. Claude Vision extracts the details.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Upload a screenshot of a business card, LinkedIn profile, or any page with contact info. Claude Vision extracts the details.</p>
 					<div
 						role="button" tabindex="0"
 						class="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors border-[#2a2a2a] hover:border-[#444]"
@@ -274,8 +274,8 @@
 						{#if imgPreview}
 							<img src={imgPreview} alt="preview" class="max-h-40 mx-auto rounded-lg object-contain" />
 						{:else}
-							<p class="text-[#666] text-sm">Drop image or click to upload</p>
-							<p class="text-[#444] text-xs mt-1">PNG, JPG, WebP</p>
+							<p class="text-[#8a8a8a] text-sm">Drop image or click to upload</p>
+							<p class="text-[#6e6e6e] text-xs mt-1">PNG, JPG, WebP</p>
 						{/if}
 						<input id="img-input" type="file" accept="image/*" class="hidden" onchange={handleImageInput} />
 					</div>
@@ -289,7 +289,7 @@
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-2 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 							<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Extracted</p>
 							{#each [['Name', extracted.raw_name], ['Title', extracted.raw_title], ['Company', extracted.raw_company], ['Email', extracted.raw_email], ['Phone', extracted.raw_phone]] as [label, val]}
-								{#if val}<div><p class="text-xs text-[#555]">{label}</p><p class="text-white text-sm">{val}</p></div>{/if}
+								{#if val}<div><p class="text-xs text-[#7c7c7c]">{label}</p><p class="text-white text-sm">{val}</p></div>{/if}
 							{/each}
 						</div>
 					{/if}
@@ -298,7 +298,7 @@
 			{:else if tab === 'enrich'}
 				<div>
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-3">AI Enrichment</p>
-					<p class="text-xs text-[#555] mb-4">Select a contact and Claude generates a company summary, best outreach angle, personalized opener, and talking points.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Select a contact and Claude generates a company summary, best outreach angle, personalized opener, and talking points.</p>
 					<select bind:value={selectedContact}
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none mb-3">
 						<option value="">Select a contact...</option>
@@ -312,28 +312,28 @@
 						<div class="space-y-4 mt-4">
 							{#if enrichment.companySummary}
 								<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-4">
-									<p class="text-xs text-[#555] mb-1 uppercase tracking-widest">Company</p>
+									<p class="text-xs text-[#7c7c7c] mb-1 uppercase tracking-widest">Company</p>
 									<p class="text-sm text-[#ccc]">{enrichment.companySummary}</p>
 								</div>
 							{/if}
 							{#if enrichment.outreachAngle}
 								<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-4">
-									<p class="text-xs text-[#555] mb-1 uppercase tracking-widest">Outreach Angle</p>
+									<p class="text-xs text-[#7c7c7c] mb-1 uppercase tracking-widest">Outreach Angle</p>
 									<p class="text-sm text-[#ccc]">{enrichment.outreachAngle}</p>
 								</div>
 							{/if}
 							{#if enrichment.personalizedMessage}
 								<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-4">
-									<p class="text-xs text-[#555] mb-1 uppercase tracking-widest">Opening Line</p>
+									<p class="text-xs text-[#7c7c7c] mb-1 uppercase tracking-widest">Opening Line</p>
 									<p class="text-sm text-white italic">"{enrichment.personalizedMessage}"</p>
 								</div>
 							{/if}
 							{#if enrichment.talkingPoints?.length}
 								<div class="rounded-lg border border-[#2a2a2a] bg-[#111] p-4">
-									<p class="text-xs text-[#555] mb-2 uppercase tracking-widest">Talking Points</p>
+									<p class="text-xs text-[#7c7c7c] mb-2 uppercase tracking-widest">Talking Points</p>
 									<ul class="space-y-1">
 										{#each enrichment.talkingPoints as pt}
-											<li class="text-sm text-[#ccc] flex gap-2"><span class="text-[#444]">•</span>{pt}</li>
+											<li class="text-sm text-[#ccc] flex gap-2"><span class="text-[#6e6e6e]">•</span>{pt}</li>
 										{/each}
 									</ul>
 								</div>
@@ -345,7 +345,7 @@
 			{:else if tab === 'search'}
 				<div class="space-y-4">
 					<p class="text-xs text-[#999] uppercase tracking-widest">Business Directory Search</p>
-					<p class="text-xs text-[#555]">Search for businesses and extract real contact data from their websites.</p>
+					<p class="text-xs text-[#7c7c7c]">Search for businesses and extract real contact data from their websites.</p>
 					<div class="flex gap-2">
 						<input bind:value={searchQuery} placeholder="e.g. auto mechanics Tampa FL"
 							class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none"
@@ -370,7 +370,7 @@
 			{:else if tab === 'streamer'}
 				<div class="space-y-4">
 					<p class="text-xs text-[#999] uppercase tracking-widest">Streamer Lookup</p>
-					<p class="text-xs text-[#555]">Look up a gaming creator by handle. Extracts profile info and saves to your scraper inbox.</p>
+					<p class="text-xs text-[#7c7c7c]">Look up a gaming creator by handle. Extracts profile info and saves to your scraper inbox.</p>
 					<div class="flex gap-2">
 						<input bind:value={streamerHandle} placeholder="e.g. Jynxzi"
 							class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
@@ -393,9 +393,9 @@
 					{#if streamerResult}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 text-xs space-y-1 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 							<p class="text-white font-medium">{streamerResult.name ?? streamerHandle}</p>
-							<p class="text-[#555]">{streamerResult.game ?? ''}{streamerResult.game && streamerResult.followers ? ' · ' : ''}{streamerResult.followers ?? ''} followers</p>
+							<p class="text-[#7c7c7c]">{streamerResult.game ?? ''}{streamerResult.game && streamerResult.followers ? ' · ' : ''}{streamerResult.followers ?? ''} followers</p>
 							{#if streamerResult.email}<p class="text-[var(--accent)]">{streamerResult.email}</p>{/if}
-							{#if streamerResult.bio}<p class="text-[#777] mt-1">{streamerResult.bio}</p>{/if}
+							{#if streamerResult.bio}<p class="text-[#9a9a9a] mt-1">{streamerResult.bio}</p>{/if}
 						</div>
 					{/if}
 				</div>
@@ -404,7 +404,7 @@
 				<div class="space-y-4">
 					<p class="text-xs text-[#999] uppercase tracking-widest">CSV Import</p>
 					{#if !csvHeaders.length}
-						<p class="text-xs text-[#555]">Paste your CSV below. We'll help you map the columns.</p>
+						<p class="text-xs text-[#7c7c7c]">Paste your CSV below. We'll help you map the columns.</p>
 						<textarea bind:value={csvText} placeholder="Paste CSV here..." rows="6"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none resize-none font-mono"></textarea>
 						<div class="flex gap-2">
@@ -422,7 +422,7 @@
 						<div class="grid grid-cols-2 gap-3">
 							{#each [['name','Name / Business'],['phone','Phone'],['email','Email'],['company','Company'],['title','Title']] as [field, label]}
 								<div>
-									<label class="text-xs text-[#555] mb-1 block">{label}</label>
+									<label class="text-xs text-[#7c7c7c] mb-1 block">{label}</label>
 									<select bind:value={csvMapping[field]} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:outline-none">
 										<option value="">— skip —</option>
 										{#each csvHeaders as h}<option value={h}>{h}</option>{/each}
@@ -431,7 +431,7 @@
 							{/each}
 						</div>
 						<div class="flex gap-2 pt-1">
-							<button onclick={() => { csvHeaders = []; csvText = ''; }} class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg">Back</button>
+							<button onclick={() => { csvHeaders = []; csvText = ''; }} class="text-xs text-[#7c7c7c] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg">Back</button>
 							<button onclick={importCsv} disabled={importing}
 								class="flex-1 rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
 								{importing ? 'Importing...' : `Import ${csvTotalRows} rows`}
@@ -449,15 +449,15 @@
 		<!-- Right: scraped contacts history -->
 		<div class="flex-1 flex flex-col overflow-hidden">
 			<div class="border-b border-[#1e1e1e] px-5 py-3">
-				<p class="text-xs text-white font-medium">Scraped Contacts <span class="text-[#444] font-normal">({history.length})</span></p>
+				<p class="text-xs text-white font-medium">Scraped Contacts <span class="text-[#6e6e6e] font-normal">({history.length})</span></p>
 			</div>
 			<div class="flex-1 overflow-y-auto">
 				{#if loadingHistory}
-					<p class="text-[#444] text-xs text-center py-8">Loading...</p>
+					<p class="text-[#6e6e6e] text-xs text-center py-8">Loading...</p>
 				{:else if history.length === 0}
 					<div class="flex items-center justify-center py-16 text-center">
 						<div>
-							<p class="text-[#444] text-sm">No scraped contacts yet</p>
+							<p class="text-[#6e6e6e] text-sm">No scraped contacts yet</p>
 							<p class="text-[#333] text-xs mt-1">Use the Web Scraper or Screenshot tool to find leads</p>
 						</div>
 					</div>
@@ -469,15 +469,15 @@
 									<p class="text-white text-sm font-medium truncate">{contact.raw_name ?? '—'}</p>
 									<span class="text-xs {confColor(contact.confidence)}">{Math.round(contact.confidence * 100)}%</span>
 								</div>
-								<p class="text-xs text-[#666] truncate">{[contact.raw_title, contact.raw_company].filter(Boolean).join(' · ')}</p>
-								{#if contact.raw_email}<p class="text-xs text-[#555] truncate">{contact.raw_email}</p>{/if}
+								<p class="text-xs text-[#8a8a8a] truncate">{[contact.raw_title, contact.raw_company].filter(Boolean).join(' · ')}</p>
+								{#if contact.raw_email}<p class="text-xs text-[#7c7c7c] truncate">{contact.raw_email}</p>{/if}
 							</div>
 							<div class="text-right shrink-0">
-								<p class="text-xs text-[#444] capitalize mb-1">{contact.source?.replace(/_/g,' ')}</p>
+								<p class="text-xs text-[#6e6e6e] capitalize mb-1">{contact.source?.replace(/_/g,' ')}</p>
 								{#if contact.status === 'added'}
 									<p class="text-xs text-[var(--accent)]">✓ Added</p>
 								{:else if contact.status === 'rejected'}
-									<p class="text-xs text-[#444]">Rejected</p>
+									<p class="text-xs text-[#6e6e6e]">Rejected</p>
 								{:else}
 									<button onclick={() => acceptContact(contact.id)}
 										class="rounded px-2 py-1 text-xs bg-white/10 text-white hover:bg-white/20 transition-colors">

@@ -6,13 +6,13 @@
 <div class="min-h-screen bg-[#000] text-white" style="font-family:var(--font-ui,'Inter',system-ui,sans-serif)">
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
 		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">EDELHAUS</a>
-		<a href="/privacy" class="text-xs text-[#444] hover:text-white transition-colors">Privacy Policy</a>
+		<a href="/privacy" class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Privacy Policy</a>
 	</nav>
 
 	<div class="max-w-3xl mx-auto px-8 py-16">
 		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.22em;color:#333;margin-bottom:12px">Legal</p>
 		<h1 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:300;font-size:36px;color:#fff;margin-bottom:8px">Terms of Service</h1>
-		<p class="text-xs text-[#444] mb-12">Last updated: June 2026 · Edelhaus LLC</p>
+		<p class="text-xs text-[#6e6e6e] mb-12">Last updated: June 2026 · Edelhaus LLC</p>
 
 		<div class="prose" style="font-size:13px;color:#888;line-height:1.8;max-width:none">
 

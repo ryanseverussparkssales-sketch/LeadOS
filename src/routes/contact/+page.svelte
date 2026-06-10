@@ -58,7 +58,7 @@
 	<nav class="border-b border-[#1a1a1a] px-8 py-5 flex items-center justify-between">
 		<a href="/" class="font-semibold">Edelhaus</a>
 		<div class="flex items-center gap-5">
-			<a href="/?mode=login" class="text-xs text-[#555] hover:text-white transition-colors">Log in</a>
+			<a href="/?mode=login" class="text-xs text-[#7c7c7c] hover:text-white transition-colors">Log in</a>
 		</div>
 	</nav>
 
@@ -66,9 +66,9 @@
 
 		<!-- Hero -->
 		<div class="text-center mb-16">
-			<p class="text-xs text-[#444] uppercase tracking-widest mb-4">Edelhaus</p>
-			<h1 class="text-5xl font-bold tracking-tight mb-5">Hire vetted SDRs.<br/><span class="text-[#444]">Pay per appointment.</span></h1>
-			<p class="text-[#555] text-lg max-w-xl mx-auto leading-relaxed">
+			<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">Edelhaus</p>
+			<h1 class="text-5xl font-bold tracking-tight mb-5">Hire vetted SDRs.<br/><span class="text-[#6e6e6e]">Pay per appointment.</span></h1>
+			<p class="text-[#7c7c7c] text-lg max-w-xl mx-auto leading-relaxed">
 				We source, screen, and manage sales reps for your outbound campaigns.
 				You get a live portal, real recordings, and a bill that only grows when you win.
 			</p>
@@ -83,7 +83,7 @@
 						<span class="text-[10px] text-[#333] font-mono">0{i+1}</span>
 					</div>
 					<p class="text-sm text-white font-medium mb-2">{step.title}</p>
-					<p class="text-xs text-[#555] leading-relaxed">{step.desc}</p>
+					<p class="text-xs text-[#7c7c7c] leading-relaxed">{step.desc}</p>
 				</div>
 			{/each}
 		</div>
@@ -92,19 +92,19 @@
 		<div class="rounded-2xl border border-[#2a2a2a] bg-[#111] p-8 mb-16">
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-2">Base Retainer</p>
-					<p class="text-3xl font-bold text-white">$1,500<span class="text-sm text-[#444] font-normal">/mo</span></p>
-					<p class="text-xs text-[#555] mt-2">One dedicated rep, 50+ dials/day, weekly reporting. No contract lock-in.</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Base Retainer</p>
+					<p class="text-3xl font-bold text-white">$1,500<span class="text-sm text-[#6e6e6e] font-normal">/mo</span></p>
+					<p class="text-xs text-[#7c7c7c] mt-2">One dedicated rep, 50+ dials/day, weekly reporting. No contract lock-in.</p>
 				</div>
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-2">Per Appointment</p>
-					<p class="text-3xl font-bold text-yellow-400">+$50<span class="text-sm text-[#555] font-normal"> each</span></p>
-					<p class="text-xs text-[#555] mt-2">Every qualified appointment set. You only pay more when we perform.</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Per Appointment</p>
+					<p class="text-3xl font-bold text-yellow-400">+$50<span class="text-sm text-[#7c7c7c] font-normal"> each</span></p>
+					<p class="text-xs text-[#7c7c7c] mt-2">Every qualified appointment set. You only pay more when we perform.</p>
 				</div>
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-2">Portal Access</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Portal Access</p>
 					<p class="text-3xl font-bold text-blue-400">Included</p>
-					<p class="text-xs text-[#555] mt-2">Live dashboard, call recordings, approval workflow, messaging — all in the platform.</p>
+					<p class="text-xs text-[#7c7c7c] mt-2">Live dashboard, call recordings, approval workflow, messaging — all in the platform.</p>
 				</div>
 			</div>
 		</div>
@@ -119,37 +119,37 @@
 				{#if submitted}
 					<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-6 space-y-2">
 						<p class="text-white font-medium">We'll reach out within 24 hours.</p>
-						<p class="text-xs text-[#555]">We'll review your goals and follow up with how we can run your outreach.</p>
+						<p class="text-xs text-[#7c7c7c]">We'll review your goals and follow up with how we can run your outreach.</p>
 					</div>
 				{:else}
 					<form onsubmit={submit} class="space-y-4">
 						<div class="grid grid-cols-2 gap-3">
 							<div>
-								<label class="block text-xs text-[#555] mb-1">Your name *</label>
+								<label class="block text-xs text-[#7c7c7c] mb-1">Your name *</label>
 								<input bind:value={name} required placeholder="Ryan Sparks"
 									class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 							</div>
 							<div>
-								<label class="block text-xs text-[#555] mb-1">Work email *</label>
+								<label class="block text-xs text-[#7c7c7c] mb-1">Work email *</label>
 								<input type="email" bind:value={email} required placeholder="you@company.com"
 									class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 							</div>
 						</div>
 						<div>
-							<label class="block text-xs text-[#555] mb-1">Company</label>
+							<label class="block text-xs text-[#7c7c7c] mb-1">Company</label>
 							<input bind:value={company} placeholder="Acme Inc."
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 						</div>
 						<div class="grid grid-cols-2 gap-3">
 							<div>
-								<label class="block text-xs text-[#555] mb-1">Vertical / Industry</label>
+								<label class="block text-xs text-[#7c7c7c] mb-1">Vertical / Industry</label>
 								<select bind:value={vertical} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white focus:outline-none">
 									<option value="">Select…</option>
 									{#each VERTICALS as v}<option value={v}>{v}</option>{/each}
 								</select>
 							</div>
 							<div>
-								<label class="block text-xs text-[#555] mb-1">Monthly budget</label>
+								<label class="block text-xs text-[#7c7c7c] mb-1">Monthly budget</label>
 								<select bind:value={budget} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white focus:outline-none">
 									<option value="">Select…</option>
 									{#each ['Under $2k','$2k-$5k','$5k-$10k','$10k+','Not sure yet'] as b}
@@ -159,7 +159,7 @@
 							</div>
 						</div>
 						<div>
-							<label class="block text-xs text-[#555] mb-1">Tell us about your campaign</label>
+							<label class="block text-xs text-[#7c7c7c] mb-1">Tell us about your campaign</label>
 							<textarea bind:value={message} rows="3" placeholder="Target market, what you're selling, what success looks like…"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
@@ -176,7 +176,7 @@
 			<!-- Trust / social proof -->
 			<div class="space-y-5">
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-4">What you get</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">What you get</p>
 					{#each [
 						['📞', 'Dedicated rep dialing your list 5 days/week'],
 						['📋', 'Custom script + objection handlers for your vertical'],
@@ -195,17 +195,17 @@
 				</div>
 
 				<div class="rounded-xl border border-[#1a1a1a] bg-[#111] p-5">
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-3">Currently serving</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-3">Currently serving</p>
 					{#each [
 						['The Beard Club', 'E-Commerce / D2C', 'Abandoned cart recovery'],
 						['iotty Smart Home', 'Smart Home / IoT', 'B2B channel sales'],
 						['Huntt.gg', 'Creator Economy', 'Streamer partnership outreach'],
 					] as [company, vertical, type]}
 						<div class="flex items-start gap-3 mb-3 last:mb-0">
-							<div class="w-6 h-6 rounded bg-[#1a1a1a] flex items-center justify-center text-[10px] font-bold text-[#555] shrink-0">{company[0]}</div>
+							<div class="w-6 h-6 rounded bg-[#1a1a1a] flex items-center justify-center text-[10px] font-bold text-[#7c7c7c] shrink-0">{company[0]}</div>
 							<div>
 								<p class="text-xs text-white">{company}</p>
-								<p class="text-[10px] text-[#444]">{vertical} · {type}</p>
+								<p class="text-[10px] text-[#6e6e6e]">{vertical} · {type}</p>
 							</div>
 						</div>
 					{/each}

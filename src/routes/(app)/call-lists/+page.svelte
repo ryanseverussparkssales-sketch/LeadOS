@@ -140,11 +140,11 @@
 				<button onclick={() => selectList(list)}
 					class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === list.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 					<p class="text-sm text-white font-medium truncate">{list.name}</p>
-					<p class="text-xs text-[#555] mt-0.5">{list.project?.client?.name} › {list.project?.name}</p>
-					<p class="text-xs text-[#444] mt-0.5">{contactCount(list)} contacts</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">{list.project?.client?.name} › {list.project?.name}</p>
+					<p class="text-xs text-[#6e6e6e] mt-0.5">{contactCount(list)} contacts</p>
 				</button>
 			{:else}
-				<p class="text-center text-[#444] text-xs py-8">No call lists — create from Projects view</p>
+				<p class="text-center text-[#6e6e6e] text-xs py-8">No call lists — create from Projects view</p>
 			{/each}
 		</div>
 
@@ -155,7 +155,7 @@
 				<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 					<div>
 						<p class="text-white text-sm font-medium">{selected.name}</p>
-						<p class="text-xs text-[#555]">{selected.project?.client?.name} › {selected.project?.name}</p>
+						<p class="text-xs text-[#7c7c7c]">{selected.project?.client?.name} › {selected.project?.name}</p>
 					</div>
 					<div class="flex gap-2">
 						<button onclick={loadAllContacts}
@@ -179,11 +179,11 @@
 				<div class="flex-1 overflow-y-auto">
 					{#if loadingContacts}
 						<div class="flex items-center justify-center py-16">
-							<p class="text-[#444] text-sm">Loading...</p>
+							<p class="text-[#6e6e6e] text-sm">Loading...</p>
 						</div>
 					{:else if contacts.length === 0}
 						<div class="flex flex-col items-center justify-center py-16 gap-3 text-center px-8">
-							<p class="text-[#555] text-sm">No contacts in this list yet</p>
+							<p class="text-[#7c7c7c] text-sm">No contacts in this list yet</p>
 							<p class="text-xs text-[#333]">Import contacts via the Import Center or add from Contacts page</p>
 							<a href="/import" class="text-xs text-white underline hover:no-underline">Go to Import</a>
 						</div>
@@ -204,7 +204,7 @@
 				</div>
 			{:else}
 				<div class="flex items-center justify-center flex-1">
-					<p class="text-[#444] text-sm">Select a call list to view contacts</p>
+					<p class="text-[#6e6e6e] text-sm">Select a call list to view contacts</p>
 				</div>
 			{/if}
 		</div>
@@ -218,7 +218,7 @@
 		<div class="bg-[#111111] border border-[#2a2a2a] rounded-xl w-[560px] max-h-[70vh] flex flex-col" onclick={(e) => e.stopPropagation()}>
 			<div class="p-4 border-b border-[#2a2a2a] flex items-center justify-between">
 				<p class="text-white text-sm font-medium">Add contacts to "{selected?.name}"</p>
-				<button onclick={() => showAddExisting = false} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
+				<button onclick={() => showAddExisting = false} class="text-[#8a8a8a] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-4 border-b border-[#2a2a2a]">
 				<input bind:value={addSearch} placeholder="Search contacts..."
@@ -236,13 +236,13 @@
 							}} />
 						<div class="flex-1 min-w-0">
 							<p class="text-sm text-white truncate">{contact.name}</p>
-							<p class="text-xs text-[#555] truncate">{contact.company || contact.phone}</p>
+							<p class="text-xs text-[#7c7c7c] truncate">{contact.company || contact.phone}</p>
 						</div>
 					</label>
 				{/each}
 			</div>
 			<div class="p-4 border-t border-[#2a2a2a] flex items-center justify-between">
-				<p class="text-xs text-[#555]">{selectedToAdd.length} selected</p>
+				<p class="text-xs text-[#7c7c7c]">{selectedToAdd.length} selected</p>
 				<button onclick={addSelectedContacts} disabled={!selectedToAdd.length}
 					class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
 					Add to List

@@ -252,7 +252,7 @@
 	<div class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]">
 		<div>
 			<h1 class="text-xl font-semibold">Marketing</h1>
-			<p class="text-[#666] text-sm">Content, social media, advertising, and campaign management</p>
+			<p class="text-[#8a8a8a] text-sm">Content, social media, advertising, and campaign management</p>
 		</div>
 		<!-- Context indicator + client filter -->
 		<div class="flex items-center gap-2">
@@ -267,7 +267,7 @@
 	<!-- Tabs -->
 	<div class="flex gap-1 px-6 pt-4 border-b border-[#2a2a2a]">
 		{#each [['dashboard','Dashboard'],['content','Content Hub'],['social','Social Media'],['ads','Ad Campaigns'],['copy','AI Copy'],['integrations','Integrations']] as [id, label]}
-			<button onclick={() => activeTab = id as Tab} class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === id ? 'border-white text-white' : 'border-transparent text-[#666] hover:text-[#ccc]'}">{label}</button>
+			<button onclick={() => activeTab = id as Tab} class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === id ? 'border-white text-white' : 'border-transparent text-[#8a8a8a] hover:text-[#ccc]'}">{label}</button>
 		{/each}
 	</div>
 
@@ -279,24 +279,24 @@
 	{:else if activeTab === 'dashboard'}
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-				<div class="text-[#666] text-xs mb-1">Assets</div>
+				<div class="text-[#8a8a8a] text-xs mb-1">Assets</div>
 				<div class="text-2xl font-semibold">{assets.length}</div>
-				<div class="text-xs text-[#555] mt-1">{assets.filter(a => a.status === 'published').length} published</div>
+				<div class="text-xs text-[#7c7c7c] mt-1">{assets.filter(a => a.status === 'published').length} published</div>
 			</div>
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-				<div class="text-[#666] text-xs mb-1">Social Accounts</div>
+				<div class="text-[#8a8a8a] text-xs mb-1">Social Accounts</div>
 				<div class="text-2xl font-semibold">{socialAccounts.filter(a => a.status === 'connected').length}</div>
-				<div class="text-xs text-[#555] mt-1">across {[...new Set(socialAccounts.map(a => a.platform))].length} platforms</div>
+				<div class="text-xs text-[#7c7c7c] mt-1">across {[...new Set(socialAccounts.map(a => a.platform))].length} platforms</div>
 			</div>
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-				<div class="text-[#666] text-xs mb-1">Ad Spend</div>
+				<div class="text-[#8a8a8a] text-xs mb-1">Ad Spend</div>
 				<div class="text-2xl font-semibold text-yellow-400">{fmt(totalAdSpend)}</div>
-				<div class="text-xs text-[#555] mt-1">of {fmt(totalAdBudget)} budget</div>
+				<div class="text-xs text-[#7c7c7c] mt-1">of {fmt(totalAdBudget)} budget</div>
 			</div>
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-				<div class="text-[#666] text-xs mb-1">Ad Leads</div>
+				<div class="text-[#8a8a8a] text-xs mb-1">Ad Leads</div>
 				<div class="text-2xl font-semibold text-[var(--accent)]">{fmtNum(totalLeads)}</div>
-				<div class="text-xs text-[#555] mt-1">{fmtNum(totalImpressions)} impressions</div>
+				<div class="text-xs text-[#7c7c7c] mt-1">{fmtNum(totalImpressions)} impressions</div>
 			</div>
 		</div>
 
@@ -317,8 +317,8 @@
 				{#if clientAssets.length || clientAds.length}
 					<div class="flex items-center gap-4 px-8 py-4 border-b border-[#1a1a1a] hover:bg-[#161616]">
 						<div class="flex-1 text-sm font-medium">{client.name}</div>
-						<div class="text-xs text-[#666]">{clientAssets.length} assets</div>
-						<div class="text-xs text-[#666]">{clientAds.length} ad campaigns</div>
+						<div class="text-xs text-[#8a8a8a]">{clientAssets.length} assets</div>
+						<div class="text-xs text-[#8a8a8a]">{clientAds.length} ad campaigns</div>
 						<div class="text-xs text-yellow-400">{fmt(clientAds.reduce((s, a) => s + parseFloat(a.spent ?? 0), 0))} spent</div>
 					</div>
 				{/if}
@@ -329,7 +329,7 @@
 	{:else if activeTab === 'content'}
 		<!-- Design Tools bar -->
 		<div class="mb-5">
-			<div class="text-xs text-[#666] uppercase tracking-wide mb-2">Design Tools</div>
+			<div class="text-xs text-[#8a8a8a] uppercase tracking-wide mb-2">Design Tools</div>
 			<div class="flex flex-wrap gap-2 mb-4">
 				<!-- Canva quick-create buttons -->
 				{#each CANVA_FORMATS as f}
@@ -350,7 +350,7 @@
 		</div>
 
 		<div class="flex justify-between items-center mb-3">
-			<div class="text-sm text-[#666]">{filteredAssets.length} assets</div>
+			<div class="text-sm text-[#8a8a8a]">{filteredAssets.length} assets</div>
 			<button onclick={() => showAssetForm = !showAssetForm} class="px-3 py-1 text-xs border border-[#333] rounded hover:border-white hover:text-white text-[#999] transition-colors">+ Add Asset</button>
 		</div>
 
@@ -358,18 +358,18 @@
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
 				<div class="grid grid-cols-3 gap-3 mb-3">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Name *</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Name *</label>
 						<input bind:value={assetForm.name} placeholder="Asset name" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Client</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Client</label>
 						<select bind:value={assetForm.clientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="">Own Business</option>
 							{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Platform</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Platform</label>
 						<select bind:value={assetForm.platform} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="general">General</option>
 							{#each SOCIAL_PLATFORMS as p}<option value={p.id}>{p.label}</option>{/each}
@@ -378,7 +378,7 @@
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Source</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Source</label>
 						<select bind:value={assetForm.source} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="upload">Upload</option>
 							<option value="canva">Canva</option>
@@ -388,11 +388,11 @@
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">URL / Link</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">URL / Link</label>
 						<input bind:value={assetForm.fileUrl} placeholder="https://…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Status</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Status</label>
 						<select bind:value={assetForm.status} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="draft">Draft</option>
 							<option value="approved">Approved</option>
@@ -430,16 +430,16 @@
 						<div class="p-2">
 							<div class="text-xs font-medium truncate">{asset.name}</div>
 							<div class="flex items-center gap-1 mt-1">
-								<span class="text-xs text-[#555]">{asset.platform}</span>
-								<span class="ml-auto text-xs {asset.status === 'published' ? 'text-[var(--accent)]' : asset.status === 'approved' ? 'text-blue-400' : 'text-[#555]'}">{asset.status}</span>
+								<span class="text-xs text-[#7c7c7c]">{asset.platform}</span>
+								<span class="ml-auto text-xs {asset.status === 'published' ? 'text-[var(--accent)]' : asset.status === 'approved' ? 'text-blue-400' : 'text-[#7c7c7c]'}">{asset.status}</span>
 							</div>
-							{#if asset.client}<div class="text-xs text-[#444] truncate">{asset.client.name}</div>{/if}
+							{#if asset.client}<div class="text-xs text-[#6e6e6e] truncate">{asset.client.name}</div>{/if}
 						</div>
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<div class="text-center py-12 text-[#555] text-sm">No assets yet. Use the Canva buttons above to create your first design.</div>
+			<div class="text-center py-12 text-[#7c7c7c] text-sm">No assets yet. Use the Canva buttons above to create your first design.</div>
 		{/if}
 
 	<!-- ═══════════════ SOCIAL MEDIA ═══════════════ -->
@@ -458,13 +458,13 @@
 							<div class="text-xs text-[#999] flex items-center gap-1">
 								<span class="w-1.5 h-1.5 rounded-full {statusDot(acct.status)}"></span>
 								{acct.account_handle ? `@${acct.account_handle}` : acct.account_name ?? 'Connected'}
-								{#if acct.followers}<span class="text-[#555] ml-auto">{fmtNum(acct.followers)}</span>{/if}
+								{#if acct.followers}<span class="text-[#7c7c7c] ml-auto">{fmtNum(acct.followers)}</span>{/if}
 							</div>
 						{/each}
 					{:else}
-						<div class="text-xs text-[#555]">Not connected</div>
+						<div class="text-xs text-[#7c7c7c]">Not connected</div>
 					{/if}
-					<button onclick={() => { socialForm.platform = platform.id; showSocialForm = true; }} class="mt-2 w-full text-xs text-[#666] hover:text-white border border-[#222] hover:border-[#555] rounded py-0.5 transition-colors">+ Add Account</button>
+					<button onclick={() => { socialForm.platform = platform.id; showSocialForm = true; }} class="mt-2 w-full text-xs text-[#8a8a8a] hover:text-white border border-[#222] hover:border-[#555] rounded py-0.5 transition-colors">+ Add Account</button>
 				</div>
 			{/each}
 		</div>
@@ -475,32 +475,32 @@
 				<div class="text-sm font-medium mb-3">Add Social Account</div>
 				<div class="grid grid-cols-3 gap-3 mb-3">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Platform</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Platform</label>
 						<select bind:value={socialForm.platform} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							{#each SOCIAL_PLATFORMS as p}<option value={p.id}>{p.label}</option>{/each}
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Client (blank = own business)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Client (blank = own business)</label>
 						<select bind:value={socialForm.clientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="">Own Business</option>
 							{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Account Handle (@…)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Account Handle (@…)</label>
 						<input bind:value={socialForm.accountHandle} placeholder="@handle" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Account Name</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Account Name</label>
 						<input bind:value={socialForm.accountName} placeholder="Display name" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Profile URL</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Profile URL</label>
 						<input bind:value={socialForm.accountUrl} placeholder="https://…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Followers</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Followers</label>
 						<input type="number" bind:value={socialForm.followers} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 				</div>
@@ -521,38 +521,38 @@
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
 				<div class="grid grid-cols-2 gap-3 mb-3">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Client</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Client</label>
 						<select bind:value={postForm.clientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="">Own Business</option>
 							{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Status</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Status</label>
 						<select bind:value={postForm.status} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="draft">Draft</option>
 							<option value="scheduled">Scheduled</option>
 						</select>
 					</div>
 					<div class="col-span-2">
-						<label class="block text-xs text-[#666] mb-1">Target Platforms</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Target Platforms</label>
 						<div class="flex flex-wrap gap-2">
 							{#each SOCIAL_PLATFORMS as p}
-								<button onclick={() => togglePostPlatform(p.id)} class="px-2 py-1 text-xs rounded border transition-colors {postForm.platforms.includes(p.id) ? 'border-white text-white bg-white/10' : 'border-[#333] text-[#666] hover:border-[#555]'}">{p.icon} {p.label}</button>
+								<button onclick={() => togglePostPlatform(p.id)} class="px-2 py-1 text-xs rounded border transition-colors {postForm.platforms.includes(p.id) ? 'border-white text-white bg-white/10' : 'border-[#333] text-[#8a8a8a] hover:border-[#555]'}">{p.icon} {p.label}</button>
 							{/each}
 						</div>
 					</div>
 					<div class="col-span-2">
-						<label class="block text-xs text-[#666] mb-1">Caption</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Caption</label>
 						<textarea bind:value={postForm.caption} rows="3" placeholder="Write your post…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555] resize-none"></textarea>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Hashtags</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Hashtags</label>
 						<input bind:value={postForm.hashtags} placeholder="#sales #leadgen" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					{#if postForm.status === 'scheduled'}
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Schedule Date/Time</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Schedule Date/Time</label>
 							<input type="datetime-local" bind:value={postForm.scheduledAt} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" />
 						</div>
 					{/if}
@@ -568,25 +568,25 @@
 		<div class="bg-[#111] border border-[#2a2a2a] rounded-lg overflow-hidden">
 			<table class="w-full text-sm">
 				<thead><tr class="border-b border-[#2a2a2a]">
-					<th class="text-left px-4 py-3 text-[#666] font-normal">Caption</th>
-					<th class="text-left px-4 py-3 text-[#666] font-normal">Platforms</th>
-					<th class="text-left px-4 py-3 text-[#666] font-normal">Client</th>
-					<th class="text-left px-4 py-3 text-[#666] font-normal">Status</th>
-					<th class="text-left px-4 py-3 text-[#666] font-normal">Date</th>
+					<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Caption</th>
+					<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Platforms</th>
+					<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Client</th>
+					<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Status</th>
+					<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Date</th>
 					<th class="px-4 py-3"></th>
 				</tr></thead>
 				<tbody>
 					{#each filteredPosts as post}
 						<tr class="border-b border-[#1a1a1a] hover:bg-[#161616]">
 							<td class="px-4 py-3 max-w-xs truncate">{post.caption ?? '—'}</td>
-							<td class="px-4 py-3 text-xs text-[#666]">{(post.platforms ?? []).join(', ') || '—'}</td>
-							<td class="px-4 py-3 text-xs text-[#666]">{post.client?.name ?? 'Own'}</td>
+							<td class="px-4 py-3 text-xs text-[#8a8a8a]">{(post.platforms ?? []).join(', ') || '—'}</td>
+							<td class="px-4 py-3 text-xs text-[#8a8a8a]">{post.client?.name ?? 'Own'}</td>
 							<td class="px-4 py-3"><span class="flex items-center gap-1.5 text-xs"><span class="w-1.5 h-1.5 rounded-full {statusDot(post.status)}"></span>{post.status}</span></td>
-							<td class="px-4 py-3 text-xs text-[#666]">{post.scheduled_at ? fmtDate(post.scheduled_at) : fmtDate(post.created_at)}</td>
-							<td class="px-4 py-3 text-right"><button onclick={() => deletePost(post.id)} class="text-xs text-[#555] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button></td>
+							<td class="px-4 py-3 text-xs text-[#8a8a8a]">{post.scheduled_at ? fmtDate(post.scheduled_at) : fmtDate(post.created_at)}</td>
+							<td class="px-4 py-3 text-right"><button onclick={() => deletePost(post.id)} class="text-xs text-[#7c7c7c] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button></td>
 						</tr>
 					{:else}
-						<tr><td colspan="6" class="px-4 py-8 text-center text-[#555]">No posts yet — compose your first post above.</td></tr>
+						<tr><td colspan="6" class="px-4 py-8 text-center text-[#7c7c7c]">No posts yet — compose your first post above.</td></tr>
 					{/each}
 				</tbody>
 			</table>
@@ -601,18 +601,18 @@
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-3 text-center">
 					<div class="text-2xl mb-1">{plat.icon}</div>
 					<div class="text-xs font-medium">{plat.label}</div>
-					<div class="text-xs text-[#555] mt-0.5">{plat.sub}</div>
+					<div class="text-xs text-[#7c7c7c] mt-0.5">{plat.sub}</div>
 					{#if campaigns.length}
 						<div class="mt-2 text-xs text-yellow-400">{fmt(campaigns.reduce((s, a) => s + parseFloat(a.spent ?? 0), 0))} spent</div>
 					{:else}
-						<div class="mt-2 text-xs text-[#444]">No campaigns</div>
+						<div class="mt-2 text-xs text-[#6e6e6e]">No campaigns</div>
 					{/if}
 				</div>
 			{/each}
 		</div>
 
 		<div class="flex justify-between items-center mb-3">
-			<div class="text-sm text-[#666]">{filteredAds.length} campaigns</div>
+			<div class="text-sm text-[#8a8a8a]">{filteredAds.length} campaigns</div>
 			<button onclick={() => { showAdForm = !showAdForm; editingAdId = null; adForm = { name: '', clientId: '', platform: 'meta', campaignType: 'awareness', status: 'active', budget: '', budgetPeriod: 'monthly', spent: '', impressions: '', clicks: '', leads: '', startDate: '', endDate: '', notes: '' }; }} class="px-3 py-1 text-xs border border-[#333] rounded hover:border-white hover:text-white text-[#999] transition-colors">+ New Campaign</button>
 		</div>
 
@@ -620,18 +620,18 @@
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
 				<div class="text-sm font-medium mb-3">{editingAdId ? 'Edit Campaign' : 'New Ad Campaign'}</div>
 				<div class="grid grid-cols-3 gap-3 mb-3">
-					<div><label class="block text-xs text-[#666] mb-1">Name *</label><input bind:value={adForm.name} placeholder="Campaign name" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Client</label><select bind:value={adForm.clientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="">Own Business</option>{#each clients as c}<option value={c.id}>{c.name}</option>{/each}</select></div>
-					<div><label class="block text-xs text-[#666] mb-1">Platform</label><select bind:value={adForm.platform} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">{#each AD_PLATFORMS as p}<option value={p.id}>{p.label}</option>{/each}</select></div>
-					<div><label class="block text-xs text-[#666] mb-1">Type</label><select bind:value={adForm.campaignType} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="awareness">Awareness</option><option value="traffic">Traffic</option><option value="leads">Lead Gen</option><option value="conversion">Conversion</option><option value="retargeting">Retargeting</option></select></div>
-					<div><label class="block text-xs text-[#666] mb-1">Status</label><select bind:value={adForm.status} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="active">Active</option><option value="paused">Paused</option><option value="draft">Draft</option><option value="ended">Ended</option></select></div>
-					<div><label class="block text-xs text-[#666] mb-1">Budget ($)</label><input type="number" bind:value={adForm.budget} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Spent ($)</label><input type="number" bind:value={adForm.spent} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Impressions</label><input type="number" bind:value={adForm.impressions} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Clicks</label><input type="number" bind:value={adForm.clicks} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Leads</label><input type="number" bind:value={adForm.leads} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-					<div><label class="block text-xs text-[#666] mb-1">Start Date</label><DatePicker bind:value={adForm.startDate} onchange={(v) => adForm.startDate = v} /></div>
-					<div><label class="block text-xs text-[#666] mb-1">End Date</label><DatePicker bind:value={adForm.endDate} onchange={(v) => adForm.endDate = v} /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Name *</label><input bind:value={adForm.name} placeholder="Campaign name" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Client</label><select bind:value={adForm.clientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="">Own Business</option>{#each clients as c}<option value={c.id}>{c.name}</option>{/each}</select></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Platform</label><select bind:value={adForm.platform} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">{#each AD_PLATFORMS as p}<option value={p.id}>{p.label}</option>{/each}</select></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Type</label><select bind:value={adForm.campaignType} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="awareness">Awareness</option><option value="traffic">Traffic</option><option value="leads">Lead Gen</option><option value="conversion">Conversion</option><option value="retargeting">Retargeting</option></select></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Status</label><select bind:value={adForm.status} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white"><option value="active">Active</option><option value="paused">Paused</option><option value="draft">Draft</option><option value="ended">Ended</option></select></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Budget ($)</label><input type="number" bind:value={adForm.budget} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Spent ($)</label><input type="number" bind:value={adForm.spent} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Impressions</label><input type="number" bind:value={adForm.impressions} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Clicks</label><input type="number" bind:value={adForm.clicks} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Leads</label><input type="number" bind:value={adForm.leads} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">Start Date</label><DatePicker bind:value={adForm.startDate} onchange={(v) => adForm.startDate = v} /></div>
+					<div><label class="block text-xs text-[#8a8a8a] mb-1">End Date</label><DatePicker bind:value={adForm.endDate} onchange={(v) => adForm.endDate = v} /></div>
 				</div>
 				<div class="flex gap-2"><button onclick={saveAd} disabled={adSaving || !adForm.name} class="px-4 py-2 bg-white text-black rounded text-sm font-medium disabled:opacity-50">{adSaving ? 'Saving…' : editingAdId ? 'Update' : 'Create'}</button><button onclick={() => { showAdForm = false; editingAdId = null; }} class="px-4 py-2 border border-[#333] rounded text-sm text-[#999] hover:text-white transition-colors">Cancel</button></div>
 			</div>
@@ -647,8 +647,8 @@
 						<div class="flex-1">
 							<div class="flex items-center gap-2 mb-1">
 								<span class="font-medium text-sm">{ad.name}</span>
-								<span class="text-xs px-2 py-0.5 rounded-full {ad.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#222] text-[#666]'}">{ad.status}</span>
-								<span class="text-xs text-[#555]">{ad.platform} · {ad.campaign_type}</span>
+								<span class="text-xs px-2 py-0.5 rounded-full {ad.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#222] text-[#8a8a8a]'}">{ad.status}</span>
+								<span class="text-xs text-[#7c7c7c]">{ad.platform} · {ad.campaign_type}</span>
 								{#if ad.client}<span class="text-xs text-blue-400">{ad.client.name}</span>{/if}
 							</div>
 							{#if ad.budget}
@@ -667,25 +667,25 @@
 							</div>
 						</div>
 						<div class="flex gap-2">
-							<button onclick={() => editAd(ad)} class="text-xs text-[#666] hover:text-white transition-colors">Edit</button>
-							<button onclick={async () => { if(confirm('Delete?')) { const r = await apiFetch(`/api/marketing/ad-campaigns/${ad.id}`, {method:'DELETE'}); if (r.ok) { await loadAll(); toastSuccess('Campaign deleted'); } else { toastError('Failed to delete campaign'); } } }} class="text-xs text-[#666] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button>
+							<button onclick={() => editAd(ad)} class="text-xs text-[#8a8a8a] hover:text-white transition-colors">Edit</button>
+							<button onclick={async () => { if(confirm('Delete?')) { const r = await apiFetch(`/api/marketing/ad-campaigns/${ad.id}`, {method:'DELETE'}); if (r.ok) { await loadAll(); toastSuccess('Campaign deleted'); } else { toastError('Failed to delete campaign'); } } }} class="text-xs text-[#8a8a8a] hover:text-red-400 transition-colors"><Icon name="x" size={14} /></button>
 						</div>
 					</div>
 				</div>
 			{:else}
-				<div class="text-center py-12 text-[#555] text-sm">No ad campaigns yet.</div>
+				<div class="text-center py-12 text-[#7c7c7c] text-sm">No ad campaigns yet.</div>
 			{/each}
 		</div>
 
 	<!-- ═══════════════ AI COPY ═══════════════ -->
 	{:else if activeTab === 'copy'}
 		<div class="max-w-2xl">
-			<div class="text-sm text-[#666] mb-4">Generate platform-optimized copy using Claude AI — captions, ad headlines, email subjects, and more.</div>
+			<div class="text-sm text-[#8a8a8a] mb-4">Generate platform-optimized copy using Claude AI — captions, ad headlines, email subjects, and more.</div>
 
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5 mb-4">
 				<div class="grid grid-cols-2 gap-3 mb-3">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Content Type</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Content Type</label>
 						<select bind:value={copyType} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="post">Social Media Post</option>
 							<option value="ad_headline">Google Ad Headlines</option>
@@ -695,21 +695,21 @@
 					</div>
 					{#if copyType === 'post'}
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Platform</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Platform</label>
 							<select bind:value={copyPlatform} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								{#each SOCIAL_PLATFORMS as p}<option value={p.id}>{p.label}</option>{/each}
 							</select>
 						</div>
 					{/if}
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Client / Brand</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Client / Brand</label>
 						<select bind:value={copyClientId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="">My Business</option>
 							{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Tone</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Tone</label>
 						<select bind:value={copyTone} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 							<option value="professional">Professional</option>
 							<option value="casual">Casual</option>
@@ -720,15 +720,15 @@
 						</select>
 					</div>
 					<div class="col-span-2">
-						<label class="block text-xs text-[#666] mb-1">Product / Service *</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Product / Service *</label>
 						<input bind:value={copyProduct} placeholder="What are you promoting?" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Target Audience</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Target Audience</label>
 						<input bind:value={copyAudience} placeholder="e.g. small business owners" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Key Angle / USP</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Key Angle / USP</label>
 						<input bind:value={copyContext} placeholder="What makes this special?" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 				</div>
@@ -742,55 +742,55 @@
 					<div class="text-sm font-medium mb-3">Generated Copy</div>
 					{#if copyResult.caption}
 						<div class="mb-4">
-							<div class="text-xs text-[#666] mb-1">Caption</div>
+							<div class="text-xs text-[#8a8a8a] mb-1">Caption</div>
 							<div class="bg-[#1a1a1a] rounded p-3 text-sm whitespace-pre-wrap">{copyResult.caption}</div>
-							<button onclick={() => navigator.clipboard.writeText(copyResult.caption).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="mt-1 text-xs text-[#666] hover:text-white transition-colors">Copy to clipboard</button>
+							<button onclick={() => navigator.clipboard.writeText(copyResult.caption).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="mt-1 text-xs text-[#8a8a8a] hover:text-white transition-colors">Copy to clipboard</button>
 						</div>
 					{/if}
 					{#if copyResult.hashtags}
 						<div class="mb-4">
-							<div class="text-xs text-[#666] mb-1">Hashtags</div>
+							<div class="text-xs text-[#8a8a8a] mb-1">Hashtags</div>
 							<div class="bg-[#1a1a1a] rounded p-2 text-sm text-blue-400">{copyResult.hashtags}</div>
 						</div>
 					{/if}
 					{#if copyResult.cta}
 						<div class="mb-4">
-							<div class="text-xs text-[#666] mb-1">Call to Action</div>
+							<div class="text-xs text-[#8a8a8a] mb-1">Call to Action</div>
 							<div class="bg-[#1a1a1a] rounded p-2 text-sm font-medium">{copyResult.cta}</div>
 						</div>
 					{/if}
 					{#if copyResult.headlines}
 						<div class="mb-4">
-							<div class="text-xs text-[#666] mb-2">Headlines</div>
+							<div class="text-xs text-[#8a8a8a] mb-2">Headlines</div>
 							{#each copyResult.headlines as h, i}
 								<div class="flex items-center gap-2 mb-1">
-									<span class="text-xs text-[#555] w-4">{i+1}.</span>
+									<span class="text-xs text-[#7c7c7c] w-4">{i+1}.</span>
 									<div class="flex-1 bg-[#1a1a1a] rounded px-3 py-1.5 text-sm">{h}</div>
-									<span class="text-xs {h.length > 30 ? 'text-red-400' : 'text-[#555]'}">{h.length}/30</span>
+									<span class="text-xs {h.length > 30 ? 'text-red-400' : 'text-[#7c7c7c]'}">{h.length}/30</span>
 								</div>
 							{/each}
 						</div>
 					{/if}
 					{#if copyResult.descriptions}
 						<div class="mb-4">
-							<div class="text-xs text-[#666] mb-2">Descriptions</div>
+							<div class="text-xs text-[#8a8a8a] mb-2">Descriptions</div>
 							{#each copyResult.descriptions as d, i}
 								<div class="flex items-center gap-2 mb-1">
-									<span class="text-xs text-[#555] w-4">{i+1}.</span>
+									<span class="text-xs text-[#7c7c7c] w-4">{i+1}.</span>
 									<div class="flex-1 bg-[#1a1a1a] rounded px-3 py-1.5 text-sm">{d}</div>
-									<span class="text-xs {d.length > 90 ? 'text-red-400' : 'text-[#555]'}">{d.length}/90</span>
+									<span class="text-xs {d.length > 90 ? 'text-red-400' : 'text-[#7c7c7c]'}">{d.length}/90</span>
 								</div>
 							{/each}
 						</div>
 					{/if}
 					{#if copyResult.subjects}
 						<div>
-							<div class="text-xs text-[#666] mb-2">Subject Lines</div>
+							<div class="text-xs text-[#8a8a8a] mb-2">Subject Lines</div>
 							{#each copyResult.subjects as s, i}
 								<div class="flex items-center gap-2 mb-1">
-									<span class="text-xs text-[#555] w-4">{i+1}.</span>
+									<span class="text-xs text-[#7c7c7c] w-4">{i+1}.</span>
 									<div class="flex-1 bg-[#1a1a1a] rounded px-3 py-1.5 text-sm">{s}</div>
-									<button onclick={() => navigator.clipboard.writeText(s).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="text-xs text-[#555] hover:text-white transition-colors">Copy</button>
+									<button onclick={() => navigator.clipboard.writeText(s).then(() => toastSuccess('Copied')).catch(() => toastError('Failed to copy'))} class="text-xs text-[#7c7c7c] hover:text-white transition-colors">Copy</button>
 								</div>
 							{/each}
 						</div>
@@ -809,26 +809,26 @@
 					<span class="text-xl">💬</span>
 					<div>
 						<div class="font-medium text-sm">Slack</div>
-						<div class="text-xs text-[#666]">Send notifications to your Slack workspace</div>
+						<div class="text-xs text-[#8a8a8a]">Send notifications to your Slack workspace</div>
 					</div>
 					{#if slackConfig.webhookUrl}<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Connected</span>{/if}
 				</div>
 				<div class="space-y-3 mb-4">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Incoming Webhook URL</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Incoming Webhook URL</label>
 						<input bind:value={slackConfig.webhookUrl} placeholder="https://hooks.slack.com/services/…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
-						<div class="text-xs text-[#555] mt-1">Create at: Slack App → Incoming Webhooks</div>
+						<div class="text-xs text-[#7c7c7c] mt-1">Create at: Slack App → Incoming Webhooks</div>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Default Channel</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Default Channel</label>
 						<input bind:value={slackConfig.defaultChannel} placeholder="#general" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Workspace Name (label)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Workspace Name (label)</label>
 						<input bind:value={slackConfig.workspaceName} placeholder="My Team" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div class="space-y-1">
-						<div class="text-xs text-[#666] mb-1">Notify on:</div>
+						<div class="text-xs text-[#8a8a8a] mb-1">Notify on:</div>
 						{#each [['notifyNewLeads','New Leads'],['notifyCalls','Calls'],['notifyDeals','Deal changes']] as [key, label]}
 							<label class="flex items-center gap-2 text-sm cursor-pointer">
 								<input type="checkbox" bind:checked={(slackConfig as any)[key]} class="accent-white" />
@@ -853,22 +853,22 @@
 					<span class="text-xl">🟦</span>
 					<div>
 						<div class="font-medium text-sm">Microsoft Teams</div>
-						<div class="text-xs text-[#666]">Post notifications to a Teams channel</div>
+						<div class="text-xs text-[#8a8a8a]">Post notifications to a Teams channel</div>
 					</div>
 					{#if teamsConfig.webhookUrl}<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Connected</span>{/if}
 				</div>
 				<div class="space-y-3 mb-4">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Incoming Webhook URL</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Incoming Webhook URL</label>
 						<input bind:value={teamsConfig.webhookUrl} placeholder="https://…webhook.office.com/webhookb2/…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
-						<div class="text-xs text-[#555] mt-1">Create in Teams channel → Connectors → Incoming Webhook</div>
+						<div class="text-xs text-[#7c7c7c] mt-1">Create in Teams channel → Connectors → Incoming Webhook</div>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Channel Name (label)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Channel Name (label)</label>
 						<input bind:value={teamsConfig.channelName} placeholder="#sales-alerts" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div class="space-y-1">
-						<div class="text-xs text-[#666] mb-1">Notify on:</div>
+						<div class="text-xs text-[#8a8a8a] mb-1">Notify on:</div>
 						{#each [['notifyNewLeads','New Leads'],['notifyCalls','Calls']] as [key, label]}
 							<label class="flex items-center gap-2 text-sm cursor-pointer">
 								<input type="checkbox" bind:checked={(teamsConfig as any)[key]} class="accent-white" />
@@ -884,10 +884,10 @@
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5">
 				<div class="flex items-center gap-2 mb-3">
 					<div class="w-6 h-6 bg-[var(--accent)] rounded flex items-center justify-center text-[var(--accent-ink)] text-xs font-bold">C</div>
-					<div><div class="font-medium text-sm">Canva</div><div class="text-xs text-[#666]">Create designs — no API key required</div></div>
+					<div><div class="font-medium text-sm">Canva</div><div class="text-xs text-[#8a8a8a]">Create designs — no API key required</div></div>
 					<span class="ml-auto text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded">Ready</span>
 				</div>
-				<p class="text-xs text-[#666] mb-3">Canva design buttons are available in the Content Hub tab. Click any format to open Canva directly. To use the Canva API for automated design generation, add your Canva API key in Settings → API Key Vault.</p>
+				<p class="text-xs text-[#8a8a8a] mb-3">Canva design buttons are available in the Content Hub tab. Click any format to open Canva directly. To use the Canva API for automated design generation, add your Canva API key in Settings → API Key Vault.</p>
 				<a href="https://www.canva.com/create/" target="_blank" rel="noopener" class="inline-block px-3 py-1.5 bg-[var(--accent)] hover:bg-[var(--accent-hi)] text-[var(--accent-ink)] rounded text-xs transition-colors">Open Canva →</a>
 			</div>
 
@@ -895,12 +895,12 @@
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5">
 				<div class="flex items-center gap-2 mb-3">
 					<span class="text-xl">🐻</span>
-					<div><div class="font-medium text-sm">Bannerbear</div><div class="text-xs text-[#666]">Auto-generate images via API from templates</div></div>
+					<div><div class="font-medium text-sm">Bannerbear</div><div class="text-xs text-[#8a8a8a]">Auto-generate images via API from templates</div></div>
 				</div>
-				<p class="text-xs text-[#666] mb-3">Bannerbear lets you auto-generate social media images, ads, and thumbnails using pre-built templates. Perfect for scaling client content creation.</p>
+				<p class="text-xs text-[#8a8a8a] mb-3">Bannerbear lets you auto-generate social media images, ads, and thumbnails using pre-built templates. Perfect for scaling client content creation.</p>
 				<div class="flex gap-2">
 					<a href="https://bannerbear.com" target="_blank" rel="noopener" class="text-xs text-yellow-400 hover:underline">Sign up →</a>
-					<span class="text-xs text-[#555]">Then add the API key to Vercel env vars.</span>
+					<span class="text-xs text-[#7c7c7c]">Then add the API key to Vercel env vars.</span>
 				</div><!-- /flex gap-2 -->
 			</div><!-- /bannerbear card -->
 

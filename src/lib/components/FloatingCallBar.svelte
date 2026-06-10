@@ -92,7 +92,7 @@
 			class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors
 			       {muted
 			         ? 'bg-white/20 text-white'
-			         : 'text-[#555] hover:text-white hover:bg-white/10'}"
+			         : 'text-[#7c7c7c] hover:text-white hover:bg-white/10'}"
 		>
 			<span class="text-sm">{muted ? '🔇' : '🎙️'}</span>
 		</button>
@@ -111,7 +111,7 @@
 		<!-- Go to dialer -->
 		<button
 			onclick={goToDialer}
-			class="flex items-center gap-1 text-[10px] text-[#555] hover:text-white transition-colors"
+			class="flex items-center gap-1 text-[10px] text-[#7c7c7c] hover:text-white transition-colors"
 		>
 			<span>Dialer</span>
 			<span>→</span>

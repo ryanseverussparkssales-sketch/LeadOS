@@ -717,7 +717,7 @@
 							<span class="text-[10px] {selectedNumHealth.cls}">{selectedNumHealth.icon}</span>
 						{/if}
 						<span class="truncate">{phoneNumbers.find(n => n.phone_number === selectedCallerId)?.friendly_name || selectedCallerId || 'Select number'}</span>
-						<span class="text-[#444] ml-auto">▾</span>
+						<span class="text-[#6e6e6e] ml-auto">▾</span>
 					</button>
 					{#if showNumberPicker}
 						<div class="absolute top-full mt-1 left-0 w-72 rounded-xl border border-[var(--c-border-subtle)] bg-[#0d0d0d] shadow-2xl z-50 overflow-hidden" transition:slide={{ duration: 120 }}>
@@ -742,7 +742,7 @@
 										<div class="flex-1 min-w-0">
 											<p class="text-xs text-white truncate">{num.friendly_name || num.phone_number}</p>
 											{#if num.friendly_name}
-												<p class="text-[9px] text-[#444] font-mono">{num.phone_number}</p>
+												<p class="text-[9px] text-[#6e6e6e] font-mono">{num.phone_number}</p>
 											{/if}
 										</div>
 										<span class="text-[9px] text-[#333] shrink-0">{num.calls_today}/{num.daily_limit}</span>
@@ -774,7 +774,7 @@
 		{/if}
 		<!-- Queue remaining -->
 		{#if queueRemaining !== null && selectedListId}
-			<span class="text-[10px] text-[#444] shrink-0" title="Contacts remaining in queue">
+			<span class="text-[10px] text-[#6e6e6e] shrink-0" title="Contacts remaining in queue">
 				{queueRemaining} left
 			</span>
 		{/if}
@@ -786,9 +786,9 @@
 		{#if showShortcutHint}
 			<button
 				onclick={() => { showShortcutHint = false; sessionStorage.setItem('rogueos_hint_seen','1'); }}
-				class="shrink-0 flex items-center gap-1 rounded-lg border border-[#1e1e1e] px-2 h-7 text-[10px] text-[#444] hover:text-white hover:border-[#333] transition-colors animate-pulse"
+				class="shrink-0 flex items-center gap-1 rounded-lg border border-[#1e1e1e] px-2 h-7 text-[10px] text-[#6e6e6e] hover:text-white hover:border-[#333] transition-colors animate-pulse"
 				title="Press ? to see all keyboard shortcuts">
-				⌨ Press <kbd class="font-mono mx-0.5 text-[#555]">?</kbd> for shortcuts
+				⌨ Press <kbd class="font-mono mx-0.5 text-[#7c7c7c]">?</kbd> for shortcuts
 			</button>
 		{/if}
 	</div>
@@ -859,10 +859,10 @@
 							<p class="text-[var(--c-text-ghost)] text-xs mb-6">Select a campaign above to start dialing, or import contacts first</p>
 						{/if}
 						<div class="flex gap-3 justify-center">
-							<a href="/campaigns" class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">
+							<a href="/campaigns" class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-2 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 								View Campaigns
 							</a>
-							<a href="/contacts" class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">
+							<a href="/contacts" class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-2 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 								Import Contacts
 							</a>
 						</div>
@@ -1017,6 +1017,6 @@
 			class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20 transition-colors font-medium">
 			Undo
 		</button>
-		<button onclick={() => { showUndoToast = false; }} class="text-[#444] hover:text-white text-xs transition-colors"><Icon name="x" size={14} /></button>
+		<button onclick={() => { showUndoToast = false; }} class="text-[#6e6e6e] hover:text-white text-xs transition-colors"><Icon name="x" size={14} /></button>
 	</div>
 {/if}

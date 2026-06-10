@@ -58,16 +58,16 @@
         </div>
     {:else if weather}
         <div>
-            <p class=" text-[#444]  mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">{weather.location}</p>
+            <p class=" text-[#6e6e6e]  mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">{weather.location}</p>
             <div class="flex items-center gap-3">
                 <span style="font-size: 2.5rem; line-height: 1">{weather.icon}</span>
                 <div>
                     <p class="text-3xl text-white font-bold font-mono">{weather.temp}°</p>
-                    <p class="text-xs text-[#666]">{weather.condition}</p>
+                    <p class="text-xs text-[#8a8a8a]">{weather.condition}</p>
                 </div>
             </div>
         </div>
-        <p class="text-xs text-[#444]">H:{weather.high}° L:{weather.low}°</p>
+        <p class="text-xs text-[#6e6e6e]">H:{weather.high}° L:{weather.low}°</p>
     {:else}
         <p class="text-xs text-[#333] text-center mt-4">Enable location to see weather</p>
     {/if}

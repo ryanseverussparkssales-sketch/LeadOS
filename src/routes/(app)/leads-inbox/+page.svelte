@@ -370,7 +370,7 @@
 	}
 
 	function scoreColor(score: number | null): string {
-		if (!score) return 'text-[#444]';
+		if (!score) return 'text-[#6e6e6e]';
 		if (score >= 70) return 'text-[var(--accent)]';
 		if (score >= 40) return 'text-yellow-400';
 		return 'text-red-400';
@@ -386,7 +386,7 @@
 	<div class="border-b border-[#1e1e1e] px-6 py-4 flex items-center justify-between flex-shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Lead Inbox</h2>
-			<p class="text-[#555] text-xs mt-0.5">
+			<p class="text-[#7c7c7c] text-xs mt-0.5">
 				{leadsTotal} leads{selectedSource ? ` from ${selectedSource.name}` : ' across all sources'}
 			</p>
 		</div>
@@ -404,7 +404,7 @@
 				class="flex items-center justify-between px-8 py-4 border-b border-[#1e1e1e] transition-colors text-left {allLeadsSelected ? 'bg-white/5' : 'hover:bg-white/5'}">
 				<div>
 					<p class="text-sm text-white font-medium">All Sources</p>
-					<p class="text-xs text-[#555]">All inbound leads</p>
+					<p class="text-xs text-[#7c7c7c]">All inbound leads</p>
 				</div>
 			</button>
 
@@ -426,16 +426,16 @@
 							class="w-full text-left px-4 py-3 border-b border-[#1a1a1a] transition-colors {selectedSource?.id === source.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 							<div class="flex items-center justify-between mb-1">
 								<p class="text-sm text-white font-medium truncate flex-1 mr-2">{source.name}</p>
-								<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 {source.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#1a1a1a] text-[#555]'}">
+								<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 {source.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#1a1a1a] text-[#7c7c7c]'}">
 									{source.status === 'active' ? '● LIVE' : '⏸'}
 								</span>
 							</div>
-							<div class="flex gap-3 text-[10px] text-[#555]">
+							<div class="flex gap-3 text-[10px] text-[#7c7c7c]">
 								<span>{source.leads_today ?? 0} today</span>
 								<span>{source.lead_count ?? 0} total</span>
 							</div>
 							{#if source.last_lead_at}
-								<p class="text-[10px] text-[#444] mt-0.5">Last: {timeAgo(source.last_lead_at)}</p>
+								<p class="text-[10px] text-[#6e6e6e] mt-0.5">Last: {timeAgo(source.last_lead_at)}</p>
 							{/if}
 						</button>
 					{/each}
@@ -473,7 +473,7 @@
 							{creating ? 'Creating…' : 'Create'}
 						</button>
 						<button onclick={() => showNewSource = false}
-							class="flex-1 rounded-lg border border-[#2a2a2a] py-1.5 text-xs text-[#666]">
+							class="flex-1 rounded-lg border border-[#2a2a2a] py-1.5 text-xs text-[#8a8a8a]">
 							Cancel
 						</button>
 					</div>
@@ -500,61 +500,61 @@
 							<button onclick={saveSourceEdit}
 								class="rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black">Save</button>
 							<button onclick={() => editingSource = false}
-								class="text-xs text-[#666] hover:text-white px-2">Cancel</button>
+								class="text-xs text-[#8a8a8a] hover:text-white px-2">Cancel</button>
 						</div>
 					{:else}
 						<div class="flex items-center gap-4 min-w-0">
 							<div class="min-w-0">
 								<div class="flex items-center gap-2">
 									<p class="text-white font-semibold text-sm">{selectedSource.name}</p>
-									<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 {selectedSource.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#1a1a1a] text-[#555]'}">
+									<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 {selectedSource.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : 'bg-[#1a1a1a] text-[#7c7c7c]'}">
 										{selectedSource.status === 'active' ? '● LIVE' : '⏸ PAUSED'}
 									</span>
 								</div>
-								<p class="text-[#555] text-xs font-mono mt-0.5 truncate max-w-xs">
+								<p class="text-[#7c7c7c] text-xs font-mono mt-0.5 truncate max-w-xs">
 									/api/webhook/{selectedSource.webhook_token}
 								</p>
 								<div class="mt-1.5">
-									<button onclick={() => showEmbed = !showEmbed} class="text-xs text-[#444] hover:text-white transition-colors">
+									<button onclick={() => showEmbed = !showEmbed} class="text-xs text-[#6e6e6e] hover:text-white transition-colors">
 										{showEmbed ? '▼' : '▶'} Embed Form
 									</button>
 									{#if showEmbed}
-										<pre class="mt-1.5 rounded-lg bg-[#0a0a0a] border border-[#1a1a1a] p-3 text-[10px] text-[#666] overflow-x-auto whitespace-pre-wrap">{`<iframe\n  src="${window.location.origin}/embed/form/${selectedSource.webhook_token}?theme=dark"\n  width="100%"\n  height="420"\n  frameborder="0"\n  style="border-radius: 12px; max-width: 480px;"\n></iframe>`}</pre>
+										<pre class="mt-1.5 rounded-lg bg-[#0a0a0a] border border-[#1a1a1a] p-3 text-[10px] text-[#8a8a8a] overflow-x-auto whitespace-pre-wrap">{`<iframe\n  src="${window.location.origin}/embed/form/${selectedSource.webhook_token}?theme=dark"\n  width="100%"\n  height="420"\n  frameborder="0"\n  style="border-radius: 12px; max-width: 480px;"\n></iframe>`}</pre>
 										<button onclick={() => copyEmbedSnippet(selectedSource!.webhook_token)}
-											class="mt-1 text-xs text-[#555] hover:text-white transition-colors">⎘ Copy snippet</button>
+											class="mt-1 text-xs text-[#7c7c7c] hover:text-white transition-colors">⎘ Copy snippet</button>
 									{/if}
 								</div>
 							</div>
 							<div class="flex gap-4 text-center">
 								<div>
 									<p class="text-white font-mono text-lg font-bold">{selectedSource.leads_today ?? 0}</p>
-									<p class="text-[#444] text-[10px]">today</p>
+									<p class="text-[#6e6e6e] text-[10px]">today</p>
 								</div>
 								<div>
 									<p class="text-white font-mono text-lg font-bold">{selectedSource.leads_this_week ?? 0}</p>
-									<p class="text-[#444] text-[10px]">this week</p>
+									<p class="text-[#6e6e6e] text-[10px]">this week</p>
 								</div>
 								<div>
 									<p class="text-white font-mono text-lg font-bold">{selectedSource.lead_count ?? 0}</p>
-									<p class="text-[#444] text-[10px]">total</p>
+									<p class="text-[#6e6e6e] text-[10px]">total</p>
 								</div>
 							</div>
 						</div>
 						<div class="flex items-center gap-2 flex-shrink-0">
 							<button onclick={() => copyWebhookUrl(selectedSource!.webhook_token)}
-								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#666] hover:border-white hover:text-white transition-colors">
+								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 								⎘ URL
 							</button>
 							<button onclick={() => toggleSourceStatus(selectedSource!)}
-								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#666] hover:border-white hover:text-white transition-colors">
+								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 								{selectedSource.status === 'active' ? '⏸ Pause' : '▶ Activate'}
 							</button>
 							<button onclick={() => { editingSource = true; editData = { ...selectedSource }; }}
-								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#666] hover:border-white hover:text-white transition-colors">
+								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 								Edit
 							</button>
 							<button onclick={() => deleteSource(selectedSource!)}
-								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#666] hover:border-red-900 hover:text-red-400 transition-colors">
+								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-red-900 hover:text-red-400 transition-colors">
 								Delete
 							</button>
 						</div>
@@ -567,14 +567,14 @@
 				<div class="border-b border-[#1e1e1e] px-8 py-4 flex-shrink-0">
 					<div class="flex items-center justify-between">
 						<button onclick={() => showRules = !showRules}
-							class="flex items-center gap-2 text-xs text-[#555] hover:text-white transition-colors text-left">
+							class="flex items-center gap-2 text-xs text-[#7c7c7c] hover:text-white transition-colors text-left">
 							<span class="text-[8px]">{showRules ? '▼' : '▶'}</span>
 							<span>Routing Rules ({rules.length})</span>
-							{#if loadingRules}<span class="text-[#444] ml-1">…</span>{/if}
+							{#if loadingRules}<span class="text-[#6e6e6e] ml-1">…</span>{/if}
 						</button>
 						{#if showRules && rules.length > 0}
 							<button onclick={() => { showRuleTest = !showRuleTest; testResults = []; }}
-								class="text-[10px] border border-[#2a2a2a] text-[#555] hover:border-white hover:text-white px-2 py-0.5 rounded transition-colors">
+								class="text-[10px] border border-[#2a2a2a] text-[#7c7c7c] hover:border-white hover:text-white px-2 py-0.5 rounded transition-colors">
 								{showRuleTest ? 'Close Test' : 'Test Rules'}
 							</button>
 						{/if}
@@ -583,7 +583,7 @@
 					{#if showRules}
 						<div class="mt-3 space-y-2">
 							{#if rules.length === 0}
-								<p class="text-[10px] text-[#444] pl-1">No rules yet — leads flow through unfiltered.</p>
+								<p class="text-[10px] text-[#6e6e6e] pl-1">No rules yet — leads flow through unfiltered.</p>
 							{:else}
 								{#each rules as rule, index}
 									<div class="flex items-center justify-between rounded-lg bg-[#111] border border-[#1a1a1a] px-3 py-2">
@@ -596,19 +596,19 @@
 										</div>
 									<p class="text-xs text-[#888] leading-relaxed flex-1 truncate">
 										<span class="text-white capitalize">{(rule.condition_field ?? '').replace(/_/g,' ')}</span>
-										<span class="text-[#555]">{OPERATORS.find(o => o.value === rule.condition_operator)?.label ?? rule.condition_operator}</span>
+										<span class="text-[#7c7c7c]">{OPERATORS.find(o => o.value === rule.condition_operator)?.label ?? rule.condition_operator}</span>
 										{#if rule.condition_value}<span class="text-white">"{rule.condition_value}"</span>{/if}
-										<span class="text-[#555]">{getActionDisplay(rule)}</span>
+										<span class="text-[#7c7c7c]">{getActionDisplay(rule)}</span>
 										{#if rule.stop_on_match}<span class="text-[10px] text-yellow-500/70 ml-1">stop</span>{/if}
 									</p>
-									<button onclick={() => deleteRule(rule.id)} aria-label="Delete rule" class="text-[#444] hover:text-red-400 text-xs ml-2 flex-shrink-0"><Icon name="x" size={14} /></button>
+									<button onclick={() => deleteRule(rule.id)} aria-label="Delete rule" class="text-[#6e6e6e] hover:text-red-400 text-xs ml-2 flex-shrink-0"><Icon name="x" size={14} /></button>
 								</div>
 							{/each}
 						{/if}
 
 						<!-- New rule form -->
 						<div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] p-3 space-y-2 mt-2">
-							<p class="text-[10px] text-[#555] uppercase tracking-widest">Add rule</p>
+							<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest">Add rule</p>
 							<div class="flex flex-wrap gap-2">
 								<select bind:value={newRuleField} class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white">
 									{#each CONDITION_FIELDS as f}<option value={f.value}>{f.label}</option>{/each}
@@ -632,7 +632,7 @@
 								{:else if newRuleAction !== 'skip'}
 									<input bind:value={newRuleActionVal} placeholder="value" class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444] flex-1 min-w-[100px]" />
 								{/if}
-								<label class="flex items-center gap-1 text-[10px] text-[#666]"><input type="checkbox" bind:checked={newRuleStopOnMatch} /> stop on match</label>
+								<label class="flex items-center gap-1 text-[10px] text-[#8a8a8a]"><input type="checkbox" bind:checked={newRuleStopOnMatch} /> stop on match</label>
 							</div>
 							<button onclick={saveRule} disabled={savingRule} class="rounded bg-white px-3 py-1 text-xs font-semibold text-black hover:bg-white/90 disabled:opacity-40">
 								{savingRule ? 'Adding…' : '+ Add rule'}
@@ -641,7 +641,7 @@
 
 						{#if showRuleTest}
 							<div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] p-3 space-y-2 mt-2">
-								<p class="text-[10px] text-[#555] uppercase tracking-widest">Test a sample lead</p>
+								<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest">Test a sample lead</p>
 								<div class="grid grid-cols-2 gap-2">
 									<input bind:value={testContact.company} placeholder="Company" class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444]" />
 									<input bind:value={testContact.email} placeholder="Email" class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444]" />
@@ -652,7 +652,7 @@
 								{#if testResults.length > 0}
 									<div class="space-y-1">
 										{#each testResults as tr}
-											<div class="flex items-center gap-2 text-[10px]"><span class="{tr.matched ? 'text-[var(--accent)]' : 'text-[#444]'}">{tr.matched ? '✓ match' : '· no match'}</span><span class="text-[#666]">{tr.action}</span></div>
+											<div class="flex items-center gap-2 text-[10px]"><span class="{tr.matched ? 'text-[var(--accent)]' : 'text-[#6e6e6e]'}">{tr.matched ? '✓ match' : '· no match'}</span><span class="text-[#8a8a8a]">{tr.action}</span></div>
 										{/each}
 									</div>
 								{/if}
@@ -672,7 +672,7 @@
 				{:else if leads.length === 0}
 					<div class="flex items-center justify-center h-full text-center">
 						<div>
-							<p class="text-[#444] text-sm">No leads yet{selectedSource ? ` from ${selectedSource.name}` : ''}</p>
+							<p class="text-[#6e6e6e] text-sm">No leads yet{selectedSource ? ` from ${selectedSource.name}` : ''}</p>
 							<p class="text-[#333] text-xs mt-1">Inbound leads will appear here as they arrive.</p>
 						</div>
 					</div>
@@ -686,11 +686,11 @@
 											<a href="/contacts/{lead.id}" class="text-sm text-white font-medium hover:underline truncate">{lead.name || lead.company || lead.email || lead.phone || 'Unknown lead'}</a>
 											{#if lead.contact_score != null}<span class="text-xs font-mono {scoreColor(lead.contact_score)}">{lead.contact_score}</span>{/if}
 										</div>
-										<div class="flex items-center gap-2 text-xs text-[#555] mt-0.5 flex-wrap">
+										<div class="flex items-center gap-2 text-xs text-[#7c7c7c] mt-0.5 flex-wrap">
 											{#if lead.company}<span>{lead.company}</span>{/if}
 											{#if lead.phone}<span class="font-mono">{lead.phone}</span>{/if}
 											{#if lead.email}<span class="truncate">{lead.email}</span>{/if}
-											{#if lead.lead_source}<span class="text-[#444]">via {lead.lead_source}</span>{/if}
+											{#if lead.lead_source}<span class="text-[#6e6e6e]">via {lead.lead_source}</span>{/if}
 											<span class="text-[#333]">{timeAgo(lead.created_at)}</span>
 										</div>
 									</div>
@@ -702,10 +702,10 @@
 													{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
 												</select>
 												<button onclick={() => assignLeadToCampaign(lead.id, assignCampaignId)} disabled={!assignCampaignId} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] disabled:opacity-30 px-1">Assign</button>
-												<button onclick={() => { assigningLeadId = null; assignCampaignId = ''; }} class="text-xs text-[#555] hover:text-white px-1"><Icon name="x" size={14} /></button>
+												<button onclick={() => { assigningLeadId = null; assignCampaignId = ''; }} class="text-xs text-[#7c7c7c] hover:text-white px-1"><Icon name="x" size={14} /></button>
 											</div>
 										{:else}
-											<button onclick={() => { assigningLeadId = lead.id; assignCampaignId = ''; }} class="text-xs text-[#555] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity border border-[#2a2a2a] rounded px-2 py-1">→ Campaign</button>
+											<button onclick={() => { assigningLeadId = lead.id; assignCampaignId = ''; }} class="text-xs text-[#7c7c7c] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity border border-[#2a2a2a] rounded px-2 py-1">→ Campaign</button>
 										{/if}
 									</div>
 								</div>

@@ -103,16 +103,16 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Rep Payouts</h2>
-			<p class="text-[10px] text-[#444] mt-0.5">Approve wins → transfer to rep's Stripe account</p>
+			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Approve wins → transfer to rep's Stripe account</p>
 		</div>
 		<div class="flex items-center gap-4 text-xs">
 			<div class="text-center">
 				<p class="text-white font-semibold">{totalPending}</p>
-				<p class="text-[#444]">pending</p>
+				<p class="text-[#6e6e6e]">pending</p>
 			</div>
 			<div class="text-center">
 				<p class="text-[var(--accent)] font-semibold">{fmtCents(totalPaid)}</p>
-				<p class="text-[#444]">paid out</p>
+				<p class="text-[#6e6e6e]">paid out</p>
 			</div>
 		</div>
 	</div>
@@ -121,7 +121,7 @@
 	<div class="flex border-b border-[#1a1a1a] shrink-0">
 		{#each [['unpaid','Pending Wins'],['history','Payout History']] as [tab, label]}
 			<button onclick={() => activeTab = tab as any}
-				class="px-6 py-3 text-xs font-medium border-b-2 transition-colors {activeTab === tab ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-white'}">
+				class="px-6 py-3 text-xs font-medium border-b-2 transition-colors {activeTab === tab ? 'border-white text-white' : 'border-transparent text-[#7c7c7c] hover:text-white'}">
 				{label}
 				{#if tab === 'unpaid' && totalPending > 0}
 					<span class="ml-1.5 bg-yellow-600 text-white text-[9px] px-1.5 py-0.5 rounded-full">{totalPending}</span>
@@ -139,7 +139,7 @@
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 text-center mt-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<p class="text-2xl mb-2">✓</p>
 					<p class="text-sm text-white font-medium">All wins paid out</p>
-					<p class="text-xs text-[#444] mt-1">New wins will appear here when logged</p>
+					<p class="text-xs text-[#6e6e6e] mt-1">New wins will appear here when logged</p>
 				</div>
 			{:else}
 				<div class="space-y-2 mt-2">
@@ -148,7 +148,7 @@
 							<span class="text-lg shrink-0">{OUTCOME_ICON[win.outcome] ?? '✓'}</span>
 							<div class="flex-1 min-w-0">
 								<p class="text-sm text-white font-medium">{win.contact?.name ?? 'Unknown'}</p>
-								<p class="text-xs text-[#555]">{win.contact?.company ?? ''} · {new Date(win.created_at).toLocaleDateString()}</p>
+								<p class="text-xs text-[#7c7c7c]">{win.contact?.company ?? ''} · {new Date(win.created_at).toLocaleDateString()}</p>
 							</div>
 							<button onclick={() => openPayModal(win)}
 								class="rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hi)] px-3 py-1.5 text-xs font-medium text-[var(--accent-ink)] transition-colors shrink-0">
@@ -162,7 +162,7 @@
 		{:else}
 			{#if payouts.length === 0}
 				<div class="rounded-xl border border-[#1a1a1a] bg-[#111] p-8 text-center mt-4">
-					<p class="text-xs text-[#444]">No payouts yet</p>
+					<p class="text-xs text-[#6e6e6e]">No payouts yet</p>
 				</div>
 			{:else}
 				<div class="space-y-2 mt-2">
@@ -175,7 +175,7 @@
 										{p.status}
 									</span>
 								</div>
-								<p class="text-xs text-[#555]">{p.call?.contact?.name ?? '—'} · {new Date(p.created_at).toLocaleDateString()}</p>
+								<p class="text-xs text-[#7c7c7c]">{p.call?.contact?.name ?? '—'} · {new Date(p.created_at).toLocaleDateString()}</p>
 							</div>
 							<p class="text-sm font-semibold text-[var(--accent)] shrink-0">{fmtCents(p.amount_cents)}</p>
 						</div>
@@ -195,12 +195,12 @@
 			<h3 class="text-white font-semibold">Approve Payout</h3>
 			<div class="rounded-xl border border-[#1a1a1a] bg-[#111] px-3 py-2">
 				<p class="text-xs text-white">{payingWin.contact?.name ?? 'Unknown'}</p>
-				<p class="text-[10px] text-[#555]">{payingWin.outcome} · {new Date(payingWin.created_at).toLocaleDateString()}</p>
+				<p class="text-[10px] text-[#7c7c7c]">{payingWin.outcome} · {new Date(payingWin.created_at).toLocaleDateString()}</p>
 			</div>
 
 			<!-- Rep selector -->
 			<div>
-				<label class="block text-xs text-[#555] mb-1.5">Rep to pay</label>
+				<label class="block text-xs text-[#7c7c7c] mb-1.5">Rep to pay</label>
 				<select bind:value={selectedMemberId}
 					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:outline-none">
 					<option value="">Select rep…</option>
@@ -217,20 +217,20 @@
 
 			<!-- Amount -->
 			<div>
-				<label class="block text-xs text-[#555] mb-1.5">Amount ($)</label>
+				<label class="block text-xs text-[#7c7c7c] mb-1.5">Amount ($)</label>
 				<input bind:value={payAmount} type="number" min="0.50" step="0.50" placeholder="50.00"
 					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none" />
 			</div>
 
 			<div>
-				<label class="block text-xs text-[#555] mb-1.5">Notes (optional)</label>
+				<label class="block text-xs text-[#7c7c7c] mb-1.5">Notes (optional)</label>
 				<input bind:value={payNotes} placeholder="Bonus for Thursday campaign…"
 					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#333] focus:border-white focus:outline-none" />
 			</div>
 
 			<div class="flex gap-3 pt-1">
 				<button onclick={() => payingWin = null}
-					class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-xs text-[#666] hover:text-white hover:border-white transition-colors">
+					class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 					Cancel
 				</button>
 				<button onclick={approvePay} disabled={processing || !selectedMemberId || !payAmount}

@@ -25,7 +25,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Team Messaging</h2>
-			<p class="text-[10px] text-[#444] mt-0.5">Channels between you, your clients, and your reps</p>
+			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Channels between you, your clients, and your reps</p>
 		</div>
 	</div>
 	<div class="flex-1 overflow-hidden">

@@ -26,13 +26,13 @@
 	{#if setupError || !connected}
 		<div class="text-center space-y-2">
 			<p class="text-2xl">📅</p>
-			<p class="text-xs text-[#555]">Google Calendar not connected</p>
+			<p class="text-xs text-[#7c7c7c]">Google Calendar not connected</p>
 			<a href="/settings"
-				class="block rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#555] hover:border-white hover:text-white transition-colors">
+				class="block rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#7c7c7c] hover:border-white hover:text-white transition-colors">
 				Connect in Settings →
 			</a>
 		</div>
 	{:else}
-		<p class="text-xs text-[#444]">Calendar connected</p>
+		<p class="text-xs text-[#6e6e6e]">Calendar connected</p>
 	{/if}
 </div>

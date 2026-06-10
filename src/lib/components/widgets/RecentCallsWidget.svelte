@@ -7,7 +7,7 @@
 
 	const outcomeColors: Record<string,string> = {
 		answered:'text-[var(--accent)]', voicemail:'text-yellow-400', callback:'text-blue-400',
-		not_interested:'text-[#555]', do_not_call:'text-red-400', no_answer:'text-[#444]'
+		not_interested:'text-[#7c7c7c]', do_not_call:'text-red-400', no_answer:'text-[#6e6e6e]'
 	};
 
 	onMount(async () => {
@@ -26,16 +26,16 @@
 
 <div class="space-y-2 overflow-y-auto h-full">
 	{#if calls.length === 0}
-		<p class="text-[#444] text-xs text-center py-4">No calls yet today</p>
+		<p class="text-[#6e6e6e] text-xs text-center py-4">No calls yet today</p>
 	{:else}
 		{#each calls as call}
 			<div class="flex items-center gap-3 py-1.5">
 				<div class="flex-1 min-w-0">
 					<p class="text-white text-xs font-medium truncate">{call.contact?.name ?? '—'}</p>
-					<p class="text-[#555] text-xs truncate">{call.contact?.company ?? ''}</p>
+					<p class="text-[#7c7c7c] text-xs truncate">{call.contact?.company ?? ''}</p>
 				</div>
 				<div class="text-right shrink-0">
-					<p class="text-xs {outcomeColors[call.outcome??''] ?? 'text-[#444]'} capitalize">
+					<p class="text-xs {outcomeColors[call.outcome??''] ?? 'text-[#6e6e6e]'} capitalize">
 						{call.outcome?.replace(/_/g,' ') ?? '—'}
 					</p>
 					<p class="text-xs text-[#333]">{fmt(call.created_at)}</p>

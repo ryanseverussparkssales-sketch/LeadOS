@@ -22,11 +22,11 @@
 <div class="space-y-3 h-full">
 	<div class="grid grid-cols-2 gap-2">
 		<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-2.5">
-			<p class="text-xs text-[#555] mb-0.5">Weighted</p>
+			<p class="text-xs text-[#7c7c7c] mb-0.5">Weighted</p>
 			<p class="text-white text-base font-semibold">{fmt$(Math.round(weighted))}</p>
 		</div>
 		<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-2.5">
-			<p class="text-xs text-[#555] mb-0.5">Won</p>
+			<p class="text-xs text-[#7c7c7c] mb-0.5">Won</p>
 			<p class="text-[var(--accent)] text-base font-semibold">{fmt$(won)}</p>
 		</div>
 	</div>
@@ -34,10 +34,10 @@
 		{#each STAGES as stage}
 			<div class="flex items-center gap-2">
 				<div class="w-2 h-2 rounded-full shrink-0" style="background-color:{COLORS[stage]}"></div>
-				<p class="text-xs text-[#666] flex-1 capitalize">{stage}</p>
+				<p class="text-xs text-[#8a8a8a] flex-1 capitalize">{stage}</p>
 				<p class="text-xs text-white">{stageCount(stage)}</p>
 			</div>
 		{/each}
 	</div>
-	<a href="/pipeline" class="block text-xs text-[#444] hover:text-white text-center">Open pipeline →</a>
+	<a href="/pipeline" class="block text-xs text-[#6e6e6e] hover:text-white text-center">Open pipeline →</a>
 </div>

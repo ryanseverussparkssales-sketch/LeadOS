@@ -18,7 +18,7 @@
 	let debounce: ReturnType<typeof setTimeout> | null = null;
 
 	const TYPE_COLORS: Record<string,string> = { lead:'text-blue-400', prospect:'text-yellow-400', customer:'text-[var(--accent)]', creator:'text-pink-400', partner:'text-[var(--accent)]', vendor:'text-[#888]' };
-	const STAGE_COLORS: Record<string,string> = { prospect:'text-[#666]', qualified:'text-blue-400', demo:'text-yellow-400', proposal:'text-orange-400', negotiation:'text-[var(--accent)]', won:'text-[var(--accent)]', lost:'text-red-400' };
+	const STAGE_COLORS: Record<string,string> = { prospect:'text-[#8a8a8a]', qualified:'text-blue-400', demo:'text-yellow-400', proposal:'text-orange-400', negotiation:'text-[var(--accent)]', won:'text-[var(--accent)]', lost:'text-red-400' };
 
 	function openPalette() { open = true; query = ''; results = null; setTimeout(() => searchEl?.focus(), 50); }
 	function closePalette() { open = false; query = ''; results = null; selectedIdx = 0; }
@@ -78,7 +78,7 @@
 
 <!-- Trigger hint -->
 <button onclick={openPalette}
-	class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-[#555] hover:text-white hover:border-[#444] transition-colors w-full">
+	class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-[#7c7c7c] hover:text-white hover:border-[#444] transition-colors w-full">
 	<span>Search...</span>
 	<span class="ml-auto font-mono text-[#333]">⌘K</span>
 </button>
@@ -92,7 +92,7 @@
 
 			<!-- Search input -->
 			<div class="flex items-center gap-3 px-4 py-3 border-b border-[#1e1e1e]">
-				<svg class="text-[#555] shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg class="text-[#7c7c7c] shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
 				</svg>
 				<input
@@ -102,16 +102,16 @@
 					placeholder="Search contacts, deals, campaigns, scripts..."
 					class="flex-1 bg-transparent text-white text-sm placeholder-[#444] focus:outline-none"
 				/>
-				{#if loading}<span class="text-xs text-[#444] shrink-0">Searching...</span>{/if}
+				{#if loading}<span class="text-xs text-[#6e6e6e] shrink-0">Searching...</span>{/if}
 				<kbd class="text-xs text-[#333] border border-[#2a2a2a] rounded px-1.5 py-0.5 shrink-0">Esc</kbd>
 			</div>
 
 			<!-- Results -->
 			<div class="max-h-80 overflow-y-auto">
 				{#if query.length < 2}
-					<p class="text-xs text-[#444] text-center py-8">Type at least 2 characters to search</p>
+					<p class="text-xs text-[#6e6e6e] text-center py-8">Type at least 2 characters to search</p>
 				{:else if allResults.length === 0 && !loading}
-					<p class="text-xs text-[#444] text-center py-8">No results for "{query}"</p>
+					<p class="text-xs text-[#6e6e6e] text-center py-8">No results for "{query}"</p>
 				{:else}
 					{#each allResults as item, i}
 						<button onclick={() => navigateTo(item)}
@@ -119,9 +119,9 @@
 							<div class="flex-1 min-w-0">
 								<div class="flex items-center gap-2">
 									<p class="text-sm text-white truncate">{item.label}</p>
-									{#if item.badge}<span class="text-xs {item.badgeColor ?? 'text-[#555]'} capitalize">{item.badge}</span>{/if}
+									{#if item.badge}<span class="text-xs {item.badgeColor ?? 'text-[#7c7c7c]'} capitalize">{item.badge}</span>{/if}
 								</div>
-								<p class="text-xs text-[#555] truncate">{item.sub}</p>
+								<p class="text-xs text-[#7c7c7c] truncate">{item.sub}</p>
 							</div>
 							<span class="text-xs text-[#333] shrink-0">{item.category}</span>
 						</button>

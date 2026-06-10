@@ -104,12 +104,12 @@
 		<div class="bg-[#111111] border border-[#2a2a2a] rounded-xl w-[520px] max-h-[70vh] overflow-y-auto" onclick={(e) => e.stopPropagation()}>
 			<div class="px-5 py-4 border-b border-[#2a2a2a] flex items-center justify-between">
 				<p class="text-white font-medium text-sm">Keyboard Shortcuts</p>
-				<button onclick={() => showHelp = false} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
+				<button onclick={() => showHelp = false} class="text-[#8a8a8a] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				{#each ['Global', 'Dialer', 'Dialer (postmortem)'] as ctx}
 					<div>
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-2">{ctx}</p>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">{ctx}</p>
 						<div class="space-y-1.5">
 							{#each shortcuts.filter(s => s.context === ctx) as s}
 								<div class="flex items-center justify-between">

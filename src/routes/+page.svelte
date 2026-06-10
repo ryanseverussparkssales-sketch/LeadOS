@@ -53,11 +53,11 @@
 	<nav class="flex items-center justify-between px-10 py-6">
 		<span style="font-family:var(--font-label);font-size:13px;letter-spacing:.28em;color:#777">EDELHAUS<span style="color:var(--call)">OS</span></span>
 		<div class="flex items-center gap-5">
-			<a href="/pricing" class="text-xs text-[#666] hover:text-white transition-colors">Pricing</a>
-			<a href="/about" class="text-xs text-[#666] hover:text-white transition-colors">About</a>
-			<a href="/contact" class="text-xs text-[#666] hover:text-white transition-colors">Hire SDRs</a>
+			<a href="/pricing" class="text-xs text-[#8a8a8a] hover:text-white transition-colors">Pricing</a>
+			<a href="/about" class="text-xs text-[#8a8a8a] hover:text-white transition-colors">About</a>
+			<a href="/contact" class="text-xs text-[#8a8a8a] hover:text-white transition-colors">Hire SDRs</a>
 			<button onclick={() => { mode = 'login'; authError = ''; }}
-				class="text-xs text-[#666] hover:text-white transition-colors">
+				class="text-xs text-[#8a8a8a] hover:text-white transition-colors">
 				Log in →
 			</button>
 		</div>
@@ -87,7 +87,7 @@
 				</button>
 				<button
 					onclick={() => { mode = 'login'; authError = ''; }}
-					class="px-8 py-3 border border-[#262626] text-[#666] text-xs hover:border-[#444] hover:text-white transition-colors"
+					class="px-8 py-3 border border-[#262626] text-[#8a8a8a] text-xs hover:border-[#444] hover:text-white transition-colors"
 					style="font-family:var(--font-label);letter-spacing:.2em">
 					SIGN IN
 				</button>
@@ -136,19 +136,19 @@
 					{#if mode === 'login'}
 						<button
 							onclick={() => { mode = 'signup'; authError = ''; email = ''; password = ''; }}
-							class="text-xs text-[#333] hover:text-[#666] transition-colors">
+							class="text-xs text-[#333] hover:text-[#8a8a8a] transition-colors">
 							No account? Sign up →
 						</button>
 					{:else}
 						<button
 							onclick={() => { mode = 'login'; authError = ''; email = ''; password = ''; }}
-							class="text-xs text-[#333] hover:text-[#666] transition-colors">
+							class="text-xs text-[#333] hover:text-[#8a8a8a] transition-colors">
 							Already have an account? Sign in →
 						</button>
 					{/if}
 					<button
 						onclick={() => { mode = 'home'; authError = ''; }}
-						class="text-xs text-[#222] hover:text-[#444] transition-colors">
+						class="text-xs text-[#222] hover:text-[#6e6e6e] transition-colors">
 						← Back
 					</button>
 				</div>

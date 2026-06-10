@@ -56,7 +56,7 @@
 <div class="h-full flex flex-col">
 	{#if !active}
 		<div class="flex-1 flex items-center justify-center">
-			<p class="text-xs text-[#444] text-center">No script<br/><a href="/scripts" class="underline hover:text-white">Create one</a></p>
+			<p class="text-xs text-[#6e6e6e] text-center">No script<br/><a href="/scripts" class="underline hover:text-white">Create one</a></p>
 		</div>
 	{:else}
 		{#if scripts.length > 1}
@@ -70,7 +70,7 @@
 		<div class="flex gap-1 mb-3 flex-wrap">
 			{#each sections as sec}
 				<button onclick={() => activeSection = sec.key}
-					class="rounded px-2 py-1 text-xs transition-colors {activeSection === sec.key ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">
+					class="rounded px-2 py-1 text-xs transition-colors {activeSection === sec.key ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 					{sec.label}
 				</button>
 			{/each}
@@ -84,7 +84,7 @@
 		<!-- Objection handlers -->
 		{#if active.objections?.length}
 			<div class="shrink-0">
-				<p class="text-xs text-[#555] uppercase tracking-widest mb-2">Objections</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">Objections</p>
 				<div class="space-y-1.5 overflow-y-auto max-h-44">
 					{#each active.objections as obj}
 						<button onclick={() => clickObjection(obj)}
@@ -95,7 +95,7 @@
 							</div>
 							{#if expandedObj === obj.id}
 								<p class="text-xs text-[#ccc] mt-1.5 leading-relaxed">{obj.response}</p>
-								{#if obj.follow_up}<p class="text-xs text-[#555] mt-1">↳ {obj.follow_up}</p>{/if}
+								{#if obj.follow_up}<p class="text-xs text-[#7c7c7c] mt-1">↳ {obj.follow_up}</p>{/if}
 							{/if}
 						</button>
 					{/each}

@@ -69,27 +69,27 @@
 			<!-- Header -->
 			<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 				<p class="text-white font-semibold text-sm">Help & Support</p>
-				<button onclick={() => open = false} class="text-[#555] hover:text-white text-lg leading-none"><Icon name="x" size={14} /></button>
+				<button onclick={() => open = false} class="text-[#7c7c7c] hover:text-white text-lg leading-none"><Icon name="x" size={14} /></button>
 			</div>
 
 			<!-- Status indicators -->
 			<div class="px-5 py-3 border-b border-[#1e1e1e]">
-				<p class="text-[10px] text-[#444] uppercase tracking-widest mb-2">System Status</p>
+				<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-2">System Status</p>
 				<div class="flex gap-4">
 					<div class="flex items-center gap-1.5">
 						<span class="w-2 h-2 rounded-full {supabaseStatus === 'ok' ? 'bg-[var(--accent)]' : supabaseStatus === 'checking' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}"></span>
-						<span class="text-xs text-[#666]">Database</span>
+						<span class="text-xs text-[#8a8a8a]">Database</span>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
-						<span class="text-xs text-[#666]">API</span>
+						<span class="text-xs text-[#8a8a8a]">API</span>
 					</div>
 				</div>
 			</div>
 
 			<!-- Troubleshooting -->
 			<div class="flex-1 overflow-y-auto px-5 py-4">
-				<p class="text-[10px] text-[#444] uppercase tracking-widest mb-3">Common Issues</p>
+				<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-3">Common Issues</p>
 				<div class="space-y-2">
 					{#each ISSUES as issue}
 						<details class="group rounded-xl border border-[#1a1a1a] bg-[#111]">
@@ -99,7 +99,7 @@
 								<span class="text-[#333] text-xs group-open:rotate-180 transition-transform">▼</span>
 							</summary>
 							<div class="px-4 pb-3">
-								<p class="text-xs text-[#555] leading-relaxed mb-2">{issue.fix}</p>
+								<p class="text-xs text-[#7c7c7c] leading-relaxed mb-2">{issue.fix}</p>
 								{#if issue.href}
 									<a href={issue.href} onclick={() => open = false}
 										class="text-xs text-white underline hover:no-underline">
@@ -112,18 +112,18 @@
 				</div>
 
 				<!-- Quick actions -->
-				<p class="text-[10px] text-[#444] uppercase tracking-widest mt-5 mb-3">Quick Actions</p>
+				<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mt-5 mb-3">Quick Actions</p>
 				<div class="space-y-2">
 					<button onclick={() => window.location.reload()}
-						class="w-full text-left px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#666] hover:text-white hover:border-[#333] transition-colors">
+						class="w-full text-left px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#8a8a8a] hover:text-white hover:border-[#333] transition-colors">
 						🔄 Refresh the page
 					</button>
 					<button onclick={() => { localStorage.clear(); window.location.href = '/'; }}
-						class="w-full text-left px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#666] hover:text-white hover:border-[#333] transition-colors">
+						class="w-full text-left px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#8a8a8a] hover:text-white hover:border-[#333] transition-colors">
 						🗑 Clear cache and reload
 					</button>
 					<a href="mailto:support@sparkscuriositystudio.com"
-						class="block px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#666] hover:text-white hover:border-[#333] transition-colors">
+						class="block px-4 py-3 rounded-xl border border-[#1a1a1a] bg-[#111] text-xs text-[#8a8a8a] hover:text-white hover:border-[#333] transition-colors">
 						✉ Email support
 					</a>
 				</div>

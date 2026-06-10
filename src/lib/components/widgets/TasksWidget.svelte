@@ -37,7 +37,7 @@
 <div class="space-y-2 h-full overflow-y-auto">
 	{#if tasks.length === 0}
 		<div class="flex items-center justify-center h-full">
-			<p class="text-xs text-[#444]">No pending tasks</p>
+			<p class="text-xs text-[#6e6e6e]">No pending tasks</p>
 		</div>
 	{:else}
 		{#each tasks as task}
@@ -46,16 +46,16 @@
 				</button>
 				<div class="flex-1 min-w-0">
 					<p class="text-xs text-white truncate">{task.title}</p>
-					{#if task.contact}<p class="text-xs text-[#555] truncate">{task.contact.name}</p>{/if}
+					{#if task.contact}<p class="text-xs text-[#7c7c7c] truncate">{task.contact.name}</p>{/if}
 				</div>
 				<div class="shrink-0 flex items-center gap-1.5">
 					<div class="w-1.5 h-1.5 rounded-full {PRIORITY_DOT[task.priority] ?? 'bg-[#444]'}"></div>
 					{#if task.due_date}
-						<p class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#444]'}">{fmtDue(task.due_date)}</p>
+						<p class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#6e6e6e]'}">{fmtDue(task.due_date)}</p>
 					{/if}
 				</div>
 			</div>
 		{/each}
-		<a href="/tasks" class="block text-center text-xs text-[#444] hover:text-white pt-2">View all →</a>
+		<a href="/tasks" class="block text-center text-xs text-[#6e6e6e] hover:text-white pt-2">View all →</a>
 	{/if}
 </div>

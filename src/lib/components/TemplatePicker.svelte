@@ -55,7 +55,7 @@
 	<button onclick={() => open = !open}
 		class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors flex items-center gap-1.5">
 		<span>📋</span> Templates
-		{#if templates.length > 0}<span class="text-[#444]">({templates.length})</span>{/if}
+		{#if templates.length > 0}<span class="text-[#6e6e6e]">({templates.length})</span>{/if}
 	</button>
 
 	{#if open}
@@ -66,7 +66,7 @@
 				<div class="flex gap-1 flex-wrap">
 					{#each CATEGORIES as cat}
 						<button onclick={() => filterCat = cat === 'all' ? '' : cat}
-							class="rounded px-2 py-0.5 text-xs transition-colors {(filterCat || 'all') === cat ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">
+							class="rounded px-2 py-0.5 text-xs transition-colors {(filterCat || 'all') === cat ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 							{CAT_LABELS[cat]}
 						</button>
 					{/each}
@@ -76,9 +76,9 @@
 			<!-- Template list -->
 			<div class="max-h-56 overflow-y-auto">
 				{#if loading}
-					<p class="text-xs text-[#444] text-center py-4">Loading...</p>
+					<p class="text-xs text-[#6e6e6e] text-center py-4">Loading...</p>
 				{:else if filtered.length === 0}
-					<p class="text-xs text-[#444] text-center py-4">No templates found</p>
+					<p class="text-xs text-[#6e6e6e] text-center py-4">No templates found</p>
 				{:else}
 					{#each filtered as t}
 						<button onclick={() => useTemplate(t)}
@@ -87,16 +87,16 @@
 								<p class="text-xs text-white font-medium truncate">{t.name}</p>
 								<span class="text-xs text-[#333] shrink-0 ml-2">{t.use_count}×</span>
 							</div>
-							{#if t.subject}<p class="text-xs text-[#555] truncate">Subject: {t.subject}</p>{/if}
-							<p class="text-xs text-[#666] truncate">{t.body.slice(0, 80)}...</p>
+							{#if t.subject}<p class="text-xs text-[#7c7c7c] truncate">Subject: {t.subject}</p>{/if}
+							<p class="text-xs text-[#8a8a8a] truncate">{t.body.slice(0, 80)}...</p>
 						</button>
 					{/each}
 				{/if}
 			</div>
 
 			<div class="p-2 border-t border-[#1e1e1e] flex justify-between items-center">
-				<a href="/templates" onclick={() => open = false} class="text-xs text-[#444] hover:text-white">Manage templates →</a>
-				<button onclick={() => open = false} class="text-xs text-[#444] hover:text-white"><Icon name="x" size={14} /></button>
+				<a href="/templates" onclick={() => open = false} class="text-xs text-[#6e6e6e] hover:text-white">Manage templates →</a>
+				<button onclick={() => open = false} class="text-xs text-[#6e6e6e] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 		</div>
 	{/if}

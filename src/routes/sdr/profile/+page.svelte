@@ -107,7 +107,7 @@
 	<div class="flex items-center justify-between mb-6">
 		<div>
 			<h2 class="text-white text-xl font-semibold">My Rep Profile</h2>
-			<p class="text-xs text-[#555] mt-0.5">Your internal rep profile and certification.</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Your internal rep profile and certification.</p>
 		</div>
 	</div>
 
@@ -119,10 +119,10 @@
 			<!-- Interview badge -->
 			{#if profile?.interview_score !== null && profile?.interview_score !== undefined}
 				<div class="rounded-xl border {profile.interview_score >= 70 ? 'border-[var(--accent)]/40 bg-[var(--accent)]/12' : 'border-[#2a2a2a] bg-[#111]'} p-4 flex items-center gap-3">
-					<p class="text-2xl font-bold {profile.interview_score >= 85 ? 'text-[var(--accent)]' : profile.interview_score >= 70 ? 'text-yellow-400' : 'text-[#666]'}">{profile.interview_score}</p>
+					<p class="text-2xl font-bold {profile.interview_score >= 85 ? 'text-[var(--accent)]' : profile.interview_score >= 70 ? 'text-yellow-400' : 'text-[#8a8a8a]'}">{profile.interview_score}</p>
 					<div>
 						<p class="text-xs text-white font-medium">AI Interview Score</p>
-						<p class="text-[10px] text-[#555]">
+						<p class="text-[10px] text-[#7c7c7c]">
 							{profile.interview_score >= 70 ? '✓ Live Roleplay unlocked' : 'Score ≥ 70 to unlock Live Roleplay'}
 							· <a href="/sdr/interview" class="underline hover:text-white">Retake interview</a>
 						</p>
@@ -137,35 +137,35 @@
 
 			<!-- Basic info -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#555] uppercase tracking-widest">Basic Info</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Basic Info</p>
 				<div class="grid grid-cols-2 gap-3">
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Display Name</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Display Name</label>
 						<input bind:value={displayName} placeholder="Ryan Sparks"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Location</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Location</label>
 						<input bind:value={location} placeholder="New York, NY"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Hourly Rate ($)</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Hourly Rate ($)</label>
 						<input type="number" bind:value={hourlyRate} placeholder="75" min="0"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] mb-1">Bio</label>
+					<label class="block text-xs text-[#7c7c7c] mb-1">Bio</label>
 					<textarea bind:value={bio} rows="3" placeholder="5+ years in SaaS outbound. Specializing in..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none resize-none"></textarea>
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] mb-2">Availability</label>
+					<label class="block text-xs text-[#7c7c7c] mb-2">Availability</label>
 					<div class="flex gap-2">
 						{#each [['available','Available'],['busy','Busy'],['unavailable','Unavailable']] as [val, label]}
 							<button onclick={() => availability = val}
-								class="px-3 py-1.5 rounded-lg text-xs border transition-colors {availability === val ? 'border-white text-white bg-white/10' : 'border-[#2a2a2a] text-[#555] hover:border-white hover:text-white'}">
+								class="px-3 py-1.5 rounded-lg text-xs border transition-colors {availability === val ? 'border-white text-white bg-white/10' : 'border-[#2a2a2a] text-[#7c7c7c] hover:border-white hover:text-white'}">
 								{label}
 							</button>
 						{/each}
@@ -175,11 +175,11 @@
 
 			<!-- Specialties -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#555] uppercase tracking-widest mb-3">Specialties</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-3">Specialties</p>
 				<div class="flex flex-wrap gap-2">
 					{#each SPECIALTIES as s}
 						<button onclick={() => toggleSpecialty(s.key)}
-							class="px-3 py-1.5 rounded-full text-xs border transition-colors {specialties.includes(s.key) ? 'border-white bg-white/10 text-white' : 'border-[#2a2a2a] text-[#555] hover:border-white hover:text-white'}">
+							class="px-3 py-1.5 rounded-full text-xs border transition-colors {specialties.includes(s.key) ? 'border-white bg-white/10 text-white' : 'border-[#2a2a2a] text-[#7c7c7c] hover:border-white hover:text-white'}">
 							{s.label}
 						</button>
 					{/each}
@@ -188,28 +188,28 @@
 
 			<!-- Work history & credentials -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#555] uppercase tracking-widest">Work History & Credentials</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Work History & Credentials</p>
 				<div>
-					<label class="block text-xs text-[#555] mb-1">Years of Experience</label>
+					<label class="block text-xs text-[#7c7c7c] mb-1">Years of Experience</label>
 					<input type="number" bind:value={yearsExperience} placeholder="5" min="0"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] mb-1">Previous Roles</label>
+					<label class="block text-xs text-[#7c7c7c] mb-1">Previous Roles</label>
 					<textarea bind:value={previousRoles} rows="3" placeholder="Previous roles and experience..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] mb-1">Top Achievement</label>
+					<label class="block text-xs text-[#7c7c7c] mb-1">Top Achievement</label>
 					<input bind:value={topAchievement} placeholder="Closed $1.2M in new ARR in 2024"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] mb-2">Certifications</label>
+					<label class="block text-xs text-[#7c7c7c] mb-2">Certifications</label>
 					<div class="flex flex-wrap gap-2">
 						{#each CERT_OPTIONS as cert}
 							<button onclick={() => certifications = certifications.includes(cert) ? certifications.filter(c => c !== cert) : [...certifications, cert]}
-								class="px-3 py-1.5 rounded-full text-xs border transition-colors {certifications.includes(cert) ? 'border-white bg-white/10 text-white' : 'border-[#2a2a2a] text-[#555] hover:border-white hover:text-white'}">
+								class="px-3 py-1.5 rounded-full text-xs border transition-colors {certifications.includes(cert) ? 'border-white bg-white/10 text-white' : 'border-[#2a2a2a] text-[#7c7c7c] hover:border-white hover:text-white'}">
 								{cert}
 							</button>
 						{/each}

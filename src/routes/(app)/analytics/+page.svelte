@@ -142,7 +142,7 @@
 		<div class="flex gap-1">
 			{#each (['today', 'week', 'month', 'all'] as Period[]) as p}
 				<button onclick={() => { period = p; load(); }}
-					class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">
+					class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">
 					{periodLabels[p]}
 				</button>
 			{/each}
@@ -168,8 +168,8 @@
 		</div>
 		<!-- View toggle -->
 		<div class="flex gap-1 ml-4">
-			<button onclick={() => analyticsView = 'activity'} class="rounded-lg px-3 py-1.5 text-xs transition-colors {analyticsView === 'activity' ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">Activity</button>
-			<button onclick={() => { analyticsView = 'revenue'; loadRevenue(); }} class="rounded-lg px-3 py-1.5 text-xs transition-colors {analyticsView === 'revenue' ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">Revenue</button>
+			<button onclick={() => analyticsView = 'activity'} class="rounded-lg px-3 py-1.5 text-xs transition-colors {analyticsView === 'activity' ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">Activity</button>
+			<button onclick={() => { analyticsView = 'revenue'; loadRevenue(); }} class="rounded-lg px-3 py-1.5 text-xs transition-colors {analyticsView === 'revenue' ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">Revenue</button>
 		</div>
 	</div>
 
@@ -178,12 +178,12 @@
 			<div class="p-8 max-w-4xl space-y-6">
 				<div class="flex items-center gap-4">
 					<p class="text-white text-sm font-medium">Revenue {revenueYear}</p>
-					<button onclick={() => { revenueYear--; loadRevenue(); }} class="text-xs text-[#555] hover:text-white px-2">← {revenueYear - 1}</button>
-					<button onclick={() => { revenueYear++; loadRevenue(); }} class="text-xs text-[#555] hover:text-white px-2">{revenueYear + 1} →</button>
+					<button onclick={() => { revenueYear--; loadRevenue(); }} class="text-xs text-[#7c7c7c] hover:text-white px-2">← {revenueYear - 1}</button>
+					<button onclick={() => { revenueYear++; loadRevenue(); }} class="text-xs text-[#7c7c7c] hover:text-white px-2">{revenueYear + 1} →</button>
 				</div>
 				<div class="grid grid-cols-3 gap-4">
 					{#each [['Total Revenue', '$' + (revenueData.totalRevenue >= 1000 ? (revenueData.totalRevenue/1000).toFixed(0) + 'k' : revenueData.totalRevenue)],['Deals Closed', revenueData.dealCount.toString()],['Avg Deal Size', '$' + Math.round(revenueData.avgDealSize)]] as [l,v]}
-						<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5"><p class="text-xs text-[#555] mb-2">{l}</p><p class="text-white text-2xl font-semibold">{v}</p></div>
+						<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5"><p class="text-xs text-[#7c7c7c] mb-2">{l}</p><p class="text-white text-2xl font-semibold">{v}</p></div>
 					{/each}
 				</div>
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
@@ -195,46 +195,46 @@
 								<div class="w-full rounded-t bg-white/20 hover:bg-white/40 transition-colors relative group" style="height:{Math.max(4, m.revenue/max*100)}%">
 									<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-[#111] border border-[#2a2a2a] rounded px-2 py-1 text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">${m.revenue >= 1000 ? (m.revenue/1000).toFixed(0) + 'k' : m.revenue} · {m.deals} deals</div>
 								</div>
-								<p class="text-xs text-[#444]">{m.label}</p>
+								<p class="text-xs text-[#6e6e6e]">{m.label}</p>
 							</div>
 						{/each}
 					</div>
 				</div>
 			</div>
 		{:else}
-			<div class="flex items-center justify-center py-24"><p class="text-[#444] text-sm">No revenue data yet</p></div>
+			<div class="flex items-center justify-center py-24"><p class="text-[#6e6e6e] text-sm">No revenue data yet</p></div>
 		{/if}
 	{:else}
 		{#if pipelineData}
 			<div class="px-8 pt-6 max-w-5xl">
-				<p class="text-[10px] text-[#444] uppercase tracking-widest mb-3">Pipeline</p>
+				<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-3">Pipeline</p>
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
-						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Total Pipeline</p>
+						<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-1">Total Pipeline</p>
 						<p class="text-2xl text-white font-bold font-mono">${(pipelineData.totalPipeline / 1000).toFixed(0)}k</p>
-						<p class="text-[10px] text-[#444] mt-0.5">{pipelineData.dealCount} open deals</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">{pipelineData.dealCount} open deals</p>
 					</div>
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
-						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Weighted</p>
+						<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-1">Weighted</p>
 						<p class="text-2xl text-white font-bold font-mono">${(pipelineData.weightedPipeline / 1000).toFixed(0)}k</p>
-						<p class="text-[10px] text-[#444] mt-0.5">by probability</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">by probability</p>
 					</div>
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
-						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Win Rate</p>
+						<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-1">Win Rate</p>
 						<p class="text-2xl font-bold font-mono {pipelineData.winRate >= 50 ? 'text-[var(--accent)]' : 'text-white'}">{pipelineData.winRate}%</p>
-						<p class="text-[10px] text-[#444] mt-0.5">closed deals</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">closed deals</p>
 					</div>
 					<div class="bg-[var(--c-surface-1)] border border-[var(--c-border)] rounded-xl p-4">
-						<p class="text-[10px] text-[#555] uppercase tracking-widest mb-1">Won Value</p>
+						<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-1">Won Value</p>
 						<p class="text-2xl text-[var(--accent)] font-bold font-mono">${(pipelineData.wonValue / 1000).toFixed(0)}k</p>
-						<p class="text-[10px] text-[#444] mt-0.5">this period</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">this period</p>
 					</div>
 				</div>
 			</div>
 		{/if}
 		{#if loading}
 		<div class="flex items-center justify-center py-24">
-			<p class="text-[#444] text-sm">Loading...</p>
+			<p class="text-[#6e6e6e] text-sm">Loading...</p>
 		</div>
 	{:else if data}
 		<div class="p-8 space-y-6 max-w-5xl">
@@ -248,7 +248,7 @@
 					{ label: 'Billable Time', value: fmtMins(data.time.billableMins) },
 				] as card}
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-2">{card.label}</p>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">{card.label}</p>
 						<p class="text-white text-xl font-semibold">{card.value}</p>
 					</div>
 				{/each}
@@ -264,7 +264,7 @@
 					</div>
 				</div>
 				{#if daily.length === 0}
-					<p class="text-sm text-[#666] py-10 text-center">No activity in this period yet — make a few calls and trends will appear here.</p>
+					<p class="text-sm text-[#8a8a8a] py-10 text-center">No activity in this period yet — make a few calls and trends will appear here.</p>
 				{:else}
 					<svg viewBox="0 0 {CW} {CH}" class="w-full" style="height:160px" preserveAspectRatio="none" role="img" aria-label="Calls and cost per day">
 						<defs>
@@ -281,7 +281,7 @@
 						<path d={linePath(daily.map((d) => d.calls), maxCalls)} fill="none" stroke="#22c55e" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
 						<path d={linePath(daily.map((d) => d.cost), maxCost)} fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
 					</svg>
-					<div class="flex justify-between mt-2 text-[10px] text-[#666]">
+					<div class="flex justify-between mt-2 text-[10px] text-[#8a8a8a]">
 						<span>{fmtDay(daily[0].date)}</span>
 						<span class="text-[#888]">{daily.reduce((s, d) => s + d.calls, 0)} calls · {fmt$(daily.reduce((s, d) => s + d.cost, 0))}</span>
 						{#if daily.length > 1}<span>{fmtDay(daily[daily.length - 1].date)}</span>{/if}
@@ -309,7 +309,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
 				<p class="text-xs text-[#999] uppercase tracking-widest mb-4">Call Outcomes</p>
 				{#if !data.outcomes || Object.keys(data.outcomes).length === 0}
-					<p class="text-sm text-[#555] py-4">No calls in this period yet.</p>
+					<p class="text-sm text-[#7c7c7c] py-4">No calls in this period yet.</p>
 				{:else}
 					{@const totalOutcomes = Object.values(data.outcomes).reduce((a, b) => a + b, 0)}
 					<div class="space-y-2.5">
@@ -317,7 +317,7 @@
 							<div>
 								<div class="flex items-center justify-between mb-1">
 									<span class="text-sm text-white capitalize">{outcome.replace(/_/g, ' ')}</span>
-									<span class="text-xs text-[#777]">{count} ({totalOutcomes ? Math.round((count / totalOutcomes) * 100) : 0}%)</span>
+									<span class="text-xs text-[#9a9a9a]">{count} ({totalOutcomes ? Math.round((count / totalOutcomes) * 100) : 0}%)</span>
 								</div>
 								<div class="h-1.5 rounded-full bg-[#1a1a1a] overflow-hidden">
 									<div class="h-full rounded-full" style="width:{totalOutcomes ? (count / totalOutcomes) * 100 : 0}%;background:{outcomeColors[outcome] ?? '#6b7280'}"></div>

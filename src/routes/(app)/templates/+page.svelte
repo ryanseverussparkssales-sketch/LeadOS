@@ -156,7 +156,7 @@
 			<div class="h-14 bg-[#0f0f0f] border border-[#1a1a1a] rounded-xl animate-pulse"></div>
 		</div>
 	{:else if filtered.length === 0}
-				<p class="text-xs text-[#444] text-center py-8">No templates yet</p>
+				<p class="text-xs text-[#6e6e6e] text-center py-8">No templates yet</p>
 			{:else}
 				{#each filtered as t}
 					<button onclick={() => selectTemplate(t)}
@@ -165,7 +165,7 @@
 							<span class="text-xs {t.type === 'email' ? 'text-blue-400' : 'text-[var(--accent)]'}">{t.type === 'email' ? '✉' : '💬'}</span>
 							<p class="text-sm text-white font-medium truncate">{t.name}</p>
 						</div>
-						<p class="text-xs text-[#555] capitalize">{t.category.replace(/_/g,' ')} · {t.use_count} uses</p>
+						<p class="text-xs text-[#7c7c7c] capitalize">{t.category.replace(/_/g,' ')} · {t.use_count} uses</p>
 					</button>
 				{/each}
 			{/if}
@@ -186,27 +186,27 @@
 					</div>
 					{#if fType === 'email'}
 						<div>
-							<label class="text-xs text-[#555] block mb-1.5">Subject Line</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1.5">Subject Line</label>
 							<input bind:value={fSubject} placeholder="Subject (supports variables)" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 					{/if}
 					<div>
 						<div class="flex items-center justify-between mb-1.5">
-							<label class="text-xs text-[#555]">Body *</label>
+							<label class="text-xs text-[#7c7c7c]">Body *</label>
 							<div class="flex gap-1">
 								{#each VARS as v}
-									<button onclick={() => insertVar(v)} class="rounded px-1.5 py-0.5 text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-[#666] hover:text-white hover:border-[#444] transition-colors" style="font-family:var(--font-mono)">{v}</button>
+									<button onclick={() => insertVar(v)} class="rounded px-1.5 py-0.5 text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-[#8a8a8a] hover:text-white hover:border-[#444] transition-colors" style="font-family:var(--font-mono)">{v}</button>
 								{/each}
 							</div>
 						</div>
 						<textarea bind:value={fBody} rows={fType === 'sms' ? 4 : 8} placeholder="Template body...&#10;&#10;Use variables: {'{name}'}, {'{company}'}, {'{rep_name}'}, {'{product}'}" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-4 py-3 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 						{#if fType === 'sms'}
-							<p class="text-xs text-right mt-1 {fBody.length > 160 ? 'text-red-400' : 'text-[#444]'}">{fBody.length}/160</p>
+							<p class="text-xs text-right mt-1 {fBody.length > 160 ? 'text-red-400' : 'text-[#6e6e6e]'}">{fBody.length}/160</p>
 						{/if}
 					</div>
 					<div class="flex gap-3">
 						<button onclick={save} disabled={saving || !fName.trim() || !fBody.trim()} class="rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? 'Saving...' : 'Save Template'}</button>
-						<button onclick={() => { editing = false; if (selected) selectTemplate(selected); else selected = null; }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-sm text-[#666] hover:text-white">Cancel</button>
+						<button onclick={() => { editing = false; if (selected) selectTemplate(selected); else selected = null; }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-sm text-[#8a8a8a] hover:text-white">Cancel</button>
 					</div>
 				</div>
 			{:else if selected}
@@ -217,7 +217,7 @@
 								<span class="text-lg">{selected.type === 'email' ? '✉️' : '💬'}</span>
 								<h3 class="text-white text-xl font-semibold">{selected.name}</h3>
 							</div>
-							<p class="text-xs text-[#555] capitalize">{selected.type} · {selected.category.replace(/_/g,' ')} · {selected.use_count} uses</p>
+							<p class="text-xs text-[#7c7c7c] capitalize">{selected.type} · {selected.category.replace(/_/g,' ')} · {selected.use_count} uses</p>
 						</div>
 						<div class="flex gap-2">
 							<button onclick={() => { editing = true; }} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">Edit</button>
@@ -227,24 +227,24 @@
 
 					{#if selected.subject}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-							<p class="text-xs text-[#555] uppercase tracking-widest mb-1">Subject</p>
+							<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Subject</p>
 							<p class="text-sm text-white">{selected.subject}</p>
 						</div>
 					{/if}
 
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-2">Body</p>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">Body</p>
 						<p class="text-sm text-[#ccc] whitespace-pre-wrap leading-relaxed">{selected.body}</p>
 					</div>
 
 					<!-- Variable legend -->
 					<div class="rounded-lg border border-[#1e1e1e] p-3">
-						<p class="text-xs text-[#444] font-medium mb-1.5">Variables (auto-filled when used with a contact)</p>
+						<p class="text-xs text-[#6e6e6e] font-medium mb-1.5">Variables (auto-filled when used with a contact)</p>
 						<div class="flex flex-wrap gap-2">
 							{#each [{v:'{name}',d:"Contact's full name"},{v:'{first_name}',d:"First name only"},{v:'{company}',d:"Company name"},{v:'{rep_name}',d:"Your name"},{v:'{product}',d:"Your product"}] as item}
 								<div class="rounded px-2 py-1 bg-[#1a1a1a] border border-[#2a2a2a]">
 									<code class="text-xs text-blue-400">{item.v}</code>
-									<span class="text-xs text-[#444] ml-1.5">{item.d}</span>
+									<span class="text-xs text-[#6e6e6e] ml-1.5">{item.d}</span>
 								</div>
 							{/each}
 						</div>
@@ -253,7 +253,7 @@
 			{:else}
 				<div class="flex items-center justify-center h-full">
 					<div class="text-center">
-						<p class="text-[#444] text-sm">Select a template or create a new one</p>
+						<p class="text-[#6e6e6e] text-sm">Select a template or create a new one</p>
 						<button onclick={newTemplate} class="mt-3 text-xs text-white underline">Create first template</button>
 					</div>
 				</div>

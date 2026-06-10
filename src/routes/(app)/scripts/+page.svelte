@@ -286,9 +286,9 @@
 				<div class="flex items-center justify-between mb-5">
 					<div>
 						<h3 class="text-white font-semibold">✦ Generate Script with AI</h3>
-						<p class="text-xs text-[#555] mt-0.5">Claude writes a complete cold call playbook with objection handlers</p>
+						<p class="text-xs text-[#7c7c7c] mt-0.5">Claude writes a complete cold call playbook with objection handlers</p>
 					</div>
-					<button onclick={() => showAIGenerator = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
+					<button onclick={() => showAIGenerator = false} class="text-[#7c7c7c] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 
 				<div class="space-y-4">
@@ -335,7 +335,7 @@
 					</div>
 
 					<div class="pt-2 flex gap-3">
-						<button onclick={() => showAIGenerator = false} class="rounded-lg border border-[#2a2a2a] px-4 py-2.5 text-sm text-[#666] hover:text-white transition-colors">
+						<button onclick={() => showAIGenerator = false} class="rounded-lg border border-[#2a2a2a] px-4 py-2.5 text-sm text-[#8a8a8a] hover:text-white transition-colors">
 							Cancel
 						</button>
 						<button onclick={generateScript} disabled={generating || !genProduct.trim() || !genPersona.trim()}
@@ -367,12 +367,12 @@
 		<!-- Script list — grouped by client -->
 		<div class="w-64 shrink-0 border-r border-[#1e1e1e] overflow-y-auto">
 			{#if scripts.length === 0}
-				<p class="text-[#444] text-xs text-center py-8">No scripts yet.<br/>Create one above.</p>
+				<p class="text-[#6e6e6e] text-xs text-center py-8">No scripts yet.<br/>Create one above.</p>
 			{:else}
 				{#each scriptsByClient() as group}
 					<!-- Client group header -->
 					<div class="px-4 py-2 bg-[#0d0d0d] border-b border-[#1e1e1e] sticky top-0 z-10">
-						<p class="text-[10px] text-[#555] uppercase tracking-widest font-semibold">{group.label}</p>
+						<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest font-semibold">{group.label}</p>
 					</div>
 					{#each group.scripts as script}
 						<button onclick={() => selectScript(script)}
@@ -382,7 +382,7 @@
 								{#if script.is_default}<span class="text-[10px] bg-white/10 text-white px-1 py-0.5 rounded shrink-0">Default</span>{/if}
 							</div>
 							{#if script.campaign?.name}
-								<p class="text-[10px] text-[#444] mt-0.5 truncate">📣 {script.campaign.name}</p>
+								<p class="text-[10px] text-[#6e6e6e] mt-0.5 truncate">📣 {script.campaign.name}</p>
 							{/if}
 							<p class="text-[10px] text-[#333] mt-0.5">{script.objections?.length ?? 0} objection handlers</p>
 						</button>
@@ -407,14 +407,14 @@
 
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="text-xs text-[#555] block mb-1.5">Client (optional)</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1.5">Client (optional)</label>
 							<select bind:value={fClient} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="">Global (all clients)</option>
 								{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1.5">Campaign (optional)</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1.5">Campaign (optional)</label>
 							<select bind:value={fCampaign} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="">All campaigns</option>
 								{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
@@ -424,7 +424,7 @@
 
 					{#each [['fOpener', 'Opener', 'Hi [Name], this is [Your Name] calling from...'], ['fPitch', 'Elevator Pitch', 'We help sales teams...'], ['fDiscovery', 'Discovery Questions', 'Can I ask...?'], ['fClosing', 'Close / Next Steps', 'The best next step would be...']] as [field, label, placeholder]}
 						<div>
-							<label class="text-xs text-[#555] block mb-1.5">{label}</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1.5">{label}</label>
 							<textarea
 								value={field === 'fOpener' ? fOpener : field === 'fPitch' ? fPitch : field === 'fDiscovery' ? fDiscovery : fClosing}
 								oninput={(e) => {
@@ -446,7 +446,7 @@
 							{saving ? 'Saving...' : 'Save Script'}
 						</button>
 						<button onclick={() => { editing = false; if (selected) selectScript(selected); }}
-							class="rounded-lg border border-[#2a2a2a] px-6 py-2.5 text-sm text-[#666] hover:text-white transition-colors">
+							class="rounded-lg border border-[#2a2a2a] px-6 py-2.5 text-sm text-[#8a8a8a] hover:text-white transition-colors">
 							Cancel
 						</button>
 					</div>
@@ -457,7 +457,7 @@
 					<div class="flex items-start justify-between">
 						<div>
 							<h3 class="text-white text-xl font-semibold">{selected.title}</h3>
-							<p class="text-xs text-[#555] mt-0.5">
+							<p class="text-xs text-[#7c7c7c] mt-0.5">
 								{selected.client?.name ?? selected.campaign?.name ?? 'Global script'}
 								{selected.is_default ? ' · Default' : ''}
 							</p>
@@ -482,7 +482,7 @@
 									<span class="text-2xl font-bold {improvement.overallScore >= 80 ? 'text-[var(--accent)]' : improvement.overallScore >= 60 ? 'text-yellow-400' : 'text-red-400'}">{improvement.overallScore}/100</span>
 									<p class="text-sm text-white font-medium">Script Analysis</p>
 								</div>
-								<button onclick={() => showImprovement = false} class="text-[#444] hover:text-white text-xs"><Icon name="x" size={14} /></button>
+								<button onclick={() => showImprovement = false} class="text-[#6e6e6e] hover:text-white text-xs"><Icon name="x" size={14} /></button>
 							</div>
 							<p class="text-sm text-[#ccc] leading-relaxed">{improvement.diagnosis}</p>
 							{#if improvement.quickWins?.length}
@@ -503,14 +503,14 @@
 												<p class="text-xs text-yellow-400">{imp.issue}</p>
 											</div>
 											<p class="text-sm text-[#ccc] mb-2">{imp.suggestion}</p>
-											<p class="text-xs text-[#555]">↳ {imp.whyItWorks}</p>
+											<p class="text-xs text-[#7c7c7c]">↳ {imp.whyItWorks}</p>
 										</div>
 									{/each}
 								</div>
 							{/if}
 							{#if improvement.strengthsToKeep?.length}
 								<div class="rounded-lg bg-[#111] border border-[#2a2a2a] p-3">
-									<p class="text-xs text-[#555] font-medium mb-2">✓ Keep these</p>
+									<p class="text-xs text-[#7c7c7c] font-medium mb-2">✓ Keep these</p>
 									{#each improvement.strengthsToKeep as s}
 										<p class="text-xs text-[#888] mb-1">• {s}</p>
 									{/each}
@@ -522,7 +522,7 @@
 					{#each [['Opener', selected.opener], ['Elevator Pitch', selected.elevator_pitch], ['Discovery', selected.discovery], ['Closing', selected.closing]] as [label, content]}
 						{#if content}
 							<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-								<p class="text-xs text-[#555] uppercase tracking-widest mb-3">{label}</p>
+								<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-3">{label}</p>
 								<p class="text-sm text-[#ccc] leading-relaxed whitespace-pre-wrap">{content}</p>
 							</div>
 						{/if}
@@ -534,7 +534,7 @@
 							<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-3 group hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 								<div class="flex items-start justify-between mb-2">
 									<p class="text-sm text-yellow-400 font-medium">"{obj.objection}"</p>
-									<button onclick={() => deleteObjection(obj.id)} class="opacity-0 group-hover:opacity-100 text-[#666] hover:text-red-400 transition-colors text-xs ml-auto">🗑</button>
+									<button onclick={() => deleteObjection(obj.id)} class="opacity-0 group-hover:opacity-100 text-[#8a8a8a] hover:text-red-400 transition-colors text-xs ml-auto">🗑</button>
 								</div>
 								{#if obj.response}<p class="text-sm text-[#ccc] mt-2">{obj.response}</p>{/if}
 							</div>
@@ -545,7 +545,7 @@
 				<div class="flex items-center justify-center h-full">
 					<div class="text-center">
 						<p class="text-3xl mb-3">📝</p>
-						<p class="text-[#555] text-sm">Select a script to view it</p>
+						<p class="text-[#7c7c7c] text-sm">Select a script to view it</p>
 					</div>
 				</div>
 			{/if}

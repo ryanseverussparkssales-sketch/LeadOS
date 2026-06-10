@@ -45,7 +45,7 @@
 <div class="flex flex-col flex-1 overflow-hidden">
 	<!-- Stats bar -->
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-6 bg-[#080808]">
-		<p class="text-xs text-[#555] uppercase tracking-widest shrink-0">Today</p>
+		<p class="text-xs text-[#7c7c7c] uppercase tracking-widest shrink-0">Today</p>
 		{#if loadingStats}
 			<div class="flex gap-6">
 				{#each [1,2,3,4] as _}<div class="h-4 w-16 bg-[#1a1a1a] rounded animate-pulse"></div>{/each}
@@ -54,19 +54,19 @@
 			<div class="flex items-center gap-6 text-sm">
 				<div class="text-center">
 					<p class="text-white font-semibold">{stats.calls}</p>
-					<p class="text-[10px] text-[#555]">Calls</p>
+					<p class="text-[10px] text-[#7c7c7c]">Calls</p>
 				</div>
 				<div class="text-center">
 					<p class="text-[var(--accent)] font-semibold">{stats.answered}</p>
-					<p class="text-[10px] text-[#555]">Answered</p>
+					<p class="text-[10px] text-[#7c7c7c]">Answered</p>
 				</div>
 				<div class="text-center">
 					<p class="text-yellow-400 font-semibold">{stats.appointments}</p>
-					<p class="text-[10px] text-[#555]">Appointments</p>
+					<p class="text-[10px] text-[#7c7c7c]">Appointments</p>
 				</div>
 				<div class="text-center">
 					<p class="text-[var(--accent)] font-semibold">${stats.bonusEarned}</p>
-					<p class="text-[10px] text-[#555]">Bonus earned</p>
+					<p class="text-[10px] text-[#7c7c7c]">Bonus earned</p>
 				</div>
 				{#if stats.appointments > 0}
 					<div class="ml-2 rounded-full bg-yellow-900/30 border border-yellow-800/40 px-3 py-1">
@@ -86,15 +86,15 @@
 				<h3 style="font-family:var(--font-display);font-weight:300;font-size:22px;color:#fff;margin-bottom:8px">
 					One quick call first.
 				</h3>
-				<p class="text-xs text-[#555] max-w-sm leading-relaxed mb-6">
+				<p class="text-xs text-[#7c7c7c] max-w-sm leading-relaxed mb-6">
 					Before you start dialing we do a brief verbal call with our founder — 15 minutes, no pressure. It's how we make sure every rep we send to clients is ready to represent them well.
 				</p>
 				<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] px-6 py-4 max-w-sm text-left space-y-2 mb-6">
-					<p class="text-xs text-[#555]">What the call covers:</p>
+					<p class="text-xs text-[#7c7c7c]">What the call covers:</p>
 					{#each ['Your sales background & style','The campaigns you\'ll be working','How recordings & coaching work','Q&A — ask anything'] as item}
 						<div class="flex items-center gap-2">
 							<div class="w-1 h-1 rounded-full bg-[#333] shrink-0"></div>
-							<span class="text-[11px] text-[#444]">{item}</span>
+							<span class="text-[11px] text-[#6e6e6e]">{item}</span>
 						</div>
 					{/each}
 				</div>

@@ -154,7 +154,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Document Library</h2>
-			<p class="text-xs text-[#555] mt-0.5">{docs.length} documents</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">{docs.length} documents</p>
 		</div>
 		<div class="flex gap-2 items-center">
 			<!-- Export dropdown -->
@@ -199,11 +199,11 @@
 
 				<!-- Category filter -->
 				<div class="space-y-1">
-					<button onclick={() => filterCat = ''} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors {!filterCat ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">All documents ({docs.length})</button>
+					<button onclick={() => filterCat = ''} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors {!filterCat ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">All documents ({docs.length})</button>
 					{#each CATEGORIES as cat}
 						{@const count = docs.filter(d => d.document_category === cat).length}
 						{#if count > 0 || true}
-							<button onclick={() => filterCat = filterCat === cat ? '' : cat} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors flex items-center gap-2 {filterCat === cat ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">
+							<button onclick={() => filterCat = filterCat === cat ? '' : cat} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors flex items-center gap-2 {filterCat === cat ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 								<span>{CAT_ICONS[cat]}</span>
 								<span class="flex-1 capitalize">{cat}</span>
 								<span class="text-[#333]">{count}</span>
@@ -215,10 +215,10 @@
 				<!-- Client filter -->
 				{#if clients.length > 0}
 					<div class="pt-2 border-t border-[#1e1e1e]">
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-2">By Client</p>
-						<button onclick={() => filterClient = ''} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors {!filterClient ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">All clients</button>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">By Client</p>
+						<button onclick={() => filterClient = ''} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors {!filterClient ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">All clients</button>
 						{#each clients as c}
-							<button onclick={() => filterClient = filterClient === c.id ? '' : c.id} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors truncate {filterClient === c.id ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">{c.name}</button>
+							<button onclick={() => filterClient = filterClient === c.id ? '' : c.id} class="w-full text-left px-2 py-1.5 rounded text-xs transition-colors truncate {filterClient === c.id ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">{c.name}</button>
 						{/each}
 					</div>
 				{/if}
@@ -226,7 +226,7 @@
 
 			<!-- Add URL link -->
 			<div class="p-4 space-y-2 flex-1">
-				<p class="text-xs text-[#555] uppercase tracking-widest mb-2">Add Link</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-2">Add Link</p>
 				<input bind:value={urlInput} placeholder="https://..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<input bind:value={urlName} placeholder="Display name" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<select bind:value={urlCat} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none">
@@ -239,12 +239,12 @@
 		<!-- Main: doc grid -->
 		<div class="flex-1 overflow-y-auto p-6">
 			{#if loading}
-				<p class="text-[#444] text-sm">Loading...</p>
+				<p class="text-[#6e6e6e] text-sm">Loading...</p>
 			{:else if filtered.length === 0}
 				<div class="flex items-center justify-center h-full text-center">
 					<div>
 						<p class="text-4xl mb-3">📁</p>
-						<p class="text-[#444] text-sm">No documents yet</p>
+						<p class="text-[#6e6e6e] text-sm">No documents yet</p>
 						<p class="text-[#333] text-xs mt-1">Drop files above or add a link</p>
 					</div>
 				</div>
@@ -256,7 +256,7 @@
 								<span class="text-2xl">{CAT_ICONS[doc.document_category] ?? '📄'}</span>
 								<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
 									{#if !doc.file_url.startsWith('pending-upload:')}
-										<a href={doc.file_url} target="_blank" class="rounded p-1 text-[#555] hover:text-white hover:bg-white/5 transition-colors text-xs" title="Open">↗</a>
+										<a href={doc.file_url} target="_blank" class="rounded p-1 text-[#7c7c7c] hover:text-white hover:bg-white/5 transition-colors text-xs" title="Open">↗</a>
 									{/if}
 									{#if !doc.id.startsWith('report-')}
 										<button onclick={() => deleteDoc(doc.id)} class="rounded p-1 text-red-700 hover:text-red-400 hover:bg-red-950/20 transition-colors text-xs" title="Delete"><Icon name="x" size={14} /></button>
@@ -265,12 +265,12 @@
 							</div>
 							<p class="text-sm text-white font-medium truncate mb-1">{doc.name}</p>
 							<div class="flex items-center gap-2 flex-wrap">
-								<span class="text-xs text-[#444] capitalize">{doc.document_category}</span>
+								<span class="text-xs text-[#6e6e6e] capitalize">{doc.document_category}</span>
 								{#if doc.file_size}<span class="text-xs text-[#333]">{fmtSize(doc.file_size)}</span>{/if}
 							</div>
 							{#if clientName(doc.client_id)}
 								<div class="mt-2">
-									<span class="inline-block text-[10px] px-2 py-0.5 rounded-full border border-[#2a2a2a] text-[#666]">{clientName(doc.client_id)}</span>
+									<span class="inline-block text-[10px] px-2 py-0.5 rounded-full border border-[#2a2a2a] text-[#8a8a8a]">{clientName(doc.client_id)}</span>
 								</div>
 							{/if}
 							<p class="text-xs text-[#333] mt-2">{fmtDate(doc.created_at)}</p>

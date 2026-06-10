@@ -168,14 +168,14 @@
 			<div class="h-14 bg-[#0f0f0f] border border-[#1a1a1a] rounded-xl animate-pulse"></div>
 		</div>
 	{:else if reports.length === 0}
-				<p class="text-[#444] text-xs text-center py-8">No reports yet</p>
+				<p class="text-[#6e6e6e] text-xs text-center py-8">No reports yet</p>
 			{:else}
 				{#each reports as report}
 					<button onclick={() => selected = report}
 						class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === report.id ? 'bg-white/10' : 'hover:bg-white/5'}">
-						<p class="text-xs text-[#555] mb-0.5">{typeLabel(report.report_type)}</p>
+						<p class="text-xs text-[#7c7c7c] mb-0.5">{typeLabel(report.report_type)}</p>
 						<p class="text-sm text-white font-medium truncate">{report.report_title}</p>
-						<p class="text-xs text-[#444] mt-0.5">{new Date(report.created_at).toLocaleDateString()}</p>
+						<p class="text-xs text-[#6e6e6e] mt-0.5">{new Date(report.created_at).toLocaleDateString()}</p>
 					</button>
 				{/each}
 			{/if}
@@ -209,7 +209,7 @@
 				</div>
 			{:else}
 				<div class="flex items-center justify-center h-full">
-					<p class="text-[#444] text-sm">Select a report or generate a new one</p>
+					<p class="text-[#6e6e6e] text-sm">Select a report or generate a new one</p>
 				</div>
 			{/if}
 		</div>
@@ -224,7 +224,7 @@
 			onclick={(e) => e.stopPropagation()}>
 			<div class="p-5 border-b border-[#2a2a2a] flex justify-between">
 				<p class="text-white font-medium">Generate Action Report</p>
-				<button onclick={() => showModal = null} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
+				<button onclick={() => showModal = null} class="text-[#8a8a8a] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				<div>
@@ -266,7 +266,7 @@
 			onclick={(e) => e.stopPropagation()}>
 			<div class="p-5 border-b border-[#2a2a2a] flex justify-between">
 				<p class="text-white font-medium">Create Invoice</p>
-				<button onclick={() => showModal = null} class="text-[#666] hover:text-white"><Icon name="x" size={14} /></button>
+				<button onclick={() => showModal = null} class="text-[#8a8a8a] hover:text-white"><Icon name="x" size={14} /></button>
 			</div>
 			<div class="p-5 space-y-4">
 				<div>

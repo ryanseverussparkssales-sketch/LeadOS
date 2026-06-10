@@ -31,27 +31,27 @@
     <div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
         <div>
             <h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Company Deduplication</h2>
-            <p class="text-xs text-[#555] mt-0.5">Companies with similar names that may be duplicates</p>
+            <p class="text-xs text-[#7c7c7c] mt-0.5">Companies with similar names that may be duplicates</p>
         </div>
-        <a href="/companies" class="text-xs text-[#444] hover:text-white">← Back</a>
+        <a href="/companies" class="text-xs text-[#6e6e6e] hover:text-white">← Back</a>
     </div>
     <div class="p-8 max-w-2xl space-y-4">
         {#if loading}
-            <p class="text-xs text-[#444]">Scanning for duplicates...</p>
+            <p class="text-xs text-[#6e6e6e]">Scanning for duplicates...</p>
         {:else if groups.length === 0}
             <div class="text-center py-12">
                 <p class="text-[var(--accent)] text-sm">✓ No duplicate companies found</p>
             </div>
         {:else}
-            <p class="text-xs text-[#555]">{groups.length} potential duplicate group{groups.length !== 1 ? 's' : ''} found</p>
+            <p class="text-xs text-[#7c7c7c]">{groups.length} potential duplicate group{groups.length !== 1 ? 's' : ''} found</p>
             {#each groups as group}
                 <div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-                    <p class="text-xs text-[#555] mb-3">Keep one — others will be merged into it:</p>
+                    <p class="text-xs text-[#7c7c7c] mb-3">Keep one — others will be merged into it:</p>
                     {#each group as co}
                         <div class="flex items-center justify-between py-2 border-b border-[#1a1a1a] last:border-0">
                             <div>
                                 <p class="text-sm text-white">{co.name}</p>
-                                <p class="text-xs text-[#555]">{[co.company_type, co.city].filter(Boolean).join(' · ')}</p>
+                                <p class="text-xs text-[#7c7c7c]">{[co.company_type, co.city].filter(Boolean).join(' · ')}</p>
                             </div>
                             <button onclick={() => merge(group, co.id)} disabled={merging === co.id}
                                 class="text-xs bg-white text-black px-3 py-1.5 rounded-lg font-medium hover:bg-[#e5e5e5] disabled:opacity-40">

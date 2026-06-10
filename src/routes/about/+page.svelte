@@ -18,9 +18,9 @@
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
 		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">EDELHAUS</a>
 		<div class="flex items-center gap-6">
-			<a href="/pricing" class="text-xs text-[#444] hover:text-white transition-colors">Pricing</a>
-			<a href="/contact" class="text-xs text-[#444] hover:text-white transition-colors">Contact</a>
-			<a href="/" class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-4 py-1.5 rounded-lg hover:border-white transition-colors">Log in →</a>
+			<a href="/pricing" class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Pricing</a>
+			<a href="/contact" class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Contact</a>
+			<a href="/" class="text-xs text-[#6e6e6e] hover:text-white border border-[#1e1e1e] px-4 py-1.5 rounded-lg hover:border-white transition-colors">Log in →</a>
 		</div>
 	</nav>
 
@@ -31,7 +31,7 @@
 			We built the tool<br/>
 			<span style="font-style:italic;color:#444">we needed ourselves.</span>
 		</h1>
-		<p class="text-sm text-[#555] leading-relaxed max-w-2xl">
+		<p class="text-sm text-[#7c7c7c] leading-relaxed max-w-2xl">
 			Edelhaus is a managed outreach agency. Edelhaus is the platform we built to run it. Both are available to you — together or separately.
 		</p>
 	</div>
@@ -42,21 +42,21 @@
 
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">The problem</p>
-				<p class="text-sm text-[#666] leading-relaxed">
+				<p class="text-sm text-[#8a8a8a] leading-relaxed">
 					Outbound sales tooling splits into two bad options: enterprise CRM platforms that cost a fortune and take months to configure, or cheap dialers with no analytics, no client visibility, and no way to actually improve a rep's performance. Neither was built for a lean outreach agency trying to serve multiple clients at once.
 				</p>
 			</div>
 
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">What we built</p>
-				<p class="text-sm text-[#666] leading-relaxed">
+				<p class="text-sm text-[#8a8a8a] leading-relaxed">
 					Edelhaus started as an internal tool for managing our own SDR team. It needed three things no single platform offered: a fast, AI-enhanced dialer for reps, a transparent client portal that builds trust without weekly report calls, and an agency command center that gives one person full operational visibility across every campaign and client simultaneously.
 				</p>
 			</div>
 
 			<div>
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#2a2a2a;margin-bottom:8px">Where we are now</p>
-				<p class="text-sm text-[#666] leading-relaxed">
+				<p class="text-sm text-[#8a8a8a] leading-relaxed">
 					Edelhaus operates outbound campaigns for brands in home improvement, B2B services, and adjacent verticals. We run appointment-setting and lead rejuvenation programs, performance-based and retainer models. Edelhaus is the infrastructure behind every campaign we run — and now it's available to other teams and agencies too.
 				</p>
 			</div>
@@ -83,7 +83,7 @@
 			] as item}
 				<div class="rounded-2xl border border-[#1a1a1a] bg-[#080808] p-7">
 					<h3 class="text-white font-medium mb-3 text-sm">{item.title}</h3>
-					<p class="text-xs text-[#444] leading-relaxed">{item.body}</p>
+					<p class="text-xs text-[#6e6e6e] leading-relaxed">{item.body}</p>
 				</div>
 			{/each}
 		</div>
@@ -96,12 +96,12 @@
 			<div class="rounded-2xl border border-[#1a1a1a] bg-[#060606] p-10">
 				<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:#333;margin-bottom:14px">For brands & companies</p>
 				<h3 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:400;font-size:22px;color:#fff;margin-bottom:10px">You need appointments.<br/>We set them.</h3>
-				<p class="text-xs text-[#555] leading-relaxed mb-6">Home improvement, B2B services, SaaS, fintech — if your sale starts with a conversation, we can build and run the outreach motion. Performance-based or retainer. Contact us to see if we're a fit.</p>
+				<p class="text-xs text-[#7c7c7c] leading-relaxed mb-6">Home improvement, B2B services, SaaS, fintech — if your sale starts with a conversation, we can build and run the outreach motion. Performance-based or retainer. Contact us to see if we're a fit.</p>
 				<div class="space-y-2 mb-6">
 					{#each ['Home improvement (windows, roofing, solar, HVAC)','B2B appointment setting','Lead database rejuvenation','Customer insight & marketing activation'] as v}
 						<div class="flex items-center gap-2">
 							<div class="w-1 h-1 rounded-full bg-[#2a2a2a] shrink-0"></div>
-							<span class="text-[11px] text-[#444]">{v}</span>
+							<span class="text-[11px] text-[#6e6e6e]">{v}</span>
 						</div>
 					{/each}
 				</div>
@@ -117,11 +117,11 @@
 		<div class="border-t border-[#0a0a0a] pt-14">
 			<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.22em;color:#2a2a2a;margin-bottom:20px">Founded by</p>
 			<div class="flex items-start gap-6">
-				<div class="w-12 h-12 rounded-xl border border-[#1a1a1a] bg-[#080808] flex items-center justify-center text-lg font-semibold text-[#444] shrink-0">R</div>
+				<div class="w-12 h-12 rounded-xl border border-[#1a1a1a] bg-[#080808] flex items-center justify-center text-lg font-semibold text-[#6e6e6e] shrink-0">R</div>
 				<div>
 					<p class="text-white font-medium mb-0.5">Ryan Sparks</p>
 					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.14em;color:#333;margin-bottom:10px">Edelhaus</p>
-					<p class="text-xs text-[#444] leading-relaxed max-w-lg">
+					<p class="text-xs text-[#6e6e6e] leading-relaxed max-w-lg">
 						Sales professional, actor, writer, and builder. Spent years doing outbound the hard way before deciding to build the tool that should have existed. Edelhaus runs every campaign we run — which means every bug matters and every feature has to earn its place.
 					</p>
 					<div class="flex items-center gap-4 mt-4">
@@ -139,7 +139,7 @@
 		<h2 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:300;font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.02em;color:#fff;margin-bottom:12px">
 			Let's build something together.
 		</h2>
-		<p class="text-xs text-[#444] mb-10">Whether you need the platform, the team, or both — start with a conversation.</p>
+		<p class="text-xs text-[#6e6e6e] mb-10">Whether you need the platform, the team, or both — start with a conversation.</p>
 		<div class="flex items-center justify-center gap-4 flex-wrap">
 			<a href="/contact" class="rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
 				Get in touch

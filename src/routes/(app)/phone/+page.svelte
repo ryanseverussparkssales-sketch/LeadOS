@@ -203,8 +203,8 @@
 	let loadingVm = $state(false);
 	let selectedVm = $state<Voicemail | null>(null);
 
-	const OUTCOME_COLORS: Record<string,string> = { answered:'text-[var(--call)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#666]', do_not_call:'text-[var(--end-text)]', no_answer:'text-[#444]' };
-	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-[var(--end-text)] bg-[var(--end)]/12', high:'text-orange-400 bg-orange-400/10', medium:'text-yellow-400 bg-yellow-400/10', low:'text-[#666] bg-[#1a1a1a]' };
+	const OUTCOME_COLORS: Record<string,string> = { answered:'text-[var(--call)]', voicemail:'text-yellow-400', callback:'text-blue-400', not_interested:'text-[#8a8a8a]', do_not_call:'text-[var(--end-text)]', no_answer:'text-[#6e6e6e]' };
+	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-[var(--end-text)] bg-[var(--end)]/12', high:'text-orange-400 bg-orange-400/10', medium:'text-yellow-400 bg-yellow-400/10', low:'text-[#8a8a8a] bg-[#1a1a1a]' };
 
 	function fmtDur(s: number|null) { if (!s) return '—'; return `${Math.floor(s/60)}m ${s%60}s`; }
 	function fmtDate(d: string) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
@@ -252,7 +252,7 @@
 			opt_out: 'bg-[var(--end)]/12 text-[var(--end-text)]',
 			referral: 'bg-[var(--accent)]/12 text-[var(--accent)]',
 		};
-		return map[intent] ?? 'bg-[#1a1a1a] text-[#555]';
+		return map[intent] ?? 'bg-[#1a1a1a] text-[#7c7c7c]';
 	}
 
 	// ─── TWILIO ───────────────────────────────────────────────────────────────────
@@ -605,11 +605,11 @@
 	<div class="w-[268px] flex-shrink-0 border-r border-[#1e1e1e] flex flex-col bg-[#0a0a0a]">
 		<!-- Status bar -->
 		<div class="px-8 py-4 border-b border-[#1e1e1e] flex items-center justify-between">
-			<span class="text-xs text-[#555] uppercase tracking-widest">Phone</span>
+			<span class="text-xs text-[#7c7c7c] uppercase tracking-widest">Phone</span>
 			<div class="flex items-center gap-1.5">
 				<div class="w-2 h-2 rounded-full {twilioReady?'bg-[var(--call)]':twilioError?'bg-[var(--end)]':'bg-yellow-500 animate-pulse'}"></div>
-				<span class="text-xs text-[#555]">{twilioReady?'Ready':twilioError?'Error':'Connecting…'}</span>
-				{#if twilioError}<button onclick={initTwilio} class="text-xs text-[#555] underline hover:text-white ml-1">Retry</button>{/if}
+				<span class="text-xs text-[#7c7c7c]">{twilioReady?'Ready':twilioError?'Error':'Connecting…'}</span>
+				{#if twilioError}<button onclick={initTwilio} class="text-xs text-[#7c7c7c] underline hover:text-white ml-1">Retry</button>{/if}
 			</div>
 		</div>
 
@@ -618,7 +618,7 @@
 			<div class="w-full rounded-xl border border-[#2a2a2a] bg-[#111] px-4 h-[52px] flex items-center hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				{#if callState === 'connected'}
 					<span class="flex-1 text-center text-[var(--call)] text-xl font-mono leading-none">{formatDuration(callDuration)}</span>
-					<span class="flex items-center gap-1.5 text-[#777]">
+					<span class="flex items-center gap-1.5 text-[#9a9a9a]">
 						{#if muted}<Icon name="micOff" size={14} />{/if}
 						{#if onHold}<Icon name="pause" size={14} />{/if}
 					</span>
@@ -628,7 +628,7 @@
 					<input bind:value={number} placeholder="+1 555 000 0000"
 						class="flex-1 bg-transparent text-white text-center text-xl outline-none placeholder-[#333] font-mono leading-none" style="line-height:1" />
 					{#if number}
-						<button onclick={() => number=number.slice(0,-1)} class="text-[#555] hover:text-white px-1 leading-none flex items-center" aria-label="Delete digit"><Icon name="backspace" size={18} /></button>
+						<button onclick={() => number=number.slice(0,-1)} class="text-[#7c7c7c] hover:text-white px-1 leading-none flex items-center" aria-label="Delete digit"><Icon name="backspace" size={18} /></button>
 					{/if}
 				{/if}
 			</div>
@@ -649,7 +649,7 @@
 			<!-- From number selector — always visible -->
 			{#if callState === 'idle'}
 				<div class="px-2 mb-1 w-full">
-					<label class="block text-[10px] text-[#444] uppercase tracking-widest mb-1">Calling from</label>
+					<label class="block text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-1">Calling from</label>
 					{#if phoneNumbers.length > 0}
 						<select bind:value={selectedFromNumber}
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-3 py-2 text-sm text-white focus:outline-none focus:border-[#444]">
@@ -706,7 +706,7 @@
 			{:else}
 				<div class="grid grid-cols-3 gap-2 w-full">
 					<button onclick={toggleMute}
-						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {muted?'border-[var(--end)]/40 text-[var(--end-text)] bg-[var(--end)]/12':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
+						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {muted?'border-[var(--end)]/40 text-[var(--end-text)] bg-[var(--end)]/12':'border-[#2a2a2a] text-[#9a9a9a] hover:border-white hover:text-white'}">
 						<Icon name={muted?'micOff':'mic'} size={14} /> {muted?'Unmute':'Mute'}
 					</button>
 					<button onclick={hangUp}
@@ -714,12 +714,12 @@
 						<Icon name={callState==='calling'?'x':'phoneOff'} size={15} /> {callState==='calling'?'Cancel':'End'}
 					</button>
 					<button onclick={toggleHold}
-						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {onHold?'border-yellow-500 text-yellow-400 bg-yellow-500/10':'border-[#2a2a2a] text-[#777] hover:border-white hover:text-white'}">
+						class="rounded-xl border py-3 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 {onHold?'border-yellow-500 text-yellow-400 bg-yellow-500/10':'border-[#2a2a2a] text-[#9a9a9a] hover:border-white hover:text-white'}">
 						<Icon name={onHold?'play':'pause'} size={14} /> {onHold?'Resume':'Hold'}
 					</button>
 				</div>
 				{#if callState==='connected'}
-					<p class="text-xs text-[#444] text-center font-mono">{number}</p>
+					<p class="text-xs text-[#6e6e6e] text-center font-mono">{number}</p>
 				{/if}
 			{/if}
 
@@ -731,7 +731,7 @@
 		<!-- Quick SMS shortcut -->
 		<div class="border-t border-[#1e1e1e] p-4">
 			<button onclick={() => rightTab='sms'}
-				class="w-full text-xs text-[#555] hover:text-white border border-[#222] hover:border-[#444] rounded-lg py-2 transition-colors flex items-center justify-center gap-2">
+				class="w-full text-xs text-[#7c7c7c] hover:text-white border border-[#222] hover:border-[#444] rounded-lg py-2 transition-colors flex items-center justify-center gap-2">
 				<Icon name="message" size={14} /> SMS Inbox {#if totalUnread > 0}<span class="ml-1 bg-[var(--call)] text-[var(--call-ink)] rounded-full px-1.5 py-0.5 text-[9px] font-bold">{totalUnread > 9 ? '9+' : totalUnread}</span>{/if}
 			</button>
 		</div>
@@ -743,7 +743,7 @@
 		<div class="border-b border-[#1e1e1e] px-4 flex shrink-0">
 			{#each [['calls','Recent Calls'],['tasks',`Tasks (${filteredTasks.length})`],['sms', totalUnread > 0 ? `SMS ●${totalUnread}` : 'SMS'],['voicemails',`Voicemails${unreadVm?` ●${unreadVm}`:''}`]] as [tab, label]}
 				<button onclick={() => rightTab=tab as RightTab}
-					class="px-4 py-3 text-xs border-b-2 whitespace-nowrap transition-colors {rightTab===tab?'border-white text-white':'border-transparent text-[#555] hover:text-[#999]'}">
+					class="px-4 py-3 text-xs border-b-2 whitespace-nowrap transition-colors {rightTab===tab?'border-white text-white':'border-transparent text-[#7c7c7c] hover:text-[#999]'}">
 					{label}
 				</button>
 			{/each}
@@ -757,32 +757,32 @@
 					{#if callsLoading}
 						<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
 					{:else if recentCalls.length === 0}
-						<div class="text-center py-12 text-[#555] text-sm">No calls yet</div>
+						<div class="text-center py-12 text-[#7c7c7c] text-sm">No calls yet</div>
 					{:else}
 						{#each recentCalls as call}
 							<div class="bg-[#111] border border-[#2a2a2a] rounded-lg px-4 py-3 flex items-center gap-3 hover:bg-[#141414] transition-colors">
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2">
 										<span class="text-sm font-medium text-white truncate">{call.contact?.name ?? call.phone_number ?? 'Unknown'}</span>
-										{#if call.outcome}<span class="text-xs {OUTCOME_COLORS[call.outcome]??'text-[#555]'} capitalize shrink-0">{call.outcome.replace(/_/g,' ')}</span>{/if}
+										{#if call.outcome}<span class="text-xs {OUTCOME_COLORS[call.outcome]??'text-[#7c7c7c]'} capitalize shrink-0">{call.outcome.replace(/_/g,' ')}</span>{/if}
 									</div>
-									{#if call.contact?.company}<div class="text-xs text-[#555]">{call.contact.company}</div>{/if}
-									<div class="text-xs text-[#444] mt-0.5 flex gap-3">
+									{#if call.contact?.company}<div class="text-xs text-[#7c7c7c]">{call.contact.company}</div>{/if}
+									<div class="text-xs text-[#6e6e6e] mt-0.5 flex gap-3">
 										<span>{fmtDate(call.created_at)}</span>
 										{#if call.call_duration_seconds}<span>{fmtDur(call.call_duration_seconds)}</span>{/if}
 									</div>
-									{#if call.summary}<div class="text-xs text-[#555] mt-1 truncate italic">"{call.summary}"</div>{/if}
+									{#if call.summary}<div class="text-xs text-[#7c7c7c] mt-1 truncate italic">"{call.summary}"</div>{/if}
 									{#if !call.contact && call.phone_number}
 										{#if addingContact === call.phone_number}
 											<div class="mt-1 flex gap-1.5">
 												<input bind:value={quickContactName} placeholder="Name *" class="flex-1 rounded border border-[#2a2a2a] bg-[#111] px-2 py-1 text-xs text-white placeholder-[#333] focus:outline-none" />
 												<input bind:value={quickContactCompany} placeholder="Company" class="flex-1 rounded border border-[#2a2a2a] bg-[#111] px-2 py-1 text-xs text-white placeholder-[#333] focus:outline-none" />
 												<button onclick={() => quickAddContact(call.phone_number!)} class="text-xs bg-white text-black px-2 py-1 rounded font-medium">+</button>
-												<button onclick={() => addingContact = null} aria-label="Cancel" class="text-[#444] hover:text-white px-1"><Icon name="x" size={13} /></button>
+												<button onclick={() => addingContact = null} aria-label="Cancel" class="text-[#6e6e6e] hover:text-white px-1"><Icon name="x" size={13} /></button>
 											</div>
 										{:else}
 											<button onclick={() => { addingContact = call.phone_number; quickContactName = ''; }}
-												class="text-xs text-[#444] hover:text-[#777] transition-colors mt-0.5">+ Add contact</button>
+												class="text-xs text-[#6e6e6e] hover:text-[#9a9a9a] transition-colors mt-0.5">+ Add contact</button>
 										{/if}
 									{/if}
 								</div>
@@ -817,28 +817,28 @@
 						<option value="today">Today</option>
 						<option value="week">This Week</option>
 					</select>
-					<span class="ml-auto text-xs text-[#555]">{filteredTasks.length} task{filteredTasks.length!==1?'s':''}</span>
+					<span class="ml-auto text-xs text-[#7c7c7c]">{filteredTasks.length} task{filteredTasks.length!==1?'s':''}</span>
 				</div>
 				<div class="p-4 space-y-2 overflow-y-auto h-full">
 					{#if tasksLoading}
 						<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
 					{:else if filteredTasks.length === 0}
-						<div class="text-center py-12 text-[#555] text-sm">No tasks match the filters</div>
+						<div class="text-center py-12 text-[#7c7c7c] text-sm">No tasks match the filters</div>
 					{:else}
 						{#each filteredTasks as task}
 							<div class="bg-[#111] border border-[#2a2a2a] rounded-lg px-4 py-3 flex items-start gap-3 hover:bg-[#141414] transition-colors">
 								<button onclick={() => completeTask(task.id)}
-									class="w-5 h-5 rounded border border-[#444] flex-shrink-0 mt-0.5 hover:border-[var(--call)]/40 hover:bg-[var(--call)]/12 transition-colors flex items-center justify-center text-[#444] hover:text-[var(--call)] text-xs"
+									class="w-5 h-5 rounded border border-[#444] flex-shrink-0 mt-0.5 hover:border-[var(--call)]/40 hover:bg-[var(--call)]/12 transition-colors flex items-center justify-center text-[#6e6e6e] hover:text-[var(--call)] text-xs"
 									title="Mark complete" aria-label="Mark complete"><Icon name="check" size={13} /></button>
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2 flex-wrap mb-0.5">
 										<span class="text-sm text-white font-medium">{task.title}</span>
-										<span class="text-[10px] px-1.5 py-0.5 rounded-full {PRIORITY_COLORS[task.priority]??'text-[#666]'} capitalize">{task.priority}</span>
+										<span class="text-[10px] px-1.5 py-0.5 rounded-full {PRIORITY_COLORS[task.priority]??'text-[#8a8a8a]'} capitalize">{task.priority}</span>
 									</div>
-									{#if task.contact}<div class="text-xs text-[#666]">{task.contact.name}{task.contact.company?` · ${task.contact.company}`:''}</div>{/if}
+									{#if task.contact}<div class="text-xs text-[#8a8a8a]">{task.contact.name}{task.contact.company?` · ${task.contact.company}`:''}</div>{/if}
 									<div class="text-xs mt-0.5 flex gap-3">
-										<span class="{isOverdue(task.due_date)?'text-[var(--end-text)] font-medium':'text-[#555]'}">{fmtDue(task.due_date)}</span>
-										<span class="text-[#444] capitalize">{task.task_type.replace(/_/g,' ')}</span>
+										<span class="{isOverdue(task.due_date)?'text-[var(--end-text)] font-medium':'text-[#7c7c7c]'}">{fmtDue(task.due_date)}</span>
+										<span class="text-[#6e6e6e] capitalize">{task.task_type.replace(/_/g,' ')}</span>
 									</div>
 								</div>
 								<div class="flex gap-1.5 shrink-0">
@@ -877,7 +877,7 @@
 								{/each}
 							{:else if filteredThreads.length === 0}
 								<div class="flex flex-col items-center justify-center h-40 text-center px-4">
-									<p class="text-[#555] text-sm">No conversations yet</p>
+									<p class="text-[#7c7c7c] text-sm">No conversations yet</p>
 									<p class="text-[#333] text-xs mt-1">Inbound messages will appear here</p>
 								</div>
 							{:else}
@@ -895,14 +895,14 @@
 													{/if}
 												</div>
 												{#if thread.contacts?.company}
-													<p class="text-xs text-[#555] truncate">{thread.contacts.company}</p>
+													<p class="text-xs text-[#7c7c7c] truncate">{thread.contacts.company}</p>
 												{/if}
-												<p class="text-xs text-[#444] truncate mt-0.5">
+												<p class="text-xs text-[#6e6e6e] truncate mt-0.5">
 													{thread.last_message_direction === 'outbound' ? '→ ' : ''}{thread.last_message_body ?? ''}
 												</p>
 											</div>
 											<div class="flex flex-col items-end gap-1 flex-shrink-0">
-												<p class="text-[10px] text-[#444]">{timeAgo(thread.last_message_at ?? '')}</p>
+												<p class="text-[10px] text-[#6e6e6e]">{timeAgo(thread.last_message_at ?? '')}</p>
 												{#if thread.unread_count > 0}
 													<span class="bg-white text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
 														{thread.unread_count > 9 ? '9+' : thread.unread_count}
@@ -931,13 +931,13 @@
 								<!-- Header -->
 								<div class="border-b border-[var(--c-border)] px-8 py-4 flex items-center justify-between flex-shrink-0">
 									<p class="text-white font-semibold text-sm">New Message</p>
-									<button onclick={() => showNewThread = false} aria-label="Close" class="text-[#555] hover:text-white"><Icon name="x" size={15} /></button>
+									<button onclick={() => showNewThread = false} aria-label="Close" class="text-[#7c7c7c] hover:text-white"><Icon name="x" size={15} /></button>
 								</div>
 
 								<!-- Compose body -->
 								<div class="p-4 space-y-3 flex-1 overflow-y-auto">
 									<div>
-										<label class="text-xs text-[#555] uppercase tracking-widest block mb-1.5">To</label>
+										<label class="text-xs text-[#7c7c7c] uppercase tracking-widest block mb-1.5">To</label>
 										<input bind:value={newThreadTo} placeholder="Search contact or enter number..."
 											oninput={searchNewThreadContact}
 											class="w-full rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-surface-2)] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
@@ -947,7 +947,7 @@
 													<button onclick={() => selectNewThreadContact(c)}
 														class="w-full text-left px-4 py-2.5 hover:bg-white/5 border-b border-[var(--c-border)] last:border-0 transition-colors">
 														<p class="text-sm text-white">{c.name}</p>
-														<p class="text-xs text-[#555]">{c.phone}</p>
+														<p class="text-xs text-[#7c7c7c]">{c.phone}</p>
 													</button>
 												{/each}
 											</div>
@@ -955,7 +955,7 @@
 									</div>
 
 									<div>
-										<label class="text-xs text-[#555] uppercase tracking-widest block mb-1.5">Message</label>
+										<label class="text-xs text-[#7c7c7c] uppercase tracking-widest block mb-1.5">Message</label>
 										<textarea bind:value={newThreadBody} rows="4" placeholder="Write your message..."
 											class="w-full rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-surface-2)] px-3 py-3 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none">
 										</textarea>
@@ -970,7 +970,7 @@
 						{:else if !selectedThread}
 							<div class="flex flex-col items-center justify-center flex-1 text-center">
 								<div class="text-[#333] mb-4"><Icon name="message" size={40} /></div>
-								<p class="text-[#555] text-sm">Select a conversation</p>
+								<p class="text-[#7c7c7c] text-sm">Select a conversation</p>
 							</div>
 						{:else}
 							<!-- Thread header -->
@@ -979,20 +979,20 @@
 									<div class="flex items-center gap-2">
 										<p class="text-white font-semibold text-sm truncate">{selectedThread.contacts?.name ?? selectedThread.remote_number}</p>
 										{#if selectedThread.contacts?.contact_score}
-											<span class="text-xs font-mono {selectedThread.contacts.contact_score >= 70 ? 'text-[var(--call)]' : 'text-[#555]'}">{selectedThread.contacts.contact_score}</span>
+											<span class="text-xs font-mono {selectedThread.contacts.contact_score >= 70 ? 'text-[var(--call)]' : 'text-[#7c7c7c]'}">{selectedThread.contacts.contact_score}</span>
 										{/if}
 										{#if selectedThread.is_opted_out}
 											<span class="text-[9px] bg-[var(--end)]/12 text-[var(--end-text)] px-1.5 py-0.5 rounded flex-shrink-0">OPT-OUT</span>
 										{/if}
 									</div>
-									<p class="text-xs text-[#555] font-mono mt-0.5">{selectedThread.remote_number}</p>
+									<p class="text-xs text-[#7c7c7c] font-mono mt-0.5">{selectedThread.remote_number}</p>
 								</div>
 								<div class="flex items-center gap-1.5 flex-shrink-0">
 									<button onclick={() => dial(selectedThread.remote_number)}
 										class="w-8 h-8 rounded-full bg-[var(--call)]/12 hover:bg-[var(--call)]/25 text-[var(--call)] flex items-center justify-center transition-colors" title="Call" aria-label="Call"><Icon name="phone" size={15} /></button>
 									{#if !selectedThread.contact_id}
 										<button onclick={() => createContactFromThread(selectedThread!)}
-											class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] hover:border-[#444] rounded-lg px-2.5 py-1.5 transition-colors flex items-center gap-1"><Icon name="plus" size={12} /> Add contact</button>
+											class="text-xs text-[#7c7c7c] hover:text-white border border-[#2a2a2a] hover:border-[#444] rounded-lg px-2.5 py-1.5 transition-colors flex items-center gap-1"><Icon name="plus" size={12} /> Add contact</button>
 									{/if}
 								</div>
 							</div>
@@ -1002,7 +1002,7 @@
 								{#if loadingMessages}
 									<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
 								{:else if threadMessages.length === 0}
-									<div class="text-center py-12 text-[#555] text-sm">No messages yet</div>
+									<div class="text-center py-12 text-[#7c7c7c] text-sm">No messages yet</div>
 								{:else}
 									{#each threadMessages as msg}
 										<div class="flex {msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}">
@@ -1011,7 +1011,7 @@
 													{msg.body}
 												</div>
 												<div class="flex items-center gap-2 px-1 {msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}">
-													<span class="text-[10px] text-[#444]">{timeAgo(msg.sent_at)}</span>
+													<span class="text-[10px] text-[#6e6e6e]">{timeAgo(msg.sent_at)}</span>
 													{#if msg.intent_label}
 														<span class="text-[9px] px-1.5 py-0.5 rounded-full {intentColor(msg.intent_label)}">{msg.intent_label.replace(/_/g,' ')}</span>
 													{/if}
@@ -1035,7 +1035,7 @@
 											<p class="leading-relaxed">{aiDraft}</p>
 											<div class="flex gap-2">
 												<button onclick={() => { replyBody = aiDraft; aiDraft = ''; }} class="text-[var(--accent)] hover:underline font-medium">Use this</button>
-												<button onclick={() => aiDraft = ''} class="text-[#555] hover:text-white">Dismiss</button>
+												<button onclick={() => aiDraft = ''} class="text-[#7c7c7c] hover:text-white">Dismiss</button>
 											</div>
 										</div>
 									{/if}
@@ -1065,7 +1065,7 @@
 				{#if vmLoading}
 					<div class="flex justify-center py-12"><div class="w-5 h-5 border-2 border-[#333] border-t-white rounded-full animate-spin"></div></div>
 				{:else if voicemails.length === 0}
-					<div class="text-center py-12 text-[#555] text-sm">No voicemails</div>
+					<div class="text-center py-12 text-[#7c7c7c] text-sm">No voicemails</div>
 				{:else}
 					{#each voicemails as vm}
 						{@const unread = vm.status === 'unread' || vm.is_read === false}
@@ -1076,7 +1076,7 @@
 										{#if unread}<span class="w-1.5 h-1.5 rounded-full bg-[var(--call)] flex-shrink-0"></span>{/if}
 										<span class="text-sm font-medium text-white truncate">{vm.contact_name ?? vm.caller_name ?? vm.from_number ?? vm.caller_id ?? 'Unknown'}</span>
 									</div>
-									<div class="text-xs text-[#444] mt-0.5 flex gap-3">
+									<div class="text-xs text-[#6e6e6e] mt-0.5 flex gap-3">
 										<span>{fmtDate(vm.received_at ?? vm.created_at ?? '')}</span>
 										{#if vm.duration_seconds}<span>{fmtDur(vm.duration_seconds)}</span>{/if}
 									</div>
@@ -1095,10 +1095,10 @@
 									{/if}
 									{#if unread}
 										<button onclick={() => markVmRead(vm.id)}
-											class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[#444] text-[#555] hover:text-white flex items-center justify-center transition-colors" title="Mark read" aria-label="Mark read"><Icon name="check" size={14} /></button>
+											class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[#444] text-[#7c7c7c] hover:text-white flex items-center justify-center transition-colors" title="Mark read" aria-label="Mark read"><Icon name="check" size={14} /></button>
 									{/if}
 									<button onclick={() => deleteVm(vm.id)}
-										class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[var(--end)]/40 text-[#555] hover:text-[var(--end-text)] flex items-center justify-center transition-colors" title="Delete" aria-label="Delete"><Icon name="trash" size={14} /></button>
+										class="w-8 h-8 rounded-full border border-[#2a2a2a] hover:border-[var(--end)]/40 text-[#7c7c7c] hover:text-[var(--end-text)] flex items-center justify-center transition-colors" title="Delete" aria-label="Delete"><Icon name="trash" size={14} /></button>
 								</div>
 							</div>
 						</div>
@@ -1115,10 +1115,10 @@
 	<div class="fixed inset-0 z-[95] bg-black/70 flex items-center justify-center p-4">
 		<div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[#2a2a2a] bg-[#0d0d0d] shadow-2xl">
 			<div class="flex items-center justify-between px-4 pt-3 pb-1">
-				<p class="text-[10px] text-[#555] font-semibold uppercase tracking-widest">Log inbound call</p>
+				<p class="text-[10px] text-[#7c7c7c] font-semibold uppercase tracking-widest">Log inbound call</p>
 				<button
 					onclick={() => { postmortemCall = null; postmortemContact = null; }}
-					class="text-[#555] hover:text-white text-xs transition-colors"
+					class="text-[#7c7c7c] hover:text-white text-xs transition-colors"
 					aria-label="Skip logging">Skip ✕</button>
 			</div>
 			<div class="p-4 pt-2">

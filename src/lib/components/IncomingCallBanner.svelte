@@ -78,7 +78,7 @@
 				<span class="w-2 h-2 rounded-full bg-[var(--call)] animate-pulse"></span>
 				<p class="text-[10px] text-[var(--call)] font-semibold uppercase tracking-widest">Incoming Call</p>
 			</div>
-			<p class="text-[10px] text-[#444] font-mono tabular-nums">{timeLeft}s</p>
+			<p class="text-[10px] text-[#6e6e6e] font-mono tabular-nums">{timeLeft}s</p>
 		</div>
 
 		<!-- Caller info -->
@@ -87,7 +87,7 @@
 				{info.contactName ?? formatNumber(info.from)}
 			</p>
 			{#if info.contactName}
-				<p class="text-[#555] text-xs font-mono mt-0.5">{formatNumber(info.from)}</p>
+				<p class="text-[#7c7c7c] text-xs font-mono mt-0.5">{formatNumber(info.from)}</p>
 			{/if}
 			{#if info.to}
 				<p class="text-[#333] text-[10px] mt-1 truncate">→ {formatNumber(info.to)}</p>

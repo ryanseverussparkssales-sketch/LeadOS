@@ -14,9 +14,9 @@
 
 <div class="space-y-2 h-full overflow-y-auto">
 	{#if slots.length === 0}
-		<p class="text-xs text-[#444] text-center py-4">Make more calls to see patterns</p>
+		<p class="text-xs text-[#6e6e6e] text-center py-4">Make more calls to see patterns</p>
 	{:else}
-		<p class="text-xs text-[#555] mb-2">Based on your call history</p>
+		<p class="text-xs text-[#7c7c7c] mb-2">Based on your call history</p>
 		{#each slots as slot}
 			<div class="flex items-center gap-3">
 				<p class="text-xs text-white w-24 shrink-0">{DAYS[slot.day]} {slot.hour}:00</p>

@@ -283,12 +283,12 @@
 				<!-- Category filter -->
 				<div class="flex gap-2 flex-wrap">
 					<button onclick={() => pickerCategory = 'all'}
-						class="px-3 py-1 rounded-lg text-xs {pickerCategory === 'all' ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#555] hover:text-white'}">
+						class="px-3 py-1 rounded-lg text-xs {pickerCategory === 'all' ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#7c7c7c] hover:text-white'}">
 						All
 					</button>
 					{#each (['productivity','sales','comms','tools','flair'] as const) as cat}
 						<button onclick={() => pickerCategory = cat}
-							class="px-3 py-1 rounded-lg text-xs capitalize {pickerCategory === cat ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#555] hover:text-white'}">
+							class="px-3 py-1 rounded-lg text-xs capitalize {pickerCategory === cat ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#7c7c7c] hover:text-white'}">
 							{cat}
 						</button>
 					{/each}
@@ -309,7 +309,7 @@
 								<span class="text-base">{widgetDef.icon}</span>
 								<p class="text-xs font-semibold text-white">{widgetDef.label}</p>
 							</div>
-							<p class="text-[10px] text-[#444] leading-relaxed">{widgetDef.description}</p>
+							<p class="text-[10px] text-[#6e6e6e] leading-relaxed">{widgetDef.description}</p>
 							{#if !alreadyAdded && widgetDef.multiInstance && activeTypes.has(widgetDef.type)}
 								<p class="text-xs text-[#3b82f6] mt-1">+ Add another</p>
 							{/if}
@@ -332,7 +332,7 @@
 			<div class="flex flex-col items-center justify-center py-24 text-center">
 				<p class="text-5xl mb-4">⬛</p>
 				<p class="text-white text-sm font-medium mb-2">Your dashboard is empty</p>
-				<p class="text-[#555] text-xs mb-6">Add widgets to customize your workspace</p>
+				<p class="text-[#7c7c7c] text-xs mb-6">Add widgets to customize your workspace</p>
 				<button onclick={() => showPicker = true}
 					class="rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
 					+ Add Widgets
@@ -394,7 +394,7 @@
 								</div>
 								<button
 									onclick={() => removeWidget(widget.id)}
-									class="remove-btn text-xs text-[#444] hover:text-red-400 transition-all"
+									class="remove-btn text-xs text-[#6e6e6e] hover:text-red-400 transition-all"
 									aria-label="Remove {widgetLabel(widget.type)} widget"
 									title="Remove widget"><Icon name="x" size={14} /></button>
 							</div>

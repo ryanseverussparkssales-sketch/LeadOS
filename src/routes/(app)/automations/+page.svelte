@@ -59,7 +59,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Workflow Automations</h2>
-			<p class="text-xs text-[#555] mt-0.5">Auto-trigger actions when events occur</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Auto-trigger actions when events occur</p>
 		</div>
 		<button onclick={() => showNew = !showNew} class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">+ New Rule</button>
 	</div>
@@ -78,14 +78,14 @@
 				<input bind:value={nName} placeholder="Rule name (e.g. Auto-task new leads)" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 
 				<div>
-					<label class="text-xs text-[#555] uppercase tracking-widest block mb-2">When</label>
+					<label class="text-xs text-[#7c7c7c] uppercase tracking-widest block mb-2">When</label>
 					<select bind:value={nTrigger} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 						{#each TRIGGERS as [v, l]}<option value={v}>{l}</option>{/each}
 					</select>
 				</div>
 
 				<div>
-					<label class="text-xs text-[#555] uppercase tracking-widest block mb-2">If (conditions)</label>
+					<label class="text-xs text-[#7c7c7c] uppercase tracking-widest block mb-2">If (conditions)</label>
 					{#each nConditions as cond, i}
 						<div class="flex gap-2 mb-2">
 							<select bind:value={cond.field} class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none">
@@ -98,11 +98,11 @@
 							<button onclick={() => nConditions = nConditions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1"><Icon name="x" size={14} /></button>
 						</div>
 					{/each}
-					<button onclick={() => nConditions = [...nConditions, {field:'lead_source',operator:'equals',value:''}]} class="text-xs text-[#555] hover:text-white">+ Add condition</button>
+					<button onclick={() => nConditions = [...nConditions, {field:'lead_source',operator:'equals',value:''}]} class="text-xs text-[#7c7c7c] hover:text-white">+ Add condition</button>
 				</div>
 
 				<div>
-					<label class="text-xs text-[#555] uppercase tracking-widest block mb-2">Then (actions)</label>
+					<label class="text-xs text-[#7c7c7c] uppercase tracking-widest block mb-2">Then (actions)</label>
 					{#each nActions as action, i}
 						<div class="flex gap-2 mb-2">
 							<select bind:value={action.type} class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none">
@@ -124,12 +124,12 @@
 							<button onclick={() => nActions = nActions.filter((_,idx)=>idx!==i)} class="text-xs text-red-700 hover:text-red-400 px-1"><Icon name="x" size={14} /></button>
 						</div>
 					{/each}
-					<button onclick={() => nActions = [...nActions, {type:'create_task',params:{title:''}}]} class="text-xs text-[#555] hover:text-white">+ Add action</button>
+					<button onclick={() => nActions = [...nActions, {type:'create_task',params:{title:''}}]} class="text-xs text-[#7c7c7c] hover:text-white">+ Add action</button>
 				</div>
 
 				<div class="flex gap-3">
 					<button onclick={createRule} disabled={saving || !nName.trim()} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? 'Saving...' : 'Create Rule'}</button>
-					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-3">Cancel</button>
+					<button onclick={() => showNew = false} class="text-xs text-[#7c7c7c] hover:text-white px-3">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -138,7 +138,7 @@
 	<div class="p-8 space-y-3 max-w-3xl">
 		{#if rules.length === 0}
 			<div class="rounded-xl border border-dashed border-[#2a2a2a] p-10 text-center">
-				<p class="text-[#444] text-sm">No automation rules yet</p>
+				<p class="text-[#6e6e6e] text-sm">No automation rules yet</p>
 				<p class="text-[#333] text-xs mt-1">Rules run automatically when their trigger event fires</p>
 			</div>
 		{:else}
@@ -150,7 +150,7 @@
 					</button>
 					<div class="flex-1">
 						<p class="text-white text-sm font-medium">{rule.name}</p>
-						<p class="text-xs text-[#555] mt-0.5">
+						<p class="text-xs text-[#7c7c7c] mt-0.5">
 							When: {TRIGGERS.find(t=>t[0]===rule.trigger_type)?.[1] ?? rule.trigger_type} ·
 							{rule.actions.length} action{rule.actions.length !== 1 ? 's' : ''} ·
 							Ran {rule.run_count} times

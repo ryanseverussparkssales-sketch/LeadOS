@@ -118,7 +118,7 @@
 	<div class="w-80 shrink-0 border-r border-[#1a1a1a] flex flex-col">
 		<div class="px-5 py-4 border-b border-[#1a1a1a]">
 			<h2 class="text-sm text-white font-medium">Call Review</h2>
-			<p class="text-[10px] text-[#444] mt-0.5">Recorded calls — leave coaching notes</p>
+			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Recorded calls — leave coaching notes</p>
 			<select bind:value={filterOutcome}
 				class="mt-3 w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-2 py-1.5 text-xs text-white focus:outline-none">
 				<option value="">All outcomes</option>
@@ -135,7 +135,7 @@
 				{/each}
 			{:else if filtered.length === 0}
 				<div class="p-6 text-center">
-					<p class="text-xs text-[#444]">No recorded calls yet</p>
+					<p class="text-xs text-[#6e6e6e]">No recorded calls yet</p>
 				</div>
 			{:else}
 				{#each filtered as call}
@@ -143,12 +143,12 @@
 						class="w-full text-left px-4 py-3 border-b border-[#111] hover:bg-[#111] transition-colors {selectedCall?.id === call.id ? 'bg-[#111] border-l-2 border-l-white' : ''}">
 						<div class="flex items-center justify-between gap-2 mb-0.5">
 							<p class="text-xs text-white font-medium truncate">{call.contact?.name ?? 'Unknown'}</p>
-							<span class="text-[9px] text-[#555] shrink-0">{new Date(call.created_at).toLocaleDateString()}</span>
+							<span class="text-[9px] text-[#7c7c7c] shrink-0">{new Date(call.created_at).toLocaleDateString()}</span>
 						</div>
 						<div class="flex items-center gap-2">
-							<span class="text-[9px] text-[#555]">{call.contact?.company ?? ''}</span>
+							<span class="text-[9px] text-[#7c7c7c]">{call.contact?.company ?? ''}</span>
 							{#if call.outcome}
-								<span class="text-[9px] text-[#444]">· {OUTCOME_LABEL[call.outcome] ?? call.outcome}</span>
+								<span class="text-[9px] text-[#6e6e6e]">· {OUTCOME_LABEL[call.outcome] ?? call.outcome}</span>
 							{/if}
 							{#if call.recording_url}
 								<span class="text-[9px] text-blue-500 ml-auto">🎙</span>
@@ -167,7 +167,7 @@
 				<div class="text-center">
 					<p class="text-4xl mb-3">🎙</p>
 					<p class="text-sm text-white font-medium">Select a call to review</p>
-					<p class="text-xs text-[#444] mt-1">Leave timestamped coaching notes for your SDRs</p>
+					<p class="text-xs text-[#6e6e6e] mt-1">Leave timestamped coaching notes for your SDRs</p>
 				</div>
 			</div>
 		{:else}
@@ -177,7 +177,7 @@
 				<div class="flex items-start justify-between gap-4">
 					<div>
 						<h3 class="text-white font-semibold">{selectedCall.contact?.name ?? 'Unknown'}</h3>
-						<p class="text-xs text-[#555] mt-0.5">
+						<p class="text-xs text-[#7c7c7c] mt-0.5">
 							{selectedCall.contact?.company ?? ''} ·
 							{new Date(selectedCall.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} ·
 							{selectedCall.call_duration_seconds ? fmtSecs(selectedCall.call_duration_seconds) : '—'}
@@ -193,7 +193,7 @@
 				<!-- Audio player -->
 				{#if selectedCall.recording_url}
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-						<p class="text-[10px] text-[#444] uppercase tracking-widest mb-3">Recording</p>
+						<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-3">Recording</p>
 						<!-- svelte-ignore a11y_media_has_caption -->
 						<audio
 							bind:this={audioEl}
@@ -203,7 +203,7 @@
 							class="w-full h-8"
 						></audio>
 						{#if currentTime > 0}
-							<p class="text-[9px] text-[#444] mt-1.5">📍 {fmtSecs(Math.round(currentTime))} — use this as timestamp when adding notes</p>
+							<p class="text-[9px] text-[#6e6e6e] mt-1.5">📍 {fmtSecs(Math.round(currentTime))} — use this as timestamp when adding notes</p>
 						{/if}
 					</div>
 				{/if}
@@ -211,7 +211,7 @@
 				<!-- Transcript -->
 				{#if selectedCall.raw_transcript}
 					<details class="rounded-xl border border-[#2a2a2a] bg-[#111] overflow-hidden hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-						<summary class="px-4 py-3 text-xs text-[#555] cursor-pointer hover:text-white transition-colors">📝 Transcript</summary>
+						<summary class="px-4 py-3 text-xs text-[#7c7c7c] cursor-pointer hover:text-white transition-colors">📝 Transcript</summary>
 						<div class="px-4 pb-4">
 							<p class="text-xs text-[#888] leading-relaxed whitespace-pre-wrap">{selectedCall.raw_transcript}</p>
 						</div>
@@ -227,14 +227,14 @@
 
 				<!-- Existing feedback -->
 				<div>
-					<p class="text-[10px] text-[#444] uppercase tracking-widest mb-3">
+					<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-3">
 						Coaching Notes ({feedback.length})
 					</p>
 					{#if loadingFeedback}
 						<div class="space-y-2">{#each [1,2] as _}<div class="h-14 bg-[#111] rounded-xl animate-pulse"></div>{/each}</div>
 					{:else if feedback.length === 0}
 						<div class="rounded-xl border border-dashed border-[#2a2a2a] p-4 text-center">
-							<p class="text-xs text-[#444]">No notes yet — add the first coaching note below</p>
+							<p class="text-xs text-[#6e6e6e]">No notes yet — add the first coaching note below</p>
 						</div>
 					{:else}
 						<div class="space-y-2">
@@ -267,7 +267,7 @@
 
 				<!-- Add note form -->
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-					<p class="text-[10px] text-[#444] uppercase tracking-widest">Add Coaching Note</p>
+					<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest">Add Coaching Note</p>
 					<textarea bind:value={newNote} rows="3"
 						placeholder="What should the SDR do differently? Be specific — include timestamps where possible..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] px-3 py-2 text-xs text-white placeholder-[#333] focus:border-white focus:outline-none resize-none"></textarea>

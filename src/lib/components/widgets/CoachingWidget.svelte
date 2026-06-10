@@ -55,7 +55,7 @@
 	function momentumClass(m: string | undefined) {
 		if (m === 'rising') return 'bg-[var(--accent)]/12 text-[var(--accent)]';
 		if (m === 'dropping') return 'bg-red-950 text-red-400';
-		return 'bg-[#1a1a1a] text-[#555]';
+		return 'bg-[#1a1a1a] text-[#7c7c7c]';
 	}
 
 	function momentumArrow(m: string | undefined) {
@@ -77,12 +77,12 @@
 	</div>
 {:else if error}
 	<div class="flex flex-col items-center justify-center h-full gap-2">
-		<p class="text-[#444] text-xs">{error}</p>
-		<button onclick={loadCoaching} class="text-xs text-[#555] hover:text-white transition-colors underline">Retry</button>
+		<p class="text-[#6e6e6e] text-xs">{error}</p>
+		<button onclick={loadCoaching} class="text-xs text-[#7c7c7c] hover:text-white transition-colors underline">Retry</button>
 	</div>
 {:else if !coaching?.available}
 	<div class="flex flex-col items-center justify-center h-full gap-1">
-		<p class="text-[#444] text-xs text-center">Coaching unavailable</p>
+		<p class="text-[#6e6e6e] text-xs text-center">Coaching unavailable</p>
 		<p class="text-[#333] text-xs text-center">{coaching?.reason ?? 'Score more calls to unlock'}</p>
 	</div>
 {:else if coaching?.coaching}
@@ -93,9 +93,9 @@
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-2">
 				<span class="font-mono text-white font-bold text-2xl">{coaching.avgScore}</span>
-				<span class="text-[10px] text-[#444]">/100</span>
+				<span class="text-[10px] text-[#6e6e6e]">/100</span>
 				{#if (coaching.trend ?? 0) !== 0}
-					<span class="text-[10px] text-[#555]">{trendLabel(coaching.trend ?? 0)}</span>
+					<span class="text-[10px] text-[#7c7c7c]">{trendLabel(coaching.trend ?? 0)}</span>
 				{/if}
 			</div>
 			<span class="text-xs px-2 py-0.5 rounded-full {momentumClass(c.momentum)}">
@@ -127,19 +127,19 @@
 			<div class="flex gap-4 pt-3 border-t border-[#1a1a1a] mt-auto">
 				<div class="text-center">
 					<p class="text-white font-mono text-sm">{m.avgTalkRatio}%</p>
-					<p class="text-[10px] text-[#444]">talk ratio</p>
+					<p class="text-[10px] text-[#6e6e6e]">talk ratio</p>
 				</div>
 				<div class="text-center">
 					<p class="text-white font-mono text-sm">{m.avgDiscoveryQ}</p>
-					<p class="text-[10px] text-[#444]">questions/call</p>
+					<p class="text-[10px] text-[#6e6e6e]">questions/call</p>
 				</div>
 				<div class="text-center">
 					<p class="text-white font-mono text-sm">{m.winRate}%</p>
-					<p class="text-[10px] text-[#444]">win rate</p>
+					<p class="text-[10px] text-[#6e6e6e]">win rate</p>
 				</div>
 				<div class="text-center">
 					<p class="text-white font-mono text-sm">{m.objHandleRate}%</p>
-					<p class="text-[10px] text-[#444]">obj. handled</p>
+					<p class="text-[10px] text-[#6e6e6e]">obj. handled</p>
 				</div>
 			</div>
 		{/if}
@@ -148,15 +148,15 @@
 		{#if c.callTargets}
 			<div class="flex gap-3 text-center pt-2 border-t border-[#111]">
 				<div class="flex-1 rounded-lg bg-[#0d0d0d] p-2">
-					<p class="text-[10px] text-[#444] mb-0.5">Talk target</p>
+					<p class="text-[10px] text-[#6e6e6e] mb-0.5">Talk target</p>
 					<p class="text-white font-mono text-xs">{c.callTargets.talkRatioTarget}%</p>
 				</div>
 				<div class="flex-1 rounded-lg bg-[#0d0d0d] p-2">
-					<p class="text-[10px] text-[#444] mb-0.5">Qs/call target</p>
+					<p class="text-[10px] text-[#6e6e6e] mb-0.5">Qs/call target</p>
 					<p class="text-white font-mono text-xs">{c.callTargets.discoveryQTarget}</p>
 				</div>
 				<div class="flex-1 rounded-lg bg-[#0d0d0d] p-2">
-					<p class="text-[10px] text-[#444] mb-0.5">Score target</p>
+					<p class="text-[10px] text-[#6e6e6e] mb-0.5">Score target</p>
 					<p class="text-white font-mono text-xs">{c.callTargets.scoreTarget}</p>
 				</div>
 			</div>
@@ -164,7 +164,7 @@
 
 		<!-- Refresh -->
 		<button onclick={loadCoaching}
-			class="text-[10px] text-[#333] hover:text-[#666] transition-colors text-center mt-auto">
+			class="text-[10px] text-[#333] hover:text-[#8a8a8a] transition-colors text-center mt-auto">
 			Refresh · {coaching.callCount} calls analyzed
 		</button>
 	</div>

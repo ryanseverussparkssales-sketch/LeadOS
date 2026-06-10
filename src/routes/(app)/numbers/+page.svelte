@@ -431,7 +431,7 @@
 		<div class="flex gap-1">
 			{#each ([['numbers','Numbers'],['voicemail',`Voicemail${unreadVoicemails > 0 ? ` (${unreadVoicemails})` : ''}`],['missed',`Missed${unreturned > 0 ? ` (${unreturned})` : ''}`]] as [Tab,string][]) as [t,label]}
 				<button onclick={() => { tab = t; showBuy = false; showAdd = false; }}
-					class="rounded-lg px-4 py-1.5 text-xs transition-colors {tab === t ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">
+					class="rounded-lg px-4 py-1.5 text-xs transition-colors {tab === t ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">
 					{label}
 				</button>
 			{/each}
@@ -443,7 +443,7 @@
 
 			<!-- Toolbar -->
 			<div class="border-b border-[#1e1e1e] px-8 py-3 flex justify-between items-center">
-				<p class="text-xs text-[#555]">{numbers.length} number{numbers.length !== 1 ? 's' : ''}</p>
+				<p class="text-xs text-[#7c7c7c]">{numbers.length} number{numbers.length !== 1 ? 's' : ''}</p>
 				<div class="flex gap-2">
 					<button onclick={() => { showBuy = !showBuy; showAdd = false; }}
 						class="rounded-lg px-3 py-1 text-xs transition-colors {showBuy ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#999] hover:border-white hover:text-white'}">
@@ -459,7 +459,7 @@
 			<!-- A2P Registration Status -->
 			<div class="border-b border-[#1e1e1e] px-6 py-4">
 				{#if loadingA2P}
-					<div class="flex items-center gap-2 text-xs text-[#555]">
+					<div class="flex items-center gap-2 text-xs text-[#7c7c7c]">
 						<div class="w-3 h-3 rounded-full border border-[#333] border-t-white animate-spin"></div>
 						Checking A2P registration status...
 					</div>
@@ -473,7 +473,7 @@
 							</span>
 						</div>
 						<div class="flex items-center gap-2">
-							<button onclick={loadA2PStatus} class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-2 py-1 rounded transition-colors">Refresh</button>
+							<button onclick={loadA2PStatus} class="text-xs text-[#6e6e6e] hover:text-white border border-[#1e1e1e] px-2 py-1 rounded transition-colors">Refresh</button>
 							<a href={a2pStatus.registrationUrl} target="_blank" rel="noopener"
 								class="text-xs text-blue-400 hover:text-blue-300 border border-blue-800/40 px-2 py-1 rounded transition-colors">
 								Twilio Console
@@ -489,18 +489,18 @@
 						<!-- Registration checklist -->
 						<div class="rounded-lg border border-red-900/30 bg-red-950/10 p-3 text-xs space-y-2">
 							<p class="text-red-400 font-medium">SMS messages may be filtered without A2P 10DLC registration</p>
-							<div class="space-y-1 text-[#777]">
+							<div class="space-y-1 text-[#9a9a9a]">
 								<p>Step 1: Register your brand at Twilio Console → Messaging → A2P Registration</p>
 								<p>Step 2: Create a campaign (use case: "Mixed — outbound sales + follow-ups")</p>
 								<p>Step 3: Assign your SMS-enabled numbers to the campaign</p>
-								<p class="text-[#555] mt-2">For toll-free numbers: use separate Toll-Free Verification in the same Console</p>
+								<p class="text-[#7c7c7c] mt-2">For toll-free numbers: use separate Toll-Free Verification in the same Console</p>
 							</div>
 						</div>
 					{:else if a2pStatus.brands.length > 0}
 						<!-- Brand + campaign status grid -->
 						<div class="grid grid-cols-2 gap-3 text-xs">
 							<div class="rounded-lg border border-[#1e1e1e] p-2.5">
-								<p class="text-[#444] uppercase tracking-widest text-xs mb-1.5">Brand</p>
+								<p class="text-[#6e6e6e] uppercase tracking-widest text-xs mb-1.5">Brand</p>
 								{#each a2pStatus.brands as brand}
 									<p class="text-[#888] mb-0.5">{brand.brandName}</p>
 									<span class="text-xs px-1.5 py-0.5 rounded {brand.status === 'APPROVED' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' : brand.status === 'FAILED' ? 'bg-red-900/30 text-red-400' : 'bg-yellow-900/30 text-yellow-400'}">
@@ -510,7 +510,7 @@
 								{/each}
 							</div>
 							<div class="rounded-lg border border-[#1e1e1e] p-2.5">
-								<p class="text-[#444] uppercase tracking-widest text-xs mb-1.5">Campaigns</p>
+								<p class="text-[#6e6e6e] uppercase tracking-widest text-xs mb-1.5">Campaigns</p>
 								{#if a2pStatus.campaigns.length === 0}
 									<p class="text-red-400">No campaigns — create one in Twilio Console</p>
 								{:else}
@@ -526,7 +526,7 @@
 					<!-- CNAM per number -->
 					{#if a2pStatus.numbers.length > 0}
 						<div class="mt-3 pt-3 border-t border-[#1a1a1a]">
-							<p class="text-xs text-[#444] uppercase tracking-widest mb-2">Caller ID Names (CNAM)</p>
+							<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Caller ID Names (CNAM)</p>
 							<div class="space-y-2">
 								{#each a2pStatus.numbers as num}
 									<div class="flex items-center justify-between">
@@ -547,10 +547,10 @@
 													class="text-xs text-white bg-[#1a1a1a] border border-[#2a2a2a] px-2 py-1 rounded hover:border-white transition-colors disabled:opacity-40">
 													{savingCnam ? '...' : 'Set'}
 												</button>
-												<button onclick={() => editingCnamSid = null} class="text-xs text-[#444] hover:text-white">x</button>
+												<button onclick={() => editingCnamSid = null} class="text-xs text-[#6e6e6e] hover:text-white">x</button>
 											{:else}
 												<button onclick={() => { editingCnamSid = num.sid; cnamInput = num.callerIdName ?? ''; cnamMsg = ''; }}
-													class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-2 py-1 rounded hover:border-[#333] transition-colors">
+													class="text-xs text-[#6e6e6e] hover:text-white border border-[#1e1e1e] px-2 py-1 rounded hover:border-[#333] transition-colors">
 													{num.callerIdName ? 'Edit' : 'Set Name'}
 												</button>
 											{/if}
@@ -568,16 +568,16 @@
 			<!-- Buy Numbers Panel -->
 			{#if showBuy}
 				<div class="border-b border-[#1e1e1e] bg-[#0a0a0a] p-6">
-					<p class="text-xs text-[#555] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with Edelhaus webhooks.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with Edelhaus webhooks.</p>
 
 					<!-- Type toggle -->
 					<div class="flex gap-2 mb-4">
 						<button onclick={() => { searchType = 'local'; searchResults = []; searchError = ''; }}
-							class="rounded-lg px-4 py-1.5 text-xs transition-colors {searchType === 'local' ? 'bg-white/10 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#666] hover:text-white'}">
+							class="rounded-lg px-4 py-1.5 text-xs transition-colors {searchType === 'local' ? 'bg-white/10 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#8a8a8a] hover:text-white'}">
 							Local
 						</button>
 						<button onclick={() => { searchType = 'tollfree'; searchAreaCode = ''; searchResults = []; searchError = ''; }}
-							class="rounded-lg px-4 py-1.5 text-xs transition-colors {searchType === 'tollfree' ? 'bg-white/10 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#666] hover:text-white'}">
+							class="rounded-lg px-4 py-1.5 text-xs transition-colors {searchType === 'tollfree' ? 'bg-white/10 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#8a8a8a] hover:text-white'}">
 							Toll-Free (1-800)
 						</button>
 					</div>
@@ -604,12 +604,12 @@
 					<!-- Results -->
 					{#if searchResults.length > 0}
 						<div class="mt-4 space-y-2">
-							<p class="text-xs text-[#444]">{searchResults.length} numbers available · ${searchResults[0].monthlyFee.toFixed(2)}/mo each</p>
+							<p class="text-xs text-[#6e6e6e]">{searchResults.length} numbers available · ${searchResults[0].monthlyFee.toFixed(2)}/mo each</p>
 							{#each searchResults as num}
 								<div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3 flex items-center justify-between gap-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 									<div class="min-w-0">
 										<p class="text-sm text-white font-mono font-medium">{num.friendlyName}</p>
-										<p class="text-xs text-[#555]">{num.locality ? num.locality + ', ' : ''}{num.region} · {num.type}</p>
+										<p class="text-xs text-[#7c7c7c]">{num.locality ? num.locality + ', ' : ''}{num.region} · {num.type}</p>
 									</div>
 									<button onclick={() => openPurchaseModal(num)}
 										class="shrink-0 rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-white hover:border-white hover:bg-white/5 transition-colors">
@@ -625,32 +625,32 @@
 			<!-- Add Existing Number Form -->
 			{#if showAdd}
 				<div class="border-b border-[#1e1e1e] bg-[#0a0a0a] p-6">
-					<p class="text-xs text-[#555] mb-4">Manually register a Twilio number you already own.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Manually register a Twilio number you already own.</p>
 					<div class="grid grid-cols-2 gap-3 mb-3">
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Phone Number *</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Phone Number *</label>
 							<input bind:value={newPhone} placeholder="+16125550000"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Friendly Name</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Friendly Name</label>
 							<input bind:value={newFriendly} placeholder="Sales Line"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Twilio Phone SID</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Twilio Phone SID</label>
 							<input bind:value={newSid} placeholder="PNxxxxxxxx"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Client</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Client</label>
 							<select bind:value={newClient} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="">None</option>
 								{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Campaign</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Campaign</label>
 							<select bind:value={newCampaign} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="">None</option>
 								{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
@@ -664,7 +664,7 @@
 						</div>
 					</div>
 					<div class="mb-3">
-						<label class="text-xs text-[#555] block mb-1">Voicemail Greeting</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Voicemail Greeting</label>
 						<textarea bind:value={newGreeting} rows="2"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 					</div>
@@ -686,7 +686,7 @@
 					</div>
 				{:else if numbers.length === 0}
 					<div class="flex flex-col items-center justify-center h-40 text-center px-8">
-						<p class="text-[#555] text-sm mb-2">No numbers yet</p>
+						<p class="text-[#7c7c7c] text-sm mb-2">No numbers yet</p>
 						<p class="text-xs text-[#333]">Buy a new number or add an existing Twilio number above</p>
 					</div>
 				{:else}
@@ -705,24 +705,24 @@
 											</span>
 										</div>
 										{#if num.friendly_name}
-											<p class="text-xs text-[#666] mb-1">{num.friendly_name}</p>
+											<p class="text-xs text-[#8a8a8a] mb-1">{num.friendly_name}</p>
 										{/if}
-										<div class="flex items-center gap-3 text-xs text-[#444]">
+										<div class="flex items-center gap-3 text-xs text-[#6e6e6e]">
 											{#if num.client}<span>Client: {num.client.name}</span>{/if}
 											{#if num.campaign}<span>Campaign: {num.campaign.name}</span>{/if}
 										</div>
 									</div>
 									<div class="flex items-center gap-2 shrink-0">
 										<button onclick={() => toggleStatus(num)}
-											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#666] hover:text-white hover:border-[#444] transition-colors">
+											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#8a8a8a] hover:text-white hover:border-[#444] transition-colors">
 											{num.status === 'active' ? 'Pause' : 'Resume'}
 										</button>
 										<button onclick={() => { expandedNumId === num.id ? (expandedNumId = null) : openNumSettings(num); }}
-											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#666] hover:text-white hover:border-[#444] transition-colors">
+											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#8a8a8a] hover:text-white hover:border-[#444] transition-colors">
 											Settings
 										</button>
 										<button onclick={() => copyWebhook(num)}
-											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#666] hover:text-white hover:border-[#444] transition-colors">
+											class="text-xs border border-[#2a2a2a] px-2 py-1 rounded text-[#8a8a8a] hover:text-white hover:border-[#444] transition-colors">
 											{copiedId === num.id ? 'Copied!' : 'Webhook'}
 										</button>
 										<button onclick={() => releaseNumber(num)} disabled={releasingId === num.id}
@@ -751,19 +751,19 @@
 										</div>
 										{#if editingNum.forwardingEnabled}
 											<div>
-												<label class="text-xs text-[#555] block mb-1">Forwarding Number</label>
+												<label class="text-xs text-[#7c7c7c] block mb-1">Forwarding Number</label>
 												<input bind:value={editingNum.forwardingNumber} placeholder="+16125550000"
 													class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
 											</div>
 										{/if}
 										<div>
-											<label class="text-xs text-[#555] block mb-1">Ring Timeout (seconds)</label>
+											<label class="text-xs text-[#7c7c7c] block mb-1">Ring Timeout (seconds)</label>
 											<input type="number" bind:value={editingNum.ringTimeout} min="10" max="60"
 												class="w-24 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 										</div>
 										<!-- Per-rep routing: which rep's browser this number rings -->
 										<div>
-											<label class="text-xs text-[#555] block mb-1">Assigned rep</label>
+											<label class="text-xs text-[#7c7c7c] block mb-1">Assigned rep</label>
 											<select bind:value={editingNum.assignedUserId}
 												class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 												<option value="">Whole team (ring everyone)</option>
@@ -771,13 +771,13 @@
 													<option value={rep.member_user_id}>{rep.member_name || rep.member_email}</option>
 												{/each}
 											</select>
-											<p class="text-[10px] text-[#444] mt-1">
+											<p class="text-[10px] text-[#6e6e6e] mt-1">
 												{editingNum.assignedUserId ? 'Inbound calls ring only this rep.' : 'Inbound calls ring the owner and all active reps; first to answer wins.'}
 											</p>
 										</div>
 										<!-- Voicemail greeting section -->
 									<div class="space-y-3">
-										<p class="text-xs text-[#555] uppercase tracking-widest">Voicemail Greeting</p>
+										<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Voicemail Greeting</p>
 
 										<!-- Recording controls -->
 										<div class="rounded-xl border border-[var(--c-border-subtle,#2a2a2a)] bg-[var(--c-surface-2,#111)] p-3">
@@ -794,7 +794,7 @@
 											<div class="flex gap-2">
 												{#if !recording}
 													<button onclick={startRecording}
-														class="flex items-center gap-2 rounded-lg border border-[var(--c-border-subtle,#2a2a2a)] px-3 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">
+														class="flex items-center gap-2 rounded-lg border border-[var(--c-border-subtle,#2a2a2a)] px-3 py-2 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 														🎙️ Record
 													</button>
 												{:else}
@@ -816,7 +816,7 @@
 															{uploadingGreeting ? 'Uploading...' : '↑ Use as Greeting'}
 														</button>
 														<button onclick={() => { recordedBlob = null; audioPreviewUrl = null; }}
-															class="rounded-lg border border-[var(--c-border-subtle,#2a2a2a)] px-3 py-1.5 text-xs text-[#555]">
+															class="rounded-lg border border-[var(--c-border-subtle,#2a2a2a)] px-3 py-1.5 text-xs text-[#7c7c7c]">
 															Discard
 														</button>
 													</div>
@@ -836,7 +836,7 @@
 												{savingNumSettings ? 'Saving...' : 'Save'}
 											</button>
 											<button onclick={() => expandedNumId = expandedNumId === num.id ? null : num.id}
-								class="text-xs text-[#666] hover:text-white transition-colors px-2">
+								class="text-xs text-[#8a8a8a] hover:text-white transition-colors px-2">
 								{expandedNumId === num.id ? 'Collapse' : 'Settings'}
 							</button>
 						</div>

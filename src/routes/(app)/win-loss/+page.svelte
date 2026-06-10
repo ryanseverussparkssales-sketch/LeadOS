@@ -29,7 +29,7 @@
 		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Win/Loss Analysis</h2>
 		<div class="flex gap-1">
 			{#each (['month','quarter','year'] as Period[]) as p}
-				<button onclick={() => { period = p; load(); }} class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">{PERIOD_LABELS[p]}</button>
+				<button onclick={() => { period = p; load(); }} class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">{PERIOD_LABELS[p]}</button>
 			{/each}
 		</div>
 	</div>
@@ -54,7 +54,7 @@
 					{ label:'Avg Deal Size', value: fmt$(Math.round(data.avgDealSize)), color:'text-white' },
 				] as kpi}
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4">
-						<p class="text-xs text-[#555] mb-1">{kpi.label}</p>
+						<p class="text-xs text-[#7c7c7c] mb-1">{kpi.label}</p>
 						<p class="text-xl font-semibold {kpi.color}">{kpi.value}</p>
 					</div>
 				{/each}
@@ -72,14 +72,14 @@
 								<div class="w-32 h-1.5 rounded-full bg-[#1a1a1a]">
 									<div class="h-full rounded-full bg-red-500/50" style="width:{data.lostCount ? (count/data.lostCount*100).toFixed(0) : 0}%"></div>
 								</div>
-								<p class="text-xs text-[#444] w-8">{data.lostCount ? (count/data.lostCount*100).toFixed(0) : 0}%</p>
+								<p class="text-xs text-[#6e6e6e] w-8">{data.lostCount ? (count/data.lostCount*100).toFixed(0) : 0}%</p>
 							</div>
 						{/each}
 					</div>
 				</div>
 			{:else}
 				<div class="rounded-xl border border-[#1e1e1e] p-8 text-center">
-					<p class="text-[#444] text-sm">No losses recorded yet — or lost reason wasn't captured</p>
+					<p class="text-[#6e6e6e] text-sm">No losses recorded yet — or lost reason wasn't captured</p>
 					<p class="text-[#333] text-xs mt-1">When you mark a deal as Lost, add a reason to see it here</p>
 				</div>
 			{/if}
@@ -90,11 +90,11 @@
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-4">Monthly Trend</p>
 					<table class="w-full text-sm">
 						<thead><tr class="border-b border-[#1e1e1e]">
-							<th class="text-left text-xs text-[#555] font-medium py-2">Month</th>
-							<th class="text-right text-xs text-[#555] font-medium py-2 text-[var(--accent)]">Won</th>
-							<th class="text-right text-xs text-[#555] font-medium py-2 text-red-400">Lost</th>
-							<th class="text-right text-xs text-[#555] font-medium py-2">Revenue</th>
-							<th class="text-right text-xs text-[#555] font-medium py-2">Win %</th>
+							<th class="text-left text-xs text-[#7c7c7c] font-medium py-2">Month</th>
+							<th class="text-right text-xs text-[#7c7c7c] font-medium py-2 text-[var(--accent)]">Won</th>
+							<th class="text-right text-xs text-[#7c7c7c] font-medium py-2 text-red-400">Lost</th>
+							<th class="text-right text-xs text-[#7c7c7c] font-medium py-2">Revenue</th>
+							<th class="text-right text-xs text-[#7c7c7c] font-medium py-2">Win %</th>
 						</tr></thead>
 						<tbody>
 							{#each data.monthly as row}
@@ -103,7 +103,7 @@
 									<td class="py-2 text-right text-[var(--accent)]">{row.won}</td>
 									<td class="py-2 text-right text-red-400">{row.lost}</td>
 									<td class="py-2 text-right text-white">{fmt$(row.revenue)}</td>
-									<td class="py-2 text-right text-[#666]">{row.won+row.lost ? Math.round(row.won/(row.won+row.lost)*100) : 0}%</td>
+									<td class="py-2 text-right text-[#8a8a8a]">{row.won+row.lost ? Math.round(row.won/(row.won+row.lost)*100) : 0}%</td>
 								</tr>
 							{/each}
 						</tbody>

@@ -18,7 +18,7 @@
         urgent: 'text-red-400 bg-red-400/10 border-red-400/20',
         high: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
         medium: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
-        low: 'text-[#666] bg-[#1a1a1a] border-[#2a2a2a]',
+        low: 'text-[#8a8a8a] bg-[#1a1a1a] border-[#2a2a2a]',
     };
 
     function fmtDate(iso: string) {
@@ -59,7 +59,7 @@
     <div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
         <div>
             <h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Notifications</h2>
-            {#if data?.totalCount}<p class="text-xs text-[#555] mt-0.5">{data.totalCount} items need attention</p>{/if}
+            {#if data?.totalCount}<p class="text-xs text-[#7c7c7c] mt-0.5">{data.totalCount} items need attention</p>{/if}
         </div>
         {#if data?.totalCount === 0}
             <span class="text-xs text-[var(--accent)]">✓ All clear</span>
@@ -93,11 +93,11 @@
                                         <p class="text-sm text-white">{task.title}</p>
                                         <span class="text-xs px-1.5 py-0.5 rounded border {PRIORITY_COLORS[task.priority] ?? PRIORITY_COLORS.low}">{task.priority}</span>
                                     </div>
-                                    {#if task.contact}<p class="text-xs text-[#555] mt-0.5">{task.contact.name}</p>{/if}
+                                    {#if task.contact}<p class="text-xs text-[#7c7c7c] mt-0.5">{task.contact.name}</p>{/if}
                                     <p class="text-xs text-red-400 mt-0.5">Due {new Date(task.due_date).toLocaleDateString('en-US', {month:'short',day:'numeric'})}</p>
                                 </div>
                                 <div class="flex gap-2 ml-4">
-                                    <a href="/tasks" class="text-xs text-[#444] hover:text-white border border-[#1e1e1e] px-2.5 py-1.5 rounded-lg transition-colors">Open</a>
+                                    <a href="/tasks" class="text-xs text-[#6e6e6e] hover:text-white border border-[#1e1e1e] px-2.5 py-1.5 rounded-lg transition-colors">Open</a>
                                     <button onclick={() => completeTask(task.id)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 px-2.5 py-1.5 rounded-lg transition-colors">Done ✓</button>
                                 </div>
                             </div>
@@ -119,8 +119,8 @@
                             <div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3 flex items-center justify-between hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
                                 <div>
                                     <p class="text-sm text-white">{lead.name}</p>
-                                    {#if lead.company}<p class="text-xs text-[#555]">{lead.company}</p>{/if}
-                                    <p class="text-xs text-[#444] mt-0.5">{lead.lead_source?.replace(/_/g,' ')} · {fmtDate(lead.created_at)}</p>
+                                    {#if lead.company}<p class="text-xs text-[#7c7c7c]">{lead.company}</p>{/if}
+                                    <p class="text-xs text-[#6e6e6e] mt-0.5">{lead.lead_source?.replace(/_/g,' ')} · {fmtDate(lead.created_at)}</p>
                                 </div>
                                 <a href="/contacts/{lead.id}" class="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/20 px-2.5 py-1.5 rounded-lg transition-colors ml-4">View →</a>
                             </div>
@@ -142,7 +142,7 @@
                             <div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3 flex items-center justify-between hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
                                 <div>
                                     <p class="text-sm text-white font-mono">{vm.caller_id}</p>
-                                    <p class="text-xs text-[#444] mt-0.5">{fmtDate(vm.received_at)}</p>
+                                    <p class="text-xs text-[#6e6e6e] mt-0.5">{fmtDate(vm.received_at)}</p>
                                 </div>
                                 <a href="/numbers" class="text-xs text-yellow-400 hover:text-yellow-300 border border-yellow-400/20 px-2.5 py-1.5 rounded-lg transition-colors ml-4">Listen →</a>
                             </div>
@@ -164,7 +164,7 @@
                             <div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3 flex items-center justify-between hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
                                 <div>
                                     <p class="text-sm text-white font-mono">{call.caller_id}</p>
-                                    <p class="text-xs text-[#444] mt-0.5">{fmtDate(call.received_at)}</p>
+                                    <p class="text-xs text-[#6e6e6e] mt-0.5">{fmtDate(call.received_at)}</p>
                                 </div>
                                 <a href="/phone?number={call.caller_id}" class="text-xs text-orange-400 hover:text-orange-300 border border-orange-400/20 px-2.5 py-1.5 rounded-lg transition-colors ml-4">Call back →</a>
                             </div>
@@ -178,7 +178,7 @@
                 <div class="flex flex-col items-center justify-center py-16 text-center">
                     <p class="text-4xl mb-4">✓</p>
                     <p class="text-white text-sm font-medium">You're all caught up</p>
-                    <p class="text-xs text-[#444] mt-1">No overdue tasks, new leads, voicemails, or missed calls</p>
+                    <p class="text-xs text-[#6e6e6e] mt-1">No overdue tasks, new leads, voicemails, or missed calls</p>
                 </div>
             {/if}
 

@@ -97,10 +97,10 @@
 				<button onclick={() => selectProject(project)}
 					class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === project.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 					<p class="text-sm text-white font-medium truncate">{project.name}</p>
-					<p class="text-xs text-[#555] mt-0.5">{project.client?.name}</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">{project.client?.name}</p>
 				</button>
 			{:else}
-				<p class="text-center text-[#444] text-xs py-8">No projects — create from Clients view</p>
+				<p class="text-center text-[#6e6e6e] text-xs py-8">No projects — create from Clients view</p>
 			{/each}
 		</div>
 
@@ -109,7 +109,7 @@
 			{#if selected}
 				<div class="max-w-2xl">
 					<div class="mb-6">
-						<p class="text-xs text-[#555] mb-1">{selected.client?.name}</p>
+						<p class="text-xs text-[#7c7c7c] mb-1">{selected.client?.name}</p>
 						<h3 class="text-white text-xl font-semibold">{selected.name}</h3>
 					</div>
 
@@ -129,7 +129,7 @@
 
 					<!-- Campaigns list -->
 					{#if loadingCampaigns}
-						<p class="text-[#444] text-sm">Loading...</p>
+						<p class="text-[#6e6e6e] text-sm">Loading...</p>
 					{:else}
 						<div class="space-y-3">
 							{#each campaigns as campaign}
@@ -137,12 +137,12 @@
 									<div class="flex items-start justify-between mb-3">
 										<div>
 											<p class="text-white text-sm font-medium">{campaign.name}</p>
-											<p class="text-xs text-[#555] mt-0.5">
+											<p class="text-xs text-[#7c7c7c] mt-0.5">
 												{listCount(campaign)} call list{listCount(campaign) !== 1 ? 's' : ''} · {contactCount(campaign)} contacts
 											</p>
 										</div>
 										<div class="flex items-center gap-3 shrink-0">
-											<a href="/campaigns" class="text-xs text-[#666] hover:text-white transition-colors">
+											<a href="/campaigns" class="text-xs text-[#8a8a8a] hover:text-white transition-colors">
 												Manage →
 											</a>
 											<button onclick={() => deleteCampaign(campaign.id)}
@@ -154,24 +154,24 @@
 									{#if campaign.call_lists?.length}
 										<div class="flex flex-wrap gap-2">
 											{#each (campaign.call_lists ?? []) as list}
-												<span class="px-2 py-1 rounded text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-[#666]">
+												<span class="px-2 py-1 rounded text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-[#8a8a8a]">
 													{list.name}
 												</span>
 											{/each}
 										</div>
 									{:else}
-										<p class="text-xs text-[#444]">No call lists yet — add them in Campaigns view</p>
+										<p class="text-xs text-[#6e6e6e]">No call lists yet — add them in Campaigns view</p>
 									{/if}
 								</div>
 							{:else}
-								<p class="text-[#444] text-sm">No campaigns yet. Add one above.</p>
+								<p class="text-[#6e6e6e] text-sm">No campaigns yet. Add one above.</p>
 							{/each}
 						</div>
 					{/if}
 				</div>
 			{:else}
 				<div class="flex items-center justify-center h-full">
-					<p class="text-[#555] text-sm">Select a project or create one above.</p>
+					<p class="text-[#7c7c7c] text-sm">Select a project or create one above.</p>
 			</div>
 	{/if}
 	</div>

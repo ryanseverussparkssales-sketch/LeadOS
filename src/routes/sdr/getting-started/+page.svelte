@@ -74,13 +74,13 @@
 	<!-- Welcome header -->
 	<div class="mb-8">
 		<h1 class="text-2xl font-semibold text-white mb-1">Welcome, {userName} 👋</h1>
-		<p class="text-sm text-[#555]">Here's everything you need to start dialing and earning.</p>
+		<p class="text-sm text-[#7c7c7c]">Here's everything you need to start dialing and earning.</p>
 	</div>
 
 	<!-- Progress bar -->
 	<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 mb-6 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 		<div class="flex items-center justify-between mb-2">
-			<p class="text-xs text-[#555] uppercase tracking-widest">Setup progress</p>
+			<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Setup progress</p>
 			<p class="text-xs text-white">{completedCount}/{totalChecks} done</p>
 		</div>
 		<div class="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
@@ -107,7 +107,7 @@
 						{#if verbalApproved}
 							<p class="text-xs text-[var(--accent)]">✓ Approved — you're cleared to dial live campaigns</p>
 						{:else}
-							<p class="text-xs text-[#666] mb-3">Before your first live dial we do a quick 15-minute call. You talk, Ryan listens. If it's a fit you're in the same day.</p>
+							<p class="text-xs text-[#8a8a8a] mb-3">Before your first live dial we do a quick 15-minute call. You talk, Ryan listens. If it's a fit you're in the same day.</p>
 							<a href="mailto:ryanseverussparkssales@gmail.com?subject=Verbal call request — Edelhaus&body=Hi Ryan, I'd like to schedule my intro call."
 								class="inline-block rounded-lg border border-yellow-800/40 bg-yellow-950/10 px-4 py-2 text-xs text-yellow-400 hover:bg-yellow-950/20 transition-colors">
 								Request your call →
@@ -126,7 +126,7 @@
 					<div class="flex-1">
 						<p class="text-sm text-white font-medium mb-1">Your active campaigns</p>
 						{#if campaigns.length === 0}
-							<p class="text-xs text-[#555]">No active campaigns assigned yet. Your manager will assign you to a campaign.</p>
+							<p class="text-xs text-[#7c7c7c]">No active campaigns assigned yet. Your manager will assign you to a campaign.</p>
 							<p class="text-xs text-[#333] mt-1">Once assigned, your call queue will populate automatically.</p>
 						{:else}
 							<div class="space-y-2 mt-2">
@@ -135,7 +135,7 @@
 										<div class="w-2 h-2 rounded-full bg-[var(--accent)] shrink-0"></div>
 										<div class="flex-1 min-w-0">
 											<p class="text-xs text-white font-medium truncate">{c.name}</p>
-											<p class="text-[10px] text-[#444]">{c.project?.client?.name} · {c.project?.name}</p>
+											<p class="text-[10px] text-[#6e6e6e]">{c.project?.client?.name} · {c.project?.name}</p>
 										</div>
 										<a href="/sdr?listId={c.call_lists?.[0]?.id ?? ''}" class="text-[10px] text-[var(--accent)] hover:text-[var(--accent-hi)] transition-colors shrink-0">Start dialing →</a>
 									</div>
@@ -155,7 +155,7 @@
 					<div class="flex-1">
 						<p class="text-sm text-white font-medium mb-1">Your call scripts</p>
 						{#if scripts.length === 0}
-							<p class="text-xs text-[#555]">No scripts assigned yet. Your manager will add scripts to your campaigns.</p>
+							<p class="text-xs text-[#7c7c7c]">No scripts assigned yet. Your manager will add scripts to your campaigns.</p>
 						{:else}
 							<div class="space-y-1.5 mt-2">
 								{#each scripts.slice(0,3) as s}
@@ -163,12 +163,12 @@
 										<span class="text-sm">📝</span>
 										<div class="flex-1 min-w-0">
 											<p class="text-xs text-white truncate">{s.title}</p>
-											{#if s.client}<p class="text-[10px] text-[#444]">{s.client.name}</p>{/if}
+											{#if s.client}<p class="text-[10px] text-[#6e6e6e]">{s.client.name}</p>{/if}
 										</div>
-										<span class="text-[10px] text-[#444]">→</span>
+										<span class="text-[10px] text-[#6e6e6e]">→</span>
 									</a>
 								{/each}
-								{#if scripts.length > 3}<p class="text-[10px] text-[#444] mt-1">+{scripts.length - 3} more in <a href="/sdr/scripts" class="underline hover:text-white">Scripts</a></p>{/if}
+								{#if scripts.length > 3}<p class="text-[10px] text-[#6e6e6e] mt-1">+{scripts.length - 3} more in <a href="/sdr/scripts" class="underline hover:text-white">Scripts</a></p>{/if}
 							</div>
 						{/if}
 					</div>
@@ -184,18 +184,18 @@
 						{#if engagement}
 							<div class="grid grid-cols-2 gap-3 mt-2">
 								<div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] px-3 py-2.5">
-									<p class="text-lg font-semibold text-white">${engagement.base_fee.toLocaleString()}<span class="text-[#444] text-xs font-normal">/mo</span></p>
-									<p class="text-[10px] text-[#555]">Base retainer</p>
+									<p class="text-lg font-semibold text-white">${engagement.base_fee.toLocaleString()}<span class="text-[#6e6e6e] text-xs font-normal">/mo</span></p>
+									<p class="text-[10px] text-[#7c7c7c]">Base retainer</p>
 								</div>
 								<div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] px-3 py-2.5">
-									<p class="text-lg font-semibold text-yellow-400">+${engagement.bonus_rate}<span class="text-[#444] text-xs font-normal"> per appt</span></p>
-									<p class="text-[10px] text-[#555]">Appointment bonus</p>
+									<p class="text-lg font-semibold text-yellow-400">+${engagement.bonus_rate}<span class="text-[#6e6e6e] text-xs font-normal"> per appt</span></p>
+									<p class="text-[10px] text-[#7c7c7c]">Appointment bonus</p>
 								</div>
 							</div>
 							<p class="text-[10px] text-[#333] mt-2">Set 10 appointments = ${engagement.base_fee + engagement.bonus_rate * 10}/mo · Set 20 = ${engagement.base_fee + engagement.bonus_rate * 20}/mo</p>
 						{:else}
-							<p class="text-xs text-[#555]">Base retainer + $50 per qualified appointment set. Your exact rates will be set by your manager.</p>
-							<p class="text-xs text-[#444] mt-1">View your rates in <a href="/sdr/performance" class="underline hover:text-white">Performance</a> once assigned.</p>
+							<p class="text-xs text-[#7c7c7c]">Base retainer + $50 per qualified appointment set. Your exact rates will be set by your manager.</p>
+							<p class="text-xs text-[#6e6e6e] mt-1">View your rates in <a href="/sdr/performance" class="underline hover:text-white">Performance</a> once assigned.</p>
 						{/if}
 					</div>
 				</div>
@@ -212,7 +212,7 @@
 						{#if checks.hasInterview}
 							<p class="text-xs text-[var(--accent)]">Score: {profile?.interview_score}/100 {profile?.interview_score >= 70 ? '· Live Roleplay unlocked ✓' : '· Score ≥70 to unlock Live Roleplay'}</p>
 						{:else}
-							<p class="text-xs text-[#555] mb-3">Answer 5 sales questions to get an AI score. Score ≥70 unlocks Live Roleplay certification.</p>
+							<p class="text-xs text-[#7c7c7c] mb-3">Answer 5 sales questions to get an AI score. Score ≥70 unlocks Live Roleplay certification.</p>
 							<a href="/sdr/interview" class="inline-block rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-4 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 								Start AI Interview →
 							</a>
@@ -225,7 +225,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 flex items-center justify-between hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
 					<p class="text-sm text-white font-medium">Ready to start dialing?</p>
-					<p class="text-xs text-[#555] mt-0.5">Your queue loads automatically from your assigned campaigns.</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">Your queue loads automatically from your assigned campaigns.</p>
 				</div>
 				<a href="/sdr" class="rounded-xl bg-white px-5 py-2.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors whitespace-nowrap">
 					📞 Open Dialer

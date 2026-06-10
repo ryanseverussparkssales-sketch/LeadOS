@@ -22,8 +22,8 @@
 	{#if quotas.length === 0}
 		<div class="flex items-center justify-center h-full">
 			<div class="text-center">
-				<p class="text-xs text-[#444]">No quotas set</p>
-				<a href="/settings" class="text-xs text-[#555] underline hover:text-white">Set quotas in Settings →</a>
+				<p class="text-xs text-[#6e6e6e]">No quotas set</p>
+				<a href="/settings" class="text-xs text-[#7c7c7c] underline hover:text-white">Set quotas in Settings →</a>
 			</div>
 		</div>
 	{:else}
@@ -38,7 +38,7 @@
 				<div class="h-2 rounded-full bg-[#1a1a1a] overflow-hidden">
 					<div class="h-full rounded-full transition-all {color(p)}" style="width:{p}%"></div>
 				</div>
-				<p class="text-xs text-[#444] mt-0.5 text-right">{p}% of monthly quota</p>
+				<p class="text-xs text-[#6e6e6e] mt-0.5 text-right">{p}% of monthly quota</p>
 			</div>
 		{/each}
 	{/if}

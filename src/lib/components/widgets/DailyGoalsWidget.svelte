@@ -51,7 +51,7 @@
                     </div>
                     {#if c.target_wins}
                         <div class="flex justify-between text-[10px] mt-1.5 mb-0.5">
-                            <span class="text-[#555]">{c.win_label ?? 'Wins'}</span>
+                            <span class="text-[#7c7c7c]">{c.win_label ?? 'Wins'}</span>
                             <span class="text-[var(--accent)] font-mono">{c.win_count}/{c.target_wins}</span>
                         </div>
                         <div class="w-full h-1 bg-[#1a1a1a] rounded-full overflow-hidden">

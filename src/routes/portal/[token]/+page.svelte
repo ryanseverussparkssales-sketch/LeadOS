@@ -32,13 +32,13 @@
 
 {#if loading}
 	<div class="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-		<p class="text-[#444] text-sm">Loading report...</p>
+		<p class="text-[#6e6e6e] text-sm">Loading report...</p>
 	</div>
 {:else if notFound}
 	<div class="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
 		<div class="text-center">
 			<p class="text-white text-lg font-semibold mb-2">Report not found</p>
-			<p class="text-[#444] text-sm">This link may have expired or been revoked.</p>
+			<p class="text-[#6e6e6e] text-sm">This link may have expired or been revoked.</p>
 		</div>
 	</div>
 {:else if report}

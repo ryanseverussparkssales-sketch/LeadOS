@@ -77,7 +77,7 @@
 					<code class="text-xs text-blue-400">{snippet.trigger}</code>
 					<p class="text-sm text-white truncate">{snippet.title}</p>
 				</div>
-				<p class="text-xs text-[#555] truncate mt-0.5">{snippet.content.slice(0, 60)}</p>
+				<p class="text-xs text-[#7c7c7c] truncate mt-0.5">{snippet.content.slice(0, 60)}</p>
 			</button>
 		{/each}
 		<p class="text-xs text-[#333] px-4 py-1.5 border-t border-[#1e1e1e]">Tab to insert · Esc to close</p>

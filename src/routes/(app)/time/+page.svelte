@@ -159,11 +159,11 @@
 			<!-- Totals -->
 			<div class="p-4 border-b border-[#1e1e1e] grid grid-cols-2 gap-3">
 				<div class="rounded-lg bg-[#111] border border-[#2a2a2a] p-3">
-					<p class="text-xs text-[#555] mb-1">Total</p>
+					<p class="text-xs text-[#7c7c7c] mb-1">Total</p>
 					<p class="text-white text-sm font-medium">{fmtDuration(totalMins)}</p>
 				</div>
 				<div class="rounded-lg bg-[#111] border border-[#2a2a2a] p-3">
-					<p class="text-xs text-[#555] mb-1">Billable</p>
+					<p class="text-xs text-[#7c7c7c] mb-1">Billable</p>
 					<p class="text-[var(--accent)] text-sm font-medium">{fmtDuration(billableMins)}</p>
 				</div>
 			</div>
@@ -177,12 +177,12 @@
 
 				<div class="grid grid-cols-2 gap-2">
 					<div>
-						<label class="text-xs text-[#555] block mb-1">Hours</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Hours</label>
 						<input type="number" bind:value={newHours} min="0" max="24"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none" />
 					</div>
 					<div>
-						<label class="text-xs text-[#555] block mb-1">Minutes</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Minutes</label>
 						<input type="number" bind:value={newMins} min="0" max="59" step="5"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none" />
 					</div>
@@ -235,7 +235,7 @@
 	{:else if entries.length === 0}
 				<div class="flex items-center justify-center py-16 text-center">
 					<div>
-						<p class="text-[#555] text-sm">No time entries yet</p>
+						<p class="text-[#7c7c7c] text-sm">No time entries yet</p>
 						<p class="text-[#333] text-xs mt-1">Log time using the form on the left</p>
 					</div>
 				</div>
@@ -248,17 +248,17 @@
 								{#if entry.billable}
 									<p class="text-xs text-[var(--accent)]">{fmtEarning(entry)}</p>
 								{:else}
-									<p class="text-xs text-[#444]">non-billable</p>
+									<p class="text-xs text-[#6e6e6e]">non-billable</p>
 								{/if}
 							</div>
 							<div class="flex-1 min-w-0">
 								<p class="text-white text-sm truncate">{entry.description || '—'}</p>
-								<p class="text-xs text-[#555] truncate">
+								<p class="text-xs text-[#7c7c7c] truncate">
 									{[entry.client?.name, entry.project?.name, entry.campaign?.name].filter(Boolean).join(' › ') || 'No project'}
 								</p>
 							</div>
 							<div class="text-right shrink-0">
-								<p class="text-xs text-[#555]">{new Date(entry.entry_date).toLocaleDateString()}</p>
+								<p class="text-xs text-[#7c7c7c]">{new Date(entry.entry_date).toLocaleDateString()}</p>
 							</div>
 							<button onclick={() => deleteEntry(entry.id)}
 								class="opacity-0 group-hover:opacity-100 text-xs text-red-700 hover:text-red-400 transition-all shrink-0"><Icon name="x" size={14} /></button>

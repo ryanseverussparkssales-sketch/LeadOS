@@ -349,10 +349,10 @@
 						class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === client.id ? 'bg-white/10' : 'hover:bg-white/5'}"
 					>
 						<p class="text-sm text-white font-medium truncate">{client.name}</p>
-						<p class="text-xs text-[#555] mt-0.5">{projectCount(client)} project{projectCount(client) !== 1 ? 's' : ''}</p>
+						<p class="text-xs text-[#7c7c7c] mt-0.5">{projectCount(client)} project{projectCount(client) !== 1 ? 's' : ''}</p>
 					</button>
 				{:else}
-					<p class="text-center text-[#444] text-xs py-8">No clients yet</p>
+					<p class="text-center text-[#6e6e6e] text-xs py-8">No clients yet</p>
 				{/each}
 			</div>
 		</div>
@@ -362,12 +362,12 @@
 			{#if selected}
 				<div class="max-w-2xl">
 					<div class="flex items-center gap-2 mb-2">
-						<button onclick={() => selected = null} class="lg:hidden text-xs text-[#555] hover:text-white transition-colors">← Back</button>
+						<button onclick={() => selected = null} class="lg:hidden text-xs text-[#7c7c7c] hover:text-white transition-colors">← Back</button>
 					</div>
 					<div class="flex items-center justify-between mb-6">
 						<h3 class="text-white text-xl font-semibold">{selected.name}</h3>
 						<div class="flex items-center gap-2">
-							<button onclick={startEditClient} class="text-xs text-[#555] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">
+							<button onclick={startEditClient} class="text-xs text-[#7c7c7c] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">
 								✎ Edit Profile
 							</button>
 							<button onclick={() => { showKbChat = !showKbChat; if (showKbChat) kbHistory = []; }} class="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">✨ Ask AI</button>
@@ -379,7 +379,7 @@
 							{#if confirmDeleteId === selected!.id}
 								<span class="text-xs text-red-400">Sure?</span>
 								<button onclick={() => deleteClient(selected!.id)} class="text-xs text-red-400 hover:text-red-300">Yes</button>
-								<button onclick={() => confirmDeleteId = null} class="text-xs text-[#555] hover:text-white ml-1">No</button>
+								<button onclick={() => confirmDeleteId = null} class="text-xs text-[#7c7c7c] hover:text-white ml-1">No</button>
 							{:else}
 								<button onclick={() => confirmDeleteId = selected!.id} class="text-xs text-red-700 hover:text-red-400 transition-colors">Delete client</button>
 							{/if}
@@ -390,31 +390,31 @@
 				{#if editingClient}
 					<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 						<div class="grid grid-cols-2 gap-3">
-							<div><label class="text-xs text-[#555] block mb-1">Website</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Website</label>
 								<input bind:value={clientEdit.website} placeholder="https://" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Industry</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Industry</label>
 								<input bind:value={clientEdit.industry} placeholder="e.g. DTC, SaaS, E-commerce" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Primary Contact</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Primary Contact</label>
 								<input bind:value={clientEdit.primary_contact_name} placeholder="Name" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Contact Email</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Contact Email</label>
 								<input bind:value={clientEdit.primary_contact_email} placeholder="email@company.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Contact Phone</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Contact Phone</label>
 								<input bind:value={clientEdit.primary_contact_phone} placeholder="+1 612..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Contract Value ($/mo)</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Contract Value ($/mo)</label>
 								<input type="number" bind:value={clientEdit.contract_value} placeholder="2800" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">LinkedIn</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">LinkedIn</label>
 								<input bind:value={clientEdit.linkedin_url} placeholder="https://linkedin.com/company/..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-							<div><label class="text-xs text-[#555] block mb-1">Status</label>
+							<div><label class="text-xs text-[#7c7c7c] block mb-1">Status</label>
 								<select bind:value={clientEdit.contract_status} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 									{#each ['prospect','active','paused','ended'] as s}<option value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>{/each}
 								</select>
 							</div>
 						</div>
-						<div class="mt-3"><label class="text-xs text-[#555] block mb-1">Notes</label>
+						<div class="mt-3"><label class="text-xs text-[#7c7c7c] block mb-1">Notes</label>
 							<textarea bind:value={clientEdit.notes} rows="2" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
 						<div class="flex gap-2 mt-3">
-							<button onclick={() => editingClient = false} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#777] hover:border-white hover:text-white transition-colors">Cancel</button>
+							<button onclick={() => editingClient = false} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">Cancel</button>
 							<button onclick={saveClientEdit} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">Save Profile</button>
 						</div>
 					</div>
@@ -423,22 +423,22 @@
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 							<div class="flex items-center justify-between mb-3">
 								<p class="text-xs text-[#999] uppercase tracking-widest">Client Profile</p>
-								<button onclick={startEditClient} class="text-xs text-[#444] hover:text-white transition-colors">Edit ✎</button>
+								<button onclick={startEditClient} class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Edit ✎</button>
 							</div>
 							<div class="grid grid-cols-2 gap-2 text-xs">
-								{#if selected.industry}<div><span class="text-[#555]">Industry</span><p class="text-white">{selected.industry}</p></div>{/if}
-								{#if selected.contract_value}<div><span class="text-[#555]">Contract</span><p class="text-white">${selected.contract_value?.toLocaleString()}/mo</p></div>{/if}
-								{#if selected.primary_contact_name}<div><span class="text-[#555]">Contact</span><p class="text-white">{selected.primary_contact_name}</p></div>{/if}
-								{#if selected.primary_contact_email}<div><span class="text-[#555]">Email</span><a href="mailto:{selected.primary_contact_email}" class="text-blue-400 hover:underline">{selected.primary_contact_email}</a></div>{/if}
-								{#if selected.primary_contact_phone}<div><span class="text-[#555]">Phone</span><a href="/phone?number={selected.primary_contact_phone}" class="text-[var(--accent)] hover:underline">{selected.primary_contact_phone}</a></div>{/if}
-								{#if selected.website}<div class="col-span-2"><span class="text-[#555]">Website</span><a href={selected.website} target="_blank" rel="noopener" class="text-blue-400 hover:underline ml-2">{selected.website} ↗</a></div>{/if}
-								{#if selected.contract_status && selected.contract_status !== 'active'}<div><span class="text-[#555]">Status</span><span class="text-yellow-400 capitalize ml-1">{selected.contract_status}</span></div>{/if}
+								{#if selected.industry}<div><span class="text-[#7c7c7c]">Industry</span><p class="text-white">{selected.industry}</p></div>{/if}
+								{#if selected.contract_value}<div><span class="text-[#7c7c7c]">Contract</span><p class="text-white">${selected.contract_value?.toLocaleString()}/mo</p></div>{/if}
+								{#if selected.primary_contact_name}<div><span class="text-[#7c7c7c]">Contact</span><p class="text-white">{selected.primary_contact_name}</p></div>{/if}
+								{#if selected.primary_contact_email}<div><span class="text-[#7c7c7c]">Email</span><a href="mailto:{selected.primary_contact_email}" class="text-blue-400 hover:underline">{selected.primary_contact_email}</a></div>{/if}
+								{#if selected.primary_contact_phone}<div><span class="text-[#7c7c7c]">Phone</span><a href="/phone?number={selected.primary_contact_phone}" class="text-[var(--accent)] hover:underline">{selected.primary_contact_phone}</a></div>{/if}
+								{#if selected.website}<div class="col-span-2"><span class="text-[#7c7c7c]">Website</span><a href={selected.website} target="_blank" rel="noopener" class="text-blue-400 hover:underline ml-2">{selected.website} ↗</a></div>{/if}
+								{#if selected.contract_status && selected.contract_status !== 'active'}<div><span class="text-[#7c7c7c]">Status</span><span class="text-yellow-400 capitalize ml-1">{selected.contract_status}</span></div>{/if}
 							</div>
-							{#if selected.notes}<p class="text-xs text-[#666] mt-2 border-t border-[#1a1a1a] pt-2">{selected.notes}</p>{/if}
+							{#if selected.notes}<p class="text-xs text-[#8a8a8a] mt-2 border-t border-[#1a1a1a] pt-2">{selected.notes}</p>{/if}
 						</div>
 					{:else}
 						<div class="rounded-xl border border-[#2a2a2a] border-dashed p-4 mb-4 text-center">
-							<button onclick={startEditClient} class="text-xs text-[#444] hover:text-white transition-colors">+ Add client profile details</button>
+							<button onclick={startEditClient} class="text-xs text-[#6e6e6e] hover:text-white transition-colors">+ Add client profile details</button>
 						</div>
 					{/if}
 				{/if}
@@ -447,7 +447,7 @@
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4 mb-4">
 					<div class="flex items-center justify-between mb-3">
 						<p class="text-xs text-[#999] uppercase tracking-widest">Compensation</p>
-						<button onclick={() => showEngForm = !showEngForm} class="text-xs text-[#555] hover:text-white transition-colors">
+						<button onclick={() => showEngForm = !showEngForm} class="text-xs text-[#7c7c7c] hover:text-white transition-colors">
 							{showEngForm ? 'Cancel' : '+ Set rates'}
 						</button>
 					</div>
@@ -455,31 +455,31 @@
 						{#each engagements as eng}
 							<div class="flex items-center justify-between rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] px-3 py-2.5 mb-2">
 								<div>
-									<p class="text-sm text-white">${eng.base_fee.toLocaleString()}<span class="text-[#555] text-xs">/mo base</span></p>
+									<p class="text-sm text-white">${eng.base_fee.toLocaleString()}<span class="text-[#7c7c7c] text-xs">/mo base</span></p>
 									<p class="text-xs text-yellow-400">${eng.bonus_rate} per appointment · bills day {eng.billing_day}</p>
-									{#if eng.notes}<p class="text-[10px] text-[#444] mt-0.5">{eng.notes}</p>{/if}
+									{#if eng.notes}<p class="text-[10px] text-[#6e6e6e] mt-0.5">{eng.notes}</p>{/if}
 								</div>
 								<button onclick={() => window.confirm('Remove this engagement?') && deleteEngagement(eng.id)} class="text-[#333] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{/each}
 					{:else if !showEngForm}
-						<p class="text-xs text-[#444]">No rates set. Click "+ Set rates" to configure.</p>
+						<p class="text-xs text-[#6e6e6e]">No rates set. Click "+ Set rates" to configure.</p>
 					{/if}
 					{#if showEngForm}
 						<div class="space-y-2 mt-2">
 							<div class="grid grid-cols-3 gap-2">
 								<div>
-									<label class="block text-[10px] text-[#555] mb-1">Base ($/mo)</label>
+									<label class="block text-[10px] text-[#7c7c7c] mb-1">Base ($/mo)</label>
 									<input type="number" bind:value={engBaseFee} placeholder="2000"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none" />
 								</div>
 								<div>
-									<label class="block text-[10px] text-[#555] mb-1">Bonus ($/appt)</label>
+									<label class="block text-[10px] text-[#7c7c7c] mb-1">Bonus ($/appt)</label>
 									<input type="number" bind:value={engBonusRate} placeholder="50"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none" />
 								</div>
 								<div>
-									<label class="block text-[10px] text-[#555] mb-1">Bill day</label>
+									<label class="block text-[10px] text-[#7c7c7c] mb-1">Bill day</label>
 									<input type="number" bind:value={engBillingDay} placeholder="1" min="1" max="28"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none" />
 								</div>
@@ -498,7 +498,7 @@
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4 mb-4">
 					<div class="flex items-center justify-between mb-3">
 						<p class="text-xs text-[#999] uppercase tracking-widest">Documents</p>
-						<button onclick={() => showDocForm = !showDocForm} class="text-xs text-[#555] hover:text-white transition-colors">
+						<button onclick={() => showDocForm = !showDocForm} class="text-xs text-[#7c7c7c] hover:text-white transition-colors">
 							{showDocForm ? 'Cancel' : '+ Add doc'}
 						</button>
 					</div>
@@ -510,7 +510,7 @@
 									<span class="text-sm">{doc.doc_type === 'asset' ? '🎨' : '📁'}</span>
 									<div class="flex-1 min-w-0">
 										<a href={doc.url} target="_blank" rel="noopener noreferrer" class="text-xs text-white hover:underline truncate block">{doc.title}</a>
-										<p class="text-[9px] text-[#444]">{doc.submitted_by_name ?? 'Client'} · {new Date(doc.created_at).toLocaleDateString()}</p>
+										<p class="text-[9px] text-[#6e6e6e]">{doc.submitted_by_name ?? 'Client'} · {new Date(doc.created_at).toLocaleDateString()}</p>
 									</div>
 									<button onclick={() => deleteDoc(doc.id)} class="text-[#333] hover:text-red-400 text-xs shrink-0"><Icon name="x" size={14} /></button>
 								</div>
@@ -525,10 +525,10 @@
 									<span class="text-base">{doc.doc_type === 'pdf' ? '📄' : doc.doc_type === 'contract' ? '📑' : doc.doc_type === 'link' ? '🔗' : doc.doc_type === 'sow' ? '📋' : '📁'}</span>
 									<div class="flex-1 min-w-0">
 										<a href={doc.url} target="_blank" rel="noopener noreferrer" class="text-xs text-white hover:underline truncate block">{doc.title}</a>
-								{#if doc.description}<p class="text-[10px] text-[#444] mt-0.5">{doc.description}</p>{/if}
+								{#if doc.description}<p class="text-[10px] text-[#6e6e6e] mt-0.5">{doc.description}</p>{/if}
 								<p class="text-[10px] text-[#333]">{new Date(doc.created_at).toLocaleDateString()}</p>
 							</div>
-							<a href={doc.url} target="_blank" rel="noopener noreferrer" class="text-[#555] hover:text-white text-xs shrink-0">↗</a>
+							<a href={doc.url} target="_blank" rel="noopener noreferrer" class="text-[#7c7c7c] hover:text-white text-xs shrink-0">↗</a>
 						</div>
 					{/each}
 					</div>
@@ -545,7 +545,7 @@
 						<span class="text-2xl">🏢</span>
 					</div>
 					<h3 style="font-family:var(--font-display);font-weight:300;font-size:22px;color:#fff;margin-bottom:6px">Select a client</h3>
-					<p class="text-xs text-[#444]">Click a client on the left to view their campaigns, compensation, docs, and AI insights.</p>
+					<p class="text-xs text-[#6e6e6e]">Click a client on the left to view their campaigns, compensation, docs, and AI insights.</p>
 				</div>
 
 				<!-- Aggregate stats across all clients -->
@@ -553,15 +553,15 @@
 					<div class="grid grid-cols-3 gap-4 w-full max-w-sm mb-8">
 						<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4">
 							<p class="text-2xl font-semibold text-white">{clients.length}</p>
-							<p class="text-[10px] text-[#444] mt-1 uppercase tracking-wider">Clients</p>
+							<p class="text-[10px] text-[#6e6e6e] mt-1 uppercase tracking-wider">Clients</p>
 						</div>
 						<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4">
 							<p class="text-2xl font-semibold text-white">{clients.reduce((s, c) => s + (c.projects?.length ?? 0), 0)}</p>
-							<p class="text-[10px] text-[#444] mt-1 uppercase tracking-wider">Projects</p>
+							<p class="text-[10px] text-[#6e6e6e] mt-1 uppercase tracking-wider">Projects</p>
 						</div>
 						<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4">
 							<p class="text-2xl font-semibold text-[var(--accent)]">${clients.reduce((s, c) => s + (c.contract_value ?? 0), 0).toLocaleString()}</p>
-							<p class="text-[10px] text-[#444] mt-1 uppercase tracking-wider">Monthly</p>
+							<p class="text-[10px] text-[#6e6e6e] mt-1 uppercase tracking-wider">Monthly</p>
 						</div>
 					</div>
 
@@ -572,14 +572,14 @@
 								onclick={() => { selected = client; loadEngagements(client.id); engagements = []; loadDocs(client.id); docs = []; }}
 								class="rounded-xl border border-[#1a1a1a] bg-[#080808] hover:border-[#262626] hover:bg-[#0f0f0f] px-4 py-3 text-left transition-colors cursor-pointer">
 								<p class="text-sm text-white font-medium truncate">{client.name}</p>
-								<p class="text-[10px] text-[#444] mt-0.5">{client.projects?.length ?? 0} project{(client.projects?.length ?? 0) !== 1 ? 's' : ''}</p>
+								<p class="text-[10px] text-[#6e6e6e] mt-0.5">{client.projects?.length ?? 0} project{(client.projects?.length ?? 0) !== 1 ? 's' : ''}</p>
 							</button>
 						{/each}
 					</div>
 				{:else}
 					<button
 						onclick={() => { const input = document.querySelector('input[placeholder="New client name"]') as HTMLInputElement; input?.focus(); }}
-						class="rounded-xl border border-[#2a2a2a] px-6 py-3 text-xs text-[#555] hover:border-white hover:text-white transition-colors">
+						class="rounded-xl border border-[#2a2a2a] px-6 py-3 text-xs text-[#7c7c7c] hover:border-white hover:text-white transition-colors">
 						+ Add your first client
 					</button>
 				{/if}

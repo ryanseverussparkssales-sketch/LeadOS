@@ -188,7 +188,7 @@
 	// ── Tier / Plan ────────────────────────────────────────────
 	let currentTier = $state<'free'|'pro'|'agency'>('free');
 	const TIER_LABELS: Record<string, string> = { free: 'Free', pro: 'Pro — $39/mo', agency: 'Agency — $99/mo' };
-	const TIER_COLORS: Record<string, string> = { free: 'text-[#666]', pro: 'text-yellow-400', agency: 'text-[var(--accent)]' };
+	const TIER_COLORS: Record<string, string> = { free: 'text-[#8a8a8a]', pro: 'text-yellow-400', agency: 'text-[var(--accent)]' };
 
 	// ── Password change ───────────────────────────────────────
 	let newPassword = $state(''); let confirmPassword = $state(''); let passwordMsg = $state(''); let changingPw = $state(false);
@@ -321,7 +321,7 @@
 				<p class="text-xs text-[#333] uppercase tracking-widest px-4 mb-1">{grp.group}</p>
 				{#each grp.items as [s, label]}
 					<button onclick={() => section = s as Section}
-						class="w-full text-left px-4 py-2 text-xs transition-colors {section === s ? 'bg-white/10 text-white' : 'text-[#555] hover:text-white'}">
+						class="w-full text-left px-4 py-2 text-xs transition-colors {section === s ? 'bg-white/10 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 						{label}
 					</button>
 				{/each}
@@ -341,7 +341,7 @@
 				<div class="grid grid-cols-2 gap-4">
 					{#each [['company_name','Your Name / Display Name','Ryan Sparks'],['company_email','Email','you@company.com'],['company_phone','Phone',''],['company_website','Website','']] as [f,l,ph]}
 						<div>
-							<label class="text-xs text-[#555] block mb-1">{l}</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">{l}</label>
 							<input bind:value={settings[f as keyof typeof settings]} placeholder={ph} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 					{/each}
@@ -350,8 +350,8 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Change Password</p>
 				<div class="grid grid-cols-2 gap-4">
-					<div><label class="text-xs text-[#555] block mb-1">New Password</label><input type="password" bind:value={newPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Confirm</label><input type="password" bind:value={confirmPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">New Password</label><input type="password" bind:value={newPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Confirm</label><input type="password" bind:value={confirmPassword} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 				</div>
 				{#if passwordMsg}<p class="text-xs {passwordMsg.startsWith('✓') ? 'text-[var(--accent)]' : 'text-red-400'}">{passwordMsg}</p>{/if}
 				<button onclick={changePassword} disabled={changingPw || !newPassword} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{changingPw ? 'Updating...' : 'Update Password'}</button>
@@ -364,14 +364,14 @@
 			<!-- Plan / Tier -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 mb-5 flex items-center justify-between hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
-					<p class="text-xs text-[#555] uppercase tracking-widest mb-1">Current Plan</p>
+					<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Current Plan</p>
 					<p class="text-lg font-semibold {TIER_COLORS[currentTier]}">{TIER_LABELS[currentTier]}</p>
 					{#if currentTier === 'free'}
-						<p class="text-xs text-[#444] mt-1">250 contacts · 1 campaign · basic dialer</p>
+						<p class="text-xs text-[#6e6e6e] mt-1">250 contacts · 1 campaign · basic dialer</p>
 					{:else if currentTier === 'pro'}
-						<p class="text-xs text-[#444] mt-1">Unlimited contacts · AI features · all campaigns</p>
+						<p class="text-xs text-[#6e6e6e] mt-1">Unlimited contacts · AI features · all campaigns</p>
 					{:else}
-						<p class="text-xs text-[#444] mt-1">Full platform · team management · client portal</p>
+						<p class="text-xs text-[#6e6e6e] mt-1">Full platform · team management · client portal</p>
 					{/if}
 				</div>
 				{#if currentTier !== 'agency'}
@@ -388,21 +388,21 @@
 				<div class="grid grid-cols-2 gap-4">
 					{#each [['agency_name','Agency/Business Name','Sparks Consulting'],['agency_website','Website','https://'],['agency_phone','Phone',''],['agency_address','Address','']] as [f,l,ph]}
 						<div>
-							<label class="text-xs text-[#555] block mb-1">{l}</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">{l}</label>
 							<input bind:value={settings[f as keyof typeof settings]} placeholder={ph} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 					{/each}
 				</div>
 				<div>
-					<label class="text-xs text-[#555] block mb-1">Logo URL</label>
+					<label class="text-xs text-[#7c7c7c] block mb-1">Logo URL</label>
 					<input bind:value={settings.agency_logo_url} placeholder="https://your-logo.png" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 					{#if settings.agency_logo_url}<img src={settings.agency_logo_url as string} alt="Logo" class="mt-2 h-12 object-contain rounded" />{/if}
 				</div>
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Invoice & Report Header</p>
-				<div><label class="text-xs text-[#555] block mb-1">Header Text (appears at top of invoices/reports)</label><textarea bind:value={settings.invoice_header} rows="3" placeholder="Sparks Consulting | ryan@sparks.com | (555) 000-0000" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea></div>
-				<div><label class="text-xs text-[#555] block mb-1">Footer Text</label><input bind:value={settings.invoice_footer} placeholder="Thank you for your business" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+				<div><label class="text-xs text-[#7c7c7c] block mb-1">Header Text (appears at top of invoices/reports)</label><textarea bind:value={settings.invoice_header} rows="3" placeholder="Sparks Consulting | ryan@sparks.com | (555) 000-0000" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea></div>
+				<div><label class="text-xs text-[#7c7c7c] block mb-1">Footer Text</label><input bind:value={settings.invoice_footer} placeholder="Thank you for your business" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Email Signature</p>
@@ -414,7 +414,7 @@
 			<h2 class="text-white text-sm font-medium mb-6">Appearance</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Sidebar — Toggle Items</p>
-				<p class="text-xs text-[#555]">Hide items you don't use to keep the sidebar clean.</p>
+				<p class="text-xs text-[#7c7c7c]">Hide items you don't use to keep the sidebar clean.</p>
 				<div class="grid grid-cols-2 gap-2">
 					{#each ALL_SIDEBAR_ITEMS as item}
 						<label class="flex items-center gap-2 cursor-pointer rounded-lg border border-[#2a2a2a] px-3 py-2 hover:border-[#444] transition-colors">
@@ -443,7 +443,7 @@
 					<input type="checkbox" bind:checked={settings.daily_digest_email as boolean} class="rounded" />
 					<div>
 						<p class="text-sm text-white">Daily digest email</p>
-						<p class="text-xs text-[#555]">Summary of calls, new leads, and overdue tasks every morning</p>
+						<p class="text-xs text-[#7c7c7c]">Summary of calls, new leads, and overdue tasks every morning</p>
 					</div>
 				</label>
 			</div>
@@ -453,18 +453,18 @@
 			<h2 class="text-white text-sm font-medium mb-6">Calling Rules</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Working Hours</p>
-				<p class="text-xs text-[#555]">The dialer and automations will respect these hours. Contacts will not be auto-dialed outside these times.</p>
+				<p class="text-xs text-[#7c7c7c]">The dialer and automations will respect these hours. Contacts will not be auto-dialed outside these times.</p>
 				<div class="flex gap-4 items-end">
-					<div><label class="text-xs text-[#555] block mb-1">Start</label><input type="time" bind:value={settings.working_hours_start} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-					<span class="text-[#444] pb-2">to</span>
-					<div><label class="text-xs text-[#555] block mb-1">End</label><input type="time" bind:value={settings.working_hours_end} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Start</label><input type="time" bind:value={settings.working_hours_start} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<span class="text-[#6e6e6e] pb-2">to</span>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">End</label><input type="time" bind:value={settings.working_hours_end} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 				</div>
 				<div>
-					<p class="text-xs text-[#555] mb-2">Working Days</p>
+					<p class="text-xs text-[#7c7c7c] mb-2">Working Days</p>
 					<div class="flex gap-2">
 						{#each DAYS as day}
 							<button onclick={() => { const d = settings.working_days as string[]; settings = { ...settings, working_days: d.includes(day) ? d.filter(x=>x!==day) : [...d, day] }; }}
-								class="rounded-lg px-3 py-1.5 text-xs transition-colors {(settings.working_days as string[]).includes(day) ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#555] hover:text-white'}">{day}</button>
+								class="rounded-lg px-3 py-1.5 text-xs transition-colors {(settings.working_days as string[]).includes(day) ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#7c7c7c] hover:text-white'}">{day}</button>
 						{/each}
 					</div>
 				</div>
@@ -472,8 +472,8 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Call Retry Rules</p>
 				<div class="grid grid-cols-2 gap-4">
-					<div><label class="text-xs text-[#555] block mb-1">Max retries per contact</label><input type="number" bind:value={settings.call_retry_limit} min="0" max="10" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Hours between retries</label><input type="number" bind:value={settings.call_retry_interval_hours} min="1" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Max retries per contact</label><input type="number" bind:value={settings.call_retry_limit} min="0" max="10" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Hours between retries</label><input type="number" bind:value={settings.call_retry_interval_hours} min="1" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 				</div>
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
@@ -482,7 +482,7 @@
 					<input type="checkbox" bind:checked={settings.recording_compliance_enabled as boolean} class="rounded mt-0.5" />
 					<div>
 						<p class="text-sm text-white">Play compliance message before recording</p>
-						<p class="text-xs text-[#555]">Required in some US states (California, Illinois, etc.)</p>
+						<p class="text-xs text-[#7c7c7c]">Required in some US states (California, Illinois, etc.)</p>
 					</div>
 				</label>
 				{#if settings.recording_compliance_enabled}
@@ -502,17 +502,17 @@
 			<h2 class="text-white text-sm font-medium mb-6">Communication</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">SMTP — Send emails from your own domain</p>
-				<p class="text-xs text-[#555]">Configure your email server so generated emails come from your address.</p>
+				<p class="text-xs text-[#7c7c7c]">Configure your email server so generated emails come from your address.</p>
 				<div class="grid grid-cols-3 gap-4">
-					<div class="col-span-2"><label class="text-xs text-[#555] block mb-1">SMTP Host</label><input bind:value={settings.smtp_host} placeholder="smtp.gmail.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Port</label><input type="number" bind:value={settings.smtp_port} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-					<div class="col-span-2"><label class="text-xs text-[#555] block mb-1">Username / Email</label><input bind:value={settings.smtp_user} placeholder="you@company.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Password</label><input type="password" bind:value={settings.smtp_pass_encrypted} placeholder="••••••••" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div class="col-span-2"><label class="text-xs text-[#7c7c7c] block mb-1">SMTP Host</label><input bind:value={settings.smtp_host} placeholder="smtp.gmail.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Port</label><input type="number" bind:value={settings.smtp_port} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div class="col-span-2"><label class="text-xs text-[#7c7c7c] block mb-1">Username / Email</label><input bind:value={settings.smtp_user} placeholder="you@company.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Password</label><input type="password" bind:value={settings.smtp_pass_encrypted} placeholder="••••••••" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
 				</div>
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">SMS Auto-Reply</p>
-				<p class="text-xs text-[#555]">Sent automatically when you receive an SMS you haven't replied to within 30 minutes.</p>
+				<p class="text-xs text-[#7c7c7c]">Sent automatically when you receive an SMS you haven't replied to within 30 minutes.</p>
 				<textarea bind:value={settings.sms_auto_reply} rows="2" placeholder="Thanks for your message! I'll get back to you shortly. - Ryan" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 			</div>
 
@@ -521,7 +521,7 @@
 			<h2 class="text-white text-sm font-medium mb-6">Contact Settings</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Defaults</p>
-				<div><label class="text-xs text-[#555] block mb-1.5">Default contact type for new contacts</label>
+				<div><label class="text-xs text-[#7c7c7c] block mb-1.5">Default contact type for new contacts</label>
 					<select bind:value={settings.contact_default_type} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 						{#each ['lead','prospect','customer','partner','vendor'] as t}<option value={t} class="capitalize">{t}</option>{/each}
 					</select>
@@ -531,7 +531,7 @@
 				<p class="text-xs text-[#999] uppercase tracking-widest">Auto Scoring</p>
 				<label class="flex items-center gap-3 cursor-pointer">
 					<input type="checkbox" bind:checked={settings.auto_score_on_import as boolean} class="rounded" />
-					<div><p class="text-sm text-white">Auto-score contacts on import</p><p class="text-xs text-[#555]">Calculate a 0-100 engagement score immediately after CSV import</p></div>
+					<div><p class="text-sm text-white">Auto-score contacts on import</p><p class="text-xs text-[#7c7c7c]">Calculate a 0-100 engagement score immediately after CSV import</p></div>
 				</label>
 			</div>
 
@@ -540,12 +540,12 @@
 			<h2 class="text-white text-sm font-medium mb-6">Productivity Defaults</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div class="grid grid-cols-2 gap-4">
-					<div><label class="text-xs text-[#555] block mb-1.5">Default call type</label>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1.5">Default call type</label>
 						<select bind:value={settings.default_call_type} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 							{#each ['cold_call','follow_up','callback','demo','warm','referral','check_in'] as t}<option value={t}>{t.replace(/_/g,' ')}</option>{/each}
 						</select>
 					</div>
-					<div><label class="text-xs text-[#555] block mb-1.5">Default task priority</label>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1.5">Default task priority</label>
 						<select bind:value={settings.default_task_priority} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 							{#each ['low','medium','high','urgent'] as p}<option value={p} class="capitalize">{p}</option>{/each}
 						</select>
@@ -555,13 +555,13 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Billing Defaults</p>
 				<div class="grid grid-cols-3 gap-4">
-					<div><label class="text-xs text-[#555] block mb-1">Hourly Rate</label><input type="number" bind:value={settings.hourly_rate} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Currency</label>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Hourly Rate</label><input type="number" bind:value={settings.hourly_rate} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Currency</label>
 						<select bind:value={settings.currency} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 							{#each ['USD','EUR','GBP','CAD','AUD'] as c}<option value={c}>{c}</option>{/each}
 						</select>
 					</div>
-					<div><label class="text-xs text-[#555] block mb-1">Timezone</label>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Timezone</label>
 						<select bind:value={settings.timezone} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 							{#each ['America/New_York','America/Chicago','America/Denver','America/Los_Angeles','UTC','Europe/London'] as tz}<option value={tz}>{tz}</option>{/each}
 						</select>
@@ -574,8 +574,8 @@
 			<h2 class="text-white text-sm font-medium mb-6">Widget Settings</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Dashboard Layout</p>
-				<p class="text-xs text-[#555] mb-4">Your dashboard widgets are configured per-session. To reset to defaults, clear your browser's localStorage.</p>
-				<button onclick={() => { localStorage.removeItem('rogueos_dashboard_layout'); window.location.reload(); }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white hover:border-white transition-colors">Reset Dashboard to Default</button>
+				<p class="text-xs text-[#7c7c7c] mb-4">Your dashboard widgets are configured per-session. To reset to defaults, clear your browser's localStorage.</p>
+				<button onclick={() => { localStorage.removeItem('rogueos_dashboard_layout'); window.location.reload(); }} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">Reset Dashboard to Default</button>
 			</div>
 
 		<!-- ── CONNECTIONS ────────────────────────────────── -->
@@ -591,14 +591,14 @@
 						<span class="text-2xl">{conn.icon}</span>
 						<div class="flex-1">
 							<p class="text-white text-sm font-medium">{conn.name}</p>
-							<p class="text-xs text-[#555]">{conn.desc}</p>
+							<p class="text-xs text-[#7c7c7c]">{conn.desc}</p>
 						</div>
 						<div class="text-right">
 							<span class="text-xs text-[var(--accent)] bg-[var(--accent)]/12 px-2 py-0.5 rounded-full">✓ {conn.status}</span>
 						</div>
 					</div>
 				{/each}
-				<p class="text-xs text-[#444] mt-2">Credentials are stored in your .env.local file. To update them, edit that file and restart the server.</p>
+				<p class="text-xs text-[#6e6e6e] mt-2">Credentials are stored in your .env.local file. To update them, edit that file and restart the server.</p>
 			</div>
 
 		<!-- ── INTEGRATIONS ───────────────────────────────── -->
@@ -615,7 +615,7 @@
 						<span class="text-2xl">{intg.icon}</span>
 						<div class="flex-1">
 							<p class="text-white text-sm font-medium">{intg.name}</p>
-							<p class="text-xs text-[#555]">{intg.desc}</p>
+							<p class="text-xs text-[#7c7c7c]">{intg.desc}</p>
 						</div>
 						<a href={intg.href} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">Connect</a>
 					</div>
@@ -632,12 +632,12 @@
 					<span class="text-xl">G</span>
 					<div class="flex-1">
 						<p class="text-sm font-medium text-white">Connect Gmail via OAuth</p>
-						<p class="text-xs text-[#555] mt-0.5">Pulls replies directly from your inbox — no App Password needed. Syncs every 5 minutes.</p>
+						<p class="text-xs text-[#7c7c7c] mt-0.5">Pulls replies directly from your inbox — no App Password needed. Syncs every 5 minutes.</p>
 					</div>
 				</div>
 				<div class="flex items-end gap-3">
 					<div class="flex-1">
-						<label class="text-xs text-[#555] block mb-1">Account label</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Account label</label>
 						<input bind:value={gmailConnectLabel} placeholder="Personal Gmail" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 					</div>
 					<button onclick={connectGmail}
@@ -653,9 +653,9 @@
 				<div class="flex items-center justify-between mb-4">
 					<div>
 						<p class="text-white text-sm font-medium">SMTP / App Password</p>
-						<p class="text-xs text-[#555] mt-0.5">For client accounts or non-Gmail providers using an App Password.</p>
+						<p class="text-xs text-[#7c7c7c] mt-0.5">For client accounts or non-Gmail providers using an App Password.</p>
 					</div>
-					<button onclick={() => showAddEmail = !showAddEmail} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+					<button onclick={() => showAddEmail = !showAddEmail} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						{showAddEmail ? '✕ Cancel' : '+ Add Account'}
 					</button>
 				</div>
@@ -664,28 +664,28 @@
 					<div class="border border-[#1e1e1e] rounded-lg p-4 mb-4 space-y-3 bg-[#0d0d0d]">
 						<div class="grid grid-cols-2 gap-3">
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Label</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Label</label>
 								<input bind:value={emailForm.label} placeholder="Welfel Ventures — Bryan" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							</div>
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Email Address *</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Email Address *</label>
 								<input bind:value={emailForm.emailAddress} type="email" placeholder="bryan@gmail.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							</div>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">App Password * <span class="text-[#333]">(Google Account → Security → 2FA → App Passwords)</span></label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">App Password * <span class="text-[#333]">(Google Account → Security → 2FA → App Passwords)</span></label>
 							<input bind:value={emailForm.appPassword} type="password" placeholder="xxxx xxxx xxxx xxxx" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
 						</div>
 						<div class="grid grid-cols-2 gap-3">
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Assign to Client</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Assign to Client</label>
 								<select bind:value={emailForm.clientId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 									<option value="">— None (use manually) —</option>
 									{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
 								</select>
 							</div>
 							<div class="flex items-end pb-1">
-								<label class="flex items-center gap-2 text-xs text-[#777] cursor-pointer">
+								<label class="flex items-center gap-2 text-xs text-[#9a9a9a] cursor-pointer">
 									<input type="checkbox" bind:checked={emailForm.isDefault} class="accent-white" />
 									Set as default sender
 								</label>
@@ -703,7 +703,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
 				<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Connected Accounts</p>
 				{#if emailAccounts.length === 0}
-					<p class="text-xs text-[#444] text-center py-4">No email accounts connected yet.</p>
+					<p class="text-xs text-[#6e6e6e] text-center py-4">No email accounts connected yet.</p>
 				{:else}
 					<div class="space-y-2">
 						{#each emailAccounts as acc}
@@ -712,12 +712,12 @@
 									<span class="text-base flex-shrink-0">{acc.provider === 'gmail' ? 'G' : '✉'}</span>
 									<div class="min-w-0">
 										<p class="text-sm text-white truncate">{acc.label}</p>
-										<p class="text-xs text-[#555] truncate">
+										<p class="text-xs text-[#7c7c7c] truncate">
 											{acc.email_address}
 											{#if acc.provider === 'gmail'}<span class="text-[var(--accent)]"> · OAuth</span>{/if}
 											{#if acc.client?.name} · {acc.client.name}{/if}
 											{#if acc.is_default} · Default{/if}
-											{#if acc.last_synced_at}<span class="text-[#444]"> · synced {new Date(acc.last_synced_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>{/if}
+											{#if acc.last_synced_at}<span class="text-[#6e6e6e]"> · synced {new Date(acc.last_synced_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>{/if}
 										</p>
 									</div>
 								</div>
@@ -725,7 +725,7 @@
 									{#if acc.provider === 'gmail'}
 										<button onclick={() => syncGmailAccount(acc.email_address, acc.id)}
 											disabled={syncingGmail[acc.id]}
-											class="text-xs text-[#555] hover:text-white transition-colors px-2 py-1 disabled:opacity-40">
+											class="text-xs text-[#7c7c7c] hover:text-white transition-colors px-2 py-1 disabled:opacity-40">
 											{syncingGmail[acc.id] ? 'Syncing...' : 'Sync Now'}
 										</button>
 									{/if}
@@ -735,7 +735,7 @@
 										</span>
 									{/if}
 									<button onclick={() => testAccount(acc.id)} disabled={testingAccountId === acc.id}
-										class="text-xs rounded-lg border border-[var(--c-border-subtle)] px-2.5 py-1 text-[#555] hover:text-white hover:border-white disabled:opacity-40 transition-colors">
+										class="text-xs rounded-lg border border-[var(--c-border-subtle)] px-2.5 py-1 text-[#7c7c7c] hover:text-white hover:border-white disabled:opacity-40 transition-colors">
 										{testingAccountId === acc.id ? '...' : 'Test'}
 									</button>
 									<button onclick={() => deleteEmailAccount(acc.id)} class="text-xs text-red-700 hover:text-red-400 transition-colors px-2 py-1">Remove</button>
@@ -744,75 +744,75 @@
 						{/each}
 					</div>
 				{/if}
-				<p class="text-xs text-[#333] mt-3">Fallback sender: add <code class="text-[#444]">RESEND_API_KEY</code> to Vercel env vars for sequences and automated emails.</p>
+				<p class="text-xs text-[#333] mt-3">Fallback sender: add <code class="text-[#6e6e6e]">RESEND_API_KEY</code> to Vercel env vars for sequences and automated emails.</p>
 			</div>
 
 		<!-- ── API KEYS ───────────────────────────────────── -->
 		{:else if section === 'api-keys'}
 			<h2 class="text-white text-sm font-medium mb-6">API Key Vault</h2>
-			<p class="text-xs text-[#555]">Store API keys for external services. Keys are masked after saving.</p>
+			<p class="text-xs text-[#7c7c7c]">Store API keys for external services. Keys are masked after saving.</p>
 			<button onclick={() => showNewKey = !showNewKey} class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5]">+ Add Key</button>
 			{#if showNewKey}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<div class="grid grid-cols-2 gap-3">
-						<div><label class="text-xs text-[#555] block mb-1">Name</label><input bind:value={newKeyName} placeholder="My OpenAI Key" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-						<div><label class="text-xs text-[#555] block mb-1">Service</label>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">Name</label><input bind:value={newKeyName} placeholder="My OpenAI Key" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">Service</label>
 							<select bind:value={newKeyService} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none">
 								<option value="">Custom</option>
 								{#each ['openai','anthropic','groq','hubspot','salesforce','mailchimp','stripe','google','slack','zapier','apollo','clearbit'] as s}<option value={s} class="capitalize">{s}</option>{/each}
 							</select>
 						</div>
 					</div>
-					<div><label class="text-xs text-[#555] block mb-1">API Key</label><input bind:value={newKeyValue} placeholder="sk-..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" style="font-family:var(--font-mono)" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">API Key</label><input bind:value={newKeyValue} placeholder="sk-..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" style="font-family:var(--font-mono)" /></div>
 					<div class="flex gap-2">
 						<button onclick={async () => { if (!newKeyName || !newKeyValue) return; savingKey=true; const r = await apiFetch('/api/api-key-vault', { method:'POST', body: JSON.stringify({ name:newKeyName, service:newKeyService||null, keyValue:newKeyValue, environment:newKeyEnv }) }); if (r.ok) { apiKeys=[await r.json(),...apiKeys]; showNewKey=false; newKeyName=''; newKeyValue=''; } savingKey=false; }} disabled={savingKey || !newKeyName || !newKeyValue} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Save</button>
-						<button onclick={() => showNewKey=false} class="text-xs text-[#555] hover:text-white px-3">Cancel</button>
+						<button onclick={() => showNewKey=false} class="text-xs text-[#7c7c7c] hover:text-white px-3">Cancel</button>
 					</div>
 				</div>
 			{/if}
 			{#each apiKeys as key}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 flex items-center gap-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-					<div class="flex-1"><p class="text-sm text-white">{key.name}</p><p class="text-xs text-[#555] capitalize">{key.service || 'Custom'} · {key.environment}</p></div>
-					<button onclick={() => { const s = new Set(revealedKeys); s.has(key.id) ? s.delete(key.id) : s.add(key.id); revealedKeys = s; }} class="text-xs text-[#444] hover:text-white">{revealedKeys.has(key.id) ? 'Hide' : 'Show'}</button>
+					<div class="flex-1"><p class="text-sm text-white">{key.name}</p><p class="text-xs text-[#7c7c7c] capitalize">{key.service || 'Custom'} · {key.environment}</p></div>
+					<button onclick={() => { const s = new Set(revealedKeys); s.has(key.id) ? s.delete(key.id) : s.add(key.id); revealedKeys = s; }} class="text-xs text-[#6e6e6e] hover:text-white">{revealedKeys.has(key.id) ? 'Hide' : 'Show'}</button>
 					{#if revealedKeys.has(key.id)}<code class="text-xs text-[#888] max-w-xs truncate" style="font-family:var(--font-mono)">{key.key_value}</code>{/if}
-					<button onclick={() => navigator.clipboard.writeText(key.key_value)} class="text-xs text-[#444] hover:text-white">Copy</button>
+					<button onclick={() => navigator.clipboard.writeText(key.key_value)} class="text-xs text-[#6e6e6e] hover:text-white">Copy</button>
 				</div>
 			{/each}
-			{#if apiKeys.length === 0}<p class="text-xs text-[#444]">No keys saved yet</p>{/if}
+			{#if apiKeys.length === 0}<p class="text-xs text-[#6e6e6e]">No keys saved yet</p>{/if}
 
 		<!-- ── PASSWORDS ──────────────────────────────────── -->
 		{:else if section === 'passwords'}
 			<h2 class="text-white text-sm font-medium mb-6">Password Vault</h2>
-			<p class="text-xs text-[#555]">Store login credentials for tools and websites. Never store banking credentials here.</p>
+			<p class="text-xs text-[#7c7c7c]">Store login credentials for tools and websites. Never store banking credentials here.</p>
 			<button onclick={() => showNewPwd = !showNewPwd} class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5]">+ Add Password</button>
 			{#if showNewPwd}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<div class="grid grid-cols-2 gap-3">
-						<div><label class="text-xs text-[#555] block mb-1">Site/App Name *</label><input bind:value={newPwdSite} placeholder="HubSpot" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-						<div><label class="text-xs text-[#555] block mb-1">URL</label><input bind:value={newPwdUrl} placeholder="https://app.hubspot.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-						<div><label class="text-xs text-[#555] block mb-1">Username / Email</label><input bind:value={newPwdUser} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-						<div><label class="text-xs text-[#555] block mb-1">Password *</label><input type="password" bind:value={newPwdPass} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none" /></div>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">Site/App Name *</label><input bind:value={newPwdSite} placeholder="HubSpot" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">URL</label><input bind:value={newPwdUrl} placeholder="https://app.hubspot.com" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">Username / Email</label><input bind:value={newPwdUser} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+						<div><label class="text-xs text-[#7c7c7c] block mb-1">Password *</label><input type="password" bind:value={newPwdPass} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none" /></div>
 					</div>
 					<div class="flex gap-2">
 						<button onclick={async () => { if (!newPwdSite || !newPwdPass) return; savingPwd=true; const r = await apiFetch('/api/password-vault', { method:'POST', body: JSON.stringify({ siteName:newPwdSite, siteUrl:newPwdUrl||null, username:newPwdUser||null, passwordEncrypted:newPwdPass, notes:newPwdNotes||null }) }); if (r.ok) { passwords=[await r.json(),...passwords]; showNewPwd=false; newPwdSite='';newPwdUser='';newPwdPass=''; } savingPwd=false; }} disabled={savingPwd || !newPwdSite || !newPwdPass} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Save</button>
-						<button onclick={() => showNewPwd=false} class="text-xs text-[#555] hover:text-white px-3">Cancel</button>
+						<button onclick={() => showNewPwd=false} class="text-xs text-[#7c7c7c] hover:text-white px-3">Cancel</button>
 					</div>
 				</div>
 			{/if}
 			{#each passwords as pwd}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 flex items-center gap-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-					<div class="flex-1"><p class="text-sm text-white">{pwd.site_name}</p><p class="text-xs text-[#555]">{pwd.username ?? pwd.site_url ?? ''}</p></div>
-					<button onclick={() => { const s = new Set(revealedPwds); s.has(pwd.id) ? s.delete(pwd.id) : s.add(pwd.id); revealedPwds = s; }} class="text-xs text-[#444] hover:text-white">{revealedPwds.has(pwd.id) ? 'Hide' : 'Show'}</button>
+					<div class="flex-1"><p class="text-sm text-white">{pwd.site_name}</p><p class="text-xs text-[#7c7c7c]">{pwd.username ?? pwd.site_url ?? ''}</p></div>
+					<button onclick={() => { const s = new Set(revealedPwds); s.has(pwd.id) ? s.delete(pwd.id) : s.add(pwd.id); revealedPwds = s; }} class="text-xs text-[#6e6e6e] hover:text-white">{revealedPwds.has(pwd.id) ? 'Hide' : 'Show'}</button>
 					{#if revealedPwds.has(pwd.id)}<code class="text-xs text-[#888]" style="font-family:var(--font-mono)">{pwd.password_encrypted}</code>{/if}
-					{#if pwd.site_url}<a href={pwd.site_url} target="_blank" class="text-xs text-[#444] hover:text-white">Open ↗</a>{/if}
+					{#if pwd.site_url}<a href={pwd.site_url} target="_blank" class="text-xs text-[#6e6e6e] hover:text-white">Open ↗</a>{/if}
 				</div>
 			{/each}
-			{#if passwords.length === 0}<p class="text-xs text-[#444]">No passwords saved yet</p>{/if}
+			{#if passwords.length === 0}<p class="text-xs text-[#6e6e6e]">No passwords saved yet</p>{/if}
 
 		<!-- ── TOKENS ──────────────────────────────────────── -->
 		{:else if section === 'tokens'}
 			<h2 class="text-white text-sm font-medium mb-6">API Tokens</h2>
-			<p class="text-xs text-[#555]">Tokens let external tools access Edelhaus via API.</p>
+			<p class="text-xs text-[#7c7c7c]">Tokens let external tools access Edelhaus via API.</p>
 			<div class="flex gap-3">
 				<input bind:value={newTokenName} placeholder="Token name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<button onclick={createToken} disabled={creatingToken || !newTokenName.trim()} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Create</button>
@@ -820,12 +820,12 @@
 			{#if createdToken}
 				<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3 space-y-1">
 					<p class="text-xs text-[var(--accent)] font-medium">Copy now — won't be shown again</p>
-					<div class="flex gap-2"><code class="flex-1 text-xs text-white break-all" style="font-family:var(--font-mono)">{createdToken}</code><button onclick={() => navigator.clipboard.writeText(createdToken)} class="text-xs text-[#444] hover:text-white shrink-0">Copy</button></div>
+					<div class="flex gap-2"><code class="flex-1 text-xs text-white break-all" style="font-family:var(--font-mono)">{createdToken}</code><button onclick={() => navigator.clipboard.writeText(createdToken)} class="text-xs text-[#6e6e6e] hover:text-white shrink-0">Copy</button></div>
 				</div>
 			{/if}
 			{#each tokens as t}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 flex items-center gap-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-					<div class="flex-1"><p class="text-sm text-white">{t.name}</p><p class="text-xs text-[#555]">{t.scopes?.join(', ')} · Created {new Date(t.created_at).toLocaleDateString()}</p></div>
+					<div class="flex-1"><p class="text-sm text-white">{t.name}</p><p class="text-xs text-[#7c7c7c]">{t.scopes?.join(', ')} · Created {new Date(t.created_at).toLocaleDateString()}</p></div>
 					<button onclick={() => revokeToken(t.id)} class="text-xs text-red-700 hover:text-red-400">Revoke</button>
 				</div>
 			{/each}
@@ -840,13 +840,13 @@
 					</button>
 					<div class="flex-1 min-w-0">
 						<p class="text-sm text-white">{wh.name}</p>
-						<p class="text-xs text-[#555] truncate">{wh.url}</p>
-						<div class="flex gap-1 mt-1 flex-wrap">{#each wh.events as e}<span class="text-xs bg-white/5 text-[#666] px-1.5 py-0.5 rounded">{e.replace(/_/g,' ')}</span>{/each}</div>
+						<p class="text-xs text-[#7c7c7c] truncate">{wh.url}</p>
+						<div class="flex gap-1 mt-1 flex-wrap">{#each wh.events as e}<span class="text-xs bg-white/5 text-[#8a8a8a] px-1.5 py-0.5 rounded">{e.replace(/_/g,' ')}</span>{/each}</div>
 					</div>
 				</div>
 			{/each}
-			{#if oWebhooks.length === 0}<p class="text-xs text-[#444]">No webhooks configured. Add them here.</p>{/if}
-			<p class="text-xs text-[#444]">To add webhooks, use the Webhooks tab above or go to <a href="/settings" class="underline hover:text-white">Settings → Webhooks</a>.</p>
+			{#if oWebhooks.length === 0}<p class="text-xs text-[#6e6e6e]">No webhooks configured. Add them here.</p>{/if}
+			<p class="text-xs text-[#6e6e6e]">To add webhooks, use the Webhooks tab above or go to <a href="/settings" class="underline hover:text-white">Settings → Webhooks</a>.</p>
 
 		<!-- ── DATA & PRIVACY ─────────────────────────────── -->
 		{:else if section === 'data'}
@@ -856,7 +856,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 mb-4">
 				<div>
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-1">Bulk Do Not Call</p>
-					<p class="text-xs text-[#555]">Paste phone numbers (one per line). Matching contacts will be marked Do Not Call immediately.</p>
+					<p class="text-xs text-[#7c7c7c]">Paste phone numbers (one per line). Matching contacts will be marked Do Not Call immediately.</p>
 				</div>
 				{#if !dncResult}
 					<textarea bind:value={dncInput} rows="5"
@@ -870,13 +870,13 @@
 					<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3">
 						<p class="text-xs text-[var(--accent)]">✓ {dncResult.updated} contacts marked Do Not Call · {dncResult.notFound} not found</p>
 					</div>
-					<button onclick={() => { dncResult = null; dncInput = ''; }} class="text-xs text-[#444] hover:text-white transition-colors">Upload another batch</button>
+					<button onclick={() => { dncResult = null; dncInput = ''; }} class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Upload another batch</button>
 				{/if}
 			</div>
 
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Export Your Data</p>
-				<p class="text-xs text-[#555]">Download your data as CSV files. Click individual exports or export everything at once.</p>
+				<p class="text-xs text-[#7c7c7c]">Download your data as CSV files. Click individual exports or export everything at once.</p>
 				<div class="flex flex-wrap gap-2">
 					<button onclick={() => exportData('contacts')} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Contacts</button>
 					<button onclick={() => exportData('calls')} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Calls</button>
@@ -893,16 +893,16 @@
 			</div>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Data Retention</p>
-				<div><label class="text-xs text-[#555] block mb-1.5">Auto-delete calls older than (0 = never)</label>
+				<div><label class="text-xs text-[#7c7c7c] block mb-1.5">Auto-delete calls older than (0 = never)</label>
 					<div class="flex items-center gap-2">
 						<input type="number" bind:value={settings.data_retention_months} min="0" max="60" class="w-24 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
-						<span class="text-xs text-[#555]">months</span>
+						<span class="text-xs text-[#7c7c7c]">months</span>
 					</div>
 				</div>
 			</div>
 			<div class="rounded-xl border border-red-900/30 bg-red-950/10 p-5 space-y-3">
 				<p class="text-xs text-red-400 uppercase tracking-widest">Danger Zone</p>
-				<p class="text-xs text-[#555]">Deleting your account is permanent and cannot be undone.</p>
+				<p class="text-xs text-[#7c7c7c]">Deleting your account is permanent and cannot be undone.</p>
 				<button onclick={() => { if (confirm('Are you absolutely sure? This cannot be undone.')) { alert('Contact support to delete your account.'); } }} class="rounded-lg border border-red-900 px-4 py-2 text-xs text-red-400 hover:bg-red-950/30">Delete Account</button>
 			</div>
 
@@ -911,8 +911,8 @@
 			<h2 class="text-white text-sm font-medium mb-6">Security</h2>
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<p class="text-xs text-[#999] uppercase tracking-widest">Two-Factor Authentication</p>
-				<p class="text-xs text-[#555]">2FA adds an extra layer of security to your account. Coming soon — use Supabase's built-in MFA for now.</p>
-				<a href="https://supabase.com/dashboard/project/_/auth/users" target="_blank" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#666] hover:text-white inline-block">Manage in Supabase →</a>
+				<p class="text-xs text-[#7c7c7c]">2FA adds an extra layer of security to your account. Coming soon — use Supabase's built-in MFA for now.</p>
+				<a href="https://supabase.com/dashboard/project/_/auth/users" target="_blank" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#8a8a8a] hover:text-white inline-block">Manage in Supabase →</a>
 			</div>
 
 		<!-- ── VOICE & DEVICE ───────── -->

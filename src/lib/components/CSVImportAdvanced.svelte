@@ -242,7 +242,7 @@
 	<!-- Step indicator -->
 	<div class="flex items-center gap-2 text-xs">
 		{#each [['upload','1. Upload'],['mapping','2. Map Fields'],['preview','3. Review'],['done','4. Done']] as [s, label]}
-			<span class="{step === s ? 'text-white font-medium' : step === 'done' || ['mapping','preview','done'].indexOf(step) > ['mapping','preview','done'].indexOf(s as Step) ? 'text-[#666]' : 'text-[#333]'}">{label}</span>
+			<span class="{step === s ? 'text-white font-medium' : step === 'done' || ['mapping','preview','done'].indexOf(step) > ['mapping','preview','done'].indexOf(s as Step) ? 'text-[#8a8a8a]' : 'text-[#333]'}">{label}</span>
 			{#if s !== 'done'}<span class="text-[#333]">›</span>{/if}
 		{/each}
 	</div>
@@ -257,8 +257,8 @@
 			ondrop={(e) => { e.preventDefault(); dragOver = false; const f = e.dataTransfer?.files[0]; if (f?.name.endsWith('.csv')) loadFile(f); }}
 			onclick={() => document.getElementById('csv-adv')?.click()}
 			onkeydown={(e) => e.key === 'Enter' && document.getElementById('csv-adv')?.click()}>
-			<p class="text-[#666] text-sm mb-1">Drop CSV file or click to browse</p>
-			<p class="text-[#444] text-xs">Any column names — AI will map them to the right fields</p>
+			<p class="text-[#8a8a8a] text-sm mb-1">Drop CSV file or click to browse</p>
+			<p class="text-[#6e6e6e] text-xs">Any column names — AI will map them to the right fields</p>
 			<input id="csv-adv" type="file" accept=".csv" class="hidden" onchange={(e) => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) loadFile(f); }} />
 		</div>
 
@@ -272,11 +272,11 @@
 				</button>
 			</div>
 			{#if mappingError}<p class="text-xs text-yellow-400">{mappingError}</p>{/if}
-			{#if aiNotes}<p class="text-xs text-[#555] italic">AI: {aiNotes}</p>{/if}
+			{#if aiNotes}<p class="text-xs text-[#7c7c7c] italic">AI: {aiNotes}</p>{/if}
 
 			<!-- Column mapping table -->
 			<div class="rounded-xl border border-[#2a2a2a] overflow-hidden">
-				<div class="grid grid-cols-3 gap-0 bg-[#1a1a1a] px-4 py-2 text-xs text-[#555] uppercase tracking-widest">
+				<div class="grid grid-cols-3 gap-0 bg-[#1a1a1a] px-4 py-2 text-xs text-[#7c7c7c] uppercase tracking-widest">
 					<span>CSV Column</span><span>Sample Data</span><span>Maps To</span>
 				</div>
 				{#each headers as h, i}
@@ -285,10 +285,10 @@
 							<div class="flex items-center gap-2">
 								<p class="text-sm text-white">{h}</p>
 								{#if confidence[h]}
-									<span class="text-xs {CONFIDENCE_COLORS[confidence[h]] ?? 'text-[#444]'}">{confidence[h]}</span>
+									<span class="text-xs {CONFIDENCE_COLORS[confidence[h]] ?? 'text-[#6e6e6e]'}">{confidence[h]}</span>
 								{/if}
 							</div>
-							<p class="text-xs text-[#555] truncate pr-3">{sampleRows[0]?.[i] ?? ''}</p>
+							<p class="text-xs text-[#7c7c7c] truncate pr-3">{sampleRows[0]?.[i] ?? ''}</p>
 							<select
 								value={mappings[h] ?? 'skip'}
 								onchange={(e) => {
@@ -336,7 +336,7 @@
 								<p class="text-xs text-cyan-400 font-medium">New custom field</p>
 								<div class="grid grid-cols-2 gap-2">
 									<div>
-										<label class="text-xs text-[#555] block mb-1">Field Name</label>
+										<label class="text-xs text-[#7c7c7c] block mb-1">Field Name</label>
 										<input
 											value={userNewFields[h].fieldName}
 											oninput={(e) => {
@@ -348,7 +348,7 @@
 											class="w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-cyan-600 focus:outline-none" />
 									</div>
 									<div>
-										<label class="text-xs text-[#555] block mb-1">Field Type</label>
+										<label class="text-xs text-[#7c7c7c] block mb-1">Field Type</label>
 										<select
 											value={userNewFields[h].fieldType}
 											onchange={(e) => userNewFields = { ...userNewFields, [h]: { ...userNewFields[h], fieldType: (e.target as HTMLSelectElement).value } }}
@@ -362,7 +362,7 @@
 										</select>
 									</div>
 								</div>
-								<p class="text-xs text-[#444]">Key: <span class="font-mono text-[#666]">{userNewFields[h].fieldKey || '—'}</span></p>
+								<p class="text-xs text-[#6e6e6e]">Key: <span class="font-mono text-[#8a8a8a]">{userNewFields[h].fieldKey || '—'}</span></p>
 							</div>
 						{/if}
 					</div>
@@ -380,8 +380,8 @@
 								onchange={() => { const s = new Set(fieldsToCreate); s.has(cf.csvHeader) ? s.delete(cf.csvHeader) : s.add(cf.csvHeader); fieldsToCreate = s; }}
 								class="mt-0.5 rounded" />
 							<div class="flex-1">
-								<p class="text-sm text-white">{cf.fieldName} <span class="text-xs text-[#444] font-mono">({cf.fieldType})</span></p>
-								<p class="text-xs text-[#555]">From column: "{cf.csvHeader}" — {cf.reason}</p>
+								<p class="text-sm text-white">{cf.fieldName} <span class="text-xs text-[#6e6e6e] font-mono">({cf.fieldType})</span></p>
+								<p class="text-xs text-[#7c7c7c]">From column: "{cf.csvHeader}" — {cf.reason}</p>
 							</div>
 						</label>
 					{/each}
@@ -392,7 +392,7 @@
 				<button onclick={runPreview} disabled={loadingPreview} class="rounded-lg bg-white px-6 py-2.5 text-sm font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">
 					{loadingPreview ? 'Checking...' : 'Preview Import →'}
 				</button>
-				<button onclick={() => step = 'upload'} class="text-xs text-[#555] hover:text-white px-3">← Back</button>
+				<button onclick={() => step = 'upload'} class="text-xs text-[#7c7c7c] hover:text-white px-3">← Back</button>
 			</div>
 		</div>
 
@@ -403,25 +403,25 @@
 			<div class="flex gap-4">
 				<div class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 px-4 py-2 flex-1 text-center">
 					<p class="text-lg font-semibold text-[var(--accent)]">{counts.new}</p>
-					<p class="text-xs text-[#555]">New contacts</p>
+					<p class="text-xs text-[#7c7c7c]">New contacts</p>
 				</div>
 				<div class="rounded-lg bg-yellow-950/20 border border-yellow-800/30 px-4 py-2 flex-1 text-center">
 					<p class="text-lg font-semibold text-yellow-400">{counts.duplicate}</p>
-					<p class="text-xs text-[#555]">Duplicates</p>
+					<p class="text-xs text-[#7c7c7c]">Duplicates</p>
 				</div>
 				<div class="rounded-lg bg-red-950/20 border border-red-800/30 px-4 py-2 flex-1 text-center">
 					<p class="text-lg font-semibold text-red-400">{counts.invalid}</p>
-					<p class="text-xs text-[#555]">Invalid rows</p>
+					<p class="text-xs text-[#7c7c7c]">Invalid rows</p>
 				</div>
 			</div>
 
 			<!-- Bulk actions -->
 			<div class="flex gap-2 flex-wrap text-xs">
-				<button onclick={() => toggleAll('new', true)} class="rounded border border-[#2a2a2a] px-2 py-1 text-[#666] hover:text-white">✓ All new</button>
-				<button onclick={() => toggleAll('new', false)} class="rounded border border-[#2a2a2a] px-2 py-1 text-[#666] hover:text-white">✗ Deselect new</button>
+				<button onclick={() => toggleAll('new', true)} class="rounded border border-[#2a2a2a] px-2 py-1 text-[#8a8a8a] hover:text-white">✓ All new</button>
+				<button onclick={() => toggleAll('new', false)} class="rounded border border-[#2a2a2a] px-2 py-1 text-[#8a8a8a] hover:text-white">✗ Deselect new</button>
 				<button onclick={() => toggleAll('duplicate', true)} class="rounded border border-[#2a2a2a] px-2 py-1 text-yellow-600 hover:text-yellow-400">✓ Include dupes</button>
 				<button onclick={() => toggleAll('duplicate', false)} class="rounded border border-[#2a2a2a] px-2 py-1 text-yellow-600 hover:text-yellow-400">✗ Skip dupes</button>
-				<p class="ml-auto text-[#555]">{approvedCount} selected</p>
+				<p class="ml-auto text-[#7c7c7c]">{approvedCount} selected</p>
 			</div>
 
 			<!-- Row table -->
@@ -434,7 +434,7 @@
 								<p class="text-xs text-white font-medium truncate">{row.record.name || '(no name)'}</p>
 								<span class="text-xs {STATUS_BADGES[row.status]} capitalize shrink-0">{row.status}</span>
 							</div>
-							<p class="text-xs text-[#555] truncate">{[row.record.company, row.record.phone, row.record.email].filter(Boolean).join(' · ')}</p>
+							<p class="text-xs text-[#7c7c7c] truncate">{[row.record.company, row.record.phone, row.record.email].filter(Boolean).join(' · ')}</p>
 						</div>
 						{#if row.status === 'duplicate'}<span class="text-[9px] text-yellow-600 shrink-0">{row.dupReason}</span>{/if}
 					</div>
@@ -455,14 +455,14 @@
 			<!-- Result summary -->
 			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-5 text-center">
 				<p class="text-2xl font-semibold text-[var(--accent)] mb-1">{importResult?.created ?? 0}</p>
-				<p class="text-xs text-[#555]">contacts imported{importResult?.errors ? ` · ${importResult.errors} errors` : ''}</p>
+				<p class="text-xs text-[#7c7c7c]">contacts imported{importResult?.errors ? ` · ${importResult.errors} errors` : ''}</p>
 			</div>
 
 			<!-- Routing prompt -->
 			{#if !routingDone && importResult && importResult.created > 0}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5">
 					<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.18em;color:var(--c-text-faint);margin-bottom:10px">Route to campaign</p>
-					<p class="text-xs text-[#555] mb-4">Add these {importResult.created} contacts to a call list so your reps can start dialing them immediately.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Add these {importResult.created} contacts to a call list so your reps can start dialing them immediately.</p>
 
 					<div class="space-y-3">
 						<select bind:value={routingCampaignId}
@@ -492,7 +492,7 @@
 								{routing ? 'Adding to queue…' : '→ Add to call queue'}
 							</button>
 							<button onclick={() => routingDone = true}
-								class="rounded-xl border border-[#2a2a2a] px-4 py-2.5 text-xs text-[#555] hover:text-white hover:border-white transition-colors">
+								class="rounded-xl border border-[#2a2a2a] px-4 py-2.5 text-xs text-[#7c7c7c] hover:text-white hover:border-white transition-colors">
 								Skip
 							</button>
 						</div>
@@ -501,12 +501,12 @@
 			{:else if routingDone}
 				<div class="rounded-xl border border-[#1a1a1a] bg-[#080808] p-4 text-center">
 					<p class="text-xs text-[var(--accent)]">✓ Contacts added to call queue</p>
-					<a href="/dialer" class="text-[10px] text-[#444] hover:text-white mt-1 block transition-colors">Open dialer →</a>
+					<a href="/dialer" class="text-[10px] text-[#6e6e6e] hover:text-white mt-1 block transition-colors">Open dialer →</a>
 				</div>
 			{/if}
 
 			<button onclick={() => { step = 'upload'; importResult = null; routingDone = false; routingCampaignId = ''; routingListId = ''; }}
-				class="w-full rounded-xl border border-[#2a2a2a] py-2.5 text-xs text-[#555] hover:border-white hover:text-white transition-colors">
+				class="w-full rounded-xl border border-[#2a2a2a] py-2.5 text-xs text-[#7c7c7c] hover:border-white hover:text-white transition-colors">
 				Import another file
 			</button>
 		</div>

@@ -42,7 +42,7 @@
 <div class="flex flex-col h-full p-3">
     <div class="flex items-center justify-between mb-3">
         <p class="text-xs font-semibold text-white">🔥 Hot Leads</p>
-        <span class="text-[10px] text-[#444]">last 48h</span>
+        <span class="text-[10px] text-[#6e6e6e]">last 48h</span>
     </div>
     {#if loading}
         {#each {length: 3} as _}
@@ -61,13 +61,13 @@
                             <p class="text-xs font-medium text-white truncate">{lead.name || 'Unknown'}</p>
                             <span class="text-[9px] px-1.5 py-0.5 rounded {intentColor(lead.intent_label)}">{lead.intent_label?.replace(/_/g,' ')}</span>
                         </div>
-                        <p class="text-[10px] text-[#444]">{lead.company || lead.lead_source} · {timeAgo(lead.created_at)}</p>
+                        <p class="text-[10px] text-[#6e6e6e]">{lead.company || lead.lead_source} · {timeAgo(lead.created_at)}</p>
                     </div>
                     <div class="flex gap-1 ml-2 flex-shrink-0">
                         {#if lead.phone}
                             <a href="/dialer?contact={lead.id}" class="text-[10px] px-2 py-1 rounded-lg bg-white text-black font-semibold hover:bg-[#e5e5e5]">Call</a>
                         {/if}
-                        <a href="/contacts/{lead.id}" class="text-[10px] px-2 py-1 rounded-lg border border-[#2a2a2a] text-[#666] hover:text-white">→</a>
+                        <a href="/contacts/{lead.id}" class="text-[10px] px-2 py-1 rounded-lg border border-[#2a2a2a] text-[#8a8a8a] hover:text-white">→</a>
                     </div>
                 </div>
             {/each}

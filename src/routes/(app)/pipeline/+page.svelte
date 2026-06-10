@@ -199,7 +199,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Deal Pipeline</h2>
-			<p class="text-xs text-[#444] mt-0.5">Weighted forecast: <span class="text-[var(--accent)]">{fmt$(Math.round(totalPipeline()))}</span></p>
+			<p class="text-xs text-[#6e6e6e] mt-0.5">Weighted forecast: <span class="text-[var(--accent)]">{fmt$(Math.round(totalPipeline()))}</span></p>
 		</div>
 		<button onclick={() => window.open('/api/export?type=deals', '_blank')} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Export</button>
 		<button onclick={() => showImportDeals = !showImportDeals} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↑ Import CSV</button>
@@ -213,7 +213,7 @@
 	<div class="border-b border-[#1e1e1e] bg-[#0d0d0d] px-8 py-4">
 		<div class="max-w-xl space-y-3">
 			<p class="text-xs text-white font-medium">Import Deals from CSV</p>
-			<p class="text-xs text-[#555]">Required: title/deal/name column. Optional: value, stage, contact, client, close date, notes</p>
+			<p class="text-xs text-[#7c7c7c]">Required: title/deal/name column. Optional: value, stage, contact, client, close date, notes</p>
 			<input bind:this={importFileInput} type="file" accept=".csv" onchange={handleImportFile} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white file:mr-3 file:rounded file:border-0 file:bg-white/10 file:text-white file:text-xs file:px-2 file:py-1" />
 			{#if importCsv}
 				<button onclick={importDeals} disabled={importingDeals} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{importingDeals ? 'Importing...' : 'Import Deals'}</button>
@@ -236,7 +236,7 @@
 				<div><DatePicker bind:value={nClose} onchange={(v) => nClose = v} /></div>
 				<div class="flex gap-2">
 					<button onclick={createDeal} disabled={saving || !nTitle.trim()} class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? '...' : 'Add'}</button>
-					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-2"><Icon name="x" size={14} /></button>
+					<button onclick={() => showNew = false} class="text-xs text-[#7c7c7c] hover:text-white px-2"><Icon name="x" size={14} /></button>
 				</div>
 				<div class="relative">
 					<input
@@ -247,7 +247,7 @@
 					/>
 					{#if pickerContacts.length > 0}
 						<div class="absolute z-20 top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg max-h-40 overflow-y-auto">
-							<button onclick={() => { nContact = ''; contactSearchQuery = ''; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-[#555] hover:bg-white/5">No contact</button>
+							<button onclick={() => { nContact = ''; contactSearchQuery = ''; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-[#7c7c7c] hover:bg-white/5">No contact</button>
 							{#each pickerContacts as c}
 								<button onclick={() => { nContact = c.id; contactSearchQuery = c.name; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-white hover:bg-white/5 truncate">{c.name}{c.company ? ` · ${c.company}` : ''}</button>
 							{/each}
@@ -292,10 +292,10 @@
 							<div class="flex items-center gap-2">
 								<div class="w-2 h-2 rounded-full" style="background-color:{stage.color}"></div>
 								<p class="text-xs font-medium text-white">{stage.label}</p>
-								<span class="text-xs text-[#444]">{dealsInStage(stage.key).length}</span>
+								<span class="text-xs text-[#6e6e6e]">{dealsInStage(stage.key).length}</span>
 							</div>
 							{#if stageValue(stage.key) > 0}
-								<p class="text-xs text-[#555]">{fmt$(stageValue(stage.key))}</p>
+								<p class="text-xs text-[#7c7c7c]">{fmt$(stageValue(stage.key))}</p>
 							{/if}
 						</div>
 					</div>
@@ -311,13 +311,13 @@
 								class="rounded-lg border border-[#2a2a2a] bg-[#111111] p-3 cursor-grab active:cursor-grabbing hover:border-[#444] transition-colors group">
 
 								<p class="text-sm text-white font-medium mb-1 truncate">{deal.title}</p>
-								{#if deal.contact}<p class="text-xs text-[#555] truncate">{deal.contact.name}{deal.contact.company ? ` · ${deal.contact.company}` : ''}</p>{/if}
+								{#if deal.contact}<p class="text-xs text-[#7c7c7c] truncate">{deal.contact.name}{deal.contact.company ? ` · ${deal.contact.company}` : ''}</p>{/if}
 								<div class="flex items-center justify-between mt-2">
 									<p class="text-sm font-semibold" style="color:{stage.color}">{fmt$(deal.value)}</p>
 									<p class="text-xs text-[#333]">{deal.probability}%</p>
 								</div>
 								{#if deal.expected_close}
-									<p class="text-xs text-[#444] mt-1">Close: {fmtDate(deal.expected_close)}</p>
+									<p class="text-xs text-[#6e6e6e] mt-1">Close: {fmtDate(deal.expected_close)}</p>
 								{/if}
 								{#if daysStale >= 14 && deal.stage !== 'won' && deal.stage !== 'lost'}
 									<div class="mt-1.5 flex items-center gap-1">
@@ -343,18 +343,18 @@
 			{#if editingDeal}
 				<input bind:value={dealEdit.title} class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-sm text-white font-semibold focus:border-white focus:outline-none mr-2" />
 				<button onclick={saveDealEdit} class="text-xs bg-white text-black px-3 py-1 rounded-lg font-semibold mr-1">Save</button>
-				<button onclick={() => editingDeal = false} class="text-xs text-[#555] hover:text-white">Cancel</button>
+				<button onclick={() => editingDeal = false} class="text-xs text-[#7c7c7c] hover:text-white">Cancel</button>
 			{:else}
 				<p class="text-white font-semibold flex-1">{selectedDeal.title}</p>
-				<button onclick={startEditDeal} class="text-xs text-[#444] hover:text-white border border-[#2a2a2a] rounded-lg px-2.5 py-1 transition-colors mr-2">Edit</button>
-				<button onclick={() => { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }} class="text-[#555] hover:text-white"><Icon name="x" size={14} /></button>
+				<button onclick={startEditDeal} class="text-xs text-[#6e6e6e] hover:text-white border border-[#2a2a2a] rounded-lg px-2.5 py-1 transition-colors mr-2">Edit</button>
+				<button onclick={() => { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }} class="text-[#7c7c7c] hover:text-white"><Icon name="x" size={14} /></button>
 			{/if}
 		</div>
 
 		{#if editingDeal}
 			<div class="space-y-2 mb-4">
 				<div>
-					<label class="text-xs text-[#555] block mb-1">Value ($)</label>
+					<label class="text-xs text-[#7c7c7c] block mb-1">Value ($)</label>
 					<input bind:value={dealEdit.value} type="number" placeholder="0"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 			</div>

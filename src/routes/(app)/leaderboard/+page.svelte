@@ -28,7 +28,7 @@
 	function medal(i: number) { return ['🥇','🥈','🥉'][i] ?? `${i+1}`; }
 
 	function qualityColor(q: number | null) {
-		if (!q) return 'text-[#444]';
+		if (!q) return 'text-[#6e6e6e]';
 		if (q >= 8) return 'text-[var(--accent)]';
 		if (q >= 6) return 'text-yellow-400';
 		return 'text-red-400';
@@ -43,7 +43,7 @@
 		<div class="flex gap-1">
 			{#each (['today','week','month','all'] as Period[]) as p}
 				<button onclick={() => { period = p; load(); }}
-					class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'}">
+					class="rounded-lg px-3 py-1.5 text-xs transition-colors {period === p ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'}">
 					{PERIOD_LABELS[p]}
 				</button>
 			{/each}
@@ -62,7 +62,7 @@
 	{:else}
 			<!-- Agent rankings -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] overflow-hidden">
-				<div class="px-6 py-3 border-b border-[#1e1e1e] grid grid-cols-7 text-xs text-[#555] uppercase tracking-widest">
+				<div class="px-6 py-3 border-b border-[#1e1e1e] grid grid-cols-7 text-xs text-[#7c7c7c] uppercase tracking-widest">
 					<span class="col-span-2">Agent</span>
 					<span class="text-right">Calls</span>
 					<span class="text-right">Answer %</span>
@@ -76,18 +76,18 @@
 							<span class="text-lg w-6 text-center">{medal(i)}</span>
 							<div>
 								<p class="text-sm text-white truncate">{agent.email}</p>
-								<p class="text-xs text-[#444] capitalize">{agent.role}</p>
+								<p class="text-xs text-[#6e6e6e] capitalize">{agent.role}</p>
 							</div>
 						</div>
 						<p class="text-right text-white font-semibold">{agent.totalCalls}</p>
-						<p class="text-right {agent.answerRate >= 30 ? 'text-[var(--accent)]' : agent.answerRate >= 15 ? 'text-yellow-400' : 'text-[#666]'}">{agent.answerRate}%</p>
+						<p class="text-right {agent.answerRate >= 30 ? 'text-[var(--accent)]' : agent.answerRate >= 15 ? 'text-yellow-400' : 'text-[#8a8a8a]'}">{agent.answerRate}%</p>
 						<p class="text-right text-[#888]">{agent.callbackRate}%</p>
-						<p class="text-right text-[#666]">{agent.avgDuration ? fmtDur(agent.avgDuration) : '—'}</p>
+						<p class="text-right text-[#8a8a8a]">{agent.avgDuration ? fmtDur(agent.avgDuration) : '—'}</p>
 						<p class="text-right {qualityColor(agent.avgQuality)}">{agent.avgQuality ?? '—'}</p>
 					</div>
 				{/each}
 				{#if agents.length === 0}
-					<p class="text-[#444] text-sm text-center py-8">No calls in this period</p>
+					<p class="text-[#6e6e6e] text-sm text-center py-8">No calls in this period</p>
 				{/if}
 			</div>
 
@@ -103,7 +103,7 @@
 									<div class="h-full rounded-full bg-[var(--accent)]/60" style="width:{slot.answerRate}%"></div>
 								</div>
 								<p class="text-sm text-[var(--accent)] w-12 text-right shrink-0">{slot.answerRate}%</p>
-								<p class="text-xs text-[#444] w-16 text-right shrink-0">{slot.total} calls</p>
+								<p class="text-xs text-[#6e6e6e] w-16 text-right shrink-0">{slot.total} calls</p>
 							</div>
 						{/each}
 					</div>

@@ -739,7 +739,7 @@
 		<div class="border-b border-orange-900/30 bg-orange-950/10 px-6 py-3 shrink-0">
 			<div class="flex items-center gap-3 mb-2">
 				<span class="text-orange-400 text-xs font-semibold uppercase tracking-widest">⏳ Review Queue</span>
-				<span class="text-[10px] text-[#555]">{reviewQueue.length} campaign{reviewQueue.length !== 1 ? 's' : ''} awaiting your decision</span>
+				<span class="text-[10px] text-[#7c7c7c]">{reviewQueue.length} campaign{reviewQueue.length !== 1 ? 's' : ''} awaiting your decision</span>
 				<span class="text-[10px] text-[#333] ml-auto">Client approved these — activate to start dialing or send back to draft</span>
 			</div>
 			<div class="flex gap-2 flex-wrap">
@@ -747,7 +747,7 @@
 					<div class="flex items-center gap-2 rounded-lg border border-orange-800/30 bg-[#111] px-3 py-2">
 						<div class="min-w-0">
 							<p class="text-xs text-white font-medium truncate max-w-[140px]">{c.name}</p>
-							<p class="text-[10px] text-[#555]">{(c as any).project?.client?.name ?? ''}</p>
+							<p class="text-[10px] text-[#7c7c7c]">{(c as any).project?.client?.name ?? ''}</p>
 						</div>
 						<button
 							onclick={() => activateCampaign(c.id)}
@@ -757,7 +757,7 @@
 						</button>
 						<button
 							onclick={() => rejectCampaign(c.id)}
-							class="rounded-lg border border-[#2a2a2a] px-2 py-1.5 text-[10px] text-[#555] hover:text-white transition-colors">
+							class="rounded-lg border border-[#2a2a2a] px-2 py-1.5 text-[10px] text-[#7c7c7c] hover:text-white transition-colors">
 							↩ Draft
 						</button>
 					</div>
@@ -771,7 +771,7 @@
 		<div class="flex items-center gap-2">
 			<div class="templates-container relative">
 				<button onclick={() => showTemplates = !showTemplates}
-					class="rounded-lg border border-[#2a2a2a] px-4 py-1.5 text-xs text-[#666] hover:border-white hover:text-white transition-colors">
+					class="rounded-lg border border-[#2a2a2a] px-4 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 					Templates
 				</button>
 				{#if showTemplates}
@@ -780,7 +780,7 @@
 							<button onclick={() => applyTemplate(tmpl)}
 								class="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-[#1a1a1a] last:border-0">
 								<p class="text-sm text-white font-medium">{tmpl.name}</p>
-								<p class="text-xs text-[#555] mt-0.5">{tmpl.description} · {tmpl.daily_call_goal} calls/day · {tmpl.calls_per_lead} attempts</p>
+								<p class="text-xs text-[#7c7c7c] mt-0.5">{tmpl.description} · {tmpl.daily_call_goal} calls/day · {tmpl.calls_per_lead} attempts</p>
 							</button>
 						{/each}
 					</div>
@@ -810,13 +810,13 @@
 
 				<!-- Campaign type -->
 				<div class="mb-4">
-					<label class="text-xs text-[#555] block mb-2">Campaign Type</label>
+					<label class="text-xs text-[#7c7c7c] block mb-2">Campaign Type</label>
 					<div class="grid grid-cols-2 gap-2">
 						{#each CAMPAIGN_TYPES as ct}
 							<button onclick={() => newCampaignType = ct.value}
 								class="rounded-lg border p-3 text-left transition-colors {newCampaignType === ct.value ? 'border-white bg-white/5' : 'border-[#2a2a2a] hover:border-[#444]'}">
 								<p class="text-sm text-white font-medium">{ct.label}</p>
-								<p class="text-xs text-[#555] mt-0.5">{ct.desc}</p>
+								<p class="text-xs text-[#7c7c7c] mt-0.5">{ct.desc}</p>
 							</button>
 						{/each}
 					</div>
@@ -831,7 +831,7 @@
 				<!-- Email sequence link (show for email + mixed) -->
 				{#if ['email','mixed'].includes(newCampaignType) && sequences.length > 0}
 					<div class="mb-2">
-						<label class="text-xs text-[#555] block mb-1">Linked Email Sequence</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Linked Email Sequence</label>
 						<select bind:value={newSequenceId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 							<option value="">— None —</option>
 							{#each sequences as s}<option value={s.id}>{s.name}</option>{/each}
@@ -842,10 +842,10 @@
 				<!-- Sender Configuration -->
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-4 space-y-3 mb-3">
 					<p class="text-xs text-[#999] uppercase tracking-widest">Sender Configuration</p>
-					<p class="text-xs text-[#444]">Which email and phone to use for this campaign. Falls back to project defaults if not set.</p>
+					<p class="text-xs text-[#6e6e6e]">Which email and phone to use for this campaign. Falls back to project defaults if not set.</p>
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="text-xs text-[#555] block mb-1">From Email</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">From Email</label>
 							<select bind:value={newCampaignEmailAccountId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 								<option value="">— Default / Project —</option>
 								{#each emailAccounts as acc}
@@ -854,7 +854,7 @@
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">From Phone</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">From Phone</label>
 							<select bind:value={newCampaignPhoneNumberId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 								<option value="">— Default / Primary —</option>
 								{#each phoneNumbers as num}
@@ -868,7 +868,7 @@
 				<!-- Win / Goal Definition -->
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-4 space-y-3 mb-3">
 					<p class="text-xs text-[#999] uppercase tracking-widest">What counts as a Win?</p>
-					<p class="text-xs text-[#444]">Define success for this campaign. Add multiple outcomes — each can have a different weight.</p>
+					<p class="text-xs text-[#6e6e6e]">Define success for this campaign. Add multiple outcomes — each can have a different weight.</p>
 
 					<!-- Win Conditions Builder -->
 					<div class="space-y-2">
@@ -879,9 +879,9 @@
 									<div class="flex items-center justify-between rounded-lg bg-[#111] border border-[#2a2a2a] px-3 py-2">
 										<div class="flex items-center gap-2">
 											<span class="text-xs text-white">{wc.label}</span>
-											<span class="text-[10px] text-[#555]">×{wc.weight}</span>
+											<span class="text-[10px] text-[#7c7c7c]">×{wc.weight}</span>
 										</div>
-										<button type="button" onclick={() => removeWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
+										<button type="button" onclick={() => removeWinCondition(wc.outcome)} class="text-[#6e6e6e] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
 									</div>
 								{/each}
 							</div>
@@ -895,23 +895,23 @@
 								{/each}
 							</select>
 							<div class="flex items-center gap-1 flex-shrink-0">
-								<span class="text-xs text-[#555]">×</span>
+								<span class="text-xs text-[#7c7c7c]">×</span>
 								<input bind:value={addingWinWeight} type="number" min="1" max="5"
 									class="w-12 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-2 text-sm text-white text-center focus:border-white focus:outline-none" />
 							</div>
 							<button type="button" onclick={addWinCondition} disabled={!addingWinOutcome}
-								class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#666] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
+								class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#8a8a8a] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
 								+ Add
 							</button>
 						</div>
-						<p class="text-[10px] text-[#444]">Weight = how many wins this outcome counts as (e.g. Signed Up = 2)</p>
+						<p class="text-[10px] text-[#6e6e6e]">Weight = how many wins this outcome counts as (e.g. Signed Up = 2)</p>
 					</div>
 
 					<div>
-						<label class="text-xs text-[#555] block mb-1">Target (optional)</label>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Target (optional)</label>
 						<div class="flex items-center gap-2">
 							<input type="number" bind:value={newTargetWins} placeholder="10" min="1" class="w-24 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-							<span class="text-xs text-[#555]">wins to achieve this campaign's goal</span>
+							<span class="text-xs text-[#7c7c7c]">wins to achieve this campaign's goal</span>
 						</div>
 					</div>
 				</div>
@@ -921,23 +921,23 @@
 					<p class="text-xs text-[#999] uppercase tracking-widest">Call Goals & Cadence</p>
 					<div class="grid grid-cols-3 gap-3">
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Daily Call Goal</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Daily Call Goal</label>
 							<input type="number" bind:value={newDailyCallGoal} placeholder="50"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 							<p class="text-xs text-[#333] mt-1">Calls per day target</p>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Calls Per Lead</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Calls Per Lead</label>
 							<input type="number" bind:value={newCallsPerLead} min="1" max="20" placeholder="3"
 								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 							<p class="text-xs text-[#333] mt-1">Max attempts per contact</p>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Cadence Window</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Cadence Window</label>
 							<div class="flex items-center gap-1">
 								<input type="number" bind:value={newCadenceDays} placeholder="14" min="1" max="90"
 									class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
-								<span class="text-xs text-[#444] shrink-0">days</span>
+								<span class="text-xs text-[#6e6e6e] shrink-0">days</span>
 							</div>
 							<p class="text-xs text-[#333] mt-1">Total attempt window</p>
 						</div>
@@ -968,27 +968,27 @@
 								(campaign as any).status === 'paused' ? 'bg-yellow-950 text-yellow-600' :
 								(campaign as any).status === 'completed' ? 'bg-blue-950 text-blue-400' :
 								(campaign as any).status === 'pending_approval' ? 'bg-orange-950 text-orange-400 animate-pulse' :
-								'bg-[#1a1a1a] text-[#555]'
+								'bg-[#1a1a1a] text-[#7c7c7c]'
 							}">{(campaign as any).status === 'pending_approval' ? '⏳ awaiting approval' : ((campaign as any).status ?? 'draft')}</span>
 							<span class="text-[10px] px-1.5 py-0.5 rounded-full {
 								campaign.campaign_type === 'email' ? 'bg-blue-900/30 text-blue-400' :
 								campaign.campaign_type === 'sms' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
 								campaign.campaign_type === 'mixed' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
-								'bg-[#1a1a1a] text-[#666]'
+								'bg-[#1a1a1a] text-[#8a8a8a]'
 							}">
 								{TYPE_ICONS[campaign.campaign_type] ?? '📞'}
 							</span>
 						</div>
 					</div>
-					<p class="text-xs text-[#555] truncate">{campaign.project?.client?.name} › {campaign.project?.name}</p>
+					<p class="text-xs text-[#7c7c7c] truncate">{campaign.project?.client?.name} › {campaign.project?.name}</p>
 					{#if campaign.target_wins && campaign.win_count !== undefined}
-						<p class="text-[10px] text-[#444] mt-0.5">{campaign.win_count ?? 0}/{campaign.target_wins} wins</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">{campaign.win_count ?? 0}/{campaign.target_wins} wins</p>
 					{:else if (campaign as any).daily_call_goal}
-						<p class="text-[10px] text-[#444] mt-0.5">{(campaign as any).calls_today ?? 0}/{(campaign as any).daily_call_goal} calls today</p>
+						<p class="text-[10px] text-[#6e6e6e] mt-0.5">{(campaign as any).calls_today ?? 0}/{(campaign as any).daily_call_goal} calls today</p>
 					{/if}
 				</button>
 			{:else}
-				<p class="text-center text-[#444] text-xs py-8 px-4">No campaigns yet.<br/>Create one above.</p>
+				<p class="text-center text-[#6e6e6e] text-xs py-8 px-4">No campaigns yet.<br/>Create one above.</p>
 			{/each}
 		</div>
 
@@ -997,8 +997,8 @@
 			<div class="flex-1 lg:w-80 lg:min-w-[320px] lg:shrink-0 border-r border-[#1e1e1e] flex flex-col overflow-y-auto">
 				<div class="p-4 border-b border-[#1e1e1e]">
 					<div class="flex items-center mb-2">
-						<button onclick={() => selectedCampaign = null} class="lg:hidden text-xs text-[#555] hover:text-white transition-colors mr-3">← Back</button>
-						<p class="text-xs text-[#555] truncate">{selectedCampaign.project?.client?.name} › {selectedCampaign.project?.name}</p>
+						<button onclick={() => selectedCampaign = null} class="lg:hidden text-xs text-[#7c7c7c] hover:text-white transition-colors mr-3">← Back</button>
+						<p class="text-xs text-[#7c7c7c] truncate">{selectedCampaign.project?.client?.name} › {selectedCampaign.project?.name}</p>
 					</div>
 					<div class="flex items-center gap-2 mb-1">
 						<p class="text-white text-sm font-medium">{selectedCampaign.name}</p>
@@ -1006,7 +1006,7 @@
 							selectedCampaign.campaign_type === 'email' ? 'bg-blue-900/30 text-blue-400' :
 							selectedCampaign.campaign_type === 'sms' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
 							selectedCampaign.campaign_type === 'mixed' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
-							'bg-[#1a1a1a] text-[#666]'
+							'bg-[#1a1a1a] text-[#8a8a8a]'
 						}">
 							{typeLabel(selectedCampaign.campaign_type)}
 						</span>
@@ -1022,18 +1022,18 @@
 									if (r.ok) { const u = await r.json(); campaigns = campaigns.map(c => c.id === u.id ? { ...c, ...u } : c); selectedCampaign = { ...selectedCampaign!, ...u }; toastSuccess('Sent to client for optional approval'); }
 									else { toastError('Failed to send for approval'); }
 								}}
-								class="text-xs text-[#555] hover:text-yellow-400 border border-[#2a2a2a] hover:border-yellow-900/40 px-2.5 py-1 rounded-lg transition-colors shrink-0">
+								class="text-xs text-[#7c7c7c] hover:text-yellow-400 border border-[#2a2a2a] hover:border-yellow-900/40 px-2.5 py-1 rounded-lg transition-colors shrink-0">
 								⏳ Send for Client Approval
 							</button>
 						{/if}
 						<button onclick={() => startEditCampaign(selectedCampaign!)}
-							class="{selectedCampaign.status === 'draft' || selectedCampaign.status === 'paused' ? '' : 'ml-auto'} text-xs text-[#555] hover:text-white border border-[#1e1e1e] px-2.5 py-1 rounded-lg transition-colors shrink-0">
+							class="{selectedCampaign.status === 'draft' || selectedCampaign.status === 'paused' ? '' : 'ml-auto'} text-xs text-[#7c7c7c] hover:text-white border border-[#1e1e1e] px-2.5 py-1 rounded-lg transition-colors shrink-0">
 							✎ Edit
 						</button>
 						{#if confirmDeleteId === selectedCampaign.id}
 							<span class="text-xs text-red-400">Sure?</span>
 							<button onclick={() => deleteCampaign(selectedCampaign!.id)} class="text-xs text-red-400 hover:text-red-300 ml-1">Yes</button>
-							<button onclick={() => confirmDeleteId = null} class="text-xs text-[#555] hover:text-white ml-1">No</button>
+							<button onclick={() => confirmDeleteId = null} class="text-xs text-[#7c7c7c] hover:text-white ml-1">No</button>
 						{:else}
 							<button onclick={() => confirmDeleteId = selectedCampaign!.id} class="text-xs text-red-700 hover:text-red-400 transition-colors shrink-0"><Icon name="x" size={14} /></button>
 						{/if}
@@ -1067,39 +1067,39 @@
 							<p class="text-xs text-[#999] uppercase tracking-widest">Call Goals & Cadence</p>
 							<div class="grid grid-cols-3 gap-3">
 								<div>
-									<label class="text-xs text-[#555] block mb-1">Daily Call Goal</label>
+									<label class="text-xs text-[#7c7c7c] block mb-1">Daily Call Goal</label>
 									<input type="number" bind:value={campaignEditForm.daily_call_goal} placeholder="50" min="1"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 									<p class="text-xs text-[#333] mt-1">Calls/day target</p>
 								</div>
 								<div>
-									<label class="text-xs text-[#555] block mb-1">Max Attempts/Lead</label>
+									<label class="text-xs text-[#7c7c7c] block mb-1">Max Attempts/Lead</label>
 									<input type="number" bind:value={campaignEditForm.calls_per_lead} placeholder="3" min="1" max="20"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 									<p class="text-xs text-[#333] mt-1">Before moving on</p>
 								</div>
 								<div>
-									<label class="text-xs text-[#555] block mb-1">Cadence Window</label>
+									<label class="text-xs text-[#7c7c7c] block mb-1">Cadence Window</label>
 									<div class="flex items-center gap-1">
 										<input type="number" bind:value={campaignEditForm.cadence_days} placeholder="14" min="1" max="90"
 											class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
-										<span class="text-xs text-[#444]">days</span>
+										<span class="text-xs text-[#6e6e6e]">days</span>
 									</div>
 									<p class="text-xs text-[#333] mt-1">Total attempt window</p>
 								</div>
 							</div>
 							<!-- Win conditions -->
 							<div class="pt-2 border-t border-[#1a1a1a] space-y-2">
-								<p class="text-xs text-[#555] mb-2">Win Conditions</p>
+								<p class="text-xs text-[#7c7c7c] mb-2">Win Conditions</p>
 								{#if editWinConditions.length > 0}
 									<div class="space-y-1">
 										{#each editWinConditions as wc}
 											<div class="flex items-center justify-between rounded-lg bg-[#0d0d0d] border border-[#2a2a2a] px-3 py-2">
 												<div class="flex items-center gap-2">
 													<span class="text-xs text-white">{wc.label}</span>
-													<span class="text-[10px] text-[#555]">×{wc.weight}</span>
+													<span class="text-[10px] text-[#7c7c7c]">×{wc.weight}</span>
 												</div>
-												<button type="button" onclick={() => editRemoveWinCondition(wc.outcome)} class="text-[#444] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
+												<button type="button" onclick={() => editRemoveWinCondition(wc.outcome)} class="text-[#6e6e6e] hover:text-red-400 text-xs"><Icon name="x" size={14} /></button>
 											</div>
 										{/each}
 									</div>
@@ -1113,22 +1113,22 @@
 										{/each}
 									</select>
 									<div class="flex items-center gap-1 flex-shrink-0">
-										<span class="text-xs text-[#555]">×</span>
+										<span class="text-xs text-[#7c7c7c]">×</span>
 										<input bind:value={editAddingWinWeight} type="number" min="1" max="5"
 											class="w-12 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-2 text-sm text-white text-center focus:border-white focus:outline-none" />
 									</div>
 									<button type="button" onclick={editAddWinCondition} disabled={!editAddingWinOutcome}
-										class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#666] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
+										class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#8a8a8a] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
 										+ Add
 									</button>
 								</div>
-								<p class="text-[10px] text-[#444]">Weight = how many wins this outcome counts as</p>
+								<p class="text-[10px] text-[#6e6e6e]">Weight = how many wins this outcome counts as</p>
 								<div class="pt-1">
-									<label class="text-xs text-[#555] block mb-1">Win Target (optional)</label>
+									<label class="text-xs text-[#7c7c7c] block mb-1">Win Target (optional)</label>
 									<div class="flex items-center gap-2">
 										<input type="number" bind:value={campaignEditForm.target_wins} placeholder="10" min="1"
 											class="w-24 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
-										<span class="text-xs text-[#555]">wins to achieve goal</span>
+										<span class="text-xs text-[#7c7c7c]">wins to achieve goal</span>
 									</div>
 								</div>
 							</div>
@@ -1138,7 +1138,7 @@
 						<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4 space-y-3">
 							<div class="flex items-center justify-between">
 								<p class="text-xs text-[var(--accent)] font-medium">📅 Appointment Questions</p>
-								<p class="text-[10px] text-[#444]">Qualifying questions reps see when booking</p>
+								<p class="text-[10px] text-[#6e6e6e]">Qualifying questions reps see when booking</p>
 							</div>
 							<div class="grid grid-cols-3 gap-2">
 								{#each [['window_sales','Window Sales'],['roofing','Roofing'],['electrician','Electrician'],['smart_home','Smart Home'],['general','General']] as [key, label]}
@@ -1156,20 +1156,20 @@
 						</div>
 
 						<div class="flex gap-2">
-							<button onclick={() => editingCampaign = null} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#777] hover:border-white hover:text-white transition-colors">Cancel</button>
+							<button onclick={() => editingCampaign = null} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">Cancel</button>
 							<button onclick={saveCampaignEdit} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">Save</button>
 						</div>
 						</div>
 					{/if}
 
 					{#if selectedCampaign.goal}
-						<p class="text-xs text-[#444] mb-2">🎯 {selectedCampaign.goal}</p>
+						<p class="text-xs text-[#6e6e6e] mb-2">🎯 {selectedCampaign.goal}</p>
 					{/if}
 					{#if selectedCampaign.description}
-						<p class="text-xs text-[#555] mb-2">{selectedCampaign.description}</p>
+						<p class="text-xs text-[#7c7c7c] mb-2">{selectedCampaign.description}</p>
 					{/if}
 					{#if (selectedCampaign as any).daily_call_goal || (selectedCampaign as any).calls_per_lead}
-						<div class="flex flex-wrap gap-3 text-xs text-[#555] mt-2 mb-2">
+						<div class="flex flex-wrap gap-3 text-xs text-[#7c7c7c] mt-2 mb-2">
 							{#if (selectedCampaign as any).daily_call_goal}
 								<span>📞 {(selectedCampaign as any).daily_call_goal} calls/day</span>
 							{/if}
@@ -1216,23 +1216,23 @@
 										(selectedCampaign.win_count ?? 0) >= selectedCampaign.target_wins ? 'bg-[var(--accent)]' : 'bg-blue-500'
 									}" style="width:{Math.min(((selectedCampaign.win_count ?? 0) / selectedCampaign.target_wins) * 100, 100)}%"></div>
 								</div>
-								<p class="text-xs text-[#444] mt-1">
+								<p class="text-xs text-[#6e6e6e] mt-1">
 									{selectedCampaign.target_wins - (selectedCampaign.win_count ?? 0)} remaining to reach goal
 								</p>
 							{/if}
 
 							{#if loadingWins}
-								<p class="text-[10px] text-[#444] mt-3">Loading rep data…</p>
+								<p class="text-[10px] text-[#6e6e6e] mt-3">Loading rep data…</p>
 							{:else if campaignWins?.byRep?.length > 0}
 								<div class="mt-3 pt-3 border-t border-[#1a1a1a]">
-									<p class="text-xs text-[#555] mb-2">Rep Performance</p>
+									<p class="text-xs text-[#7c7c7c] mb-2">Rep Performance</p>
 									<div class="space-y-1.5">
 										{#each campaignWins.byRep as rep}
 											<div class="flex items-center justify-between">
 												<span class="text-xs truncate flex-1 {rep.isCurrentUser ? 'text-white font-medium' : 'text-[#888]'}">{rep.name}</span>
 												<div class="flex items-center gap-2 flex-shrink-0 ml-2">
 													<span class="text-xs font-mono text-white">{rep.weighted_wins}</span>
-													<span class="text-[10px] text-[#444]">wins</span>
+													<span class="text-[10px] text-[#6e6e6e]">wins</span>
 												</div>
 											</div>
 										{/each}
@@ -1245,23 +1245,23 @@
 					<!-- Type-specific actions -->
 					<div class="flex flex-wrap gap-1.5 mb-3">
 						{#if selectedCampaign.campaign_type === 'call' || selectedCampaign.campaign_type === 'mixed'}
-							<a href="/dialer?campaign={selectedCampaign.id}" class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+							<a href="/dialer?campaign={selectedCampaign.id}" class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 								📞 Open Dialer
 							</a>
 						{/if}
 						{#if selectedCampaign.campaign_type === 'email' || selectedCampaign.campaign_type === 'mixed'}
-							<a href="/sequences{selectedCampaign.email_sequence_id ? '?id=' + selectedCampaign.email_sequence_id : ''}" class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+							<a href="/sequences{selectedCampaign.email_sequence_id ? '?id=' + selectedCampaign.email_sequence_id : ''}" class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 								✉️ Email Sequence
 							</a>
 						{/if}
 						{#if selectedCampaign?.email_sequence_id}
 							<button onclick={bulkEnrollInSequence} disabled={enrollingSequence}
-								class="rounded-lg border border-[var(--c-border-subtle)] px-2.5 py-1 text-xs text-[#666] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
+								class="rounded-lg border border-[var(--c-border-subtle)] px-2.5 py-1 text-xs text-[#8a8a8a] hover:border-white hover:text-white disabled:opacity-40 transition-colors">
 								{enrollingSequence ? 'Enrolling...' : '→ Enroll All Contacts'}
 							</button>
 						{/if}
 						{#if selectedCampaign.campaign_type === 'sms' || selectedCampaign.campaign_type === 'mixed'}
-							<button onclick={() => openBulkSmsForCampaign(selectedCampaign!)} class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+							<button onclick={() => openBulkSmsForCampaign(selectedCampaign!)} class="rounded-lg border border-[#2a2a2a] px-2.5 py-1 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 								💬 Send SMS
 							</button>
 						{/if}
@@ -1277,7 +1277,7 @@
 							<div class="px-8 py-4 border-b border-[#1a1a1a] flex items-center justify-between">
 								<p class="text-sm text-white font-medium">Compose & Send</p>
 								<button onclick={() => showEmailComposer = !showEmailComposer}
-									class="text-xs border border-[#2a2a2a] px-2.5 py-1 rounded-lg text-[#777] hover:border-white hover:text-white transition-colors">
+									class="text-xs border border-[#2a2a2a] px-2.5 py-1 rounded-lg text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 									{showEmailComposer ? 'Cancel' : '+ New Email'}
 								</button>
 							</div>
@@ -1300,7 +1300,7 @@
 										<input bind:value={campaignEmailPrompt} placeholder="Prompt (optional — e.g. 'focus on gaming partnership')"
 											class="flex-1 min-w-0 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-[var(--accent)]/40 focus:outline-none" />
 									</div>
-									<p class="text-xs text-[#444]">Use <code class="text-[#555]">{'{{name}}'}</code> and <code class="text-[#555]">{'{{company}}'}</code> — replaced per contact on send</p>
+									<p class="text-xs text-[#6e6e6e]">Use <code class="text-[#7c7c7c]">{'{{name}}'}</code> and <code class="text-[#7c7c7c]">{'{{company}}'}</code> — replaced per contact on send</p>
 									<input bind:value={emailSubject} placeholder="Subject line *"
 										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 									<textarea bind:value={emailBody} rows="6" placeholder="Hi {{name}},&#10;&#10;..."
@@ -1324,17 +1324,17 @@
 						<div class="px-4 py-3 border-b border-[#1a1a1a] flex items-center justify-between">
 							<div>
 								<p style="font-family:var(--font-label);font-size:9px;letter-spacing:.18em;color:var(--c-text-faint)">Assigned Reps</p>
-								<p class="text-[10px] text-[#444] mt-0.5">SDRs who dial this campaign · {campaignSdrs.length} assigned</p>
+								<p class="text-[10px] text-[#6e6e6e] mt-0.5">SDRs who dial this campaign · {campaignSdrs.length} assigned</p>
 							</div>
 						</div>
 						<div class="divide-y divide-[#111]">
 							{#if campaignSdrs.length === 0}
-								<p class="px-4 py-3 text-xs text-[#444]">No reps assigned — add from your team below</p>
+								<p class="px-4 py-3 text-xs text-[#6e6e6e]">No reps assigned — add from your team below</p>
 							{:else}
 								{#each campaignSdrs as sdr}
 									<div class="flex items-center justify-between px-4 py-2.5">
 										<div class="flex items-center gap-2">
-											<div class="w-6 h-6 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[10px] text-[#555] font-semibold shrink-0">
+											<div class="w-6 h-6 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[10px] text-[#7c7c7c] font-semibold shrink-0">
 												{(sdr.team_member?.member_email ?? '?')[0].toUpperCase()}
 											</div>
 											<span class="text-xs text-white">{sdr.team_member?.member_email?.split('@')[0] ?? '—'}</span>
@@ -1353,7 +1353,7 @@
 								<div class="flex flex-wrap gap-1.5">
 									{#each teamMembers.filter(m => !campaignSdrs.some(s => s.sdr_id === m.id)) as member}
 										<button onclick={() => assignSdr(member.id)}
-											class="rounded-lg border border-[#1e1e1e] px-2.5 py-1 text-[10px] text-[#555] hover:border-white hover:text-white transition-colors">
+											class="rounded-lg border border-[#1e1e1e] px-2.5 py-1 text-[10px] text-[#7c7c7c] hover:border-white hover:text-white transition-colors">
 											+ {member.member_email?.split('@')[0]}
 										</button>
 									{/each}
@@ -1369,13 +1369,13 @@
 								class="flex items-center justify-between rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors cursor-pointer">
 								<div>
 									<p class="text-xs text-white font-medium">{list.name}</p>
-									<p class="text-[10px] text-[#444] mt-0.5">{(list.call_list_contacts?.[0]?.count ?? 0)} contacts</p>
+									<p class="text-[10px] text-[#6e6e6e] mt-0.5">{(list.call_list_contacts?.[0]?.count ?? 0)} contacts</p>
 								</div>
 								<span class="text-[10px] text-[#333]">→</span>
 							</a>
 						{:else}
 							<div class="rounded-xl border border-dashed border-[#1e1e1e] p-6 text-center">
-								<p class="text-xs text-[#444]">No call lists yet</p>
+								<p class="text-xs text-[#6e6e6e]">No call lists yet</p>
 								<p class="text-[10px] text-[#333] mt-1">Create a call list to start importing contacts</p>
 							</div>
 						{/each}

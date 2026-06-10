@@ -99,19 +99,19 @@
 	{:else}
 		<!-- Monthly earnings -->
 		<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-6 mb-6">
-			<p class="text-xs text-[#555] uppercase tracking-widest mb-4">This Month's Earnings</p>
+			<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-4">This Month's Earnings</p>
 			<div class="grid grid-cols-3 gap-6">
 				<div>
 					<p class="text-2xl font-semibold text-white">${monthlyBase.toLocaleString()}</p>
-					<p class="text-xs text-[#555] mt-1">Base retainer</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">Base retainer</p>
 				</div>
 				<div>
 					<p class="text-2xl font-semibold text-yellow-400">+${bonusEarned.toLocaleString()}</p>
-					<p class="text-xs text-[#555] mt-1">{totalThisMonth.appointments} appts × ${bonusRate}</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">{totalThisMonth.appointments} appts × ${bonusRate}</p>
 				</div>
 				<div>
 					<p class="text-2xl font-semibold text-[var(--accent)]">${totalPay.toLocaleString()}</p>
-					<p class="text-xs text-[#555] mt-1">Total earned</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">Total earned</p>
 				</div>
 			</div>
 		</div>
@@ -126,7 +126,7 @@
 			] as stat}
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<p class="text-2xl font-semibold {stat.color}">{stat.value}</p>
-					<p class="text-xs text-[#555] mt-1">{stat.label}</p>
+					<p class="text-xs text-[#7c7c7c] mt-1">{stat.label}</p>
 				</div>
 			{/each}
 		</div>
@@ -134,11 +134,11 @@
 		<!-- Weekly breakdown -->
 		{#if weeks.length > 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 mb-6 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#555] uppercase tracking-widest mb-4">Weekly Breakdown</p>
+				<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-4">Weekly Breakdown</p>
 				<div class="overflow-x-auto">
 					<table class="w-full text-xs">
 						<thead>
-							<tr class="text-[#444] border-b border-[#1a1a1a]">
+							<tr class="text-[#6e6e6e] border-b border-[#1a1a1a]">
 								<th class="text-left py-2 font-normal">Week</th>
 								<th class="text-right py-2 font-normal">Calls</th>
 								<th class="text-right py-2 font-normal">Connect%</th>
@@ -150,7 +150,7 @@
 						<tbody>
 							{#each weeks.slice(-8) as week}
 								<tr class="border-b border-[#111] hover:bg-white/3">
-									<td class="py-2 text-[#666]">{week.week}</td>
+									<td class="py-2 text-[#8a8a8a]">{week.week}</td>
 									<td class="py-2 text-right text-white">{week.calls}</td>
 									<td class="py-2 text-right text-blue-400">{week.connectRate}%</td>
 									<td class="py-2 text-right text-yellow-400">{week.wins}</td>
@@ -176,7 +176,7 @@
 				<div class="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
 					<div class="h-full bg-yellow-500 rounded-full transition-all" style="width:{pct}%"></div>
 				</div>
-				<p class="text-[10px] text-[#444] mt-2">{next - totalThisMonth.appointments} more = +${(next - totalThisMonth.appointments) * bonusRate}</p>
+				<p class="text-[10px] text-[#6e6e6e] mt-2">{next - totalThisMonth.appointments} more = +${(next - totalThisMonth.appointments) * bonusRate}</p>
 			</div>
 		{:else}
 			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-4 text-center">
@@ -190,7 +190,7 @@
 			<div class="rounded-xl border border-yellow-800/40 bg-yellow-950/10 p-4 mb-4 flex items-center justify-between gap-4">
 				<div>
 					<p class="text-sm text-white font-medium">Connect Stripe to receive payouts</p>
-					<p class="text-xs text-[#666] mt-0.5">Your manager pays per appointment set — connect once and get paid directly.</p>
+					<p class="text-xs text-[#8a8a8a] mt-0.5">Your manager pays per appointment set — connect once and get paid directly.</p>
 				</div>
 				<button onclick={connectStripe} disabled={stripeConnecting}
 					class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-50 whitespace-nowrap transition-colors shrink-0">
@@ -202,7 +202,7 @@
 				<span class="text-blue-400">⏳</span>
 				<div>
 					<p class="text-sm text-white font-medium">Stripe account pending verification</p>
-					<p class="text-xs text-[#555] mt-0.5">Stripe is reviewing your account — payouts will be enabled once approved.</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">Stripe is reviewing your account — payouts will be enabled once approved.</p>
 				</div>
 			</div>
 		{:else}
@@ -215,7 +215,7 @@
 		<!-- My payouts -->
 		{#if myPayouts.length > 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#444] uppercase tracking-widest mb-3">My Payouts</p>
+				<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-3">My Payouts</p>
 				<div class="space-y-2">
 					{#each myPayouts.slice(0,5) as p}
 						<div class="flex items-center justify-between text-xs">
@@ -233,7 +233,7 @@
 		<!-- Manager feedback notes -->
 		{#if feedbackNotes.length > 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<p class="text-xs text-[#444] uppercase tracking-widest mb-3">Coach Feedback ({feedbackNotes.length})</p>
+				<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-3">Coach Feedback ({feedbackNotes.length})</p>
 				<div class="space-y-3">
 					{#each feedbackNotes.slice(0,5) as note}
 						<div class="border-b border-[#1a1a1a] pb-3 last:border-0 last:pb-0">
@@ -245,7 +245,7 @@
 										{/each}
 									</div>
 								{/if}
-								<span class="text-[9px] text-[#444]">{note.call?.contact?.name ?? '—'} · {new Date(note.created_at).toLocaleDateString()}</span>
+								<span class="text-[9px] text-[#6e6e6e]">{note.call?.contact?.name ?? '—'} · {new Date(note.created_at).toLocaleDateString()}</span>
 							</div>
 							<p class="text-xs text-[#ccc] leading-relaxed">{note.content}</p>
 						</div>

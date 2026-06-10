@@ -49,8 +49,8 @@
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 		<div>
-			<h2 class="text-white text-sm font-medium flex items-center gap-2">⭐ My Personal Leads <span class="text-[#444] text-xs font-normal">({contacts.length})</span></h2>
-			<p class="text-xs text-[#555] mt-0.5">Contacts flagged as opportunities for your own products while on client campaigns</p>
+			<h2 class="text-white text-sm font-medium flex items-center gap-2">⭐ My Personal Leads <span class="text-[#6e6e6e] text-xs font-normal">({contacts.length})</span></h2>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Contacts flagged as opportunities for your own products while on client campaigns</p>
 		</div>
 		{#if products.length > 1}
 			<select bind:value={filterProduct} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-white focus:border-white focus:outline-none">
@@ -73,7 +73,7 @@
 			<div>
 				<p class="text-4xl mb-4">⭐</p>
 				<p class="text-white text-sm font-medium">No personal leads yet</p>
-				<p class="text-[#444] text-xs mt-1 max-w-xs">While on a call during a client campaign, tap "Flag for My Pipeline" in the post-call screen to track contacts who might also want your own products</p>
+				<p class="text-[#6e6e6e] text-xs mt-1 max-w-xs">While on a call during a client campaign, tap "Flag for My Pipeline" in the post-call screen to track contacts who might also want your own products</p>
 			</div>
 		</div>
 	{:else}
@@ -88,7 +88,7 @@
 								<span class="text-xs bg-yellow-900/30 text-yellow-400 border border-yellow-800/40 px-2 py-0.5 rounded-full">{contact.own_pipeline_product}</span>
 							{/if}
 						</div>
-						<p class="text-xs text-[#666]">{[contact.title, contact.company].filter(Boolean).join(' · ')}</p>
+						<p class="text-xs text-[#8a8a8a]">{[contact.title, contact.company].filter(Boolean).join(' · ')}</p>
 						{#if contact.own_pipeline_notes}
 							<p class="text-xs text-[#888] mt-1 italic">"{contact.own_pipeline_notes}"</p>
 						{/if}
@@ -99,10 +99,10 @@
 						</div>
 					</div>
 					<div class="text-right shrink-0 space-y-1">
-						<p class="text-xs text-[#444]">{fmtDate(contact.own_pipeline_flagged_at)}</p>
-						<a href="/phone?number={encodeURIComponent(contact.phone)}" class="block text-xs text-[#555] hover:text-[var(--accent-hi)] transition-colors">{contact.phone}</a>
+						<p class="text-xs text-[#6e6e6e]">{fmtDate(contact.own_pipeline_flagged_at)}</p>
+						<a href="/phone?number={encodeURIComponent(contact.phone)}" class="block text-xs text-[#7c7c7c] hover:text-[var(--accent-hi)] transition-colors">{contact.phone}</a>
 						<div class="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
-							<a href="/contacts/{contact.id}" class="text-xs text-[#555] hover:text-white">View →</a>
+							<a href="/contacts/{contact.id}" class="text-xs text-[#7c7c7c] hover:text-white">View →</a>
 							<button onclick={() => unflag(contact.id)} class="text-xs text-red-700 hover:text-red-400">Remove</button>
 						</div>
 					</div>

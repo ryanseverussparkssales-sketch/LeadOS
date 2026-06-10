@@ -259,7 +259,7 @@
             question: 'bg-yellow-950 text-yellow-400', opt_out: 'bg-red-950 text-red-400',
             referral: 'bg-[var(--accent)]/12 text-[var(--accent)]',
         };
-        return map[label] ?? 'bg-[#1a1a1a] text-[#555]';
+        return map[label] ?? 'bg-[#1a1a1a] text-[#7c7c7c]';
     }
 </script>
 
@@ -273,7 +273,7 @@
             <div class="flex gap-1">
                 {#each (['all','sms','email','voicemail'] as Channel[]) as ch}
                     <button onclick={() => channel = ch}
-                        class="px-3 py-1 rounded-lg text-xs font-medium transition-colors {channel === ch ? 'bg-white text-black' : 'text-[#555] hover:text-white border border-[var(--c-border-subtle)]'}">
+                        class="px-3 py-1 rounded-lg text-xs font-medium transition-colors {channel === ch ? 'bg-white text-black' : 'text-[#7c7c7c] hover:text-white border border-[var(--c-border-subtle)]'}">
                         {ch === 'all' ? `All${totalUnread ? ` (${totalUnread})` : ''}` : ch === 'sms' ? `SMS${smsUnread ? ` (${smsUnread})` : ''}` : ch === 'email' ? `Email${emailUnread ? ` (${emailUnread})` : ''}` : `Voicemail${vmUnread ? ` (${vmUnread})` : ''}`}
                     </button>
                 {/each}
@@ -294,7 +294,7 @@
                 {/each}
             {:else if filtered.length === 0}
                 <div class="flex flex-col items-center justify-center h-48 text-center px-4">
-                    <p class="text-[#555] text-sm">No messages</p>
+                    <p class="text-[#7c7c7c] text-sm">No messages</p>
                 </div>
             {:else}
                 {#each filtered as t}
@@ -303,22 +303,22 @@
                             <span class="text-base mt-0.5 flex-shrink-0">{t.channel === 'sms' ? '💬' : '✉️'}</span>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
-                                    <p class="text-xs font-semibold truncate {t.unreadCount > 0 ? 'text-white' : 'text-[#777]'}">{t.contactName ?? t.remoteNumber ?? 'Unknown'}</p>
+                                    <p class="text-xs font-semibold truncate {t.unreadCount > 0 ? 'text-white' : 'text-[#9a9a9a]'}">{t.contactName ?? t.remoteNumber ?? 'Unknown'}</p>
                                     <div class="flex items-center gap-1 flex-shrink-0">
-                                        <p class="text-[10px] text-[#444]">{timeAgo(t.lastAt)}</p>
+                                        <p class="text-[10px] text-[#6e6e6e]">{timeAgo(t.lastAt)}</p>
                                         {#if t.unreadCount > 0}
                                             <span class="bg-white text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{t.unreadCount > 9 ? '9+' : t.unreadCount}</span>
                                         {/if}
                                     </div>
                                 </div>
-                                {#if t.subject}<p class="text-xs text-[#555] truncate">{t.subject}</p>{/if}
-                                <p class="text-xs text-[#444] truncate">{t.lastDirection === 'outbound' ? '→ ' : ''}{t.lastBody}</p>
+                                {#if t.subject}<p class="text-xs text-[#7c7c7c] truncate">{t.subject}</p>{/if}
+                                <p class="text-xs text-[#6e6e6e] truncate">{t.lastDirection === 'outbound' ? '→ ' : ''}{t.lastBody}</p>
                                 {#if t.intentLabel}
                                     <span class="text-[9px] px-1.5 py-0.5 rounded mt-0.5 inline-block
                                         {t.intentLabel === 'interested' || t.intentLabel === 'positive_reply' ? 'bg-[var(--accent)]/12 text-[var(--accent)]' :
                                          t.intentLabel === 'callback_request' ? 'bg-blue-950/50 text-blue-400' :
                                          t.intentLabel === 'opt_out' ? 'bg-red-950/50 text-red-400' :
-                                         'bg-[#1a1a1a] text-[#444]'}">
+                                         'bg-[#1a1a1a] text-[#6e6e6e]'}">
                                         {t.intentLabel.replace(/_/g, ' ')}
                                     </span>
                                 {/if}
@@ -334,7 +334,7 @@
             {#if !selected}
                 <div class="flex flex-col items-center justify-center flex-1">
                     <p class="text-[#333] text-5xl mb-4">📬</p>
-                    <p class="text-[#555] text-sm">Select a conversation</p>
+                    <p class="text-[#7c7c7c] text-sm">Select a conversation</p>
                 </div>
             {:else}
                 <!-- Thread header -->
@@ -344,26 +344,26 @@
                             <span>{selected.channel === 'sms' ? '💬' : selected.channel === 'voicemail' ? '🎙️' : '✉️'}</span>
                             <p class="text-white font-semibold text-sm">{selected.contactName ?? selected.remoteNumber ?? 'Unknown'}</p>
                             {#if selected.contactScore}
-                                <span class="text-xs font-mono {selected.contactScore >= 70 ? 'text-[var(--accent)]' : 'text-[#555]'}">{selected.contactScore}</span>
+                                <span class="text-xs font-mono {selected.contactScore >= 70 ? 'text-[var(--accent)]' : 'text-[#7c7c7c]'}">{selected.contactScore}</span>
                             {/if}
                         </div>
-                        {#if selected.subject}<p class="text-xs text-[#555] mt-0.5">{selected.subject}</p>{/if}
+                        {#if selected.subject}<p class="text-xs text-[#7c7c7c] mt-0.5">{selected.subject}</p>{/if}
                     </div>
                     {#if selected.contactId}
-                        <a href="/contacts/{selected.contactId}" class="text-xs border border-[var(--c-border-subtle)] rounded-lg px-3 py-1.5 text-[#555] hover:text-white hover:border-white transition-colors">View Contact →</a>
+                        <a href="/contacts/{selected.contactId}" class="text-xs border border-[var(--c-border-subtle)] rounded-lg px-3 py-1.5 text-[#7c7c7c] hover:text-white hover:border-white transition-colors">View Contact →</a>
                     {:else}
                         <button onclick={async () => {
                             const r = await apiFetch('/api/contacts/create', { method:'POST', body: JSON.stringify({ phone: selected!.remoteNumber, lead_source:'inbound_reply' }) });
                             if (r.ok) { const c = await r.json(); selected = { ...selected!, contactId: c.id, contactName: c.name }; toastSuccess('Contact created'); }
                             else { toastError('Failed to create contact — try again'); }
-                        }} class="text-xs border border-[var(--c-border-subtle)] rounded-lg px-3 py-1.5 text-[#555] hover:text-white transition-colors">+ Create Contact</button>
+                        }} class="text-xs border border-[var(--c-border-subtle)] rounded-lg px-3 py-1.5 text-[#7c7c7c] hover:text-white transition-colors">+ Create Contact</button>
                     {/if}
                 </div>
 
                 {#if selected.channel === 'voicemail'}
                     <!-- Voicemail: recording + transcript -->
                     <div class="flex-1 overflow-y-auto p-8 space-y-5">
-                        <div class="flex items-center gap-2 text-xs text-[#555] flex-wrap">
+                        <div class="flex items-center gap-2 text-xs text-[#7c7c7c] flex-wrap">
                             <span>🎙️ Voicemail</span>
                             {#if selected.lineLabel}<span>· to {selected.lineLabel}</span>{/if}
                             {#if selected.durationSeconds}<span>· {Math.floor(selected.durationSeconds/60)}m {selected.durationSeconds%60}s</span>{/if}
@@ -373,15 +373,15 @@
                             <!-- svelte-ignore a11y_media_has_caption -->
                             <audio src={selected.recordingUrl} controls preload="none" class="w-full"></audio>
                         {:else}
-                            <p class="text-xs text-[#555]">Recording not available.</p>
+                            <p class="text-xs text-[#7c7c7c]">Recording not available.</p>
                         {/if}
                         {#if selected.transcript}
                             <div>
-                                <p class="text-[10px] text-[#555] uppercase tracking-widest mb-1.5">Transcript</p>
+                                <p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-1.5">Transcript</p>
                                 <p class="text-sm text-white leading-relaxed whitespace-pre-wrap">{selected.transcript}</p>
                             </div>
                         {:else}
-                            <p class="text-sm text-[#555] italic">No transcript available.</p>
+                            <p class="text-sm text-[#7c7c7c] italic">No transcript available.</p>
                         {/if}
                     </div>
                     <!-- Voicemail actions -->
@@ -405,11 +405,11 @@
                             <div class="flex {out ? 'justify-end' : 'justify-start'}">
                                 <div class="max-w-[72%] {out ? 'bg-white text-black rounded-2xl rounded-br-sm' : 'bg-[var(--c-surface-2)] text-white rounded-2xl rounded-bl-sm'} px-4 py-2.5">
                                     {#if msg.subject && selected.channel === 'email'}
-                                        <p class="text-[10px] {out ? 'text-black/60' : 'text-[#555]'} mb-1 font-medium">{msg.subject}</p>
+                                        <p class="text-[10px] {out ? 'text-black/60' : 'text-[#7c7c7c]'} mb-1 font-medium">{msg.subject}</p>
                                     {/if}
                                     <p class="text-sm leading-relaxed whitespace-pre-wrap">{msg.body}</p>
                                     <div class="flex items-center gap-2 mt-1">
-                                        <p class="text-[10px] {out ? 'text-black/50' : 'text-[#444]'}">{timeAgo(msg.sent_at ?? msg.created_at)}</p>
+                                        <p class="text-[10px] {out ? 'text-black/50' : 'text-[#6e6e6e]'}">{timeAgo(msg.sent_at ?? msg.created_at)}</p>
                                         {#if msg.intent_label && !out}
                                             <span class="text-[9px] px-1.5 py-0.5 rounded {intentBadge(msg.intent_label)}">{msg.intent_label.replace(/_/g,' ')}</span>
                                         {/if}
@@ -424,7 +424,7 @@
                 {#if aiDraft}
                     <div class="mx-4 mb-2 rounded-xl bg-[var(--c-surface-1)] border border-[var(--c-border-subtle)] p-3">
                         <div class="flex justify-between items-center mb-1">
-                            <p class="text-[10px] text-[#555] uppercase tracking-widest">✦ AI Draft</p>
+                            <p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest">✦ AI Draft</p>
                             <button onclick={() => aiDraft = ''} class="text-[#333] hover:text-white text-xs"><Icon name="x" size={14} /></button>
                         </div>
                         <p class="text-xs text-[#888] mb-2 whitespace-pre-wrap">{aiDraft}</p>

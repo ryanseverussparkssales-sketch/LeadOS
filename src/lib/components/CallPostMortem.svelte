@@ -329,7 +329,7 @@
 					{ value: 'left_voicemail',  label: 'Voicemail',       emoji: '📬', cls: 'border-[#1e1e1e] text-[#888] hover:border-blue-800 hover:text-blue-400' },
 					{ value: 'no_answer',       label: 'No Answer',       emoji: '📵', cls: 'border-[#1e1e1e] text-[#888] hover:border-[#333] hover:text-white' },
 					{ value: 'appointment_set', label: 'Appointment Set', emoji: '📅', cls: 'border-[var(--accent)]/40 text-[var(--accent)] hover:border-[var(--accent-hi)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/12' },
-					{ value: 'not_interested',  label: 'Not Interested',  emoji: '✕',  cls: 'border-[#1e1e1e] text-[#555] hover:border-red-900/40 hover:text-red-500' },
+					{ value: 'not_interested',  label: 'Not Interested',  emoji: '✕',  cls: 'border-[#1e1e1e] text-[#7c7c7c] hover:border-red-900/40 hover:text-red-500' },
 				] as q}
 					<button
 						onclick={() => outcome = q.value}
@@ -360,8 +360,8 @@
 										class="rounded-lg border px-2.5 py-1.5 text-xs transition-colors
 											{outcome === o.value ? 'border-white bg-white/5 text-white' :
 											 group === 'Win' ? 'border-[var(--accent)]/40 text-[var(--accent)] hover:text-[var(--accent)] hover:border-[var(--accent-hi)]' :
-											 group === 'Dead' ? 'border-red-900/30 text-[#555] hover:text-red-500 hover:border-red-900/50' :
-											 'border-[#1e1e1e] text-[#555] hover:border-[#333] hover:text-white'}">
+											 group === 'Dead' ? 'border-red-900/30 text-[#7c7c7c] hover:text-red-500 hover:border-red-900/50' :
+											 'border-[#1e1e1e] text-[#7c7c7c] hover:border-[#333] hover:text-white'}">
 										{o.label}
 									</button>
 								{/each}

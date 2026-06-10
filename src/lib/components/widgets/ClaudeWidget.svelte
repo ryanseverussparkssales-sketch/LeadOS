@@ -108,8 +108,8 @@
             .replace(/^### (.+)$/gm, '<p class="text-sm font-bold text-white mt-3 mb-1">$1</p>')
             .replace(/^## (.+)$/gm, '<p class="text-sm font-bold text-white mt-3 mb-1">$1</p>')
             .replace(/^# (.+)$/gm, '<p class="text-base font-bold text-white mt-3 mb-1">$1</p>')
-            .replace(/^[•\-\*] (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#555] flex-shrink-0">•</span><span>$1</span></div>')
-            .replace(/^(\d+)\. (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#555] flex-shrink-0 w-4">$1.</span><span>$2</span></div>')
+            .replace(/^[•\-\*] (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#7c7c7c] flex-shrink-0">•</span><span>$1</span></div>')
+            .replace(/^(\d+)\. (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#7c7c7c] flex-shrink-0 w-4">$1.</span><span>$2</span></div>')
             .replace(/\n\n/g, '<br/><br/>')
             .replace(/\n/g, '<br/>');
     }
@@ -132,7 +132,7 @@
         <div class="flex items-center gap-2">
             <!-- Model toggle -->
             <button onclick={() => model = model === 'claude-sonnet-4-5' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-5'}
-                class="text-[10px] px-2 py-0.5 rounded border border-[#2a2a2a] text-[#555] hover:border-white hover:text-white transition-colors font-mono">
+                class="text-[10px] px-2 py-0.5 rounded border border-[#2a2a2a] text-[#7c7c7c] hover:border-white hover:text-white transition-colors font-mono">
                 {modelLabel}
             </button>
             {#if messages.length > 0}
@@ -154,7 +154,7 @@
                 <div class="flex flex-col gap-1.5 w-full">
                     {#each STARTERS as starter}
                         <button onclick={() => { input = starter; }}
-                            class="text-left rounded-lg border border-[#1a1a1a] px-3 py-2 text-xs text-[#555] hover:border-[#333] hover:text-[#888] transition-colors">
+                            class="text-left rounded-lg border border-[#1a1a1a] px-3 py-2 text-xs text-[#7c7c7c] hover:border-[#333] hover:text-[#888] transition-colors">
                             {starter}
                         </button>
                     {/each}
@@ -188,7 +188,7 @@
                         {#if !msg.streaming && msg.content}
                             <button
                                 onclick={() => copyMessage(msg.content, String(i))}
-                                class="self-start text-[9px] text-[#222] hover:text-[#555] transition-colors opacity-0 group-hover:opacity-100">
+                                class="self-start text-[9px] text-[#222] hover:text-[#7c7c7c] transition-colors opacity-0 group-hover:opacity-100">
                                 {copied === String(i) ? '✓ copied' : 'copy'}
                             </button>
                         {/if}

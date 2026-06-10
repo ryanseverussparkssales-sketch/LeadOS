@@ -204,7 +204,7 @@
 					<button onclick={() => setMode(m.id)}
 						title={m.label}
 						aria-pressed={mode === m.id}
-						class="mode-pill relative w-9 h-9 rounded-lg flex items-center justify-center transition-colors {mode === m.id ? 'text-white' : 'text-[#444] hover:text-[#888] hover:bg-white/5'}">
+						class="mode-pill relative w-9 h-9 rounded-lg flex items-center justify-center transition-colors {mode === m.id ? 'text-white' : 'text-[#6e6e6e] hover:text-[#888] hover:bg-white/5'}">
 						<Icon name={m.icon} size={18} />
 					</button>
 				{/each}
@@ -216,7 +216,7 @@
 					<button onclick={() => setMode(m.id)}
 						title={m.label}
 						aria-pressed={mode === m.id}
-						class="mode-pill relative flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-center transition-all {mode === m.id ? 'bg-[#121212] text-white' : 'text-[#444] hover:text-[#777]'}">
+						class="mode-pill relative flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-center transition-all {mode === m.id ? 'bg-[#121212] text-white' : 'text-[#6e6e6e] hover:text-[#9a9a9a]'}">
 						<Icon name={m.icon} size={16} />
 						<span style="font-family:var(--font-label);font-size:9px;letter-spacing:.18em;line-height:1">{m.label}</span>
 					</button>
@@ -346,7 +346,7 @@
 			{#if !collapsed}
 				<button
 					onclick={() => contentExpanded = !contentExpanded}
-					class="w-full flex items-center justify-between px-2 pb-1 transition-colors {contentActive ? 'text-white' : 'text-[#444]'}" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em"
+					class="w-full flex items-center justify-between px-2 pb-1 transition-colors {contentActive ? 'text-white' : 'text-[#6e6e6e]'}" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em"
 				>
 					<span>CONTENT</span>
 					<span class="text-[8px]">{contentExpanded ? '▲' : '▼'}</span>
@@ -380,7 +380,7 @@
 			{#if !collapsed}
 				<button
 					onclick={() => analyticsExpanded = !analyticsExpanded}
-					class="w-full flex items-center justify-between px-2 pb-1 transition-colors {analyticsActive ? 'text-white' : 'text-[#444]'}" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em"
+					class="w-full flex items-center justify-between px-2 pb-1 transition-colors {analyticsActive ? 'text-white' : 'text-[#6e6e6e]'}" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em"
 				>
 					<span>ANALYTICS</span>
 					<span class="text-[8px]">{analyticsExpanded ? '▲' : '▼'}</span>

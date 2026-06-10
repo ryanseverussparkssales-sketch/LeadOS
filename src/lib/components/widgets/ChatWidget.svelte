@@ -65,8 +65,8 @@
 			.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 			.replace(/\*(.+?)\*/g, '<em class="text-[#aaa]">$1</em>')
 			.replace(/`(.+?)`/g, '<code class="bg-[#1a1a1a] px-1 rounded text-xs font-mono text-[var(--accent)]">$1</code>')
-			.replace(/^• (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#555] mt-0.5">•</span><span>$1</span></div>')
-			.replace(/^- (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#555] mt-0.5">–</span><span>$1</span></div>')
+			.replace(/^• (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#7c7c7c] mt-0.5">•</span><span>$1</span></div>')
+			.replace(/^- (.+)$/gm, '<div class="flex gap-1.5 my-0.5"><span class="text-[#7c7c7c] mt-0.5">–</span><span>$1</span></div>')
 			.replace(/\n/g, '<br/>');
 	}
 </script>
@@ -77,9 +77,9 @@
 		<div class="flex items-center gap-2">
 			<div class="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--accent)] to-blue-600 flex items-center justify-center text-xs font-bold text-white">A</div>
 			<span class="text-sm font-medium text-white">AI Assistant</span>
-			<span class="text-[10px] text-[#444] bg-[#1a1a1a] px-1.5 py-0.5 rounded">Claude Haiku</span>
+			<span class="text-[10px] text-[#6e6e6e] bg-[#1a1a1a] px-1.5 py-0.5 rounded">Claude Haiku</span>
 		</div>
-		<button onclick={clearChat} class="text-xs text-[#444] hover:text-[#888] transition-colors" title="Clear conversation">Clear</button>
+		<button onclick={clearChat} class="text-xs text-[#6e6e6e] hover:text-[#888] transition-colors" title="Clear conversation">Clear</button>
 	</div>
 
 	<!-- Messages -->
@@ -117,7 +117,7 @@
 			{#each SUGGESTIONS as s}
 				<button
 					onclick={() => { input = s; send(); }}
-					class="text-xs px-2.5 py-1 rounded-full border border-[#2a2a2a] text-[#666] hover:border-[#444] hover:text-[#ccc] transition-colors"
+					class="text-xs px-2.5 py-1 rounded-full border border-[#2a2a2a] text-[#8a8a8a] hover:border-[#444] hover:text-[#ccc] transition-colors"
 				>{s}</button>
 			{/each}
 		</div>

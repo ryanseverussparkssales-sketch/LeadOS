@@ -144,9 +144,9 @@
 	<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 		<div>
 			<p class="text-white text-sm font-semibold">✦ Edelhaus AI</p>
-			<p class="text-xs text-[#555] mt-0.5">Create, find, navigate, learn · Ctrl+J</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Create, find, navigate, learn · Ctrl+J</p>
 		</div>
-		<button onclick={() => open = false} class="text-[#444] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close"><Icon name="x" size={14} /></button>
+		<button onclick={() => open = false} class="text-[#6e6e6e] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close"><Icon name="x" size={14} /></button>
 	</div>
 
 	<!-- Quick actions (empty state) -->
@@ -154,7 +154,7 @@
 		<div class="px-4 py-3 border-b border-[#111] flex flex-wrap gap-2">
 			{#each QUICK_ACTIONS as action}
 				<button onclick={() => send(action.prompt)}
-					class="text-xs border border-[#2a2a2a] text-[#777] px-2.5 py-1.5 rounded-lg hover:border-white hover:text-white transition-colors">
+					class="text-xs border border-[#2a2a2a] text-[#9a9a9a] px-2.5 py-1.5 rounded-lg hover:border-white hover:text-white transition-colors">
 					{action.label}
 				</button>
 			{/each}
@@ -163,7 +163,7 @@
 			<div>
 				<p class="text-4xl mb-3">✦</p>
 				<p class="text-sm text-[#888] font-medium">How can I help?</p>
-				<p class="text-xs text-[#444] mt-2">Create tasks · Find records · Get tutorials · Navigate · Log activities</p>
+				<p class="text-xs text-[#6e6e6e] mt-2">Create tasks · Find records · Get tutorials · Navigate · Log activities</p>
 			</div>
 		</div>
 	{:else}
@@ -184,15 +184,15 @@
 											<div class="rounded-lg border border-[var(--accent)]/40 bg-[var(--accent)]/12 px-3 py-2">
 												<p class="text-xs text-[var(--accent)] font-medium">✓ Task Created</p>
 												<p class="text-xs text-[#888] mt-0.5">{fmt.data?.title}</p>
-												{#if fmt.data?.due_date}<p class="text-xs text-[#555]">Due: {new Date(fmt.data.due_date).toLocaleDateString()}</p>{/if}
+												{#if fmt.data?.due_date}<p class="text-xs text-[#7c7c7c]">Due: {new Date(fmt.data.due_date).toLocaleDateString()}</p>{/if}
 											</div>
 										{:else if fmt?.type === 'search' && fmt.data?.results?.length}
 											<div class="rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] px-3 py-2">
-												<p class="text-xs text-[#555] mb-1">{fmt.data.count} results for "{fmt.data.query}"</p>
+												<p class="text-xs text-[#7c7c7c] mb-1">{fmt.data.count} results for "{fmt.data.query}"</p>
 												{#each fmt.data.results.slice(0, 3) as r}
 													<div class="py-1 border-b border-[#1a1a1a] last:border-0">
 														<p class="text-xs text-white">{r.name ?? r.title}</p>
-														{#if r.company}<p class="text-xs text-[#555]">{r.company}</p>{/if}
+														{#if r.company}<p class="text-xs text-[#7c7c7c]">{r.company}</p>{/if}
 													</div>
 												{/each}
 											</div>
@@ -232,12 +232,12 @@
 		<div class="px-3 py-2 border-t border-[#111] flex gap-2 overflow-x-auto scrollbar-hide">
 			{#each QUICK_ACTIONS.slice(0, 3) as action}
 				<button onclick={() => send(action.prompt)}
-					class="text-xs border border-[#1e1e1e] text-[#555] px-2 py-1 rounded-lg hover:border-[#333] hover:text-[#888] transition-colors whitespace-nowrap flex-shrink-0">
+					class="text-xs border border-[#1e1e1e] text-[#7c7c7c] px-2 py-1 rounded-lg hover:border-[#333] hover:text-[#888] transition-colors whitespace-nowrap flex-shrink-0">
 					{action.label}
 				</button>
 			{/each}
 			<button onclick={() => { messages = []; conversationHistory = []; }}
-				class="text-xs text-[#333] hover:text-[#555] transition-colors whitespace-nowrap flex-shrink-0 ml-auto">
+				class="text-xs text-[#333] hover:text-[#7c7c7c] transition-colors whitespace-nowrap flex-shrink-0 ml-auto">
 				Clear
 			</button>
 		</div>

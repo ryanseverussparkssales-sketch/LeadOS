@@ -28,7 +28,7 @@
         website: 'text-[var(--accent)] bg-[var(--accent)]/12',
         web_scrape: 'text-[var(--accent)] bg-[var(--accent)]/12',
         csv_import: 'text-[#888] bg-[#1a1a1a]',
-        manual: 'text-[#666] bg-[#1a1a1a]',
+        manual: 'text-[#8a8a8a] bg-[#1a1a1a]',
     };
 
     const LEAD_SOURCES = ['webhook','zapier','facebook','google','linkedin','website','web_scrape'];
@@ -118,7 +118,7 @@
                     </div>
                     <div class="lw-meta">
                         {#if lead.lead_source}
-                            <span class="lw-source {SOURCE_COLORS[lead.lead_source] ?? 'text-[#555]'}">
+                            <span class="lw-source {SOURCE_COLORS[lead.lead_source] ?? 'text-[#7c7c7c]'}">
                                 {lead.lead_source.replace(/_/g,' ')}
                             </span>
                         {/if}

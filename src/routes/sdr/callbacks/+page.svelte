@@ -25,7 +25,7 @@
 		return d.toLocaleDateString();
 	}
 
-	const PRIORITY_COLORS: Record<string, string> = { high: 'text-red-400', medium: 'text-yellow-400', low: 'text-[#555]' };
+	const PRIORITY_COLORS: Record<string, string> = { high: 'text-red-400', medium: 'text-yellow-400', low: 'text-[#7c7c7c]' };
 
 	async function completeCallback(id: string) {
 		const res = await apiFetch(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'completed' }) });
@@ -43,7 +43,7 @@
 <div class="flex-1 overflow-y-auto p-8">
 	<div class="flex items-center justify-between mb-6">
 		<h2 class="text-white text-lg font-semibold">My Callbacks</h2>
-		<p class="text-xs text-[#555]">{callbacks.length} pending</p>
+		<p class="text-xs text-[#7c7c7c]">{callbacks.length} pending</p>
 	</div>
 
 	{#if loading}
@@ -54,7 +54,7 @@
 		<div class="text-center py-20">
 			<p class="text-4xl mb-3">✓</p>
 			<p class="text-white text-sm">No callbacks scheduled</p>
-			<p class="text-xs text-[#555] mt-1">Log a callback after a call in the dialer</p>
+			<p class="text-xs text-[#7c7c7c] mt-1">Log a callback after a call in the dialer</p>
 		</div>
 	{:else}
 		<div class="space-y-3">
@@ -62,15 +62,15 @@
 				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-5 py-4 flex items-center gap-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 					<div class="flex-1 min-w-0">
 						<div class="flex items-center gap-2 mb-1">
-							<span class="text-xs {PRIORITY_COLORS[cb.priority] ?? 'text-[#555]'} font-semibold capitalize">{cb.priority}</span>
+							<span class="text-xs {PRIORITY_COLORS[cb.priority] ?? 'text-[#7c7c7c]'} font-semibold capitalize">{cb.priority}</span>
 							<p class="text-sm text-white font-medium truncate">{cb.title}</p>
 						</div>
 						{#if cb.contact}
-							<p class="text-xs text-[#555]">{cb.contact.name} · {cb.contact.phone}</p>
+							<p class="text-xs text-[#7c7c7c]">{cb.contact.name} · {cb.contact.phone}</p>
 						{/if}
 					</div>
 					<div class="text-right shrink-0">
-						<p class="text-xs text-[#777] mb-2">{fmtDate(cb.due_date)}</p>
+						<p class="text-xs text-[#9a9a9a] mb-2">{fmtDate(cb.due_date)}</p>
 						<button onclick={() => completeCallback(cb.id)}
 							class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 px-3 py-1 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
 							✓ Done

@@ -35,7 +35,7 @@
 
 	function fmtDur(s: number) { return `${Math.floor(s/60)}m ${s%60}s`; }
 	const trendIcon = (t: string) => t === 'up' ? '↑' : t === 'down' ? '↓' : '→';
-	const trendColor = (t: string) => t === 'up' ? 'text-[var(--accent)]' : t === 'down' ? 'text-red-400' : 'text-[#555]';
+	const trendColor = (t: string) => t === 'up' ? 'text-[var(--accent)]' : t === 'down' ? 'text-red-400' : 'text-[#7c7c7c]';
 </script>
 
 <svelte:head><title>Coaching — Edelhaus SDR</title></svelte:head>
@@ -46,7 +46,7 @@
 	<div class="flex items-start justify-between mb-8">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:24px;letter-spacing:-.01em;color:#fff;margin-bottom:4px">Coaching</h2>
-			<p class="text-xs text-[#444]">You vs. your personal best — not a leaderboard</p>
+			<p class="text-xs text-[#6e6e6e]">You vs. your personal best — not a leaderboard</p>
 		</div>
 		<button onclick={generateSupercut} disabled={generating}
 			class="rounded-lg border border-[var(--accent)]/40 px-3 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] disabled:opacity-40 transition-colors shrink-0">
@@ -95,7 +95,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-10 text-center">
 				<p class="text-3xl mb-4">📞</p>
 				<p class="text-white text-sm font-medium mb-2">Make some calls first</p>
-				<p class="text-xs text-[#444]">Your AI coaching insights and weekly benchmarks appear after you've logged calls</p>
+				<p class="text-xs text-[#6e6e6e]">Your AI coaching insights and weekly benchmarks appear after you've logged calls</p>
 			</div>
 
 		{:else}
@@ -109,9 +109,9 @@
 					</div>
 					{#if data.thisWeek}
 						<div class="grid grid-cols-3 gap-3">
-							<div><p class="text-2xl font-bold text-white tabular-nums">{data.thisWeek.calls}</p><p class="text-[10px] text-[#555] mt-0.5">calls</p></div>
-							<div><p class="text-2xl font-bold text-blue-400 tabular-nums">{data.thisWeek.connectRate}%</p><p class="text-[10px] text-[#555] mt-0.5">connect</p></div>
-							<div><p class="text-2xl font-bold text-yellow-400 tabular-nums">{data.thisWeek.winRate}%</p><p class="text-[10px] text-[#555] mt-0.5">win rate</p></div>
+							<div><p class="text-2xl font-bold text-white tabular-nums">{data.thisWeek.calls}</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">calls</p></div>
+							<div><p class="text-2xl font-bold text-blue-400 tabular-nums">{data.thisWeek.connectRate}%</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">connect</p></div>
+							<div><p class="text-2xl font-bold text-yellow-400 tabular-nums">{data.thisWeek.winRate}%</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">win rate</p></div>
 						</div>
 					{/if}
 				</div>
@@ -119,11 +119,11 @@
 				{#if data.bestWeek}
 					<div class="rounded-xl border border-yellow-900/30 bg-yellow-950/10 p-5">
 						<p style="font-family:var(--font-label);font-size:9px;letter-spacing:.16em;color:#854d0e;margin-bottom:4px">Your Best Week</p>
-						<p class="text-[10px] text-[#555] mb-3">{data.bestWeek.week}</p>
+						<p class="text-[10px] text-[#7c7c7c] mb-3">{data.bestWeek.week}</p>
 						<div class="grid grid-cols-3 gap-3">
-							<div><p class="text-2xl font-bold text-white tabular-nums">{data.bestWeek.calls}</p><p class="text-[10px] text-[#555] mt-0.5">calls</p></div>
-							<div><p class="text-2xl font-bold text-blue-400 tabular-nums">{data.bestWeek.connectRate}%</p><p class="text-[10px] text-[#555] mt-0.5">connect</p></div>
-							<div><p class="text-2xl font-bold text-yellow-400 tabular-nums">{data.bestWeek.winRate}%</p><p class="text-[10px] text-[#555] mt-0.5">win rate</p></div>
+							<div><p class="text-2xl font-bold text-white tabular-nums">{data.bestWeek.calls}</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">calls</p></div>
+							<div><p class="text-2xl font-bold text-blue-400 tabular-nums">{data.bestWeek.connectRate}%</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">connect</p></div>
+							<div><p class="text-2xl font-bold text-yellow-400 tabular-nums">{data.bestWeek.winRate}%</p><p class="text-[10px] text-[#7c7c7c] mt-0.5">win rate</p></div>
 						</div>
 					</div>
 				{/if}
@@ -169,11 +169,11 @@
 					<div class="divide-y divide-[#111]">
 						{#each data.weeks.slice(-6).reverse() as week}
 							<div class="px-5 py-3 grid grid-cols-5 gap-3 text-xs">
-								<p class="text-[#555] truncate">{week.week}</p>
+								<p class="text-[#7c7c7c] truncate">{week.week}</p>
 								<p class="text-white tabular-nums text-center">{week.calls} <span class="text-[#333]">dials</span></p>
 								<p class="text-blue-400 tabular-nums text-center">{week.connectRate}%</p>
 								<p class="text-yellow-400 tabular-nums text-center">{week.winRate}%</p>
-								<p class="text-[#444] text-right">{fmtDur(week.avgDuration ?? 0)}</p>
+								<p class="text-[#6e6e6e] text-right">{fmtDur(week.avgDuration ?? 0)}</p>
 							</div>
 						{/each}
 					</div>

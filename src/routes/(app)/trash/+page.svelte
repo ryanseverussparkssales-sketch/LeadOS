@@ -140,9 +140,9 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Trash</h2>
-			<p class="text-xs text-[#555] mt-0.5">Deleted items — restored or permanently removed</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Deleted items — restored or permanently removed</p>
 		</div>
-		<p class="text-xs text-[#444]">Items auto-purge after 30 days</p>
+		<p class="text-xs text-[#6e6e6e]">Items auto-purge after 30 days</p>
 	</div>
 
 	<!-- Tabs -->
@@ -153,11 +153,11 @@
 				class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors relative
 					{activeTab === tab.key
 						? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-white'
-						: 'text-[#555] hover:text-[#888]'}"
+						: 'text-[#7c7c7c] hover:text-[#888]'}"
 			>
 				{tab.label}
 				{#if tabCount(tab.key) > 0}
-					<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-[#1e1e1e] text-[#666]">
+					<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-[#1e1e1e] text-[#8a8a8a]">
 						{tabCount(tab.key)}
 					</span>
 				{/if}
@@ -178,7 +178,7 @@
 		{:else if loadError}
 			<!-- Network error state -->
 			<div class="flex flex-col items-center justify-center py-24 text-center">
-				<p class="text-[#555] text-sm font-medium mb-3">Failed to load trash</p>
+				<p class="text-[#7c7c7c] text-sm font-medium mb-3">Failed to load trash</p>
 				<button
 					onclick={fetchTrash}
 					class="px-4 py-2 text-xs font-medium rounded-md bg-[#1a1a1a] text-[#888] hover:bg-[#222] hover:text-white transition-colors border border-[#252525]"
@@ -191,11 +191,11 @@
 			<!-- Empty state -->
 			<div class="flex flex-col items-center justify-center py-24 text-center">
 				<div class="w-12 h-12 rounded-full bg-[#1e1e1e] flex items-center justify-center mb-4">
-					<svg class="w-6 h-6 text-[#444]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+					<svg class="w-6 h-6 text-[#6e6e6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
 					</svg>
 				</div>
-				<p class="text-[#555] text-sm font-medium">Trash is empty</p>
+				<p class="text-[#7c7c7c] text-sm font-medium">Trash is empty</p>
 				<p class="text-[#333] text-xs mt-1">Nothing to restore or permanently delete</p>
 			</div>
 
@@ -215,10 +215,10 @@
 							<p class="text-white text-sm font-medium truncate">{item.name}</p>
 							<div class="flex items-center gap-3 mt-0.5">
 								{#if item.phone}
-									<span class="text-[#444] text-xs">{item.phone}</span>
+									<span class="text-[#6e6e6e] text-xs">{item.phone}</span>
 								{/if}
 								{#if item.company}
-									<span class="text-[#444] text-xs">{item.company}</span>
+									<span class="text-[#6e6e6e] text-xs">{item.company}</span>
 								{/if}
 								<span class="text-[#333] text-xs">Deleted {timeAgo(item.deleted_at)}</span>
 							</div>
@@ -280,10 +280,10 @@
 				</div>
 				<div>
 					<h3 id="confirm-title" class="text-white text-sm font-medium">Permanently delete?</h3>
-					<p class="text-[#555] text-xs mt-0.5 truncate max-w-[200px]">{confirmTarget.name}</p>
+					<p class="text-[#7c7c7c] text-xs mt-0.5 truncate max-w-[200px]">{confirmTarget.name}</p>
 				</div>
 			</div>
-			<p class="text-[#555] text-xs mb-5">
+			<p class="text-[#7c7c7c] text-xs mb-5">
 				This action cannot be undone. The record will be removed from the database immediately.
 			</p>
 			<div class="flex gap-2">

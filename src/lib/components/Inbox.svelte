@@ -151,10 +151,10 @@
 	<!-- Channel list -->
 	<div class="w-full md:w-60 shrink-0 border-b md:border-b-0 md:border-r border-[#1e1e1e] bg-[#080808] flex flex-col">
 		<div class="flex items-center justify-between px-4 py-3 border-b border-[#1a1a1a]">
-			<p class="text-xs text-[#555] uppercase tracking-widest">Inbox</p>
+			<p class="text-xs text-[#7c7c7c] uppercase tracking-widest">Inbox</p>
 			{#if showNewChannel}
 				<button onclick={() => showForm = !showForm}
-					class="text-xs text-[#444] hover:text-white transition-colors">+</button>
+					class="text-xs text-[#6e6e6e] hover:text-white transition-colors">+</button>
 			{/if}
 		</div>
 
@@ -200,7 +200,7 @@
 							{/if}
 						</div>
 						{#if ch.last_message}
-							<p class="text-[10px] text-[#444] mt-0.5 truncate">
+							<p class="text-[10px] text-[#6e6e6e] mt-0.5 truncate">
 								{ch.last_message.sender_name ?? 'Someone'}: {ch.last_message.content}
 							</p>
 						{/if}
@@ -216,7 +216,7 @@
 			<div class="flex-1 flex items-center justify-center">
 				<div class="text-center">
 					<p class="text-3xl mb-2">💬</p>
-					<p class="text-xs text-[#444]">Select a channel to start messaging</p>
+					<p class="text-xs text-[#6e6e6e]">Select a channel to start messaging</p>
 				</div>
 			</div>
 		{:else}

@@ -33,10 +33,10 @@
 				<button onclick={() => selected = s}
 					class="w-full text-left px-4 py-3 border-b border-[#111] transition-colors {selected?.id === s.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 					<p class="text-xs text-white font-medium truncate">{s.title}</p>
-					<p class="text-[10px] text-[#444] mt-0.5">{s.client?.name ?? 'Global'}</p>
+					<p class="text-[10px] text-[#6e6e6e] mt-0.5">{s.client?.name ?? 'Global'}</p>
 				</button>
 			{:else}
-				<p class="text-xs text-[#444] text-center py-8">No scripts assigned</p>
+				<p class="text-xs text-[#6e6e6e] text-center py-8">No scripts assigned</p>
 			{/each}
 		{/if}
 	</div>
@@ -47,13 +47,13 @@
 			<div class="max-w-2xl space-y-5">
 				<div>
 					<h2 class="text-white text-lg font-semibold">{selected.title}</h2>
-					<p class="text-xs text-[#555]">{selected.client?.name ?? 'Global'}{selected.campaign?.name ? ` · ${selected.campaign.name}` : ''}</p>
+					<p class="text-xs text-[#7c7c7c]">{selected.client?.name ?? 'Global'}{selected.campaign?.name ? ` · ${selected.campaign.name}` : ''}</p>
 				</div>
 
 				{#each [['Opener', selected.opener], ['Elevator Pitch', selected.elevator_pitch], ['Discovery', selected.discovery], ['Closing', selected.closing]] as [label, content]}
 					{#if content}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-							<p class="text-[10px] text-[#555] uppercase tracking-widest mb-3">{label}</p>
+							<p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-3">{label}</p>
 							<p class="text-sm text-[#ccc] leading-relaxed whitespace-pre-wrap">{content}</p>
 						</div>
 					{/if}
@@ -61,12 +61,12 @@
 
 				{#if selected.objections?.length}
 					<div>
-						<p class="text-xs text-[#555] uppercase tracking-widest mb-3">Objection Handlers</p>
+						<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-3">Objection Handlers</p>
 						{#each selected.objections as obj}
 							<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-3 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 								<p class="text-sm text-yellow-400 mb-2">"{obj.objection}"</p>
 								<p class="text-sm text-[#ccc]">{obj.response}</p>
-								{#if obj.follow_up}<p class="text-xs text-[#555] mt-2">↳ {obj.follow_up}</p>{/if}
+								{#if obj.follow_up}<p class="text-xs text-[#7c7c7c] mt-2">↳ {obj.follow_up}</p>{/if}
 							</div>
 						{/each}
 					</div>
@@ -74,7 +74,7 @@
 			</div>
 		{:else}
 			<div class="flex items-center justify-center h-full">
-				<p class="text-xs text-[#444]">Select a script</p>
+				<p class="text-xs text-[#6e6e6e]">Select a script</p>
 			</div>
 		{/if}
 	</div>

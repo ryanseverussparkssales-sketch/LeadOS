@@ -84,7 +84,7 @@
 			<div class="flex items-center gap-2 mb-3">
 				{#each STEPS as s, i}
 					<div class="flex items-center gap-2">
-						<div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold {i < step ? 'bg-[var(--accent)] text-[var(--accent-ink)]' : i === step ? 'bg-white text-black' : 'bg-[#1a1a1a] text-[#444]'}">
+						<div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold {i < step ? 'bg-[var(--accent)] text-[var(--accent-ink)]' : i === step ? 'bg-white text-black' : 'bg-[#1a1a1a] text-[#6e6e6e]'}">
 							{i < step ? '✓' : i + 1}
 						</div>
 						{#if i < STEPS.length - 1}
@@ -93,14 +93,14 @@
 					</div>
 				{/each}
 			</div>
-			<p class="text-xs text-[#555]">Step {step + 1} of {STEPS.length} — {STEPS[step]}</p>
+			<p class="text-xs text-[#7c7c7c]">Step {step + 1} of {STEPS.length} — {STEPS[step]}</p>
 		</div>
 
 		<!-- Step 0: Welcome -->
 		{#if step === 0}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<h1 class="text-2xl font-semibold">Welcome to Edelhaus 👋</h1>
-				<p class="text-sm text-[#666] leading-relaxed">
+				<p class="text-sm text-[#8a8a8a] leading-relaxed">
 					Let's get you set up in about 3 minutes. You'll need:
 				</p>
 				<ul class="space-y-2">
@@ -113,7 +113,7 @@
 							<span class="text-[var(--accent)] mt-0.5">→</span>
 							<div>
 								<p class="text-white font-medium">{title}</p>
-								<p class="text-xs text-[#555] mt-0.5">{desc}</p>
+								<p class="text-xs text-[#7c7c7c] mt-0.5">{desc}</p>
 							</div>
 						</li>
 					{/each}
@@ -132,7 +132,7 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
 					<h2 class="text-xl font-semibold mb-1">Twilio credentials</h2>
-					<p class="text-xs text-[#555]">
+					<p class="text-xs text-[#7c7c7c]">
 						Find these at <a href="https://console.twilio.com" target="_blank" rel="noopener noreferrer" class="text-white underline">console.twilio.com</a>
 					</p>
 				</div>
@@ -146,7 +146,7 @@
 				['Client Identity', twilioClientIdentity, (v: string) => twilioClientIdentity = v, 'agent', 'The identity your browser registers as — must match your TwiML App. Default: agent'],
 				] as [label, val, setter, placeholder, hint]}
 					<div>
-						<label class="block text-xs text-[#555] uppercase tracking-widest mb-1">{label}</label>
+						<label class="block text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">{label}</label>
 						<input type="text" value={val} oninput={(e) => setter((e.target as HTMLInputElement).value)}
 							{placeholder}
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none font-mono" />
@@ -166,20 +166,20 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
 					<h2 class="text-xl font-semibold mb-1">Your phone number</h2>
-					<p class="text-xs text-[#555]">The number you'll call from. Add it in E.164 format (+12125551234).</p>
+					<p class="text-xs text-[#7c7c7c]">The number you'll call from. Add it in E.164 format (+12125551234).</p>
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] uppercase tracking-widest mb-1">Phone Number *</label>
+					<label class="block text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Phone Number *</label>
 					<input type="text" bind:value={phoneNumber} placeholder="+12125551234"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none font-mono" />
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] uppercase tracking-widest mb-1">Friendly Name</label>
+					<label class="block text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Friendly Name</label>
 					<input type="text" bind:value={phoneFriendly} placeholder="e.g. My Twilio Number"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] uppercase tracking-widest mb-1">Twilio Phone SID (optional)</label>
+					<label class="block text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Twilio Phone SID (optional)</label>
 					<input type="text" bind:value={phoneSid} placeholder="PN..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none font-mono" />
 					<p class="text-[10px] text-[#333] mt-1">Twilio Console → Phone Numbers → your number → SID</p>
@@ -195,20 +195,20 @@
 		{:else if step === 3}
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-8 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				<div>
-					<h2 class="text-xl font-semibold mb-1">AI features <span class="text-xs text-[#555] font-normal">— optional</span></h2>
-					<p class="text-xs text-[#555] leading-relaxed">
+					<h2 class="text-xl font-semibold mb-1">AI features <span class="text-xs text-[#7c7c7c] font-normal">— optional</span></h2>
+					<p class="text-xs text-[#7c7c7c] leading-relaxed">
 						Add your Anthropic API key to unlock pre-call briefs, AI email drafts, and call summaries.
 						Get a key at <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" class="text-white underline">console.anthropic.com</a>.
 					</p>
 				</div>
 				<div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] p-4 space-y-1.5">
-					<p class="text-xs text-[#666] font-medium">What you get:</p>
+					<p class="text-xs text-[#8a8a8a] font-medium">What you get:</p>
 					{#each ['Pre-call brief — 2-sentence contact summary before you dial', 'AI email draft — send a follow-up in one click after a call', 'Call summary — auto-logged after each recorded call'] as f}
-						<p class="text-xs text-[#555]">✦ {f}</p>
+						<p class="text-xs text-[#7c7c7c]">✦ {f}</p>
 					{/each}
 				</div>
 				<div>
-					<label class="block text-xs text-[#555] uppercase tracking-widest mb-1">Anthropic API Key</label>
+					<label class="block text-xs text-[#7c7c7c] uppercase tracking-widest mb-1">Anthropic API Key</label>
 					<input type="password" bind:value={anthropicKey} placeholder="sk-ant-..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2.5 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none font-mono" />
 				</div>
@@ -223,7 +223,7 @@
 			<div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-8 text-center space-y-4">
 				<p class="text-5xl">🎉</p>
 				<h2 class="text-2xl font-semibold">You're all set</h2>
-				<p class="text-sm text-[#666]max-w-sm mx-auto leading-relaxed">Edelhaus is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
+				<p class="text-sm text-[#8a8a8a]max-w-sm mx-auto leading-relaxed">Edelhaus is set up and ready to go. Head to your dashboard to start importing leads and making calls.</p>
 				<a href="/dashboard" class="inline-block rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black hover:bg-[#e5e5e5] transition-colors">Go to Dashboard →</a>
 			</div>
 		{/if}

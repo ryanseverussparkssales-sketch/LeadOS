@@ -96,7 +96,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4 shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Lead Pool Distribution</h2>
-			<p class="text-[10px] text-[#444] mt-0.5">Select contacts and assign them to a campaign call queue</p>
+			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Select contacts and assign them to a campaign call queue</p>
 		</div>
 	</div>
 
@@ -110,7 +110,7 @@
 			<option value="">All contacts</option>
 		</select>
 
-		<span class="text-xs text-[#444]">{contacts.length} contacts</span>
+		<span class="text-xs text-[#6e6e6e]">{contacts.length} contacts</span>
 
 		{#if selectedIds.size > 0}
 			<div class="flex items-center gap-2 ml-auto">
@@ -129,7 +129,7 @@
 					class="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">
 					{assigning ? 'Assigning…' : 'Assign'}
 				</button>
-				<button onclick={clearSelection} class="text-xs text-[#444] hover:text-white">✕ Clear</button>
+				<button onclick={clearSelection} class="text-xs text-[#6e6e6e] hover:text-white">✕ Clear</button>
 			</div>
 		{/if}
 	</div>
@@ -143,7 +143,7 @@
 		{:else}
 			<div class="overflow-x-auto"><table class="w-full text-xs min-w-[600px]">
 				<thead class="sticky top-0 bg-[#0d0d0d] border-b border-[#1a1a1a]">
-					<tr class="text-[#444]">
+					<tr class="text-[#6e6e6e]">
 						<th class="px-4 py-2.5 text-left w-8">
 							<input type="checkbox" onchange={(e) => (e.target as HTMLInputElement).checked ? selectAll() : clearSelection()} />
 						</th>
@@ -163,12 +163,12 @@
 								<input type="checkbox" checked={selectedIds.has(contact.id)} onchange={() => toggleSelect(contact.id)} onclick={(e) => e.stopPropagation()} />
 							</td>
 							<td class="px-2 py-2.5 text-white font-medium">{contact.name}</td>
-							<td class="px-2 py-2.5 text-[#555]">{contact.company ?? '—'}</td>
-							<td class="px-2 py-2.5 text-[#666] font-mono">{contact.phone}</td>
+							<td class="px-2 py-2.5 text-[#7c7c7c]">{contact.company ?? '—'}</td>
+							<td class="px-2 py-2.5 text-[#8a8a8a] font-mono">{contact.phone}</td>
 							<td class="px-2 py-2.5">
-								<span class="text-[9px] capitalize px-1.5 py-0.5 rounded {contact.contact_type === 'creator' ? 'text-pink-400 bg-pink-950/30' : 'text-[#555] bg-[#1a1a1a]'}">{contact.contact_type ?? 'lead'}</span>
+								<span class="text-[9px] capitalize px-1.5 py-0.5 rounded {contact.contact_type === 'creator' ? 'text-pink-400 bg-pink-950/30' : 'text-[#7c7c7c] bg-[#1a1a1a]'}">{contact.contact_type ?? 'lead'}</span>
 							</td>
-							<td class="px-2 py-2.5 text-right text-[#444]">{contact.call_count ?? 0}</td>
+							<td class="px-2 py-2.5 text-right text-[#6e6e6e]">{contact.call_count ?? 0}</td>
 							<td class="px-4 py-2.5 text-right text-[#333]">
 								{contact.last_called_at ? new Date(contact.last_called_at).toLocaleDateString() : 'Never'}
 							</td>
@@ -181,10 +181,10 @@
 			{#if totalPages > 1}
 				<div class="flex items-center justify-center gap-3 py-4 border-t border-[#1a1a1a]">
 					<button onclick={() => page = Math.max(0, page - 1)} disabled={page === 0}
-						class="px-3 py-1 rounded border border-[#2a2a2a] text-xs text-[#555] hover:text-white disabled:opacity-30">← Prev</button>
-					<span class="text-xs text-[#444]">Page {page + 1} of {totalPages}</span>
+						class="px-3 py-1 rounded border border-[#2a2a2a] text-xs text-[#7c7c7c] hover:text-white disabled:opacity-30">← Prev</button>
+					<span class="text-xs text-[#6e6e6e]">Page {page + 1} of {totalPages}</span>
 					<button onclick={() => page = Math.min(totalPages - 1, page + 1)} disabled={page === totalPages - 1}
-						class="px-3 py-1 rounded border border-[#2a2a2a] text-xs text-[#555] hover:text-white disabled:opacity-30">Next →</button>
+						class="px-3 py-1 rounded border border-[#2a2a2a] text-xs text-[#7c7c7c] hover:text-white disabled:opacity-30">Next →</button>
 				</div>
 			{/if}
 		{/if}

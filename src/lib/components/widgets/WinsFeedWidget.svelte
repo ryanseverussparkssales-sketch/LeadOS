@@ -44,7 +44,7 @@
                 <div class="rounded-lg bg-[var(--accent)]/12 border border-[var(--accent)]/40 px-3 py-2 flex items-center justify-between">
                     <div>
                         <p class="text-xs text-[var(--accent)] font-medium">{win.contact?.name ?? 'Unknown'}</p>
-                        <p class="text-[10px] text-[#555]">{win.outcome?.replace(/_/g,' ')} · {win.campaign?.name ?? 'Campaign'}</p>
+                        <p class="text-[10px] text-[#7c7c7c]">{win.outcome?.replace(/_/g,' ')} · {win.campaign?.name ?? 'Campaign'}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         {#if win.weight > 1}<span class="text-[10px] text-[var(--accent)] font-mono">×{win.weight}</span>{/if}

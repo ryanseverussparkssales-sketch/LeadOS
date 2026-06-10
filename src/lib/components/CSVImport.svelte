@@ -72,7 +72,7 @@
 
 <div class="space-y-4">
 	{#if callListId}
-		<p class="text-xs text-[#555]">Contacts will be imported and automatically added to this call list.</p>
+		<p class="text-xs text-[#7c7c7c]">Contacts will be imported and automatically added to this call list.</p>
 	{/if}
 
 	<div
@@ -85,8 +85,8 @@
 		onclick={() => document.getElementById('csv-input')?.click()}
 		onkeydown={(e) => e.key === 'Enter' && document.getElementById('csv-input')?.click()}
 	>
-		<p class="text-[#666] text-sm mb-1">Drag & drop a CSV or click to browse</p>
-		<p class="text-[#444] text-xs">Required columns: name, phone — Optional: email, company, title</p>
+		<p class="text-[#8a8a8a] text-sm mb-1">Drag & drop a CSV or click to browse</p>
+		<p class="text-[#6e6e6e] text-xs">Required columns: name, phone — Optional: email, company, title</p>
 		<input id="csv-input" type="file" accept=".csv" class="hidden" onchange={handleInput} />
 	</div>
 
@@ -98,7 +98,7 @@
 					<thead>
 						<tr class="border-b border-[#2a2a2a]">
 							{#each headers as h}
-								<th class="px-3 py-2 text-left text-xs text-[#666] font-medium">{h}</th>
+								<th class="px-3 py-2 text-left text-xs text-[#8a8a8a] font-medium">{h}</th>
 							{/each}
 						</tr>
 					</thead>
@@ -124,7 +124,7 @@
 	{#if result}
 		<div class="rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] p-4 text-sm space-y-1">
 			<p class="text-[var(--accent)]">✓ {result.created} contacts imported{callListId ? ' and added to list' : ''}</p>
-			{#if result.duplicates > 0}<p class="text-[#666]">{result.duplicates} duplicates skipped</p>{/if}
+			{#if result.duplicates > 0}<p class="text-[#8a8a8a]">{result.duplicates} duplicates skipped</p>{/if}
 			{#if result.errors > 0}<p class="text-red-400">{result.errors} errors</p>{/if}
 		</div>
 	{/if}

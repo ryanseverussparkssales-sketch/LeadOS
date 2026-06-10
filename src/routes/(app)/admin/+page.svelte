@@ -120,13 +120,13 @@
 		<div class="flex flex-col items-center justify-center py-24 text-center">
 			<div class="text-[#333] mb-3"><Icon name="alert" size={36} /></div>
 			<p class="text-white font-semibold">Restricted</p>
-			<p class="text-[#555] text-sm mt-1">This area is for platform super-admins only.</p>
+			<p class="text-[#7c7c7c] text-sm mt-1">This area is for platform super-admins only.</p>
 		</div>
 	{:else}
 		<div class="max-w-6xl mx-auto px-6 py-8 space-y-8">
 			<div>
 				<h1 class="text-2xl font-bold text-white">Edelhaus Admin</h1>
-				<p class="text-[#555] text-sm mt-1">Master view across every agency account on the platform.</p>
+				<p class="text-[#7c7c7c] text-sm mt-1">Master view across every agency account on the platform.</p>
 			</div>
 
 			<!-- Metrics -->
@@ -144,7 +144,7 @@
 					] as [label, value]}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] px-4 py-3">
 							<div class="text-2xl font-bold text-white tabular-nums">{value}</div>
-							<div class="text-[10px] text-[#555] uppercase tracking-widest mt-0.5">{label}</div>
+							<div class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mt-0.5">{label}</div>
 						</div>
 					{/each}
 				</div>
@@ -167,7 +167,7 @@
 				<div class="rounded-xl border border-[#2a2a2a] overflow-hidden">
 					<table class="w-full text-sm">
 						<thead>
-							<tr class="bg-[#0f0f0f] text-[#555] text-[10px] uppercase tracking-widest">
+							<tr class="bg-[#0f0f0f] text-[#7c7c7c] text-[10px] uppercase tracking-widest">
 								<th class="text-left font-medium px-4 py-2.5">Account</th>
 								<th class="text-left font-medium px-4 py-2.5">Plan</th>
 								<th class="text-left font-medium px-4 py-2.5">Team</th>
@@ -181,7 +181,7 @@
 								<tr class="border-t border-[#1a1a1a] hover:bg-[#0f0f0f] transition-colors">
 									<td class="px-4 py-3">
 										<div class="text-white font-medium">{acc.agency_name ?? '—'}</div>
-										<div class="text-xs text-[#555]">{acc.email}</div>
+										<div class="text-xs text-[#7c7c7c]">{acc.email}</div>
 									</td>
 									<td class="px-4 py-3">
 										<select value={acc.tier} onchange={(e) => setTier(acc, (e.target as HTMLSelectElement).value)}
@@ -202,7 +202,7 @@
 								</tr>
 							{/each}
 							{#if filtered.length === 0}
-								<tr><td colspan="6" class="text-center text-[#555] text-sm py-10">No accounts match</td></tr>
+								<tr><td colspan="6" class="text-center text-[#7c7c7c] text-sm py-10">No accounts match</td></tr>
 							{/if}
 						</tbody>
 					</table>
@@ -217,7 +217,7 @@
 			<div class="w-full max-w-md rounded-2xl border border-[#2a2a2a] bg-[#0d0d0d] p-6 space-y-4" role="dialog" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={() => {}}>
 				<div class="flex items-center justify-between">
 					<h3 class="text-white font-semibold">New account</h3>
-					<button onclick={() => showCreate = false} aria-label="Close" class="text-[#555] hover:text-white"><Icon name="x" size={16} /></button>
+					<button onclick={() => showCreate = false} aria-label="Close" class="text-[#7c7c7c] hover:text-white"><Icon name="x" size={16} /></button>
 				</div>
 
 				<div class="grid grid-cols-3 gap-2">
@@ -254,7 +254,7 @@
 					</select>
 				{/if}
 
-				<p class="text-[10px] text-[#555] leading-relaxed">They sign in with this email + temp password. {form.type === 'admin' ? 'Admins get the Edelhaus Admin dashboard and unlimited access.' : form.type === 'rep' ? 'Reps appear under the chosen agency and can be assigned numbers.' : 'Creates a fresh agency workspace.'}</p>
+				<p class="text-[10px] text-[#7c7c7c] leading-relaxed">They sign in with this email + temp password. {form.type === 'admin' ? 'Admins get the Edelhaus Admin dashboard and unlimited access.' : form.type === 'rep' ? 'Reps appear under the chosen agency and can be assigned numbers.' : 'Creates a fresh agency workspace.'}</p>
 
 				<button onclick={createAccount} disabled={creating}
 					class="w-full rounded-lg bg-[var(--call)] text-[var(--call-ink)] py-2.5 text-sm font-semibold hover:bg-[var(--call-hi)] disabled:opacity-50 transition-colors">

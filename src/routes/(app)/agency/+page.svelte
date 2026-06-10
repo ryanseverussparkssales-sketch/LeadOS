@@ -62,11 +62,11 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Agency Command Center</h2>
-			<p class="text-[10px] text-[#444] mt-0.5">Live view of all clients, campaigns, and your team</p>
+			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Live view of all clients, campaigns, and your team</p>
 		</div>
 		<div class="flex items-center gap-3">
 			{#if lastRefresh}<p class="text-[10px] text-[#333]">Updated {lastRefresh}</p>{/if}
-			<button onclick={load} class="text-xs text-[#444] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">↺ Refresh</button>
+			<button onclick={load} class="text-xs text-[#6e6e6e] hover:text-white border border-[#2a2a2a] px-3 py-1.5 rounded-lg transition-colors">↺ Refresh</button>
 		</div>
 	</div>
 
@@ -100,10 +100,10 @@
 
 				<!-- SDR workload -->
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-4">SDR Team ({data.sdrStats.length} reps)</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">SDR Team ({data.sdrStats.length} reps)</p>
 					{#if data.sdrStats.length === 0}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-6 text-center hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-							<p class="text-xs text-[#444]">No SDRs yet. Invite your team in <a href="/team" class="underline hover:text-white">Team</a>.</p>
+							<p class="text-xs text-[#6e6e6e]">No SDRs yet. Invite your team in <a href="/team" class="underline hover:text-white">Team</a>.</p>
 						</div>
 					{:else}
 						<div class="space-y-2">
@@ -113,7 +113,7 @@
 								<div class="rounded-xl border {needsLeads ? 'border-yellow-800/30 bg-yellow-950/5' : 'border-[#2a2a2a] bg-[#111]'} p-4">
 									<div class="flex items-center justify-between mb-2">
 										<div class="flex items-center gap-2">
-											<div class="w-7 h-7 rounded-full bg-[#1a1a1a] flex items-center justify-center text-xs font-semibold text-[#666]">
+											<div class="w-7 h-7 rounded-full bg-[#1a1a1a] flex items-center justify-center text-xs font-semibold text-[#8a8a8a]">
 												{rep.member_email[0].toUpperCase()}
 											</div>
 											<p class="text-sm text-white">{rep.member_email.split('@')[0]}</p>
@@ -121,34 +121,34 @@
 												<span class="text-[9px] text-yellow-400 border border-yellow-800/30 px-1.5 py-0.5 rounded">Needs leads</span>
 											{/if}
 										</div>
-										<p class="text-xs text-[#555]">{rep.queueSize} in queue</p>
+										<p class="text-xs text-[#7c7c7c]">{rep.queueSize} in queue</p>
 									</div>
 									<div class="grid grid-cols-3 gap-2 text-center">
 										<div>
 											<p class="text-sm font-semibold text-white">{rep.todayCalls}</p>
-											<p class="text-[9px] text-[#444]">dials</p>
+											<p class="text-[9px] text-[#6e6e6e]">dials</p>
 										</div>
 										<div>
 											<p class="text-sm font-semibold text-blue-400">{connectRate}%</p>
-											<p class="text-[9px] text-[#444]">connect</p>
+											<p class="text-[9px] text-[#6e6e6e]">connect</p>
 										</div>
 										<div>
 											<p class="text-sm font-semibold text-[var(--accent)]">{rep.todayWins}</p>
-											<p class="text-[9px] text-[#444]">wins</p>
+											<p class="text-[9px] text-[#6e6e6e]">wins</p>
 										</div>
 									</div>
 								</div>
 							{/each}
 						</div>
 					{/if}
-					<a href="/agency/pool" class="block mt-3 text-center text-xs text-[#444] hover:text-white border border-[#1a1a1a] rounded-lg py-2 transition-colors">
+					<a href="/agency/pool" class="block mt-3 text-center text-xs text-[#6e6e6e] hover:text-white border border-[#1a1a1a] rounded-lg py-2 transition-colors">
 						📋 Distribute leads to reps →
 					</a>
 				</div>
 
 				<!-- Clients & campaigns -->
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-4">Clients ({data.clients.length})</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">Clients ({data.clients.length})</p>
 					<div class="space-y-3">
 						{#each data.clients as client}
 							{@const activeCamps = (client.projects ?? []).flatMap((p: any) => p.campaigns ?? []).filter((c: any) => c.status === 'active')}
@@ -167,8 +167,8 @@
 								</div>
 								{#each activeCamps.slice(0,3) as camp}
 									<div class="flex items-center justify-between text-[10px] py-1 border-t border-[#111]">
-										<span class="text-[#666] truncate">{camp.name}</span>
-										<span class="text-[#444] shrink-0 ml-2">{camp.win_count ?? 0}/{camp.target_wins ?? '—'} wins · {camp.calls_today ?? 0} calls today</span>
+										<span class="text-[#8a8a8a] truncate">{camp.name}</span>
+										<span class="text-[#6e6e6e] shrink-0 ml-2">{camp.win_count ?? 0}/{camp.target_wins ?? '—'} wins · {camp.calls_today ?? 0} calls today</span>
 									</div>
 								{/each}
 								{#if pendingCamps.length > 0}
@@ -180,7 +180,7 @@
 						{/each}
 						{#if data.clients.length === 0}
 							<div class="rounded-xl border border-[#1a1a1a] bg-[#111] p-6 text-center">
-								<p class="text-xs text-[#444]">No clients yet. <a href="/clients" class="underline hover:text-white">Add your first client →</a></p>
+								<p class="text-xs text-[#6e6e6e]">No clients yet. <a href="/clients" class="underline hover:text-white">Add your first client →</a></p>
 							</div>
 						{/if}
 					</div>
@@ -190,14 +190,14 @@
 			<!-- Recent wins feed -->
 			{#if data.recentWins.length > 0}
 				<div>
-					<p class="text-xs text-[#444] uppercase tracking-widest mb-4">Recent Wins — Last 7 days</p>
+					<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">Recent Wins — Last 7 days</p>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
 						{#each data.recentWins.slice(0,10) as win}
 							<div class="rounded-xl border border-[#1a1a1a] bg-[#111] px-4 py-3 flex items-center gap-3">
 								<span class="text-sm shrink-0">{WIN_LABEL[win.outcome]?.split(' ')[0] ?? '✓'}</span>
 								<div class="flex-1 min-w-0">
 									<p class="text-xs text-white truncate">{win.contact?.name ?? 'Unknown'}</p>
-									<p class="text-[9px] text-[#444]">{(win.contact?.company ?? '')} · {WIN_LABEL[win.outcome]?.slice(2) ?? win.outcome}</p>
+									<p class="text-[9px] text-[#6e6e6e]">{(win.contact?.company ?? '')} · {WIN_LABEL[win.outcome]?.slice(2) ?? win.outcome}</p>
 								</div>
 								<p class="text-[9px] text-[#333] shrink-0">{new Date(win.created_at).toLocaleDateString()}</p>
 							</div>

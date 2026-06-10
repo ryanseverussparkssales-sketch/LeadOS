@@ -161,19 +161,19 @@
 		<div class="flex items-center justify-between px-6 py-4 border-b border-[#1a1a1a] shrink-0">
 			<div>
 				<h2 class="text-white font-semibold">Book Appointment</h2>
-				<p class="text-xs text-[#555] mt-0.5">{contact.name}{contact.company ? ` · ${contact.company}` : ''}</p>
+				<p class="text-xs text-[#7c7c7c] mt-0.5">{contact.name}{contact.company ? ` · ${contact.company}` : ''}</p>
 			</div>
-			<button onclick={onClose} class="text-[#444] hover:text-white transition-colors text-lg"><Icon name="x" size={14} /></button>
+			<button onclick={onClose} class="text-[#6e6e6e] hover:text-white transition-colors text-lg"><Icon name="x" size={14} /></button>
 		</div>
 
 		<!-- Quick-load template packs -->
 		{#if !campaignId}
 			<div class="px-6 py-3 border-b border-[#1a1a1a] shrink-0">
-				<p class="text-[10px] text-[#444] uppercase tracking-widest mb-2">Question template</p>
+				<p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-2">Question template</p>
 				<div class="flex gap-1.5 flex-wrap">
 					{#each Object.entries(PACKS) as [key, pack]}
 						<button onclick={() => loadPack(key)}
-							class="px-2.5 py-1 rounded-lg text-[10px] transition-colors {selectedPack === key ? 'bg-white/15 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#555] hover:text-white hover:border-[#444]'}">
+							class="px-2.5 py-1 rounded-lg text-[10px] transition-colors {selectedPack === key ? 'bg-white/15 text-white border border-white/20' : 'border border-[#2a2a2a] text-[#7c7c7c] hover:text-white hover:border-[#444]'}">
 							{pack.name}
 						</button>
 					{/each}
@@ -185,7 +185,7 @@
 		<div class="flex border-b border-[#1a1a1a] shrink-0">
 			{#each [['details','Details'],['qualify','Qualify']] as [tab, label]}
 				<button onclick={() => activeTab = tab as any}
-					class="flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 {activeTab === tab ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-white'}">
+					class="flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 {activeTab === tab ? 'border-white text-white' : 'border-transparent text-[#7c7c7c] hover:text-white'}">
 					{label}
 					{#if tab === 'qualify' && incompleteRequired.length > 0}
 						<span class="ml-1 text-red-400">({incompleteRequired.length} required)</span>
@@ -201,12 +201,12 @@
 				<!-- Date + Time -->
 				<div class="grid grid-cols-2 gap-3">
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Date</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Date</label>
 						<input type="date" bind:value={scheduledDate} autofocus
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Time</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Time</label>
 						<input type="time" bind:value={scheduledTime}
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
 					</div>
@@ -215,7 +215,7 @@
 				<!-- Format + Duration -->
 				<div class="grid grid-cols-2 gap-3">
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Format</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Format</label>
 						<select bind:value={format} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 							<option value="phone">📞 Phone</option>
 							<option value="video">🎥 Video call</option>
@@ -223,7 +223,7 @@
 						</select>
 					</div>
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Duration</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Duration</label>
 						<select bind:value={durationMinutes} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:outline-none">
 							{#each [15,30,45,60,90,120] as d}
 								<option value={d}>{d} min</option>
@@ -235,20 +235,20 @@
 				<!-- Location / Meeting link -->
 				{#if format === 'in_person'}
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Location</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Location</label>
 						<input bind:value={location} placeholder="Address or location"
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 				{:else if format === 'video'}
 					<div>
-						<label class="block text-xs text-[#555] mb-1">Meeting link</label>
+						<label class="block text-xs text-[#7c7c7c] mb-1">Meeting link</label>
 						<input bind:value={meetingLink} placeholder="https://zoom.us/j/..."
 							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none" />
 					</div>
 				{/if}
 
 				<div>
-					<label class="block text-xs text-[#555] mb-1">Notes</label>
+					<label class="block text-xs text-[#7c7c7c] mb-1">Notes</label>
 					<textarea bind:value={notes} rows="2" placeholder="Anything else to note..."
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#333] focus:border-white focus:outline-none resize-none"></textarea>
 				</div>
@@ -260,14 +260,14 @@
 				{:else}
 					{#each questions as q}
 						<div>
-							<label class="block text-xs text-[#555] mb-1">
+							<label class="block text-xs text-[#7c7c7c] mb-1">
 								{q.label}{#if q.required}<span class="text-red-400 ml-0.5">*</span>{/if}
 							</label>
 							{#if q.type === 'yesno'}
 								<div class="flex gap-2">
 									{#each [['yes','Yes ✓'],['no','No ✗'],['unknown','Not sure']] as [v,l]}
 										<button onclick={() => answers = { ...answers, [q.key]: v }}
-											class="flex-1 py-2 rounded-lg text-xs border transition-colors {answers[q.key] === v ? 'bg-white/15 border-white text-white' : 'border-[#2a2a2a] text-[#555] hover:text-white hover:border-[#444]'}">
+											class="flex-1 py-2 rounded-lg text-xs border transition-colors {answers[q.key] === v ? 'bg-white/15 border-white text-white' : 'border-[#2a2a2a] text-[#7c7c7c] hover:text-white hover:border-[#444]'}">
 											{l}
 										</button>
 									{/each}
@@ -295,7 +295,7 @@
 
 		<!-- Footer -->
 		<div class="px-6 py-4 border-t border-[#1a1a1a] flex gap-3 shrink-0">
-			<button onclick={onClose} class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-xs text-[#666] hover:border-white hover:text-white hover:bg-white/5 transition-colors">
+			<button onclick={onClose} class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white hover:bg-white/5 transition-colors">
 				Cancel
 			</button>
 			<button onclick={save} disabled={saving || !scheduledDate}

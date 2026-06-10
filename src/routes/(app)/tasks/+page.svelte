@@ -20,7 +20,7 @@
 	let saving = $state(false);
 
 	const TYPE_ICONS: Record<string,string> = { follow_up:'↩', email:'✉', call:'📞', meeting:'📅', other:'·' };
-	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-red-400', high:'text-orange-400', medium:'text-yellow-400', low:'text-[#666]' };
+	const PRIORITY_COLORS: Record<string,string> = { urgent:'text-red-400', high:'text-orange-400', medium:'text-yellow-400', low:'text-[#8a8a8a]' };
 
 	onMount(async () => {
 		const cr = await apiFetch('/api/contacts/filtered?limit=200');
@@ -107,13 +107,13 @@
 		<div class="flex items-center gap-3">
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Tasks</h2>
 			{#if overdue > 0}<span class="text-xs bg-red-900/30 text-red-400 px-2 py-0.5 rounded-full">{overdue} overdue</span>{/if}
-			{#if pending > 0}<span class="text-xs text-[#555]">{pending} pending</span>{/if}
+			{#if pending > 0}<span class="text-xs text-[#7c7c7c]">{pending} pending</span>{/if}
 		</div>
 		<div class="flex flex-wrap gap-2">
 			<!-- Filter tabs -->
 			{#each (['pending','in_progress','completed','all'] as FilterStatus[]) as s}
 				<button onclick={() => { filterStatus = s; load(); }}
-					class="rounded-lg px-3 py-1.5 text-xs transition-colors {filterStatus === s ? 'bg-white/10 text-white' : 'text-[#666] hover:text-white'} capitalize">
+					class="rounded-lg px-3 py-1.5 text-xs transition-colors {filterStatus === s ? 'bg-white/10 text-white' : 'text-[#8a8a8a] hover:text-white'} capitalize">
 					{s === 'in_progress' ? 'In Progress' : s}
 				</button>
 			{/each}
@@ -155,7 +155,7 @@
 					<button onclick={createTask} disabled={saving || !nTitle.trim()} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
 						{saving ? 'Creating...' : 'Create Task'}
 					</button>
-					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-3">Cancel</button>
+					<button onclick={() => showNew = false} class="text-xs text-[#7c7c7c] hover:text-white px-3">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -164,18 +164,18 @@
 	<!-- Priority + overdue quick-filter chips -->
 	<div class="flex gap-2 flex-wrap px-8 py-4 border-b border-[var(--c-border)]">
 		<button onclick={() => filterOverdueOnly = !filterOverdueOnly}
-			class="px-3 py-1 rounded-lg text-xs transition-colors {filterOverdueOnly ? 'bg-red-950 text-red-400 border border-red-900' : 'border border-[var(--c-border-subtle)] text-[#555] hover:text-white'}">
+			class="px-3 py-1 rounded-lg text-xs transition-colors {filterOverdueOnly ? 'bg-red-950 text-red-400 border border-red-900' : 'border border-[var(--c-border-subtle)] text-[#7c7c7c] hover:text-white'}">
 			🔴 Overdue
 		</button>
 		{#each (['urgent','high','medium','low'] as string[]) as pri}
 			<button onclick={() => filterPriority = filterPriority === pri ? null : pri}
-				class="px-3 py-1 rounded-lg text-xs capitalize transition-colors {filterPriority === pri ? 'bg-white text-black' : 'border border-[var(--c-border-subtle)] text-[#555] hover:text-white'}">
+				class="px-3 py-1 rounded-lg text-xs capitalize transition-colors {filterPriority === pri ? 'bg-white text-black' : 'border border-[var(--c-border-subtle)] text-[#7c7c7c] hover:text-white'}">
 				{pri}
 			</button>
 		{/each}
 		{#if filterPriority || filterOverdueOnly}
 			<button onclick={() => { filterPriority = null; filterOverdueOnly = false; }}
-				class="px-3 py-1 rounded-lg text-xs text-[#444] hover:text-white">
+				class="px-3 py-1 rounded-lg text-xs text-[#6e6e6e] hover:text-white">
 				✕ Clear
 			</button>
 		{/if}
@@ -198,10 +198,10 @@
 			<div class="flex items-center justify-center py-16 text-center">
 				<div>
 					{#if filterPriority || filterOverdueOnly}
-						<p class="text-[#444] text-sm">No tasks match the active filters</p>
+						<p class="text-[#6e6e6e] text-sm">No tasks match the active filters</p>
 						<button onclick={() => { filterPriority = null; filterOverdueOnly = false; }} class="mt-2 text-xs text-white underline">Clear filters</button>
 					{:else}
-						<p class="text-[#444] text-sm">No tasks</p>
+						<p class="text-[#6e6e6e] text-sm">No tasks</p>
 						<button onclick={() => showNew = true} class="mt-2 text-xs text-white underline">Create one</button>
 					{/if}
 				</div>
@@ -213,14 +213,14 @@
 						<!-- Complete checkbox -->
 						<button onclick={() => complete(task)} aria-label="Complete task" class="w-5 h-5 rounded-full border-2 shrink-0 transition-colors {task.status === 'completed' ? 'border-[var(--accent)]/40 bg-[var(--accent)]/20' : 'border-[#333] hover:border-white'}">
 						</button>
-						<span class="shrink-0 text-sm {PRIORITY_COLORS[task.priority] ?? 'text-[#666]'}" title="{task.priority} priority · {task.task_type}">{TYPE_ICONS[task.task_type] ?? '·'}</span>
+						<span class="shrink-0 text-sm {PRIORITY_COLORS[task.priority] ?? 'text-[#8a8a8a]'}" title="{task.priority} priority · {task.task_type}">{TYPE_ICONS[task.task_type] ?? '·'}</span>
 						<!-- Task content -->
 						<div class="flex-1 min-w-0">
-							<p class="text-sm {task.status === 'completed' ? 'line-through text-[#555]' : 'text-white'} truncate">{task.title}</p>
+							<p class="text-sm {task.status === 'completed' ? 'line-through text-[#7c7c7c]' : 'text-white'} truncate">{task.title}</p>
 							<div class="flex items-center gap-2 mt-0.5 flex-wrap">
-								{#if task.due_date}<span class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#555]'}">{fmtDue(task.due_date)}</span>{/if}
-								<span class="text-xs capitalize {PRIORITY_COLORS[task.priority] ?? 'text-[#666]'}">{task.priority}</span>
-								{#if task.contact}<a href="/contacts/{task.contact.id}" class="text-xs text-[#666] hover:text-white truncate">{task.contact.name}</a>{/if}
+								{#if task.due_date}<span class="text-xs {isOverdue(task) ? 'text-red-400' : 'text-[#7c7c7c]'}">{fmtDue(task.due_date)}</span>{/if}
+								<span class="text-xs capitalize {PRIORITY_COLORS[task.priority] ?? 'text-[#8a8a8a]'}">{task.priority}</span>
+								{#if task.contact}<a href="/contacts/{task.contact.id}" class="text-xs text-[#8a8a8a] hover:text-white truncate">{task.contact.name}</a>{/if}
 								{#if task.ai_suggested}<span class="text-xs text-[var(--accent)]/70">✨ AI</span>{/if}
 							</div>
 						</div>
@@ -228,11 +228,11 @@
 						{#if confirmDeleteId === task.id}
 							<div class="flex items-center gap-2 shrink-0">
 								<button onclick={() => deleteTask(task.id)} class="text-xs text-red-400 hover:text-red-300">Delete</button>
-								<button onclick={() => confirmDeleteId = null} class="text-xs text-[#555] hover:text-white">Cancel</button>
+								<button onclick={() => confirmDeleteId = null} class="text-xs text-[#7c7c7c] hover:text-white">Cancel</button>
 							</div>
 						{:else}
 							<button onclick={() => confirmDeleteId = task.id} aria-label="Delete task"
-								class="shrink-0 text-[#444] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">🗑</button>
+								class="shrink-0 text-[#6e6e6e] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">🗑</button>
 						{/if}
 					</div>
 				{/each}

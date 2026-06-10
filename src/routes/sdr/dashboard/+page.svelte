@@ -12,7 +12,7 @@
 <div class="flex-1 overflow-y-auto p-6">
 	<div class="max-w-5xl mx-auto">
 		<h2 class="text-white text-lg font-semibold">Your Dashboard</h2>
-		<p class="text-xs text-[#555] mt-0.5 mb-6">Today's performance at a glance.</p>
+		<p class="text-xs text-[#7c7c7c] mt-0.5 mb-6">Today's performance at a glance.</p>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 auto-rows-min">
 			<div class="md:col-span-2 xl:col-span-3"><StatsWidget /></div>

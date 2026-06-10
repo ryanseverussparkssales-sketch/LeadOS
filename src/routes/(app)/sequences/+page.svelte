@@ -65,7 +65,7 @@
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 		<div>
 			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Email Sequences</h2>
-			<p class="text-xs text-[#555] mt-0.5">Automated drip campaigns that send over time</p>
+			<p class="text-xs text-[#7c7c7c] mt-0.5">Automated drip campaigns that send over time</p>
 		</div>
 		<div class="flex gap-2">
 		<button onclick={advanceSequences} disabled={advancing} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">{advancing ? 'Running...' : '▶ Run Due Steps'}</button>
@@ -85,13 +85,13 @@
 		<div class="border-b border-[#1e1e1e] bg-[#0d0d0d] p-6 overflow-y-auto max-h-[70vh]">
 			<div class="max-w-2xl space-y-4">
 				<div class="grid grid-cols-2 gap-4">
-					<div><label class="text-xs text-[#555] block mb-1">Name *</label><input bind:value={nName} placeholder="Q2 Follow-up Sequence" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-					<div><label class="text-xs text-[#555] block mb-1">Trigger</label>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Name *</label><input bind:value={nName} placeholder="Q2 Follow-up Sequence" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+					<div><label class="text-xs text-[#7c7c7c] block mb-1">Trigger</label>
 						<select bind:value={nTrigger} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 							{#each Object.entries(TRIGGER_LABELS) as [v, l]}<option value={v}>{l}</option>{/each}
 						</select>
 					</div>
-					<div class="col-span-2"><label class="text-xs text-[#555] block mb-1">Description</label><input bind:value={nDesc} placeholder="Follow-up after first call" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+					<div class="col-span-2"><label class="text-xs text-[#7c7c7c] block mb-1">Description</label><input bind:value={nDesc} placeholder="Follow-up after first call" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
 				</div>
 
 				<div class="space-y-3">
@@ -102,9 +102,9 @@
 								<p class="text-xs text-white font-medium">Step {i+1}</p>
 								<div class="flex items-center gap-3">
 									<div class="flex items-center gap-2">
-										<label class="text-xs text-[#555]">Send after</label>
+										<label class="text-xs text-[#7c7c7c]">Send after</label>
 										<input type="number" bind:value={step.delay_days} min="0" class="w-16 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:outline-none" />
-										<span class="text-xs text-[#555]">days</span>
+										<span class="text-xs text-[#7c7c7c]">days</span>
 									</div>
 									{#if nSteps.length > 1}<button onclick={() => removeStep(i)} class="text-xs text-red-700 hover:text-red-400">Remove</button>{/if}
 								</div>
@@ -113,12 +113,12 @@
 							<textarea bind:value={step.body} rows="4" placeholder="Email body... Use {'{'}name{'}'}, {'{'}company{'}'} as variables" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
 					{/each}
-					<button onclick={addStep} class="text-xs text-[#555] hover:text-white">+ Add Step</button>
+					<button onclick={addStep} class="text-xs text-[#7c7c7c] hover:text-white">+ Add Step</button>
 				</div>
 
 				<div class="flex gap-3">
 					<button onclick={createSequence} disabled={saving || !nName.trim()} class="rounded-lg bg-white px-5 py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? 'Saving...' : 'Create Sequence'}</button>
-					<button onclick={() => showNew = false} class="text-xs text-[#555] hover:text-white px-3">Cancel</button>
+					<button onclick={() => showNew = false} class="text-xs text-[#7c7c7c] hover:text-white px-3">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -129,10 +129,10 @@
 			{#each sequences as seq}
 				<button onclick={() => selected = seq} class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] hover:bg-white/5 transition-colors {selected?.id === seq.id ? 'bg-white/10' : ''}">
 					<p class="text-sm text-white font-medium truncate">{seq.name}</p>
-					<p class="text-xs text-[#555] mt-0.5">{seq.steps?.length ?? 0} steps · {TRIGGER_LABELS[seq.trigger_type]}</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">{seq.steps?.length ?? 0} steps · {TRIGGER_LABELS[seq.trigger_type]}</p>
 				</button>
 			{:else}
-				<p class="text-[#444] text-xs text-center py-8">No sequences yet</p>
+				<p class="text-[#6e6e6e] text-xs text-center py-8">No sequences yet</p>
 			{/each}
 		</div>
 
@@ -142,7 +142,7 @@
 					<div class="flex items-start justify-between">
 						<div>
 							<h3 class="text-white text-xl font-semibold">{selected.name}</h3>
-							<p class="text-xs text-[#555] mt-0.5">Trigger: {TRIGGER_LABELS[selected.trigger_type]} · {selected.steps?.length ?? 0} steps</p>
+							<p class="text-xs text-[#7c7c7c] mt-0.5">Trigger: {TRIGGER_LABELS[selected.trigger_type]} · {selected.steps?.length ?? 0} steps</p>
 							{#if selected.description}<p class="text-sm text-[#888] mt-1">{selected.description}</p>{/if}
 						</div>
 						<button onclick={() => deleteSeq(selected!.id)} class="text-xs text-red-700 hover:text-red-400">Delete</button>
@@ -152,16 +152,16 @@
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 							<div class="flex items-center justify-between mb-3">
 								<p class="text-xs text-white font-medium">Step {step.step_number}</p>
-								<p class="text-xs text-[#444]">{step.delay_days === 0 ? 'Immediately' : `After ${step.delay_days} days`}</p>
+								<p class="text-xs text-[#6e6e6e]">{step.delay_days === 0 ? 'Immediately' : `After ${step.delay_days} days`}</p>
 							</div>
 							<p class="text-sm text-white mb-1">{step.subject}</p>
-							<p class="text-xs text-[#666] whitespace-pre-wrap">{step.body}</p>
+							<p class="text-xs text-[#8a8a8a] whitespace-pre-wrap">{step.body}</p>
 						</div>
 					{/each}
 				</div>
 			{:else}
 				<div class="flex items-center justify-center h-full">
-					<p class="text-[#444] text-sm">Select a sequence to view its steps</p>
+					<p class="text-[#6e6e6e] text-sm">Select a sequence to view its steps</p>
 				</div>
 			{/if}
 		</div>

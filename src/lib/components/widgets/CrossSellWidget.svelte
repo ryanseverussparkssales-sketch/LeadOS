@@ -121,19 +121,19 @@
 <div class="flex flex-col h-full bg-[var(--c-surface-1)] rounded-xl overflow-hidden">
 	<div class="flex items-center justify-between px-4 pt-4 pb-2">
 		<p class="text-xs text-[var(--c-text-muted)] uppercase tracking-widest font-semibold">Cross-Sell Leads</p>
-		<span class="text-[10px] text-[#444]">{opportunities.length} opportunities</span>
+		<span class="text-[10px] text-[#6e6e6e]">{opportunities.length} opportunities</span>
 	</div>
 
 	<!-- Product filter tabs -->
 	<div class="flex gap-1 px-3 pb-2 flex-wrap">
 		<button onclick={() => selectedProduct = 'all'}
-			class="px-2 py-1 rounded-lg text-[10px] transition-colors {selectedProduct === 'all' ? 'bg-white/15 text-white' : 'text-[#555] hover:text-white'}">
+			class="px-2 py-1 rounded-lg text-[10px] transition-colors {selectedProduct === 'all' ? 'bg-white/15 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 			All ({opportunities.length})
 		</button>
 		{#each countByProduct as p}
 			{#if p.count > 0}
 				<button onclick={() => selectedProduct = p.key}
-					class="px-2 py-1 rounded-lg text-[10px] transition-colors {selectedProduct === p.key ? 'bg-white/15 text-white' : 'text-[#555] hover:text-white'}">
+					class="px-2 py-1 rounded-lg text-[10px] transition-colors {selectedProduct === p.key ? 'bg-white/15 text-white' : 'text-[#7c7c7c] hover:text-white'}">
 					{p.icon} {p.label} ({p.count})
 				</button>
 			{/if}
@@ -159,7 +159,7 @@
 					<span class="text-base shrink-0">{product?.icon ?? '📦'}</span>
 					<div class="flex-1 min-w-0">
 						<p class="text-xs text-white truncate group-hover:text-white">{opp.contact_name}</p>
-						<p class="text-[9px] text-[#444] truncate">{opp.reason}</p>
+						<p class="text-[9px] text-[#6e6e6e] truncate">{opp.reason}</p>
 					</div>
 					<div class="flex items-center gap-1 shrink-0">
 						{#each Array(opp.score) as _}

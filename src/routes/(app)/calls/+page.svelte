@@ -72,7 +72,7 @@
 	}
 
 	function outcomeColor(o: string | null) {
-		if (!o) return 'text-[#444]';
+		if (!o) return 'text-[#6e6e6e]';
 		const WINS = new Set(['appointment_set','demo_scheduled','meeting_confirmed','callback',
 			'info_requested','decision_maker','referral','follow_up_agreed','proposal_requested',
 			'trial_started','signed_up','investment_interest']);
@@ -81,7 +81,7 @@
 		if (DEAD.has(o)) return 'text-red-400';
 		if (o === 'answered') return 'text-blue-400';
 		if (o === 'left_voicemail') return 'text-yellow-400';
-		return 'text-[#555]';
+		return 'text-[#7c7c7c]';
 	}
 
 	const recordingUrl = $derived(
@@ -122,7 +122,7 @@
 				{/each}
 			</optgroup>
 		</select>
-		<span class="text-xs text-[#444]">{calls.length} calls</span>
+		<span class="text-xs text-[#6e6e6e]">{calls.length} calls</span>
 	</div>
 
 	<div class="flex flex-1 overflow-hidden">
@@ -135,7 +135,7 @@
 					{/each}
 				</div>
 				{:else if calls.length === 0}
-				<p class="text-[#444] text-xs text-center py-8">No calls yet</p>
+				<p class="text-[#6e6e6e] text-xs text-center py-8">No calls yet</p>
 			{:else}
 				{#each calls as call}
 					<button onclick={() => selected = call}
@@ -146,16 +146,16 @@
 								{outcomeLabels[call.outcome ?? ''] ?? '—'}
 							</span>
 						</div>
-						<p class="text-xs text-[#555] truncate">{call.contact?.company ?? ''}</p>
+						<p class="text-xs text-[#7c7c7c] truncate">{call.contact?.company ?? ''}</p>
 						<div class="flex items-center gap-3 mt-1">
-							<span class="text-xs text-[#444]">{formatDate(call.created_at)}</span>
+							<span class="text-xs text-[#6e6e6e]">{formatDate(call.created_at)}</span>
 							<span class="text-xs text-[#333]">{formatDuration(call.call_duration_seconds)}</span>
 							{#if call.quality_score != null}
 								<span class="text-xs font-medium {call.quality_score >= 8 ? 'text-[var(--accent)]' : call.quality_score >= 6 ? 'text-yellow-400' : 'text-red-400'}">{call.quality_score}/10</span>
 							{/if}
 						</div>
 						{#if call.summary}
-							<p class="text-xs text-[#666] mt-1 line-clamp-2">{call.summary}</p>
+							<p class="text-xs text-[#8a8a8a] mt-1 line-clamp-2">{call.summary}</p>
 						{/if}
 					</button>
 				{/each}
@@ -170,15 +170,15 @@
 					<div class="flex items-start justify-between">
 						<div>
 							<h3 class="text-white text-xl font-semibold">{selected.contact?.name ?? '—'}</h3>
-							<p class="text-[#555] text-sm">{selected.contact?.company ?? ''} · {selected.contact?.phone ?? ''}</p>
-							<p class="text-[#444] text-xs mt-1">{formatDate(selected.created_at)} · {formatDuration(selected.call_duration_seconds)}</p>
+							<p class="text-[#7c7c7c] text-sm">{selected.contact?.company ?? ''} · {selected.contact?.phone ?? ''}</p>
+							<p class="text-[#6e6e6e] text-xs mt-1">{formatDate(selected.created_at)} · {formatDuration(selected.call_duration_seconds)}</p>
 						</div>
 						<div class="text-right">
 							<span class="text-sm {outcomeColor(selected.outcome)}">
 								{outcomeLabels[selected.outcome ?? ''] ?? 'No outcome'}
 							</span>
 							<a href="/contacts/{selected.contact?.id}"
-								class="block text-xs text-[#555] hover:text-white mt-1 transition-colors">
+								class="block text-xs text-[#7c7c7c] hover:text-white mt-1 transition-colors">
 								View contact →
 							</a>
 						</div>
@@ -188,7 +188,7 @@
 					{#if selected.recording_url && recordingUrl}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-4">
 							{#if recordingError}
-								<p class="text-xs text-[#666]">Recording unavailable — it may still be processing or could not be found.</p>
+								<p class="text-xs text-[#8a8a8a]">Recording unavailable — it may still be processing or could not be found.</p>
 							{:else}
 								<audio controls src={recordingUrl} onerror={() => recordingError = true} class="w-full h-8 mt-2" style="filter: invert(0.7) sepia(0.2)"></audio>
 							{/if}

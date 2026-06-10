@@ -158,7 +158,7 @@
                 {/if}
             </div>
             <div class="text-right">
-                <p class="text-xs text-[#555]">Portal access</p>
+                <p class="text-xs text-[#7c7c7c]">Portal access</p>
                 <p class="text-xs text-[#333]">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
             </div>
         </div>
@@ -167,24 +167,24 @@
         {#if !loading}
         <div class="max-w-6xl mx-auto px-6 pb-5 grid grid-cols-4 gap-4">
             <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-                <p class="text-[#555] text-[10px] uppercase tracking-widest mb-1">Calls Made</p>
+                <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-1">Calls Made</p>
                 <p class="text-white text-2xl font-bold font-mono">{stats.totalCalls ?? 0}</p>
-                <p class="text-[#444] text-[10px] mt-0.5">last 30 days</p>
+                <p class="text-[#6e6e6e] text-[10px] mt-0.5">last 30 days</p>
             </div>
             <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-                <p class="text-[#555] text-[10px] uppercase tracking-widest mb-1">Connect Rate</p>
+                <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-1">Connect Rate</p>
                 <p class="text-white text-2xl font-bold font-mono">{connectRate()}%</p>
-                <p class="text-[#444] text-[10px] mt-0.5">{stats.answeredCalls ?? 0} answered</p>
+                <p class="text-[#6e6e6e] text-[10px] mt-0.5">{stats.answeredCalls ?? 0} answered</p>
             </div>
             <div class="bg-[#111] border border-[var(--accent)]/40 rounded-xl p-4">
-                <p class="text-[#555] text-[10px] uppercase tracking-widest mb-1">Appointments Set</p>
+                <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-1">Appointments Set</p>
                 <p class="text-[var(--accent)] text-2xl font-bold font-mono">{wins.length}</p>
-                <p class="text-[#444] text-[10px] mt-0.5">this month</p>
+                <p class="text-[#6e6e6e] text-[10px] mt-0.5">this month</p>
             </div>
             <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-4">
-                <p class="text-[#555] text-[10px] uppercase tracking-widest mb-1">Avg Call Length</p>
+                <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-1">Avg Call Length</p>
                 <p class="text-white text-2xl font-bold font-mono">{formatDuration(stats.avgCallDuration ?? 0)}</p>
-                <p class="text-[#444] text-[10px] mt-0.5">per connected call</p>
+                <p class="text-[#6e6e6e] text-[10px] mt-0.5">per connected call</p>
             </div>
         </div>
         {/if}
@@ -201,7 +201,7 @@
                 ['messages', 'Messages'],
             ] as [val, label]}
                 <button onclick={() => activeTab = val as any}
-                    class="px-5 py-3 text-xs font-medium transition-colors border-b-2 {activeTab === val ? 'border-white text-white' : 'border-transparent text-[#555] hover:text-white'}">
+                    class="px-5 py-3 text-xs font-medium transition-colors border-b-2 {activeTab === val ? 'border-white text-white' : 'border-transparent text-[#7c7c7c] hover:text-white'}">
                     {label}
                 </button>
             {/each}
@@ -221,25 +221,25 @@
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-[#111] border border-[var(--accent)]/40 rounded-xl p-6">
-                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Appointments set</p>
+                        <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-2">Appointments set</p>
                         <p class="text-[var(--accent)] text-4xl font-bold font-mono">{wins.length}</p>
-                        <p class="text-[#444] text-xs mt-1">this month</p>
+                        <p class="text-[#6e6e6e] text-xs mt-1">this month</p>
                     </div>
                     <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-6">
-                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Connect rate</p>
+                        <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-2">Connect rate</p>
                         <p class="text-white text-4xl font-bold font-mono">{connectRate()}%</p>
-                        <p class="text-[#444] text-xs mt-1">{stats.answeredCalls ?? 0} of {stats.totalCalls ?? 0} answered</p>
+                        <p class="text-[#6e6e6e] text-xs mt-1">{stats.answeredCalls ?? 0} of {stats.totalCalls ?? 0} answered</p>
                     </div>
                     <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-6">
-                        <p class="text-[#555] text-[10px] uppercase tracking-widest mb-2">Calls made</p>
+                        <p class="text-[#7c7c7c] text-[10px] uppercase tracking-widest mb-2">Calls made</p>
                         <p class="text-white text-4xl font-bold font-mono">{stats.totalCalls ?? 0}</p>
-                        <p class="text-[#444] text-xs mt-1">last 30 days</p>
+                        <p class="text-[#6e6e6e] text-xs mt-1">last 30 days</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-5">
-                        <p class="text-xs text-[#444] uppercase tracking-widest mb-4">Campaign progress</p>
+                        <p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">Campaign progress</p>
                         {#each projects as project}
                             {#each (project.campaigns ?? []) as c}
                                 {#if c.target_wins}
@@ -251,16 +251,16 @@
                             {/each}
                         {/each}
                         {#if !projects.some((p: any) => (p.campaigns ?? []).some((c: any) => c.target_wins))}
-                            <p class="text-xs text-[#555]">No active campaign targets yet.</p>
+                            <p class="text-xs text-[#7c7c7c]">No active campaign targets yet.</p>
                         {/if}
                     </div>
                     <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-5">
                         <div class="flex items-center justify-between mb-4">
-                            <p class="text-xs text-[#444] uppercase tracking-widest">Recent wins</p>
-                            <button onclick={() => activeTab = 'wins'} class="text-[10px] text-[#555] hover:text-white transition-colors">View all →</button>
+                            <p class="text-xs text-[#6e6e6e] uppercase tracking-widest">Recent wins</p>
+                            <button onclick={() => activeTab = 'wins'} class="text-[10px] text-[#7c7c7c] hover:text-white transition-colors">View all →</button>
                         </div>
                         {#if wins.length === 0}
-                            <p class="text-xs text-[#555]">No appointments logged yet.</p>
+                            <p class="text-xs text-[#7c7c7c]">No appointments logged yet.</p>
                         {:else}
                             <div class="space-y-2.5">
                                 {#each wins.slice(0, 5) as win}
@@ -269,7 +269,7 @@
                                             <p class="text-sm text-white truncate">{win.contact?.name ?? 'Unknown'}</p>
                                             <p class="text-[10px] text-[var(--accent)]">{winLabel(win.outcome)}</p>
                                         </div>
-                                        <span class="text-[10px] text-[#444] shrink-0">{timeAgo(win.created_at)}</span>
+                                        <span class="text-[10px] text-[#6e6e6e] shrink-0">{timeAgo(win.created_at)}</span>
                                     </div>
                                 {/each}
                             </div>
@@ -293,34 +293,34 @@
             {/if}
 
             <div class="space-y-4">
-                <h2 class="text-xs text-[#444] uppercase tracking-widest">Active Campaigns</h2>
+                <h2 class="text-xs text-[#6e6e6e] uppercase tracking-widest">Active Campaigns</h2>
                 {#each projects as project}
                     {#each (project.campaigns ?? []) as campaign}
                         {#if campaign.status !== 'archived'}
                             <div class="bg-[#111] border border-[#1a1a1a] rounded-xl p-5">
                                 <div class="flex items-center justify-between mb-3">
                                     <div>
-                                        <p class="text-xs text-[#444]">{project.name}</p>
+                                        <p class="text-xs text-[#6e6e6e]">{project.name}</p>
                                         <p class="text-sm text-white font-semibold mt-0.5">{campaign.name}</p>
                                     </div>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full capitalize {campaign.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40' : campaign.status === 'pending_approval' ? 'bg-yellow-950 text-yellow-400 border border-yellow-900' : 'bg-[#1a1a1a] text-[#555]'}">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full capitalize {campaign.status === 'active' ? 'bg-[var(--accent)]/12 text-[var(--accent)] border border-[var(--accent)]/40' : campaign.status === 'pending_approval' ? 'bg-yellow-950 text-yellow-400 border border-yellow-900' : 'bg-[#1a1a1a] text-[#7c7c7c]'}">
                                         {campaign.status === 'pending_approval' ? '⏳ Awaiting your approval' : campaign.status}
                                     </span>
                                 </div>
                                 <div class="grid grid-cols-3 gap-4">
                                     <div>
-                                        <p class="text-[10px] text-[#444] mb-1">Total Calls</p>
+                                        <p class="text-[10px] text-[#6e6e6e] mb-1">Total Calls</p>
                                         <p class="text-sm text-white font-mono">{campaign.total_calls ?? 0}</p>
                                     </div>
                                     {#if campaign.daily_call_goal}
                                         <div>
-                                            <p class="text-[10px] text-[#444] mb-1">Today</p>
+                                            <p class="text-[10px] text-[#6e6e6e] mb-1">Today</p>
                                             <p class="text-sm text-white font-mono">{campaign.calls_today ?? 0}/{campaign.daily_call_goal}</p>
                                         </div>
                                     {/if}
                                     {#if campaign.target_wins}
                                         <div>
-                                            <p class="text-[10px] text-[#444] mb-1">{campaign.win_label ?? 'Wins'}</p>
+                                            <p class="text-[10px] text-[#6e6e6e] mb-1">{campaign.win_label ?? 'Wins'}</p>
                                             <div class="flex items-center gap-2">
                                                 <p class="text-sm text-[var(--accent)] font-mono">{campaign.win_count ?? 0}/{campaign.target_wins}</p>
                                             </div>
@@ -340,14 +340,14 @@
         {:else if activeTab === 'wins'}
             <div class="space-y-3">
                 <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-xs text-[#444] uppercase tracking-widest">Appointment & Win Log</h2>
-                    <p class="text-xs text-[#555]">{wins.length} total</p>
+                    <h2 class="text-xs text-[#6e6e6e] uppercase tracking-widest">Appointment & Win Log</h2>
+                    <p class="text-xs text-[#7c7c7c]">{wins.length} total</p>
                 </div>
                 {#if wins.length === 0}
                     <div class="text-center py-20">
                         <p class="text-3xl mb-3">📅</p>
                         <p class="text-white text-sm">No appointments logged yet</p>
-                        <p class="text-xs text-[#555] mt-1">They'll appear here as your SDR team works the campaign</p>
+                        <p class="text-xs text-[#7c7c7c] mt-1">They'll appear here as your SDR team works the campaign</p>
                     </div>
                 {:else}
                     {#each wins.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as win}
@@ -357,16 +357,16 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-1">
                                         <p class="text-sm text-white font-medium">{win.contact?.name ?? 'Unknown contact'}</p>
-                                        {#if win.contact?.company}<p class="text-xs text-[#555]">at {win.contact.company}</p>{/if}
+                                        {#if win.contact?.company}<p class="text-xs text-[#7c7c7c]">at {win.contact.company}</p>{/if}
                                     </div>
                                     <p class="text-xs text-[var(--accent)]">{winLabel(win.outcome)}</p>
-                                    {#if win.summary}<p class="text-xs text-[#555] mt-1 leading-relaxed">{win.summary.slice(0, 120)}{win.summary.length > 120 ? '…' : ''}</p>{/if}
+                                    {#if win.summary}<p class="text-xs text-[#7c7c7c] mt-1 leading-relaxed">{win.summary.slice(0, 120)}{win.summary.length > 120 ? '…' : ''}</p>{/if}
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <p class="text-xs text-[#444]">{timeAgo(win.created_at)}</p>
+                                    <p class="text-xs text-[#6e6e6e]">{timeAgo(win.created_at)}</p>
                                     {#if win.call_duration_seconds}<p class="text-[10px] text-[#333] mt-1">{formatDuration(win.call_duration_seconds)}</p>{/if}
                                     {#if win.recording_url || win.raw_transcript}
-                                        <p class="text-[9px] text-[#555] mt-1">{expandedWin === win.id ? '▲' : '▼'} {win.recording_url ? '🎧' : ''}{win.raw_transcript ? '📝' : ''}</p>
+                                        <p class="text-[9px] text-[#7c7c7c] mt-1">{expandedWin === win.id ? '▲' : '▼'} {win.recording_url ? '🎧' : ''}{win.raw_transcript ? '📝' : ''}</p>
                                     {/if}
                                 </div>
                             </button>
@@ -374,16 +374,16 @@
                                 <div class="px-4 pb-4 border-t border-[#1a1a1a] pt-3 space-y-3">
                                     {#if win.recording_url}
                                         <div>
-                                            <p class="text-[10px] text-[#444] uppercase tracking-widest mb-2">🎧 Call Recording</p>
+                                            <p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-2">🎧 Call Recording</p>
                                             <audio controls src="/api/calls/recording?call_id={win.id}"
                                                 class="w-full h-8" style="filter: invert(0.7) sepia(0.2)"></audio>
                                         </div>
                                     {/if}
                                     {#if win.raw_transcript}
                                         <div>
-                                            <p class="text-[10px] text-[#444] uppercase tracking-widest mb-2">📝 Transcript</p>
+                                            <p class="text-[10px] text-[#6e6e6e] uppercase tracking-widest mb-2">📝 Transcript</p>
                                             <div class="rounded-lg bg-[#0d0d0d] border border-[#1a1a1a] p-3 max-h-40 overflow-y-auto">
-                                                <p class="text-xs text-[#666] leading-relaxed whitespace-pre-wrap font-mono">{win.raw_transcript.slice(0, 1500)}{win.raw_transcript.length > 1500 ? '\n[truncated]' : ''}</p>
+                                                <p class="text-xs text-[#8a8a8a] leading-relaxed whitespace-pre-wrap font-mono">{win.raw_transcript.slice(0, 1500)}{win.raw_transcript.length > 1500 ? '\n[truncated]' : ''}</p>
                                             </div>
                                         </div>
                                     {/if}
@@ -397,12 +397,12 @@
         <!-- APPROVALS -->
         {:else if activeTab === 'approvals'}
             <div class="space-y-3">
-                <h2 class="text-xs text-[#444] uppercase tracking-widest mb-2">Campaigns Awaiting Your Approval</h2>
+                <h2 class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Campaigns Awaiting Your Approval</h2>
                 {#if pendingApprovals.length === 0}
                     <div class="text-center py-20">
                         <p class="text-3xl mb-3">✓</p>
                         <p class="text-white text-sm">Nothing to approve</p>
-                        <p class="text-xs text-[#555] mt-1">New campaigns from your agency will appear here for sign-off.</p>
+                        <p class="text-xs text-[#7c7c7c] mt-1">New campaigns from your agency will appear here for sign-off.</p>
                     </div>
                 {:else}
                     {#each pendingApprovals as camp}
@@ -412,7 +412,7 @@
                                     <p class="text-sm text-white font-semibold">{camp.name}</p>
                                     <p class="text-xs text-yellow-400 mt-0.5">⏳ Awaiting your approval</p>
                                     {#if camp.reps && camp.reps.length}
-                                        <p class="text-xs text-[#555] mt-2">Assigned reps: {camp.reps.map(r => r.member_email).filter(Boolean).join(', ')}</p>
+                                        <p class="text-xs text-[#7c7c7c] mt-2">Assigned reps: {camp.reps.map(r => r.member_email).filter(Boolean).join(', ')}</p>
                                     {/if}
                                 </div>
                                 <div class="flex gap-2 shrink-0">
@@ -434,18 +434,18 @@
         <!-- INVOICES -->
         {:else if activeTab === 'invoices'}
             <div class="space-y-3">
-                <h2 class="text-xs text-[#444] uppercase tracking-widest mb-2">Invoices</h2>
+                <h2 class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-2">Invoices</h2>
                 {#if invoices.length === 0}
                     <div class="text-center py-20">
                         <p class="text-3xl mb-3">🧾</p>
                         <p class="text-white text-sm">No invoices yet</p>
-                        <p class="text-xs text-[#555] mt-1">Invoices from your agency will appear here.</p>
+                        <p class="text-xs text-[#7c7c7c] mt-1">Invoices from your agency will appear here.</p>
                     </div>
                 {:else}
                     <div class="overflow-x-auto rounded-xl border border-[#1a1a1a]">
                         <table class="w-full text-sm min-w-[560px]">
                             <thead>
-                                <tr class="text-left text-xs text-[#555] border-b border-[#1a1a1a]">
+                                <tr class="text-left text-xs text-[#7c7c7c] border-b border-[#1a1a1a]">
                                     <th class="px-4 py-2.5 font-medium">Period</th>
                                     <th class="px-4 py-2.5 font-medium text-right">Base</th>
                                     <th class="px-4 py-2.5 font-medium text-right">Bonus</th>
@@ -473,7 +473,7 @@
         {:else if activeTab === 'docs'}
             <div class="space-y-5">
                 <div class="flex items-center justify-between">
-                    <h2 class="text-xs text-[#444] uppercase tracking-widest">Documents</h2>
+                    <h2 class="text-xs text-[#6e6e6e] uppercase tracking-widest">Documents</h2>
                     <button onclick={() => showUploadForm = !showUploadForm}
                         class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#888] hover:border-white hover:text-white transition-colors">
                         {showUploadForm ? '✕ Cancel' : '+ Share a document'}
@@ -499,9 +499,9 @@
                 {/if}
 
                 <div>
-                    <p class="text-[10px] text-[#555] uppercase tracking-widest mb-2">From your agency</p>
+                    <p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-2">From your agency</p>
                     {#if agencyDocs.length === 0}
-                        <p class="text-xs text-[#444]">No documents shared yet.</p>
+                        <p class="text-xs text-[#6e6e6e]">No documents shared yet.</p>
                     {:else}
                         <div class="space-y-2">
                             {#each agencyDocs as doc}
@@ -509,9 +509,9 @@
                                     class="flex items-center justify-between rounded-lg bg-[#111] border border-[#1a1a1a] px-4 py-3 hover:border-[#2a2a2a] transition-colors">
                                     <div class="min-w-0">
                                         <p class="text-sm text-white truncate">{doc.title}</p>
-                                        {#if doc.description}<p class="text-xs text-[#555] truncate">{doc.description}</p>{/if}
+                                        {#if doc.description}<p class="text-xs text-[#7c7c7c] truncate">{doc.description}</p>{/if}
                                     </div>
-                                    <span class="text-xs text-[#444] shrink-0 ml-3">↗ open</span>
+                                    <span class="text-xs text-[#6e6e6e] shrink-0 ml-3">↗ open</span>
                                 </a>
                             {/each}
                         </div>
@@ -519,9 +519,9 @@
                 </div>
 
                 <div>
-                    <p class="text-[10px] text-[#555] uppercase tracking-widest mb-2">Shared by you</p>
+                    <p class="text-[10px] text-[#7c7c7c] uppercase tracking-widest mb-2">Shared by you</p>
                     {#if myDocs.length === 0}
-                        <p class="text-xs text-[#444]">You haven't shared any documents yet.</p>
+                        <p class="text-xs text-[#6e6e6e]">You haven't shared any documents yet.</p>
                     {:else}
                         <div class="space-y-2">
                             {#each myDocs as doc}
@@ -529,9 +529,9 @@
                                     class="flex items-center justify-between rounded-lg bg-[#111] border border-[#1a1a1a] px-4 py-3 hover:border-[#2a2a2a] transition-colors">
                                     <div class="min-w-0">
                                         <p class="text-sm text-white truncate">{doc.title}</p>
-                                        {#if doc.description}<p class="text-xs text-[#555] truncate">{doc.description}</p>{/if}
+                                        {#if doc.description}<p class="text-xs text-[#7c7c7c] truncate">{doc.description}</p>{/if}
                                     </div>
-                                    <span class="text-xs text-[#444] shrink-0 ml-3">↗ open</span>
+                                    <span class="text-xs text-[#6e6e6e] shrink-0 ml-3">↗ open</span>
                                 </a>
                             {/each}
                         </div>

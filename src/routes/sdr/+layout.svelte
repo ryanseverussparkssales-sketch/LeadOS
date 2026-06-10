@@ -112,7 +112,7 @@
 	<nav class="rogue-nav flex-1 py-3 space-y-0.5 px-2 overflow-y-auto">
 		{#each NAV as item}
 			<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}
-				class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#666] hover:text-white hover:bg-white/5'}">
+				class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors {isActive(item.href) ? 'text-white' : 'text-[#8a8a8a] hover:text-white hover:bg-white/5'}">
 				<Icon name={item.icon} size={17} class="flex-shrink-0" />
 				{item.label}
 			</a>
@@ -120,7 +120,7 @@
 	</nav>
 
 	<div class="px-4 py-4 border-t border-[#1e1e1e]">
-		<p class="text-xs text-[#555] truncate">{sdrName}</p>
+		<p class="text-xs text-[#7c7c7c] truncate">{sdrName}</p>
 		<a href="/" class="text-[10px] text-[#333] hover:text-white transition-colors">← Exit</a>
 	</div>
 {/snippet}

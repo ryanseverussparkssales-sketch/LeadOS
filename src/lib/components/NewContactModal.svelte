@@ -58,7 +58,7 @@
 
 		<div class="p-5 border-b border-[#2a2a2a] flex items-center justify-between">
 			<p class="text-white text-sm font-medium">New Contact</p>
-			<button onclick={onClose} class="text-[#666] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
+			<button onclick={onClose} class="text-[#8a8a8a] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
 		</div>
 
 		<form onsubmit={handleSubmit} class="p-5 space-y-4">
@@ -67,7 +67,7 @@
 					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Name</label>
 					<input bind:value={name} placeholder="Full name (optional)"
 						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-					<p class="text-xs text-[#444] mt-1">Phone, email, or company required</p>
+					<p class="text-xs text-[#6e6e6e] mt-1">Phone, email, or company required</p>
 				</div>
 				<div>
 					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Phone</label>
@@ -117,7 +117,7 @@
 
 			<div class="flex gap-3 pt-1">
 				<button type="button" onclick={onClose}
-					class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-sm text-[#666] hover:text-white hover:border-white transition-colors">
+					class="flex-1 rounded-lg border border-[#2a2a2a] py-2.5 text-sm text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 					Cancel
 				</button>
 				<button type="submit" disabled={saving || !canSubmit}

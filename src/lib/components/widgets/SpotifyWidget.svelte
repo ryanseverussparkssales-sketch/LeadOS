@@ -8,7 +8,7 @@
 	{#if !connected}
 		<div class="text-center space-y-2">
 			<p class="text-2xl">🎵</p>
-			<p class="text-xs text-[#555]">Play music while dialing</p>
+			<p class="text-xs text-[#7c7c7c]">Play music while dialing</p>
 			<a href="/api/auth/spotify?redirect=/dashboard"
 				class="block rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">
 				Connect Spotify
@@ -16,6 +16,6 @@
 			<p class="text-xs text-[#333]">Requires SPOTIFY_CLIENT_ID in .env.local</p>
 		</div>
 	{:else}
-		<p class="text-xs text-[#444]">Spotify connected</p>
+		<p class="text-xs text-[#6e6e6e]">Spotify connected</p>
 	{/if}
 </div>

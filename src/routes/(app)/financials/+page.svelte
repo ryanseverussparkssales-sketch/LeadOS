@@ -207,13 +207,13 @@
 		calling: 'text-blue-400', ai: 'text-[var(--accent)]', hosting: 'text-gray-400',
 		crm: 'text-cyan-400', banking: 'text-[var(--accent)]', payments: 'text-[var(--accent)]',
 		legal: 'text-yellow-400', storage: 'text-orange-400', analytics: 'text-pink-400',
-		productivity: 'text-indigo-400', other: 'text-[#666]',
+		productivity: 'text-indigo-400', other: 'text-[#8a8a8a]',
 	};
 
 	const stackStatusColor = (s: string) =>
 		s === 'active' ? 'text-[var(--accent)] bg-[var(--accent)]/12' :
 		s === 'trial'  ? 'text-yellow-400 bg-yellow-400/10' :
-		s === 'paused' ? 'text-[#666] bg-[#222]' :
+		s === 'paused' ? 'text-[#8a8a8a] bg-[#222]' :
 		                 'text-red-400/60 bg-red-400/5';
 
 	const trialDaysLeft = (end: string) => {
@@ -547,7 +547,7 @@
 	<div class="flex items-center justify-between px-6 py-4 border-b border-[#2a2a2a]">
 		<div>
 			<h1 class="text-xl font-semibold">Financials</h1>
-			<p class="text-[#666] text-sm">Revenue, expenses, invoices, and business health</p>
+			<p class="text-[#8a8a8a] text-sm">Revenue, expenses, invoices, and business health</p>
 		</div>
 		<div class="flex gap-2">
 			{#each (['month', 'quarter', 'year'] as const) as p}
@@ -573,7 +573,7 @@
 		] as tab}
 			<button
 				onclick={() => activeTab = tab.id as any}
-				class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === tab.id ? 'border-white text-white' : 'border-transparent text-[#666] hover:text-[#ccc]'}"
+				class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === tab.id ? 'border-white text-white' : 'border-transparent text-[#8a8a8a] hover:text-[#ccc]'}"
 			>
 				{tab.label}
 			</button>
@@ -593,24 +593,24 @@
 			{@const net = (s?.balance?.totalIncome ?? 0) - (s?.balance?.totalExpenses ?? 0)}
 			<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Invoiced</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Invoiced</div>
 					<div class="text-2xl font-semibold">{fmt(s?.invoices?.totalInvoiced ?? 0)}</div>
-					<div class="text-[#666] text-xs mt-1">{s?.invoices?.total ?? 0} invoices</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">{s?.invoices?.total ?? 0} invoices</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Collected</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Collected</div>
 					<div class="text-2xl font-semibold text-[var(--accent)]">{fmt(s?.invoices?.totalPaid ?? 0)}</div>
-					<div class="text-[#666] text-xs mt-1">Outstanding: {fmt(s?.invoices?.totalOutstanding ?? 0)}</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">Outstanding: {fmt(s?.invoices?.totalOutstanding ?? 0)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Pipeline Value</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Pipeline Value</div>
 					<div class="text-2xl font-semibold text-blue-400">{fmt(s?.deals?.pipelineValue ?? 0)}</div>
-					<div class="text-[#666] text-xs mt-1">Won: {fmt(s?.deals?.wonValue ?? 0)}</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">Won: {fmt(s?.deals?.wonValue ?? 0)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Tool Spend / mo</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Tool Spend / mo</div>
 					<div class="text-2xl font-semibold text-yellow-400">{fmt(techMonthlyTotal)}</div>
-					<div class="text-[#666] text-xs mt-1">API: {fmtD(s?.apiCosts?.total ?? 0)}</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">API: {fmtD(s?.apiCosts?.total ?? 0)}</div>
 				</div>
 			</div>
 
@@ -628,21 +628,21 @@
 							style="width:{Math.min(q.pct, 100)}%"
 						></div>
 					</div>
-					<div class="text-xs text-[#666] mt-1">{q.pct}% of quota</div>
+					<div class="text-xs text-[#8a8a8a] mt-1">{q.pct}% of quota</div>
 				</div>
 			{/if}
 
 			<!-- Balance net + overdue alert -->
 			<div class="grid grid-cols-2 gap-4">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Net Cash (period)</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Net Cash (period)</div>
 					<div class="text-2xl font-semibold {net >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(net)}</div>
-					<div class="text-[#666] text-xs mt-1">In: {fmt(summary?.balance?.totalIncome ?? 0)} · Out: {fmt(summary?.balance?.totalExpenses ?? 0)}</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">In: {fmt(summary?.balance?.totalIncome ?? 0)} · Out: {fmt(summary?.balance?.totalExpenses ?? 0)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Budget Cash Flow / mo</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Budget Cash Flow / mo</div>
 					<div class="text-2xl font-semibold {monthlyCashFlow >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
-					<div class="text-[#666] text-xs mt-1">Income: {fmt(monthlyIncome)} · Expenses: {fmt(monthlyExpenses + techMonthlyTotal)}</div>
+					<div class="text-[#8a8a8a] text-xs mt-1">Income: {fmt(monthlyIncome)} · Expenses: {fmt(monthlyExpenses + techMonthlyTotal)}</div>
 				</div>
 			</div>
 
@@ -659,15 +659,15 @@
 					<div class="text-sm font-medium mb-3">API Costs ({period === 'month' ? 'This Month' : period === 'quarter' ? 'This Quarter' : 'This Year'})</div>
 					<div class="grid grid-cols-3 gap-3 text-sm">
 						<div class="text-center">
-							<div class="text-[#666] text-xs mb-1">Twilio</div>
+							<div class="text-[#8a8a8a] text-xs mb-1">Twilio</div>
 							<div class="font-medium">{fmtD(summary?.apiCosts?.twilio ?? 0)}</div>
 						</div>
 						<div class="text-center">
-							<div class="text-[#666] text-xs mb-1">Groq</div>
+							<div class="text-[#8a8a8a] text-xs mb-1">Groq</div>
 							<div class="font-medium">{fmtD(summary?.apiCosts?.groq ?? 0)}</div>
 						</div>
 						<div class="text-center">
-							<div class="text-[#666] text-xs mb-1">Claude</div>
+							<div class="text-[#8a8a8a] text-xs mb-1">Claude</div>
 							<div class="font-medium">{fmtD(summary?.apiCosts?.claude ?? 0)}</div>
 						</div>
 					</div>
@@ -677,7 +677,7 @@
 		<!-- ═══════════════ INVOICES ═══════════════ -->
 		{:else if activeTab === 'invoices'}
 			<div class="flex justify-between items-center mb-4">
-				<div class="text-sm text-[#666]">{invoices.length} invoices total</div>
+				<div class="text-sm text-[#8a8a8a]">{invoices.length} invoices total</div>
 				<button onclick={() => { showInvoiceForm = !showInvoiceForm; if (showInvoiceForm) loadInvoiceClients(); }} class="text-xs text-[#999] hover:text-white border border-[#333] px-3 py-1 rounded hover:border-white transition-colors">
 					{showInvoiceForm ? '✕ Cancel' : '+ New Invoice'}
 				</button>
@@ -685,10 +685,10 @@
 
 			{#if showInvoiceForm}
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5 mb-4 space-y-3">
-					<p class="text-xs text-[#666] uppercase tracking-widest">New Invoice</p>
+					<p class="text-xs text-[#8a8a8a] uppercase tracking-widest">New Invoice</p>
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Client</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Client</label>
 							{#if invoiceClients.length}
 								<select bind:value={invoiceForm.clientId} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 									<option value="">— No client —</option>
@@ -699,7 +699,7 @@
 							{/if}
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Type</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Type</label>
 							<select bind:value={invoiceForm.contractType} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
 								<option value="invoice">Invoice</option>
 								<option value="retainer">Monthly Retainer</option>
@@ -708,27 +708,27 @@
 							</select>
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Services</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Services</label>
 							<input bind:value={invoiceForm.services} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Hours Worked</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Hours Worked</label>
 							<input type="number" bind:value={invoiceForm.hoursWorked} placeholder="0" min="0" step="0.5" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Hourly Rate ($)</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Hourly Rate ($)</label>
 							<input type="number" bind:value={invoiceForm.hourlyRate} placeholder="0" min="0" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Tax %</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Tax %</label>
 							<input type="number" bind:value={invoiceForm.taxPercent} placeholder="0" min="0" max="100" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Invoice Date</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Invoice Date</label>
 							<DatePicker bind:value={invoiceForm.invoiceDate} onchange={(v) => invoiceForm.invoiceDate = v} />
 						</div>
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Due Date</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Due Date</label>
 							<DatePicker bind:value={invoiceForm.dueDate} onchange={(v) => invoiceForm.dueDate = v} />
 						</div>
 					</div>
@@ -736,11 +736,11 @@
 					{#if ['retainer','project'].includes(invoiceForm.contractType ?? 'invoice')}
 						<div class="grid grid-cols-2 gap-3">
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Contract Start</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Contract Start</label>
 								<DatePicker bind:value={invoiceForm.contractStart} onchange={(v) => invoiceForm.contractStart = v} />
 							</div>
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Contract End</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Contract End</label>
 								<DatePicker bind:value={invoiceForm.contractEnd} onchange={(v) => invoiceForm.contractEnd = v} />
 							</div>
 						</div>
@@ -749,15 +749,15 @@
 					{#if ['retainer','hourly'].includes(invoiceForm.contractType ?? 'invoice')}
 						<div class="grid grid-cols-3 gap-3">
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Contract Rate ($/hr)</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Contract Rate ($/hr)</label>
 								<input type="number" bind:value={invoiceForm.hourlyRateContract} placeholder="75" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							</div>
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Weekly Hours</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Weekly Hours</label>
 								<input type="number" bind:value={invoiceForm.weeklyHours} placeholder="20" step="0.5" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							</div>
 							<div>
-								<label class="text-xs text-[#555] block mb-1">Monthly Hours</label>
+								<label class="text-xs text-[#7c7c7c] block mb-1">Monthly Hours</label>
 								<input type="number" bind:value={invoiceForm.monthlyHours} placeholder="80" step="0.5" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 							</div>
 						</div>
@@ -765,17 +765,17 @@
 
 					{#if invoiceForm.contractType !== 'invoice'}
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Scope of Work</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Scope of Work</label>
 							<textarea bind:value={invoiceForm.scopeOfWork} rows="3" placeholder="Describe what's included..." class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
 					{/if}
 
 					{#if projects.filter(p => p.client_id === invoiceForm.clientId).length > 0}
 						<div>
-							<label class="text-xs text-[#555] block mb-1">Linked Projects (for time tracking)</label>
+							<label class="text-xs text-[#7c7c7c] block mb-1">Linked Projects (for time tracking)</label>
 							<div class="flex flex-wrap gap-2 mt-1">
 								{#each projects.filter(p => p.client_id === invoiceForm.clientId) as proj}
-									<label class="flex items-center gap-1.5 text-xs cursor-pointer border px-2.5 py-1 rounded-lg transition-colors {invoiceForm.projectIds?.includes(proj.id) ? 'border-white text-white' : 'border-[#2a2a2a] text-[#777] hover:border-[#555]'}">
+									<label class="flex items-center gap-1.5 text-xs cursor-pointer border px-2.5 py-1 rounded-lg transition-colors {invoiceForm.projectIds?.includes(proj.id) ? 'border-white text-white' : 'border-[#2a2a2a] text-[#9a9a9a] hover:border-[#555]'}">
 										<input type="checkbox" checked={invoiceForm.projectIds?.includes(proj.id)}
 											onchange={(e) => {
 												if ((e.target as HTMLInputElement).checked) {
@@ -804,12 +804,12 @@
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b border-[#2a2a2a]">
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Invoice #</th>
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Client</th>
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Date</th>
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Due</th>
-							<th class="text-right px-4 py-3 text-[#666] font-normal">Total</th>
-							<th class="text-center px-4 py-3 text-[#666] font-normal">Status</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Invoice #</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Client</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Date</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Due</th>
+							<th class="text-right px-4 py-3 text-[#8a8a8a] font-normal">Total</th>
+							<th class="text-center px-4 py-3 text-[#8a8a8a] font-normal">Status</th>
 							<th class="px-4 py-3"></th>
 						</tr>
 					</thead>
@@ -820,7 +820,7 @@
 								<td class="px-4 py-3">
 									<div>{inv.client?.name ?? 'No client'}</div>
 									{#if inv.contract_type && inv.contract_type !== 'invoice'}
-										<span class="text-xs text-[#555] capitalize">{inv.contract_type}</span>
+										<span class="text-xs text-[#7c7c7c] capitalize">{inv.contract_type}</span>
 									{/if}
 								</td>
 								<td class="px-4 py-3 text-[#999]">{fmtDate(inv.invoice_date)}</td>
@@ -839,7 +839,7 @@
 									{/if}
 									<div class="flex items-center gap-2 justify-end">
 										<button onclick={() => emailInvoice(inv)} disabled={sendingInvoiceId === inv.id}
-											class="text-xs border border-[#2a2a2a] px-2.5 py-1.5 rounded-lg text-[#777] hover:border-blue-400 hover:text-blue-400 transition-colors disabled:opacity-40">
+											class="text-xs border border-[#2a2a2a] px-2.5 py-1.5 rounded-lg text-[#9a9a9a] hover:border-blue-400 hover:text-blue-400 transition-colors disabled:opacity-40">
 											{sendingInvoiceId === inv.id ? 'Sending...' : '✉ Email'}
 										</button>
 										{#if inv.status !== 'paid'}
@@ -851,13 +851,13 @@
 												{markingPaid === inv.id ? '…' : 'Mark Paid'}
 											</button>
 										{:else}
-											<span class="text-xs text-[#555]">{fmtDate(inv.paid_at)}</span>
+											<span class="text-xs text-[#7c7c7c]">{fmtDate(inv.paid_at)}</span>
 										{/if}
 									</div>
 								</td>
 							</tr>
 						{:else}
-							<tr><td colspan="7" class="px-4 py-8 text-center text-[#555]">No invoices yet — create one in Reports.</td></tr>
+							<tr><td colspan="7" class="px-4 py-8 text-center text-[#7c7c7c]">No invoices yet — create one in Reports.</td></tr>
 						{/each}
 					</tbody>
 				</table>
@@ -867,15 +867,15 @@
 			{#if invoices.length}
 				<div class="flex gap-4 mt-4 text-sm">
 					<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 flex gap-3 items-center">
-						<span class="text-[#666]">Total</span>
+						<span class="text-[#8a8a8a]">Total</span>
 						<span class="font-medium">{fmtD(invoices.reduce((s, i) => s + (i.total ?? 0), 0))}</span>
 					</div>
 					<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 flex gap-3 items-center">
-						<span class="text-[#666]">Collected</span>
+						<span class="text-[#8a8a8a]">Collected</span>
 						<span class="font-medium text-[var(--accent)]">{fmtD(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + (i.total ?? 0), 0))}</span>
 					</div>
 					<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 flex gap-3 items-center">
-						<span class="text-[#666]">Outstanding</span>
+						<span class="text-[#8a8a8a]">Outstanding</span>
 						<span class="font-medium text-yellow-400">{fmtD(invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + (i.total ?? 0), 0))}</span>
 					</div>
 				</div>
@@ -888,19 +888,19 @@
 				<div class="text-sm font-medium mb-3">Log Weekly Balance</div>
 				<div class="grid grid-cols-4 gap-3">
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Date</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Date</label>
 						<DatePicker bind:value={balForm.date} onchange={(v) => balForm.date = v} />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Income ($)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Income ($)</label>
 						<input type="number" bind:value={balForm.income} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Expenses ($)</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Expenses ($)</label>
 						<input type="number" bind:value={balForm.expenses} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Notes</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Notes</label>
 						<input type="text" bind:value={balForm.notes} placeholder="Optional" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 				</div>
@@ -945,7 +945,7 @@
 							/>
 						{/each}
 					</svg>
-					<div class="flex gap-4 mt-2 text-xs text-[#666]">
+					<div class="flex gap-4 mt-2 text-xs text-[#8a8a8a]">
 						<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-[var(--accent)] inline-block"></span> Income</span>
 						<span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-red-400 inline-block"></span> Expenses</span>
 					</div>
@@ -970,11 +970,11 @@
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b border-[#2a2a2a]">
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Date</th>
-							<th class="text-right px-4 py-3 text-[#666] font-normal">Income</th>
-							<th class="text-right px-4 py-3 text-[#666] font-normal">Expenses</th>
-							<th class="text-right px-4 py-3 text-[#666] font-normal">Net</th>
-							<th class="text-left px-4 py-3 text-[#666] font-normal">Notes</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Date</th>
+							<th class="text-right px-4 py-3 text-[#8a8a8a] font-normal">Income</th>
+							<th class="text-right px-4 py-3 text-[#8a8a8a] font-normal">Expenses</th>
+							<th class="text-right px-4 py-3 text-[#8a8a8a] font-normal">Net</th>
+							<th class="text-left px-4 py-3 text-[#8a8a8a] font-normal">Notes</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -985,10 +985,10 @@
 								<td class="px-4 py-3 text-right text-[var(--accent)]">{fmtD(entry.income ?? 0)}</td>
 								<td class="px-4 py-3 text-right text-red-400">{fmtD(entry.expenses ?? 0)}</td>
 								<td class="px-4 py-3 text-right font-medium {net >= 0 ? 'text-white' : 'text-red-400'}">{fmtD(net)}</td>
-								<td class="px-4 py-3 text-[#666] text-xs">{entry.notes ?? ''}</td>
+								<td class="px-4 py-3 text-[#8a8a8a] text-xs">{entry.notes ?? ''}</td>
 							</tr>
 						{:else}
-							<tr><td colspan="5" class="px-4 py-8 text-center text-[#555]">No entries yet — log your first week above.</td></tr>
+							<tr><td colspan="5" class="px-4 py-8 text-center text-[#7c7c7c]">No entries yet — log your first week above.</td></tr>
 						{/each}
 					</tbody>
 				</table>
@@ -999,22 +999,22 @@
 			<!-- Cash flow summary -->
 			<div class="grid grid-cols-3 gap-4 mb-6">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Monthly Income</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Monthly Income</div>
 					<div class="text-xl font-semibold text-[var(--accent)]">{fmt(monthlyIncome)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Monthly Expenses</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Monthly Expenses</div>
 					<div class="text-xl font-semibold text-red-400">{fmt(monthlyExpenses + techMonthlyTotal)}</div>
-					<div class="text-xs text-[#555] mt-0.5">incl. {fmt(techMonthlyTotal)} tech stack</div>
+					<div class="text-xs text-[#7c7c7c] mt-0.5">incl. {fmt(techMonthlyTotal)} tech stack</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Net Cash Flow</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Net Cash Flow</div>
 					<div class="text-xl font-semibold {monthlyCashFlow >= 0 ? 'text-[var(--accent)]' : 'text-red-400'}">{fmt(monthlyCashFlow)}</div>
 				</div>
 			</div>
 
 			<div class="flex justify-between items-center mb-4">
-				<div class="text-sm text-[#666]">Budget line items</div>
+				<div class="text-sm text-[#8a8a8a]">Budget line items</div>
 				<button
 					onclick={() => showBudgetForm = !showBudgetForm}
 					class="px-3 py-1 text-xs border border-[#333] rounded hover:border-white hover:text-white text-[#999] transition-colors"
@@ -1027,14 +1027,14 @@
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
 					<div class="grid grid-cols-3 gap-3 mb-3">
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Type</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Type</label>
 							<select bind:value={budgetForm.entryType} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="income">Income</option>
 								<option value="expense">Expense</option>
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Category</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Category</label>
 							<select bind:value={budgetForm.category} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								{#each (budgetCategories[budgetForm.entryType as 'income' | 'expense'] ?? []) as cat}
 									<option value={cat}>{cat}</option>
@@ -1042,15 +1042,15 @@
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Label *</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Label *</label>
 							<input bind:value={budgetForm.label} placeholder="e.g. Salary, Netflix…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Amount ($) *</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Amount ($) *</label>
 							<input type="number" bind:value={budgetForm.amount} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Frequency</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Frequency</label>
 							<select bind:value={budgetForm.frequency} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="weekly">Weekly</option>
 								<option value="monthly">Monthly</option>
@@ -1059,7 +1059,7 @@
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Notes</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Notes</label>
 							<input bind:value={budgetForm.notes} placeholder="Optional" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 					</div>
@@ -1081,13 +1081,13 @@
 							<div class="flex items-center gap-3 px-8 py-4 {i < budgetIncome.length - 1 ? 'border-b border-[#1a1a1a]' : ''}">
 								<div class="flex-1">
 									<div class="text-sm">{entry.label}</div>
-									<div class="text-xs text-[#666]">{entry.category} · {entry.frequency}</div>
+									<div class="text-xs text-[#8a8a8a]">{entry.category} · {entry.frequency}</div>
 								</div>
 								<div class="text-sm text-[var(--accent)]">{fmtD(toMonthly(entry))}/mo</div>
-								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
+								<button onclick={() => deleteBudget(entry.id)} class="text-[#7c7c7c] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{:else}
-							<div class="px-4 py-6 text-center text-[#555] text-sm">No income entries</div>
+							<div class="px-4 py-6 text-center text-[#7c7c7c] text-sm">No income entries</div>
 						{/each}
 					</div>
 				</div>
@@ -1100,13 +1100,13 @@
 							<div class="flex items-center gap-3 px-8 py-4 {i < budgetExpenses.length - 1 ? 'border-b border-[#1a1a1a]' : ''}">
 								<div class="flex-1">
 									<div class="text-sm">{entry.label}</div>
-									<div class="text-xs text-[#666]">{entry.category} · {entry.frequency}</div>
+									<div class="text-xs text-[#8a8a8a]">{entry.category} · {entry.frequency}</div>
 								</div>
 								<div class="text-sm text-red-400">{fmtD(toMonthly(entry))}/mo</div>
-								<button onclick={() => deleteBudget(entry.id)} class="text-[#555] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
+								<button onclick={() => deleteBudget(entry.id)} class="text-[#7c7c7c] hover:text-red-400 text-xs transition-colors"><Icon name="x" size={14} /></button>
 							</div>
 						{:else}
-							<div class="px-4 py-6 text-center text-[#555] text-sm">No expense entries</div>
+							<div class="px-4 py-6 text-center text-[#7c7c7c] text-sm">No expense entries</div>
 						{/each}
 					</div>
 				</div>
@@ -1115,13 +1115,13 @@
 		<!-- ═══════════════ GROWTH ═══════════════ -->
 		{:else if activeTab === 'growth'}
 			<div class="mb-6">
-				<div class="text-sm text-[#666] mb-4">Revenue trends over the past year based on logged balance entries and collected invoices.</div>
+				<div class="text-sm text-[#8a8a8a] mb-4">Revenue trends over the past year based on logged balance entries and collected invoices.</div>
 
 				<!-- Net cash flow chart -->
 				{#if balanceEntries.length > 1}
 					<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 mb-4">
 						<div class="text-sm font-medium mb-1">Net Cash Flow Trend</div>
-						<div class="text-xs text-[#666] mb-3">Weekly balance entries — income minus expenses</div>
+						<div class="text-xs text-[#8a8a8a] mb-3">Weekly balance entries — income minus expenses</div>
 						<svg viewBox="0 0 700 160" class="w-full" style="height:160px">
 							<defs>
 								<linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1">
@@ -1162,7 +1162,7 @@
 						</svg>
 					</div>
 				{:else}
-					<div class="text-center py-12 text-[#555] text-sm bg-[#111] border border-[#2a2a2a] rounded-lg mb-4">
+					<div class="text-center py-12 text-[#7c7c7c] text-sm bg-[#111] border border-[#2a2a2a] rounded-lg mb-4">
 						Log at least 2 balance entries in the Balance Tracker tab to see growth charts.
 					</div>
 				{/if}
@@ -1190,7 +1190,7 @@
 								</div>
 							</div>
 						{:else}
-							<div class="text-[#555] text-sm text-center py-4">No paid invoices yet.</div>
+							<div class="text-[#7c7c7c] text-sm text-center py-4">No paid invoices yet.</div>
 						{/each}
 					</div>
 
@@ -1202,15 +1202,15 @@
 							<div class="text-sm font-medium mb-3">Cost of Sales (API)</div>
 							<div class="grid grid-cols-3 gap-4 text-sm">
 								<div class="text-center">
-									<div class="text-[#666] text-xs mb-1">Revenue</div>
+									<div class="text-[#8a8a8a] text-xs mb-1">Revenue</div>
 									<div class="font-medium text-[var(--accent)]">{fmt(totalRev)}</div>
 								</div>
 								<div class="text-center">
-									<div class="text-[#666] text-xs mb-1">API Cost</div>
+									<div class="text-[#8a8a8a] text-xs mb-1">API Cost</div>
 									<div class="font-medium text-yellow-400">{fmtD(summary?.apiCosts?.total ?? 0)}</div>
 								</div>
 								<div class="text-center">
-									<div class="text-[#666] text-xs mb-1">Cost %</div>
+									<div class="text-[#8a8a8a] text-xs mb-1">Cost %</div>
 									<div class="font-medium {costPct < 5 ? 'text-[var(--accent)]' : costPct < 15 ? 'text-yellow-400' : 'text-red-400'}">{costPct.toFixed(1)}%</div>
 								</div>
 							</div>
@@ -1224,15 +1224,15 @@
 			<!-- Summary bar -->
 			<div class="flex flex-wrap gap-3 mb-5">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 text-sm flex gap-3">
-					<span class="text-[#666]">Monthly Stack</span>
+					<span class="text-[#8a8a8a]">Monthly Stack</span>
 					<span class="font-medium text-yellow-400">{fmt(stackMonthly)}</span>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 text-sm flex gap-3">
-					<span class="text-[#666]">Annual</span>
+					<span class="text-[#8a8a8a]">Annual</span>
 					<span class="font-medium text-yellow-400">{fmt(stackMonthly * 12)}</span>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded px-4 py-2 text-sm flex gap-3">
-					<span class="text-[#666]">Accounts</span>
+					<span class="text-[#8a8a8a]">Accounts</span>
 					<span class="font-medium">{stackAccounts.filter(a => a.status === 'active').length} active</span>
 					{#if stackAccounts.filter(a => a.status === 'trial').length}
 						<span class="text-yellow-400">{stackAccounts.filter(a => a.status === 'trial').length} trial</span>
@@ -1259,12 +1259,12 @@
 			<!-- Quick Add known services -->
 			{#if !stackAccounts.length || stackAccounts.length < 3}
 				<div class="mb-5">
-					<div class="text-xs text-[#555] mb-2">Quick add known services:</div>
+					<div class="text-xs text-[#7c7c7c] mb-2">Quick add known services:</div>
 					<div class="flex flex-wrap gap-2">
 						{#each KNOWN_SERVICES.filter(s => !stackAccounts.find(a => a.service_name === s.name)) as svc}
 							<button
 								onclick={() => quickAdd(svc)}
-								class="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-[#2a2a2a] rounded-full hover:border-[#555] hover:text-white text-[#666] transition-colors"
+								class="flex items-center gap-1.5 px-3 py-1.5 text-xs border border-[#2a2a2a] rounded-full hover:border-[#555] hover:text-white text-[#8a8a8a] transition-colors"
 							>
 								<span>{svc.icon}</span>{svc.name}
 							</button>
@@ -1280,17 +1280,17 @@
 					<div class="grid grid-cols-3 gap-3 mb-3">
 						<!-- Row 1: identity -->
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Service Name *</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Service Name *</label>
 							<input bind:value={stackForm.serviceName} placeholder="Twilio, Stripe…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Category</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Category</label>
 							<select bind:value={stackForm.serviceCategory} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								{#each stackCategories as c}<option value={c}>{c}</option>{/each}
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Status</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Status</label>
 							<select bind:value={stackForm.status} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="active">Active</option>
 								<option value="trial">Trial</option>
@@ -1300,24 +1300,24 @@
 						</div>
 						<!-- Row 2: login -->
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Login Email</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Login Email</label>
 							<input bind:value={stackForm.loginEmail} placeholder="you@email.com" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Username (if different)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Username (if different)</label>
 							<input bind:value={stackForm.loginUsername} placeholder="username" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">URL</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">URL</label>
 							<input bind:value={stackForm.serviceUrl} placeholder="https://…" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<!-- Row 3: cost -->
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Cost ($)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Cost ($)</label>
 							<input type="number" bind:value={stackForm.cost} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Billing Cycle</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Billing Cycle</label>
 							<select bind:value={stackForm.billingCycle} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="monthly">Monthly</option>
 								<option value="annual">Annual</option>
@@ -1327,22 +1327,22 @@
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Next Billing Date</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Next Billing Date</label>
 							<DatePicker bind:value={stackForm.nextBillingDate} onchange={(v) => stackForm.nextBillingDate = v} />
 						</div>
 						<!-- Row 4: trial + payment -->
 						{#if stackForm.status === 'trial'}
 							<div>
-								<label class="block text-xs text-[#666] mb-1">Trial Start</label>
+								<label class="block text-xs text-[#8a8a8a] mb-1">Trial Start</label>
 								<DatePicker bind:value={stackForm.trialStart} onchange={(v) => stackForm.trialStart = v} />
 							</div>
 							<div>
-								<label class="block text-xs text-[#666] mb-1">Trial End *</label>
+								<label class="block text-xs text-[#8a8a8a] mb-1">Trial End *</label>
 								<DatePicker bind:value={stackForm.trialEnd} onchange={(v) => stackForm.trialEnd = v} />
 							</div>
 						{/if}
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Payment Method</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Payment Method</label>
 							<input bind:value={stackForm.paymentMethodLabel} placeholder="Visa •••• 4242" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<!-- Row 5: password + notes -->
@@ -1354,13 +1354,13 @@
 						</div>
 						{#if stackForm.createPassword}
 							<div class="col-span-3">
-								<label class="block text-xs text-[#666] mb-1">Password</label>
+								<label class="block text-xs text-[#8a8a8a] mb-1">Password</label>
 								<input type="password" bind:value={stackForm.rawPassword} placeholder="Enter password to vault" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
-								<p class="text-xs text-[#555] mt-1">Stored in your Password Vault — visible only to you.</p>
+								<p class="text-xs text-[#7c7c7c] mt-1">Stored in your Password Vault — visible only to you.</p>
 							</div>
 						{/if}
 						<div class="col-span-3">
-							<label class="block text-xs text-[#666] mb-1">Notes</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Notes</label>
 							<input bind:value={stackForm.notes} placeholder="Optional" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 					</div>
@@ -1378,7 +1378,7 @@
 				{@const items = stackAccounts.filter(a => a.service_category === cat)}
 				{#if items.length}
 					<div class="mb-4">
-						<div class="text-xs uppercase tracking-wide mb-2 {stackCatColors[cat] ?? 'text-[#666]'}">{cat}</div>
+						<div class="text-xs uppercase tracking-wide mb-2 {stackCatColors[cat] ?? 'text-[#8a8a8a]'}">{cat}</div>
 						<div class="space-y-2">
 							{#each items as acct}
 								{@const days = acct.trial_end ? trialDaysLeft(acct.trial_end) : null}
@@ -1397,7 +1397,7 @@
 													<span class="text-xs text-red-400">Trial expired</span>
 												{/if}
 											</div>
-											<div class="text-xs text-[#555] mt-0.5">
+											<div class="text-xs text-[#7c7c7c] mt-0.5">
 												{acct.login_email ? `${acct.login_email.slice(0,3)}…${acct.login_email.slice(acct.login_email.indexOf('@'))}` : ''}
 												{acct.payment_method_label ? ` · ${acct.payment_method_label}` : ''}
 											</div>
@@ -1409,29 +1409,29 @@
 												<div class="text-sm text-[#999]">Usage</div>
 											{:else}
 												<div class="text-sm font-medium">{fmtD(parseFloat(acct.cost ?? 0))}</div>
-												<div class="text-xs text-[#555]">/{acct.billing_cycle === 'annual' ? 'yr' : 'mo'}</div>
+												<div class="text-xs text-[#7c7c7c]">/{acct.billing_cycle === 'annual' ? 'yr' : 'mo'}</div>
 											{/if}
 										</div>
-										<div class="text-[#555] text-xs flex-shrink-0">{expandedAccount === acct.id ? '▲' : '▼'}</div>
+										<div class="text-[#7c7c7c] text-xs flex-shrink-0">{expandedAccount === acct.id ? '▲' : '▼'}</div>
 									</div>
 									{#if expandedAccount === acct.id}
 										<div class="border-t border-[#2a2a2a] px-4 py-3 bg-[#0d0d0d]">
 											<div class="grid grid-cols-3 gap-4 text-sm mb-3">
 												{#if acct.service_url}
 													<div>
-														<div class="text-xs text-[#555] mb-0.5">URL</div>
+														<div class="text-xs text-[#7c7c7c] mb-0.5">URL</div>
 														<a href={acct.service_url} target="_blank" rel="noopener" class="text-blue-400 hover:underline text-xs">{acct.service_url}</a>
 													</div>
 												{/if}
 												{#if acct.login_email}
 													<div>
-														<div class="text-xs text-[#555] mb-0.5">Login</div>
+														<div class="text-xs text-[#7c7c7c] mb-0.5">Login</div>
 														<div class="text-xs font-mono">{acct.login_email}</div>
 													</div>
 												{/if}
 												{#if acct.next_billing_date}
 													<div>
-														<div class="text-xs text-[#555] mb-0.5">Next Billing</div>
+														<div class="text-xs text-[#7c7c7c] mb-0.5">Next Billing</div>
 														<div class="text-xs font-mono">{new Date(acct.next_billing_date).toLocaleDateString()}</div>
 													</div>
 												{/if}

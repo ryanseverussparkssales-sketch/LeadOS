@@ -3,11 +3,11 @@
 	<div class="max-w-lg text-center space-y-6">
 		<p class="text-5xl">🛟</p>
 		<h1 class="text-white text-2xl font-semibold">Help & Support</h1>
-		<p class="text-[#555] text-sm leading-relaxed">
+		<p class="text-[#7c7c7c] text-sm leading-relaxed">
 			Need help with Edelhaus? Jump back into setup or your account below.
 		</p>
 		<div class="rounded-xl border border-[#1a1a1a] bg-[#111] p-5 text-left">
-			<p class="text-xs text-[#555] uppercase tracking-widest mb-3">Quick links</p>
+			<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-3">Quick links</p>
 			<div class="space-y-2">
 				{#each [
 					['/onboarding', 'Re-run setup wizard'],

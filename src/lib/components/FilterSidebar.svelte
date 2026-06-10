@@ -122,16 +122,16 @@
 		<div class="flex gap-2">
 			<button
 				onclick={() => { sortDir = 'asc'; update(); }}
-				class="flex-1 py-1 text-xs rounded border transition-colors {sortDir === 'asc' ? 'border-white text-white' : 'border-[#2a2a2a] text-[#666] hover:border-[#444]'}"
+				class="flex-1 py-1 text-xs rounded border transition-colors {sortDir === 'asc' ? 'border-white text-white' : 'border-[#2a2a2a] text-[#8a8a8a] hover:border-[#444]'}"
 			>ASC</button>
 			<button
 				onclick={() => { sortDir = 'desc'; update(); }}
-				class="flex-1 py-1 text-xs rounded border transition-colors {sortDir === 'desc' ? 'border-white text-white' : 'border-[#2a2a2a] text-[#666] hover:border-[#444]'}"
+				class="flex-1 py-1 text-xs rounded border transition-colors {sortDir === 'desc' ? 'border-white text-white' : 'border-[#2a2a2a] text-[#8a8a8a] hover:border-[#444]'}"
 			>DESC</button>
 		</div>
 	</div>
 
-	<button onclick={clearAll} class="w-full py-2 text-xs text-[#555] hover:text-white transition-colors">
+	<button onclick={clearAll} class="w-full py-2 text-xs text-[#7c7c7c] hover:text-white transition-colors">
 		Clear Filters
 	</button>
 </div>

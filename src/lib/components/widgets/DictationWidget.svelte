@@ -175,11 +175,11 @@
         </div>
         <div class="flex gap-1">
             <button onclick={() => view = 'record'}
-                class="px-2.5 py-1 rounded text-[10px] transition-colors {view === 'record' ? 'bg-white text-black font-semibold' : 'text-[#555] hover:text-white'}">
+                class="px-2.5 py-1 rounded text-[10px] transition-colors {view === 'record' ? 'bg-white text-black font-semibold' : 'text-[#7c7c7c] hover:text-white'}">
                 Record
             </button>
             <button onclick={() => view = 'saved'}
-                class="px-2.5 py-1 rounded text-[10px] transition-colors {view === 'saved' ? 'bg-white text-black font-semibold' : 'text-[#555] hover:text-white'}">
+                class="px-2.5 py-1 rounded text-[10px] transition-colors {view === 'saved' ? 'bg-white text-black font-semibold' : 'text-[#7c7c7c] hover:text-white'}">
                 Saved {entries.length > 0 ? `(${entries.length})` : ''}
             </button>
         </div>
@@ -191,7 +191,7 @@
 
             {#if !supported}
                 <div class="flex-1 flex items-center justify-center text-center">
-                    <p class="text-xs text-[#444]">Speech recognition not supported in this browser.<br/>Try Chrome or Edge.</p>
+                    <p class="text-xs text-[#6e6e6e]">Speech recognition not supported in this browser.<br/>Try Chrome or Edge.</p>
                 </div>
             {:else}
                 <!-- Mic button + status -->
@@ -214,12 +214,12 @@
                                 Listening...
                             </p>
                             {#if interimText}
-                                <p class="text-[10px] text-[#444] truncate mt-0.5 italic">{interimText}</p>
+                                <p class="text-[10px] text-[#6e6e6e] truncate mt-0.5 italic">{interimText}</p>
                             {/if}
                         {:else if transcript}
-                            <p class="text-xs text-[#666]">Tap mic to continue, or save</p>
+                            <p class="text-xs text-[#8a8a8a]">Tap mic to continue, or save</p>
                         {:else}
-                            <p class="text-xs text-[#444]">Tap mic to start dictating</p>
+                            <p class="text-xs text-[#6e6e6e]">Tap mic to start dictating</p>
                         {/if}
                     </div>
                 </div>
@@ -243,13 +243,13 @@
                         </div>
                         <p class="text-xs text-[#ccc] mb-2 leading-relaxed">{brainstormResult.summary}</p>
                         {#if brainstormResult.actionItems?.length}
-                            <p class=" text-[#555]  mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Action Items</p>
+                            <p class=" text-[#7c7c7c]  mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Action Items</p>
                             {#each brainstormResult.actionItems as item}
                                 <p class="text-xs text-[#888] flex gap-1.5 mb-0.5"><span class="text-white flex-shrink-0">→</span>{item}</p>
                             {/each}
                         {/if}
                         {#if brainstormResult.ideas?.length}
-                            <p class=" text-[#555]  mt-2 mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Ideas</p>
+                            <p class=" text-[#7c7c7c]  mt-2 mb-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;text-transform:uppercase">Ideas</p>
                             {#each brainstormResult.ideas as idea}
                                 <p class="text-xs text-[#888] flex gap-1.5 mb-0.5"><span class="text-yellow-400 flex-shrink-0">◆</span>{idea}</p>
                             {/each}
@@ -261,7 +261,7 @@
                 {#if transcript.trim()}
                     <div class="flex gap-2 flex-shrink-0">
                         <button onclick={runBrainstorm} disabled={brainstorming}
-                            class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#666] hover:border-[var(--accent)]/40 hover:text-[var(--accent)] disabled:opacity-40 transition-colors">
+                            class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#8a8a8a] hover:border-[var(--accent)]/40 hover:text-[var(--accent)] disabled:opacity-40 transition-colors">
                             {brainstorming ? '✦ Thinking...' : '✦ Brainstorm'}
                         </button>
                         <button onclick={saveEntry}
@@ -269,7 +269,7 @@
                             Save
                         </button>
                         <button onclick={clearTranscript}
-                            class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#444] hover:text-red-400 hover:border-red-900 transition-colors"><Icon name="x" size={14} /></button>
+                            class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#6e6e6e] hover:text-red-400 hover:border-red-900 transition-colors"><Icon name="x" size={14} /></button>
                     </div>
                 {/if}
             {/if}
@@ -288,10 +288,10 @@
                 {#if activeEntry}
                     <div class="p-3">
                         <button onclick={() => activeEntry = null}
-                            class="text-xs text-[#555] hover:text-white mb-3 flex items-center gap-1">
+                            class="text-xs text-[#7c7c7c] hover:text-white mb-3 flex items-center gap-1">
                             ← Back
                         </button>
-                        <p class="text-[10px] text-[#444] mb-2">{formatTime(activeEntry.createdAt)}</p>
+                        <p class="text-[10px] text-[#6e6e6e] mb-2">{formatTime(activeEntry.createdAt)}</p>
                         <p class="text-xs text-[#ccc] leading-relaxed whitespace-pre-wrap mb-3" style="font-family: var(--font-mono)">{activeEntry.text}</p>
                         {#if activeEntry.brainstorm}
                             <div class="rounded-xl border border-[var(--accent)]/40 bg-[var(--accent)]/12 p-3">
@@ -309,7 +309,7 @@
                             <button onclick={() => activeEntry = entry} class="flex-1 text-left min-w-0">
                                 <p class="text-xs text-white truncate">{entry.text.slice(0, 60)}{entry.text.length > 60 ? '...' : ''}</p>
                                 <div class="flex items-center gap-2 mt-0.5">
-                                    <p class="text-[10px] text-[#444]">{formatTime(entry.createdAt)}</p>
+                                    <p class="text-[10px] text-[#6e6e6e]">{formatTime(entry.createdAt)}</p>
                                     {#if entry.brainstorm}<span class="text-[9px] text-[var(--accent)]">✦ brainstorm</span>{/if}
                                 </div>
                             </button>

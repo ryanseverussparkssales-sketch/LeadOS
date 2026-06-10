@@ -130,7 +130,7 @@
 		{:else if elapsed > 0}
 			<p class="text-xs text-yellow-400 mt-1">◼ Paused</p>
 		{:else}
-			<p class="text-xs text-[#555] mt-1">Ready to start</p>
+			<p class="text-xs text-[#7c7c7c] mt-1">Ready to start</p>
 		{/if}
 	</div>
 
@@ -163,8 +163,8 @@
 	{:else}
 		<!-- Show context while running -->
 		<div class="text-center space-y-0.5">
-			{#if timerState.projectName}<p class="text-xs text-[#777]">{timerState.projectName}</p>{/if}
-			{#if timerState.description}<p class="text-xs text-[#555]">{timerState.description}</p>{/if}
+			{#if timerState.projectName}<p class="text-xs text-[#9a9a9a]">{timerState.projectName}</p>{/if}
+			{#if timerState.description}<p class="text-xs text-[#7c7c7c]">{timerState.description}</p>{/if}
 		</div>
 	{/if}
 
@@ -195,7 +195,7 @@
 				class="flex-1 rounded-lg bg-[var(--accent)] py-2 text-xs font-semibold text-[var(--accent-ink)] hover:bg-[var(--accent-hi)] disabled:opacity-50 transition-colors">
 				{saving ? 'Saving...' : 'Log & Reset'}
 			</button>
-			<button onclick={reset} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#555] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
+			<button onclick={reset} class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#7c7c7c] hover:text-white transition-colors"><Icon name="x" size={14} /></button>
 		{/if}
 	</div>
 </div>

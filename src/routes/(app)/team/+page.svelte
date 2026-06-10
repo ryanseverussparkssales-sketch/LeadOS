@@ -259,13 +259,13 @@
 	<!-- Header -->
 	<div class="px-6 py-4 border-b border-[#2a2a2a]">
 		<h1 class="text-xl font-semibold">Team</h1>
-		<p class="text-[#666] text-sm">Members, HR profiles, and payroll management</p>
+		<p class="text-[#8a8a8a] text-sm">Members, HR profiles, and payroll management</p>
 	</div>
 
 	<!-- Tabs -->
 	<div class="flex gap-1 px-6 pt-4 border-b border-[#2a2a2a]">
 		{#each [['members','Members'],['hr','HR Profiles'],['payroll','Payroll']] as [id, label]}
-			<button onclick={() => activeTab = id as Tab} class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === id ? 'border-white text-white' : 'border-transparent text-[#666] hover:text-[#ccc]'}">{label}</button>
+			<button onclick={() => activeTab = id as Tab} class="px-4 py-2 text-sm border-b-2 transition-colors {activeTab === id ? 'border-white text-white' : 'border-transparent text-[#8a8a8a] hover:text-[#ccc]'}">{label}</button>
 		{/each}
 	</div>
 
@@ -281,7 +281,7 @@
 
 			<!-- Invite form -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<div class="text-xs text-[#666] uppercase tracking-wide mb-3">Invite Team Member</div>
+				<div class="text-xs text-[#8a8a8a] uppercase tracking-wide mb-3">Invite Team Member</div>
 				<div class="flex gap-3">
 					<input bind:value={inviteEmail} type="email" placeholder="colleague@company.com"
 						onkeydown={(e) => e.key === 'Enter' && invite()}
@@ -298,9 +298,9 @@
 					</button>
 				</div>
 
-				<label class="flex items-center gap-2 text-xs text-[#777] mt-3 cursor-pointer select-none">
+				<label class="flex items-center gap-2 text-xs text-[#9a9a9a] mt-3 cursor-pointer select-none">
 					<input type="checkbox" bind:checked={inviteAsClient} class="accent-blue-400" />
-					<span>Client Portal Access <span class="text-[#555]">(read-only view of their project data)</span></span>
+					<span>Client Portal Access <span class="text-[#7c7c7c]">(read-only view of their project data)</span></span>
 				</label>
 
 				{#if inviteAsClient}
@@ -325,11 +325,11 @@
 									{member.first_name && member.last_name ? `${member.first_name} ${member.last_name}` : member.member_email}
 								</div>
 								<div class="text-xs mt-0.5 flex items-center gap-2 flex-wrap">
-									{#if member.first_name}<span class="text-[#555]">{member.member_email}</span>{/if}
+									{#if member.first_name}<span class="text-[#7c7c7c]">{member.member_email}</span>{/if}
 									<span class="{roleColor(member.role)} capitalize">{member.role}</span>
 									{#if member.portal_access}<span class="text-blue-400 bg-blue-900/30 px-1.5 py-0.5 rounded text-[10px]">Client Portal</span>{/if}
-									{#if member.title}<span class="text-[#555]">· {member.title}</span>{/if}
-									{#if member.department}<span class="text-[#555]">· {member.department}</span>{/if}
+									{#if member.title}<span class="text-[#7c7c7c]">· {member.title}</span>{/if}
+									{#if member.department}<span class="text-[#7c7c7c]">· {member.department}</span>{/if}
 									{#if member.verbal_approved_at}
 									<span class="text-[var(--accent)] text-[10px]">· ✓ Verbal approved</span>
 								{:else if member.role === 'sdr'}
@@ -340,9 +340,9 @@
 								</div>
 							</div>
 							{#if member.pay_rate}
-								<div class="text-xs text-[#666] text-right">
+								<div class="text-xs text-[#8a8a8a] text-right">
 									<div>{fmt(member.pay_rate)}</div>
-									<div class="text-[#444]">{member.pay_type}</div>
+									<div class="text-[#6e6e6e]">{member.pay_type}</div>
 								</div>
 							{/if}
 							<div class="flex items-center gap-2">
@@ -353,7 +353,7 @@
 										✓ Approve
 									</button>
 								{/if}
-								<button onclick={() => { activeTab = 'hr'; startEditHR(member); }} class="text-xs text-[#666] hover:text-white border border-[#333] rounded px-2 py-0.5 hover:border-white transition-colors">HR</button>
+								<button onclick={() => { activeTab = 'hr'; startEditHR(member); }} class="text-xs text-[#8a8a8a] hover:text-white border border-[#333] rounded px-2 py-0.5 hover:border-white transition-colors">HR</button>
 								<button onclick={() => openPerms(member)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 rounded px-2 py-0.5 hover:border-[var(--accent)]/60 transition-colors">Perms</button>
 								<select value={member.role} onchange={(e) => updateRole(member.id, (e.target as HTMLSelectElement).value)}
 									class="border border-[#2a2a2a] bg-[#1a1a1a] rounded px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
@@ -367,7 +367,7 @@
 					{/each}
 				</div>
 			{:else}
-				<p class="text-[#444] text-sm">No team members yet. Invite your first agent above.</p>
+				<p class="text-[#6e6e6e] text-sm">No team members yet. Invite your first agent above.</p>
 			{/if}
 
 			<!-- Permissions panel -->
@@ -380,9 +380,9 @@
 						<div class="flex items-center justify-between">
 							<div>
 								<h3 class="text-white font-semibold">Permissions</h3>
-								<p class="text-xs text-[#555]">{member?.member_email} · <span class="capitalize">{member?.role}</span></p>
+								<p class="text-xs text-[#7c7c7c]">{member?.member_email} · <span class="capitalize">{member?.role}</span></p>
 							</div>
-							<button onclick={() => permMemberId = null} class="text-[#444] hover:text-white text-sm"><Icon name="x" size={14} /></button>
+							<button onclick={() => permMemberId = null} class="text-[#6e6e6e] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 						</div>
 						<div class="space-y-2">
 							{#each permList as perm}
@@ -396,7 +396,7 @@
 							{/each}
 						</div>
 						<div class="flex gap-3 pt-2">
-							<button onclick={() => permMemberId = null} class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#666] hover:text-white transition-colors">Cancel</button>
+							<button onclick={() => permMemberId = null} class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#8a8a8a] hover:text-white transition-colors">Cancel</button>
 							<button onclick={savePerms} disabled={savingPerms} class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">
 								{savingPerms ? 'Saving…' : 'Save'}
 							</button>
@@ -407,15 +407,15 @@
 
 			<!-- Data sharing note -->
 			<div class="mt-4 rounded-lg border border-[#1e1e1e] p-4">
-				<p class="text-xs text-[#444] leading-relaxed">
-					Team members share your <strong class="text-[#666]">clients, contacts, call lists, campaigns, and scripts</strong>.
+				<p class="text-xs text-[#6e6e6e] leading-relaxed">
+					Team members share your <strong class="text-[#8a8a8a]">clients, contacts, call lists, campaigns, and scripts</strong>.
 					Managers can see all team call activity and analytics.
 				</p>
 			</div>
 
 		<!-- ═══════════════ HR PROFILES ═══════════════ -->
 		{:else if activeTab === 'hr'}
-			<div class="text-sm text-[#666] mb-4">Click a member to edit their HR profile — employment details, pay rate, quotas, and emergency contacts.</div>
+			<div class="text-sm text-[#8a8a8a] mb-4">Click a member to edit their HR profile — employment details, pay rate, quotas, and emergency contacts.</div>
 
 			{#if !editingMember}
 				<div class="space-y-2">
@@ -424,23 +424,23 @@
 							<div class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-sm">{member.member_email[0].toUpperCase()}</div>
 							<div class="flex-1">
 								<div class="text-sm font-medium">{member.first_name ? `${member.first_name} ${member.last_name}` : member.member_email}</div>
-								<div class="text-xs text-[#555] flex gap-3 mt-0.5">
+								<div class="text-xs text-[#7c7c7c] flex gap-3 mt-0.5">
 									{#if member.title}<span>{member.title}</span>{/if}
 									{#if member.department}<span>{member.department}</span>{/if}
 									{#if member.hire_date}<span>Hired {fmtDate(member.hire_date)}</span>{/if}
-									{#if !member.hire_date && !member.title}<span class="text-[#444] italic">No HR info yet — click to add</span>{/if}
+									{#if !member.hire_date && !member.title}<span class="text-[#6e6e6e] italic">No HR info yet — click to add</span>{/if}
 								</div>
 							</div>
 							{#if member.pay_rate}
 								<div class="text-right text-xs">
 									<div class="text-white">{fmt(member.pay_rate)}</div>
-									<div class="text-[#555]">{member.pay_type} · {member.pay_frequency?.replace('_', ' ')}</div>
+									<div class="text-[#7c7c7c]">{member.pay_type} · {member.pay_frequency?.replace('_', ' ')}</div>
 								</div>
 							{/if}
-							<span class="text-[#555] text-xs">Edit →</span>
+							<span class="text-[#7c7c7c] text-xs">Edit →</span>
 						</div>
 					{:else}
-						<div class="text-center py-12 text-[#555] text-sm">No team members — invite someone from the Members tab first.</div>
+						<div class="text-center py-12 text-[#7c7c7c] text-sm">No team members — invite someone from the Members tab first.</div>
 					{/each}
 				</div>
 
@@ -450,21 +450,21 @@
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-5">
 					<div class="flex items-center justify-between mb-4">
 						<div class="font-medium text-sm">HR Profile — {member?.member_email}</div>
-						<button onclick={() => editingMember = null} class="text-xs text-[#666] hover:text-white transition-colors">← Back</button>
+						<button onclick={() => editingMember = null} class="text-xs text-[#8a8a8a] hover:text-white transition-colors">← Back</button>
 					</div>
 
 					<div class="grid grid-cols-3 gap-3 mb-4">
-						<div class="col-span-3 text-xs text-[#555] uppercase tracking-wide">Personal</div>
-						<div><label class="block text-xs text-[#666] mb-1">First Name</label><input bind:value={hrForm.first_name} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
-						<div><label class="block text-xs text-[#666] mb-1">Last Name</label><input bind:value={hrForm.last_name} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
-						<div><label class="block text-xs text-[#666] mb-1">Phone</label><input bind:value={hrForm.phone} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
+						<div class="col-span-3 text-xs text-[#7c7c7c] uppercase tracking-wide">Personal</div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">First Name</label><input bind:value={hrForm.first_name} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Last Name</label><input bind:value={hrForm.last_name} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Phone</label><input bind:value={hrForm.phone} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" /></div>
 
-						<div class="col-span-3 text-xs text-[#555] uppercase tracking-wide mt-2">Employment</div>
-						<div><label class="block text-xs text-[#666] mb-1">Title</label><input bind:value={hrForm.title} placeholder="Sales Agent" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-						<div><label class="block text-xs text-[#666] mb-1">Department</label><input bind:value={hrForm.department} placeholder="Sales" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-						<div><label class="block text-xs text-[#666] mb-1">Hire Date</label><DatePicker bind:value={hrForm.hire_date} onchange={(v) => hrForm.hire_date = v} /></div>
+						<div class="col-span-3 text-xs text-[#7c7c7c] uppercase tracking-wide mt-2">Employment</div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Title</label><input bind:value={hrForm.title} placeholder="Sales Agent" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Department</label><input bind:value={hrForm.department} placeholder="Sales" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Hire Date</label><DatePicker bind:value={hrForm.hire_date} onchange={(v) => hrForm.hire_date = v} /></div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Contract Type</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Contract Type</label>
 							<select bind:value={hrForm.contract_type} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="full_time">Full-time</option>
 								<option value="part_time">Part-time</option>
@@ -474,9 +474,9 @@
 							</select>
 						</div>
 
-						<div class="col-span-3 text-xs text-[#555] uppercase tracking-wide mt-2">Compensation</div>
+						<div class="col-span-3 text-xs text-[#7c7c7c] uppercase tracking-wide mt-2">Compensation</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Pay Type</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Pay Type</label>
 							<select bind:value={hrForm.pay_type} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="salary">Salary</option>
 								<option value="hourly">Hourly</option>
@@ -485,9 +485,9 @@
 								<option value="contractor">Contractor rate</option>
 							</select>
 						</div>
-						<div><label class="block text-xs text-[#666] mb-1">Pay Rate ($)</label><input type="number" bind:value={hrForm.pay_rate} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Pay Rate ($)</label><input type="number" bind:value={hrForm.pay_rate} placeholder="0.00" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Pay Frequency</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Pay Frequency</label>
 							<select bind:value={hrForm.pay_frequency} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="weekly">Weekly</option>
 								<option value="bi_weekly">Bi-weekly</option>
@@ -495,11 +495,11 @@
 								<option value="monthly">Monthly</option>
 							</select>
 						</div>
-						<div><label class="block text-xs text-[#666] mb-1">Monthly Quota ($)</label><input type="number" bind:value={hrForm.quota_monthly} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
-						<div><label class="block text-xs text-[#666] mb-1">Commission Rate (%)</label><input type="number" bind:value={hrForm.commission_rate} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Monthly Quota ($)</label><input type="number" bind:value={hrForm.quota_monthly} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
+						<div><label class="block text-xs text-[#8a8a8a] mb-1">Commission Rate (%)</label><input type="number" bind:value={hrForm.commission_rate} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" /></div>
 
 						<div class="col-span-3">
-							<label class="block text-xs text-[#666] mb-1">Notes</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Notes</label>
 							<textarea bind:value={hrForm.notes} rows="2" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white resize-none"></textarea>
 						</div>
 					</div>
@@ -516,25 +516,25 @@
 			<!-- Summary -->
 			<div class="grid grid-cols-3 gap-4 mb-5">
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Pending Payroll</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Pending Payroll</div>
 					<div class="text-2xl font-semibold text-yellow-400">{fmt(totalPendingPayroll)}</div>
-					<div class="text-xs text-[#555] mt-1">{payrollEntries.filter(p => p.status === 'pending').length} entries</div>
+					<div class="text-xs text-[#7c7c7c] mt-1">{payrollEntries.filter(p => p.status === 'pending').length} entries</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Paid (all time)</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Paid (all time)</div>
 					<div class="text-2xl font-semibold text-[var(--accent)]">{fmt(totalPaidPayroll)}</div>
 				</div>
 				<div class="bg-[#111] border border-[#2a2a2a] rounded-lg p-4">
-					<div class="text-[#666] text-xs mb-1">Team Size</div>
+					<div class="text-[#8a8a8a] text-xs mb-1">Team Size</div>
 					<div class="text-2xl font-semibold">{members.length}</div>
-					<div class="text-xs text-[#555] mt-1">{members.filter(m => m.pay_rate).length} with pay rate set</div>
+					<div class="text-xs text-[#7c7c7c] mt-1">{members.filter(m => m.pay_rate).length} with pay rate set</div>
 				</div>
 			</div>
 
 			<div class="flex justify-between items-center mb-3">
 				<div class="flex gap-2">
 					{#each [['all','All'],['pending','Pending'],['paid','Paid']] as [v, l]}
-						<button onclick={() => payrollPeriodFilter = v as any} class="px-3 py-1 text-xs rounded border transition-colors {payrollPeriodFilter === v ? 'border-white text-white' : 'border-[#333] text-[#666] hover:border-[#555]'}">{l}</button>
+						<button onclick={() => payrollPeriodFilter = v as any} class="px-3 py-1 text-xs rounded border transition-colors {payrollPeriodFilter === v ? 'border-white text-white' : 'border-[#333] text-[#8a8a8a] hover:border-[#555]'}">{l}</button>
 					{/each}
 				</div>
 				<button onclick={() => showPayrollForm = !showPayrollForm} class="px-3 py-1 text-xs border border-[#333] rounded hover:border-white hover:text-white text-[#999] transition-colors">+ New Entry</button>
@@ -545,7 +545,7 @@
 					<div class="text-sm font-medium">New Payroll Entry</div>
 					<div class="grid grid-cols-2 gap-3">
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Team member</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Team member</label>
 							<select bind:value={payrollForm.teamMemberId} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="">Select a member…</option>
 								{#each members as m}
@@ -554,7 +554,7 @@
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Payment method</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Payment method</label>
 							<select bind:value={payrollForm.paymentMethod} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white">
 								<option value="ach">ACH / Bank transfer</option>
 								<option value="stripe">Stripe</option>
@@ -564,32 +564,32 @@
 							</select>
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Pay period start</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Pay period start</label>
 							<input type="date" bind:value={payrollForm.payPeriodStart} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Pay period end</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Pay period end</label>
 							<input type="date" bind:value={payrollForm.payPeriodEnd} class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Base pay ($)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Base pay ($)</label>
 							<input type="number" min="0" step="0.01" bind:value={payrollForm.basePay} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Commission ($)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Commission ($)</label>
 							<input type="number" min="0" step="0.01" bind:value={payrollForm.commission} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Bonuses ($)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Bonuses ($)</label>
 							<input type="number" min="0" step="0.01" bind:value={payrollForm.bonuses} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 						<div>
-							<label class="block text-xs text-[#666] mb-1">Deductions ($)</label>
+							<label class="block text-xs text-[#8a8a8a] mb-1">Deductions ($)</label>
 							<input type="number" min="0" step="0.01" bind:value={payrollForm.deductions} placeholder="0" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 						</div>
 					</div>
 					<div>
-						<label class="block text-xs text-[#666] mb-1">Notes</label>
+						<label class="block text-xs text-[#8a8a8a] mb-1">Notes</label>
 						<input bind:value={payrollForm.notes} placeholder="Optional" class="w-full bg-[#1a1a1a] border border-[#333] rounded px-3 py-2 text-sm text-white placeholder-[#555]" />
 					</div>
 					<div class="flex gap-2">
@@ -604,12 +604,12 @@
 
 			<!-- Payroll entries -->
 			{#if filteredPayroll.length === 0}
-				<div class="text-center py-12 text-[#555] text-sm">No payroll entries{payrollPeriodFilter !== 'all' ? ` (${payrollPeriodFilter})` : ''} yet.</div>
+				<div class="text-center py-12 text-[#7c7c7c] text-sm">No payroll entries{payrollPeriodFilter !== 'all' ? ` (${payrollPeriodFilter})` : ''} yet.</div>
 			{:else}
 				<div class="overflow-x-auto rounded-lg border border-[#1e1e1e]">
 					<table class="w-full text-sm min-w-[640px]">
 						<thead>
-							<tr class="text-left text-xs text-[#555] border-b border-[#1e1e1e]">
+							<tr class="text-left text-xs text-[#7c7c7c] border-b border-[#1e1e1e]">
 								<th class="px-4 py-2 font-medium">Member</th>
 								<th class="px-4 py-2 font-medium">Period</th>
 								<th class="px-4 py-2 font-medium text-right">Net pay</th>
@@ -630,7 +630,7 @@
 										{#if p.status !== 'paid'}
 											<button onclick={() => markPayrollPaid(p.id)} class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] mr-3">Mark paid</button>
 										{/if}
-										<button onclick={() => deletePayroll(p.id)} aria-label="Delete payroll entry" class="text-xs text-[#555] hover:text-red-400">Delete</button>
+										<button onclick={() => deletePayroll(p.id)} aria-label="Delete payroll entry" class="text-xs text-[#7c7c7c] hover:text-red-400">Delete</button>
 									</td>
 								</tr>
 							{/each}

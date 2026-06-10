@@ -11,7 +11,7 @@
 		<div class="flex items-center justify-center gap-2">
 			<h2 class="text-2xl font-semibold text-white">{contact.name}</h2>
 			{#if contact.contact_score}
-				<span class="text-xs font-mono font-bold {contact.contact_score >= 70 ? 'text-[var(--call)]' : contact.contact_score >= 45 ? 'text-yellow-400' : 'text-[#555]'}"
+				<span class="text-xs font-mono font-bold {contact.contact_score >= 70 ? 'text-[var(--call)]' : contact.contact_score >= 45 ? 'text-yellow-400' : 'text-[#7c7c7c]'}"
 					title="Lead score">
 					{contact.contact_score}
 				</span>
@@ -21,12 +21,12 @@
 			<p class="text-[#999] text-sm mt-1">{contact.title}</p>
 		{/if}
 		{#if contact.company}
-			<p class="text-[#666] text-sm">{contact.company}</p>
+			<p class="text-[#8a8a8a] text-sm">{contact.company}</p>
 		{/if}
 	</div>
 
 	<div class="mb-6 text-center">
-		<p class="text-[#555] text-xs uppercase tracking-widest mb-1">Phone</p>
+		<p class="text-[#7c7c7c] text-xs uppercase tracking-widest mb-1">Phone</p>
 		<a
 			href="/phone?number={encodeURIComponent(contact.phone)}"
 			title="Open in Phone tab"
@@ -54,12 +54,12 @@
 	<div class="flex flex-col items-center gap-4 mt-2">
 		<DialButtonRenderer callState="idle" onclick={onDial} size={140} />
 
-		<p class="text-[10px] tracking-[0.3em] text-[#555] uppercase">Dial</p>
+		<p class="text-[10px] tracking-[0.3em] text-[#7c7c7c] uppercase">Dial</p>
 
 		<!-- Skip button — small, below the dial button -->
 		<button
 			onclick={onSkip}
-			class="text-xs text-[#444] hover:text-[#888] transition-colors tracking-widest uppercase border border-[#222] hover:border-[#444] rounded px-6 py-1.5"
+			class="text-xs text-[#6e6e6e] hover:text-[#888] transition-colors tracking-widest uppercase border border-[#222] hover:border-[#444] rounded px-6 py-1.5"
 		>
 			Skip →
 		</button>

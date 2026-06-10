@@ -278,7 +278,7 @@
 		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">
 			Contacts
 			{#if !loading}
-				<span class="text-[#444] font-normal ml-2">({totalContacts})</span>
+				<span class="text-[#6e6e6e] font-normal ml-2">({totalContacts})</span>
 			{/if}
 		</h2>
 		<div class="flex flex-wrap items-center gap-2">
@@ -293,7 +293,7 @@
 			</button>
 			<div class="relative export-container">
 				<button onclick={() => showExport = !showExport}
-					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#666] hover:text-white hover:border-white transition-colors">
+					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
 					↓ Export
 				</button>
 				{#if showExport}
@@ -308,7 +308,7 @@
 				{/if}
 			</div>
 			<!-- FIX 5: Dedup link -->
-			<a href="/contacts/dedup" class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#666] hover:border-white hover:text-white transition-colors">
+			<a href="/contacts/dedup" class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 				🔗 Dedup
 			</a>
 		</div>
@@ -341,7 +341,7 @@
 			{:else if contacts.length === 0}
 				<div class="flex items-center justify-center py-24 text-center">
 					<div>
-						<p class="text-[#555] text-sm">No contacts yet</p>
+						<p class="text-[#7c7c7c] text-sm">No contacts yet</p>
 						<p class="text-[#333] text-xs mt-1">Create one manually or import a CSV</p>
 						<div class="mt-4 flex gap-3 justify-center">
 							<a href="/import" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#888] hover:border-white hover:text-white transition-colors">Import CSV</a>
@@ -350,7 +350,7 @@
 					</div>
 				</div>
 			{:else}
-				<div class="px-4 py-2 border-b border-[#1e1e1e] grid text-xs text-[#444]" style="grid-template-columns: minmax(0,1fr) repeat(3, auto);">
+				<div class="px-4 py-2 border-b border-[#1e1e1e] grid text-xs text-[#6e6e6e]" style="grid-template-columns: minmax(0,1fr) repeat(3, auto);">
 					<span>Name / Company</span>
 					<span class="hidden sm:block px-3">Phone</span>
 					<span class="hidden md:block px-3">Tags</span>
@@ -362,19 +362,19 @@
 						<span class="font-medium">{selectedIds.size} selected</span>
 						<button onclick={() => showBulkTask = true} class="px-3 py-1 bg-blue-400/20 hover:bg-blue-400/30 rounded text-blue-200 transition-colors">✅ Create Task for All</button>
 						<button onclick={() => showBulkActivity = true}
-							class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+							class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 							📝 Log Activity ({selectedIds.size})
 						</button>
 				<!-- FIX 4: Bulk SMS button -->
-					<button onclick={() => showBulkSms = true} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+					<button onclick={() => showBulkSms = true} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						💬 SMS ({selectedIds.size})
 					</button>
-					<button onclick={() => selectedIds = new Set()} class="text-[#666] hover:text-white transition-colors ml-auto">Deselect</button>
+					<button onclick={() => selectedIds = new Set()} class="text-[#8a8a8a] hover:text-white transition-colors ml-auto">Deselect</button>
 				</div>
 			{/if}
 
 			<!-- Select-all -->
-			<div class="flex items-center gap-2 px-4 py-1.5 border-b border-[#1a1a1a] text-xs text-[#555]">
+			<div class="flex items-center gap-2 px-4 py-1.5 border-b border-[#1a1a1a] text-xs text-[#7c7c7c]">
 				<input
 				type="checkbox"
 				checked={allSelected}
@@ -401,7 +401,7 @@
 						class="px-3 py-1.5 rounded border border-[#2a2a2a] text-xs text-[#999] hover:border-white hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
 						← Prev
 					</button>
-					<span class="text-xs text-[#555]">Page {currentPage} of {totalPages}</span>
+					<span class="text-xs text-[#7c7c7c]">Page {currentPage} of {totalPages}</span>
 					<button
 						onclick={() => loadContacts(activeFilters, currentPage + 1)}
 						disabled={currentPage >= totalPages}
@@ -428,14 +428,14 @@
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-6 w-full max-w-md" onclick={(e) => e.stopPropagation()}>
 				<div class="flex items-center justify-between mb-4">
 					<h3 class="text-white font-medium">Send SMS to {selectedIds.size} Contact{selectedIds.size !== 1 ? 's' : ''}</h3>
-					<button onclick={() => showBulkSms = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
+					<button onclick={() => showBulkSms = false} class="text-[#7c7c7c] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 				<textarea bind:value={bulkSmsBody} placeholder="Message..." rows="4"
 					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none mb-3"></textarea>
-				<p class="text-xs text-[#444] mb-3">Contacts without a phone number will be skipped.</p>
+				<p class="text-xs text-[#6e6e6e] mb-3">Contacts without a phone number will be skipped.</p>
 				{#if bulkSmsResult}<p class="text-xs text-[var(--accent)] mb-2">{bulkSmsResult}</p>{/if}
 				<div class="flex gap-2">
-					<button onclick={() => showBulkSms = false} class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#777] hover:border-white hover:text-white transition-colors">Cancel</button>
+					<button onclick={() => showBulkSms = false} class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">Cancel</button>
 					<button onclick={sendBulkSms} disabled={sendingBulkSms || !bulkSmsBody.trim()}
 						class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
 						{sendingBulkSms ? 'Sending...' : `Send to ${selectedIds.size}`}
@@ -453,13 +453,13 @@
 				onclick={(e) => e.stopPropagation()}>
 				<div class="flex items-center justify-between mb-4">
 					<h3 class="text-white font-medium text-sm">Log Activity for {selectedIds.size} Contact{selectedIds.size !== 1 ? 's' : ''}</h3>
-					<button onclick={() => showBulkActivity = false} class="text-[#555] hover:text-white text-sm"><Icon name="x" size={14} /></button>
+					<button onclick={() => showBulkActivity = false} class="text-[#7c7c7c] hover:text-white text-sm"><Icon name="x" size={14} /></button>
 				</div>
 
 				<div class="flex flex-wrap gap-1.5 mb-4">
 					{#each BULK_ACTIVITY_TYPES as t}
 						<button onclick={() => bulkActivityType = t.value}
-							class="px-2.5 py-1 rounded-full text-xs transition-colors {bulkActivityType === t.value ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#666] hover:border-[#555] hover:text-[#ccc]'}">
+							class="px-2.5 py-1 rounded-full text-xs transition-colors {bulkActivityType === t.value ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#8a8a8a] hover:border-[#555] hover:text-[#ccc]'}">
 							{t.icon} {t.label}
 						</button>
 					{/each}
@@ -480,7 +480,7 @@
 
 				<div class="flex gap-2 mt-5">
 					<button onclick={() => showBulkActivity = false}
-						class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#777] hover:border-white hover:text-white transition-colors">
+						class="flex-1 rounded-lg border border-[#2a2a2a] py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						Cancel
 					</button>
 					<button onclick={createBulkActivity}
@@ -498,7 +498,7 @@
 		<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onclick={() => showBulkTask = false}>
 			<div class="bg-[#111] border border-[#2a2a2a] rounded-xl p-6 w-full max-w-md mx-4 space-y-3">
 			<p class="text-white font-semibold text-sm mb-4">Create Tasks</p>
-			<p class="text-xs text-[#555]">Create follow-up tasks for {selectedIds.size} selected contact{selectedIds.size === 1 ? '' : 's'}.</p>
+			<p class="text-xs text-[#7c7c7c]">Create follow-up tasks for {selectedIds.size} selected contact{selectedIds.size === 1 ? '' : 's'}.</p>
 			<div class="flex gap-2 mt-4">
 				<button onclick={() => showBulkTask = false} class="px-4 py-2 border border-[#333] rounded text-xs text-[#999] hover:border-white hover:text-white transition-colors">Cancel</button>
 				<button onclick={createBulkTasks} disabled={bulkTaskSaving} class="px-4 py-2 bg-white text-black rounded text-xs font-semibold hover:bg-[#e5e5e5] disabled:opacity-50 transition-colors">{bulkTaskSaving ? 'Creating…' : 'Create Tasks'}</button>

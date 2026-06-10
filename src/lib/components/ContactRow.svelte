@@ -19,9 +19,9 @@
 			{contact.name}
 		</a>
 		<div class="flex items-center gap-2">
-			<p class="text-[#666] text-xs truncate">{contact.company || '—'}</p>
+			<p class="text-[#8a8a8a] text-xs truncate">{contact.company || '—'}</p>
 			{#if (contact as Record<string,unknown>).contact_type && (contact as Record<string,unknown>).contact_type !== 'lead'}
-				<span class="text-xs text-[#444] capitalize">{(contact as Record<string,unknown>).contact_type as string}</span>
+				<span class="text-xs text-[#6e6e6e] capitalize">{(contact as Record<string,unknown>).contact_type as string}</span>
 			{/if}
 			{#if (contact as Record<string,unknown>).is_business}
 				<span class="text-xs text-[var(--accent)]">B2B</span>
@@ -45,19 +45,19 @@
 
 	<div class="text-right shrink-0 min-w-[70px]">
 		{#if (contact as Record<string,unknown>).contact_score}
-			<p class="text-xs font-medium {((contact as Record<string,unknown>).contact_score as number) >= 70 ? 'text-[var(--accent)]' : ((contact as Record<string,unknown>).contact_score as number) >= 40 ? 'text-yellow-400' : 'text-[#555]'}">
+			<p class="text-xs font-medium {((contact as Record<string,unknown>).contact_score as number) >= 70 ? 'text-[var(--accent)]' : ((contact as Record<string,unknown>).contact_score as number) >= 40 ? 'text-yellow-400' : 'text-[#7c7c7c]'}">
 				{(contact as Record<string,unknown>).contact_score as number}pts
 			</p>
 		{/if}
-		<p class="text-xs text-[#666]">{contact.call_count} calls</p>
-		<p class="text-xs text-[#444]">{formatDate(contact.last_called_at)}</p>
+		<p class="text-xs text-[#8a8a8a]">{contact.call_count} calls</p>
+		<p class="text-xs text-[#6e6e6e]">{formatDate(contact.last_called_at)}</p>
 	</div>
 
 	<!-- Hover quick-actions -->
 	<div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
 		{#if contact.phone}
 			<a href="/phone?number={encodeURIComponent(contact.phone)}&contact={contact.id}"
-				class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#555] hover:text-white hover:border-white transition-colors"
+				class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#7c7c7c] hover:text-white hover:border-white transition-colors"
 				title="Call {contact.name}"
 				onclick={(e) => e.stopPropagation()}>
 				<span class="text-xs">📞</span>
@@ -65,13 +65,13 @@
 		{/if}
 		<button
 			onclick={(e) => { e.stopPropagation(); onQuickNote?.(contact.id, contact.name); }}
-			class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#555] hover:text-white hover:border-white transition-colors"
+			class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#7c7c7c] hover:text-white hover:border-white transition-colors"
 			title="Log note">
 			<span class="text-xs">📝</span>
 		</button>
 		<button
 			onclick={(e) => { e.stopPropagation(); onQuickTask?.(contact.id, contact.name); }}
-			class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#555] hover:text-white hover:border-white transition-colors"
+			class="rounded-lg border border-[#2a2a2a] p-1.5 text-[#7c7c7c] hover:text-white hover:border-white transition-colors"
 			title="Add task">
 			<span class="text-xs">✅</span>
 		</button>
