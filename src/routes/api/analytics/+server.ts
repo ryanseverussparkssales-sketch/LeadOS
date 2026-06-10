@@ -96,17 +96,17 @@ export const GET: RequestHandler = async ({ request, url }) => {
 	// Daily breakdown
 	const dailyMap: Record<string, { calls: number; cost: number; timeMins: number }> = {};
 	for (const row of usage) {
-		const day = new Date(row.created_at).toLocaleDateString();
+		const day = new Date(row.created_at).toISOString().slice(0, 10);
 		if (!dailyMap[day]) dailyMap[day] = { calls: 0, cost: 0, timeMins: 0 };
 		dailyMap[day].cost += row.total_cost ?? 0;
 	}
 	for (const c of callList) {
-		const day = new Date(c.created_at).toLocaleDateString();
+		const day = new Date(c.created_at).toISOString().slice(0, 10);
 		if (!dailyMap[day]) dailyMap[day] = { calls: 0, cost: 0, timeMins: 0 };
 		dailyMap[day].calls += 1;
 	}
 	for (const t of timeEntries) {
-		const day = new Date(t.entry_date).toLocaleDateString();
+		const day = new Date(t.entry_date).toISOString().slice(0, 10);
 		if (!dailyMap[day]) dailyMap[day] = { calls: 0, cost: 0, timeMins: 0 };
 		dailyMap[day].timeMins += t.duration_minutes;
 	}
@@ -119,7 +119,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
 		avgDurationMinutes: callList.length ? totals.minutes / callList.length : 0,
 		outcomes,
 		time: { totalMins: timeTotal, billableMins: timeBillable, entries: timeEntries.length },
-		daily: Object.entries(dailyMap).map(([date, d]) => ({ date, ...d })),
+		daily: Object.entries(dailyMap)
+			.map(([date, d]) => ({ date, ...d }))
+			.sort((a, b) => a.date.localeCompare(b.date)),
 		recentUsage: usage.slice(0, 10),
 		pricing: PRICING,
 	});

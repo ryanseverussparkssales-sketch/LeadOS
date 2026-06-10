@@ -98,6 +98,38 @@
 		const res = await apiFetch(`/api/analytics/revenue?year=${revenueYear}`);
 		revenueData = res.ok ? await res.json() : null;
 	}
+
+	// ── Inline-SVG trend chart helpers (no chart dependency) ──────────────────
+	// viewBox is 600×160; preserveAspectRatio="none" stretches X to container width.
+	// Strokes use vector-effect:non-scaling-stroke so they stay crisp when stretched.
+	const CW = 600, CH = 160, PAD = 8;
+	const daily = $derived(data?.daily ?? []);
+	const maxCalls = $derived(Math.max(1, ...daily.map((d) => d.calls)));
+	const maxCost = $derived(Math.max(0.0001, ...daily.map((d) => d.cost)));
+
+	function linePath(vals: number[], max: number): string {
+		if (!vals.length) return '';
+		if (vals.length === 1) {
+			const y = CH - PAD - (vals[0] / max) * (CH - 2 * PAD);
+			return `M ${PAD} ${y.toFixed(1)} L ${CW - PAD} ${y.toFixed(1)}`;
+		}
+		const step = (CW - 2 * PAD) / (vals.length - 1);
+		return vals
+			.map((v, i) => {
+				const x = PAD + i * step;
+				const y = CH - PAD - (v / max) * (CH - 2 * PAD);
+				return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+			})
+			.join(' ');
+	}
+	function areaPath(vals: number[], max: number): string {
+		const line = linePath(vals, max);
+		if (!line) return '';
+		return `${line} L ${CW - PAD} ${CH - PAD} L ${PAD} ${CH - PAD} Z`;
+	}
+	function fmtDay(iso: string): string {
+		return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+	}
 </script>
 
 <svelte:head><title>Analytics — Edelhaus</title></svelte:head>
@@ -220,6 +252,41 @@
 						<p class="text-white text-xl font-semibold">{card.value}</p>
 					</div>
 				{/each}
+			</div>
+
+			<!-- Activity trend over time -->
+			<div class="rounded-xl border border-[#2a2a2a] bg-[#111111] p-5">
+				<div class="flex items-center justify-between mb-4">
+					<p class="text-xs text-[#bbb] uppercase tracking-widest">Activity Over Time</p>
+					<div class="flex items-center gap-3 text-[10px]">
+						<span class="flex items-center gap-1.5 text-[#bbb]"><span class="w-2.5 h-0.5 rounded-full" style="background:#22c55e"></span>Calls</span>
+						<span class="flex items-center gap-1.5 text-[#bbb]"><span class="w-2.5 h-0.5 rounded-full" style="background:#3b82f6"></span>Cost</span>
+					</div>
+				</div>
+				{#if daily.length === 0}
+					<p class="text-sm text-[#666] py-10 text-center">No activity in this period yet — make a few calls and trends will appear here.</p>
+				{:else}
+					<svg viewBox="0 0 {CW} {CH}" class="w-full" style="height:160px" preserveAspectRatio="none" role="img" aria-label="Calls and cost per day">
+						<defs>
+							<linearGradient id="callGrad" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="0" stop-color="#22c55e" stop-opacity="0.22" />
+								<stop offset="1" stop-color="#22c55e" stop-opacity="0" />
+							</linearGradient>
+						</defs>
+						<!-- gridlines -->
+						{#each [0.25, 0.5, 0.75] as g}
+							<line x1="0" y1={CH * g} x2={CW} y2={CH * g} stroke="#222" stroke-width="1" vector-effect="non-scaling-stroke" />
+						{/each}
+						<path d={areaPath(daily.map((d) => d.calls), maxCalls)} fill="url(#callGrad)" />
+						<path d={linePath(daily.map((d) => d.calls), maxCalls)} fill="none" stroke="#22c55e" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+						<path d={linePath(daily.map((d) => d.cost), maxCost)} fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
+					</svg>
+					<div class="flex justify-between mt-2 text-[10px] text-[#666]">
+						<span>{fmtDay(daily[0].date)}</span>
+						<span class="text-[#888]">{daily.reduce((s, d) => s + d.calls, 0)} calls · {fmt$(daily.reduce((s, d) => s + d.cost, 0))}</span>
+						{#if daily.length > 1}<span>{fmtDay(daily[daily.length - 1].date)}</span>{/if}
+					</div>
+				{/if}
 			</div>
 
 			<!-- Cost + Outcomes -->
