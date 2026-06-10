@@ -34,6 +34,16 @@ export async function rateLimitUser(
 	const windowKey = `${userId}:${Math.floor(Date.now() / options.windowMs)}`;
 
 	try {
+		// Admin override: account_overrides.rate_limit_multiplier scales the cap
+		// (e.g. 2 = double the allowance for that tenant). Default 1. Non-fatal.
+		let max = options.max;
+		try {
+			const { data: ov } = await supabaseAdmin
+				.from('account_overrides').select('rate_limit_multiplier').eq('user_id', userId).maybeSingle();
+			const mult = Number(ov?.rate_limit_multiplier);
+			if (Number.isFinite(mult) && mult > 0) max = Math.max(1, Math.round(options.max * mult));
+		} catch { /* no override table / row → use default */ }
+
 		const { data, error } = await supabaseAdmin.rpc('increment_rate_limit', {
 			p_key: windowKey,
 			p_window_ms: options.windowMs,
@@ -46,7 +56,7 @@ export async function rateLimitUser(
 			return false;
 		}
 
-		return (data ?? 0) > options.max;
+		return (data ?? 0) > max;
 	} catch {
 		// On any error, allow the request (fail open)
 		return false;

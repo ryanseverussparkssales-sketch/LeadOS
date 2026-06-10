@@ -61,8 +61,12 @@ export const GET: RequestHandler = async ({ request, params }) => {
 	});
 };
 
-// DELETE /api/admin/accounts/[id] — offboard a tenant (deletes the auth user;
-// app data cascades via FKs). Irreversible — heavily audited.
+// DELETE /api/admin/accounts/[id] — offboard a tenant.
+// NOTE: this is an *internal* offboard, NOT a hard auth-user delete. Most app
+// tables reference auth.users WITHOUT ON DELETE CASCADE, so deleteUser() would
+// fail on a FK violation for any account that has data. Instead we permanently
+// suspend (blocks the app shell) + revoke sessions. Reversible via reactivate,
+// and the account's data is preserved for export/compliance.
 export const DELETE: RequestHandler = async ({ request, params }) => {
 	const admin = await requireSuperAdmin(request);
 	const id = params.id;
@@ -71,13 +75,33 @@ export const DELETE: RequestHandler = async ({ request, params }) => {
 	const { data: target } = await supabaseAdmin.auth.admin.getUserById(id);
 	const targetEmail = target?.user?.email ?? null;
 
-	const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(id);
-	if (delErr) throw error(500, delErr.message);
+	const { error: e } = await supabaseAdmin.from('account_overrides').upsert(
+		{
+			user_id: id,
+			suspended: true,
+			suspended_reason: 'Offboarded',
+			suspended_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+			updated_by: admin.id,
+		},
+		{ onConflict: 'user_id' }
+	);
+	if (e) throw error(500, e.message);
+
+	// Best-effort: revoke active sessions so they're locked out immediately.
+	try {
+		const { PUBLIC_SUPABASE_URL } = await import('$env/static/public');
+		const { SUPABASE_SERVICE_KEY } = await import('$env/static/private');
+		await fetch(`${PUBLIC_SUPABASE_URL}/auth/v1/admin/users/${id}/logout`, {
+			method: 'POST',
+			headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` },
+		});
+	} catch { /* non-fatal */ }
 
 	await logAdminAction({
 		adminUserId: admin.id, adminEmail: admin.email,
 		action: 'offboard', targetUserId: id, targetEmail,
-		detail: { note: 'auth user deleted; data cascaded' },
+		detail: { method: 'internal_suspend', note: 'permanently suspended + sessions revoked; data preserved' },
 	});
 	return json({ ok: true });
 };

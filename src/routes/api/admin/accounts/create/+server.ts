@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { requireSuperAdmin, supabaseAdmin } from '$lib/server/supabase';
+import { logAdminAction } from '$lib/server/audit';
 import type { RequestHandler } from './$types';
 
 // Super-admin only: provision a new account.
@@ -7,7 +8,7 @@ import type { RequestHandler } from './$types';
 //   - rep    → a team member under an existing agency (owner_user_id)
 //   - admin  → a platform admin (agency-tier workspace + platform_admins row)
 export const POST: RequestHandler = async ({ request }) => {
-	await requireSuperAdmin(request);
+	const admin = await requireSuperAdmin(request);
 
 	const { type, email, password, name, agencyName, ownerUserId, tier } = await request.json() as {
 		type: 'agency' | 'rep' | 'admin';
@@ -61,5 +62,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		throw error(500, e instanceof Error ? e.message : 'Could not finish account setup');
 	}
 
+	await logAdminAction({
+		adminUserId: admin.id, adminEmail: admin.email,
+		action: 'create_account', targetUserId: newId, targetEmail: email,
+		detail: { type, tier: tier ?? null, ownerUserId: ownerUserId ?? null },
+	});
 	return json({ success: true, id: newId, email, type });
 };

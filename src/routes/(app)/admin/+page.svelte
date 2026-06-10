@@ -120,8 +120,8 @@
 
 	async function offboard() {
 		if (!detail) return;
-		if (!confirm(`PERMANENTLY delete ${detail.agency_name ?? detail.email} and all their data? This cannot be undone.`)) return;
-		if (prompt('Type DELETE to confirm') !== 'DELETE') return;
+		if (!confirm(`Offboard ${detail.agency_name ?? detail.email}? This permanently suspends the account and revokes access. It's reversible via Reactivate and their data is preserved.`)) return;
+		if (prompt('Type OFFBOARD to confirm') !== 'OFFBOARD') return;
 		busy = true;
 		const res = await apiFetch(`/api/admin/accounts/${detail.id}`, { method: 'DELETE' });
 		busy = false;
@@ -467,7 +467,7 @@
 							<button onclick={forceLogout} disabled={busy} class="rounded-lg border border-[#2a2a2a] text-white py-2 text-xs font-medium hover:bg-white/5 disabled:opacity-50">Force logout</button>
 							<button onclick={() => detail && viewAs(detail)} disabled={busy} class="rounded-lg border border-[var(--accent)]/40 text-[var(--accent)] py-2 text-xs font-medium hover:bg-[var(--accent)]/10 disabled:opacity-50">View as →</button>
 						</div>
-						<button onclick={offboard} disabled={busy} class="w-full rounded-lg border border-[var(--end)]/40 text-[var(--end-text)] py-2 text-xs font-medium hover:bg-[var(--end)]/10 disabled:opacity-50 mt-1">Offboard (delete account)</button>
+						<button onclick={offboard} disabled={busy} class="w-full rounded-lg border border-[var(--end)]/40 text-[var(--end-text)] py-2 text-xs font-medium hover:bg-[var(--end)]/10 disabled:opacity-50 mt-1">Offboard (suspend & lock)</button>
 					</div>
 				{/if}
 			</div>
