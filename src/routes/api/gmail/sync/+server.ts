@@ -60,101 +60,121 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
             const accessToken = await getValidToken(account as any);
             const rawMessages = await fetchNewMessages(account as any, accessToken);
 
-            for (const rawMsg of rawMessages) {
-                const parsed = parseGmailMessage(rawMsg);
-                if (!parsed) continue;
+            // ── Batched sync (was ~5 serial DB queries PER message — an N+1 that
+            // timed out the 5-min cron at scale). Now: 1 dedup query + 1 contact
+            // match + one upsert/update per *thread* + one bulk insert per account.
+            const touchSynced = async () => {
+                await supabaseAdmin.from('email_accounts')
+                    .update({ last_synced_at: new Date().toISOString() }).eq('id', account.id);
+            };
+            const dirOf = (p: { isSent: boolean; isInbox: boolean }) =>
+                p.isSent && !p.isInbox ? 'outbound' : 'inbound';
 
-                // Only handle INBOX messages (skip drafts, spam, etc.)
-                if (!parsed.isInbox && !parsed.isSent) continue;
-                const direction = parsed.isSent && !parsed.isInbox ? 'outbound' : 'inbound';
+            const parsed = rawMessages
+                .map((m) => parseGmailMessage(m))
+                .filter((p): p is NonNullable<ReturnType<typeof parseGmailMessage>> =>
+                    !!p && (p.isInbox || p.isSent));
+            if (!parsed.length) { await touchSynced(); continue; }
 
-                // Deduplicate by Message-ID header
-                const { data: existing } = await supabaseAdmin
-                    .from('email_logs')
-                    .select('id')
-                    .eq('message_id', parsed.messageId)
-                    .maybeSingle();
-                if (existing) continue;
+            // 1 query: which Message-IDs already exist → skip them
+            const msgIds = [...new Set(parsed.map((p) => p.messageId).filter(Boolean))];
+            const { data: existingRows } = msgIds.length
+                ? await supabaseAdmin.from('email_logs').select('message_id').in('message_id', msgIds)
+                : { data: [] as { message_id: string }[] };
+            const existing = new Set((existingRows ?? []).map((r) => r.message_id));
+            const fresh = parsed.filter((p) => !existing.has(p.messageId));
+            if (!fresh.length) { await touchSynced(); continue; }
 
-                // Match sender to a contact
-                const fromEmail = extractEmail(parsed.from);
-                const { data: contact } = await supabaseAdmin
+            // 1 query: match all senders to contacts (case-insensitive, like the original)
+            const fromEmails = [...new Set(fresh.map((p) => extractEmail(p.from)).filter(Boolean))];
+            const contactByEmail = new Map<string, { id: string; name: string }>();
+            if (fromEmails.length) {
+                const { data: contactRows } = await supabaseAdmin
                     .from('contacts')
-                    .select('id, name')
+                    .select('id, name, email')
                     .eq('user_id', account.user_id)
-                    .ilike('email', fromEmail)
                     .is('deleted_at', null)
-                    .maybeSingle();
-
-                // Thread grouping key — same logic as inbound webhook
-                const threadKey = normalizeThreadKey(parsed.subject);
-
-                // Upsert email_thread row
-                const snippet = parsed.textBody.slice(0, 200).replace(/\n/g, ' ').trim();
-                const { data: thread } = await supabaseAdmin
-                    .from('email_threads')
-                    .upsert(
-                        {
-                            user_id: account.user_id,
-                            contact_id: contact?.id ?? null,
-                            subject: parsed.subject
-                                .replace(/^(Re:|Fwd:|RE:|FWD:|Fw:)\s*/gi, '')
-                                .trim(),
-                            thread_key: threadKey,
-                            last_message_at: parsed.date,
-                            last_message_body: snippet,
-                            last_message_direction: direction,
-                        },
-                        { onConflict: 'user_id,thread_key,contact_id' }
-                    )
-                    .select()
-                    .maybeSingle();
-
-                if (thread && direction === 'inbound') {
-                    await supabaseAdmin
-                        .from('email_threads')
-                        .update({
-                            unread_count: (thread.unread_count ?? 0) + 1,
-                            message_count: (thread.message_count ?? 0) + 1,
-                        })
-                        .eq('id', thread.id);
+                    .or(fromEmails.map((e) => `email.ilike.${e}`).join(','));
+                for (const c of contactRows ?? []) {
+                    const k = (c.email ?? '').toLowerCase();
+                    if (k && !contactByEmail.has(k)) contactByEmail.set(k, { id: c.id, name: c.name });
                 }
+            }
+            const contactFor = (p: { from: string }) =>
+                contactByEmail.get(extractEmail(p.from)) ?? null;
 
-                // Insert email_log
-                const { error: insertErr } = await supabaseAdmin.from('email_logs').insert({
-                    user_id: account.user_id,
-                    contact_id: contact?.id ?? null,
-                    subject: parsed.subject,
-                    body: parsed.textBody,
-                    html_body: parsed.htmlBody,
-                    from_address: parsed.from,
-                    to_address: parsed.to,
-                    in_reply_to: parsed.inReplyTo,
-                    message_id: parsed.messageId,
-                    thread_id: threadKey,
-                    email_thread_id: thread?.id ?? null,
-                    direction,
-                    status: direction === 'outbound' ? 'sent' : 'received',
-                    email_type: direction === 'inbound' ? 'inbound' : 'outbound',
-                    created_at: parsed.date,
-                });
-
-                if (insertErr) {
-                    // Duplicate message_id — safe to skip
-                    if (insertErr.code !== '23505') {
-                        console.error('[gmail/sync] insert error:', insertErr.message);
-                    }
-                    continue;
+            // Group messages into threads (oldest → newest so the latest wins on last_message_*)
+            const ordered = [...fresh].sort((a, b) => +new Date(a.date) - +new Date(b.date));
+            interface Grp {
+                user_id: string; contact_id: string | null; subject: string; thread_key: string;
+                last_message_at: string; last_message_body: string; last_message_direction: string;
+                inbound: number; // original incremented unread_count AND message_count by inbound only
+            }
+            const groups = new Map<string, Grp>();
+            for (const p of ordered) {
+                const c = contactFor(p);
+                const threadKey = normalizeThreadKey(p.subject);
+                const gkey = `${threadKey}|${c?.id ?? ''}`;
+                const direction = dirOf(p);
+                const snippet = p.textBody.slice(0, 200).replace(/\n/g, ' ').trim();
+                const g = groups.get(gkey);
+                if (!g) {
+                    groups.set(gkey, {
+                        user_id: account.user_id, contact_id: c?.id ?? null,
+                        subject: p.subject.replace(/^(Re:|Fwd:|RE:|FWD:|Fw:)\s*/gi, '').trim(),
+                        thread_key: threadKey, last_message_at: p.date, last_message_body: snippet,
+                        last_message_direction: direction, inbound: direction === 'inbound' ? 1 : 0,
+                    });
+                } else {
+                    g.last_message_at = p.date; g.last_message_body = snippet;
+                    g.last_message_direction = direction;
+                    if (direction === 'inbound') g.inbound++;
                 }
-
-                totalSynced++;
             }
 
-            // Update last_synced_at regardless of message count
-            await supabaseAdmin
-                .from('email_accounts')
-                .update({ last_synced_at: new Date().toISOString() })
-                .eq('id', account.id);
+            // Upsert one row per thread, bump counts, remember thread id for the log insert
+            const threadIdByKey = new Map<string, string>();
+            for (const [gkey, g] of groups) {
+                const { data: thread } = await supabaseAdmin
+                    .from('email_threads')
+                    .upsert({
+                        user_id: g.user_id, contact_id: g.contact_id, subject: g.subject,
+                        thread_key: g.thread_key, last_message_at: g.last_message_at,
+                        last_message_body: g.last_message_body, last_message_direction: g.last_message_direction,
+                    }, { onConflict: 'user_id,thread_key,contact_id' })
+                    .select('id, unread_count, message_count')
+                    .maybeSingle();
+                if (!thread) continue;
+                threadIdByKey.set(gkey, thread.id);
+                if (g.inbound > 0) {
+                    await supabaseAdmin.from('email_threads').update({
+                        unread_count: (thread.unread_count ?? 0) + g.inbound,
+                        message_count: (thread.message_count ?? 0) + g.inbound,
+                    }).eq('id', thread.id);
+                }
+            }
+
+            // 1 bulk insert of all new email_logs (ignore any racing duplicates by message_id)
+            const rows = ordered.map((p) => {
+                const c = contactFor(p);
+                const threadKey = normalizeThreadKey(p.subject);
+                const direction = dirOf(p);
+                return {
+                    user_id: account.user_id, contact_id: c?.id ?? null,
+                    subject: p.subject, body: p.textBody, html_body: p.htmlBody,
+                    from_address: p.from, to_address: p.to, in_reply_to: p.inReplyTo,
+                    message_id: p.messageId, thread_id: threadKey,
+                    email_thread_id: threadIdByKey.get(`${threadKey}|${c?.id ?? ''}`) ?? null,
+                    direction, status: direction === 'outbound' ? 'sent' : 'received',
+                    email_type: direction === 'inbound' ? 'inbound' : 'outbound', created_at: p.date,
+                };
+            });
+            const { error: insErr } = await supabaseAdmin
+                .from('email_logs').upsert(rows, { onConflict: 'message_id', ignoreDuplicates: true });
+            if (insErr) console.error('[gmail/sync] batch insert error:', insErr.message);
+            else totalSynced += rows.length;
+
+            await touchSynced();
 
         } catch (e: any) {
             const msg = `${account.email_address}: ${e?.message ?? String(e)}`;
