@@ -40,9 +40,17 @@
     // Tag input
     let tagInput = $state('');
 
-    const filtered = $derived(
-        search ? companies.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.industry?.toLowerCase().includes(search.toLowerCase()) || c.city?.toLowerCase().includes(search.toLowerCase())) : companies
-    );
+    let typeFilter = $state('');
+    let clientFilter = $state('');
+    let industryFilter = $state('');
+    const industries = $derived([...new Set(companies.map(c => c.industry).filter(Boolean))].sort() as string[]);
+    const filtered = $derived(companies.filter(c =>
+        (!search || c.name.toLowerCase().includes(search.toLowerCase()) || c.industry?.toLowerCase().includes(search.toLowerCase()) || c.city?.toLowerCase().includes(search.toLowerCase()))
+        && (!typeFilter || c.company_type === typeFilter)
+        && (!clientFilter || (c as Record<string, unknown> & { client?: { id?: string } }).client?.id === clientFilter || (c as Record<string, unknown>).client_id === clientFilter)
+        && (!industryFilter || c.industry === industryFilter)
+    ));
+    const filtersActive = $derived(Boolean(typeFilter || clientFilter || industryFilter));
 
     onMount(async () => {
         const [cr, clr] = await Promise.all([apiFetch('/api/companies'), apiFetch('/api/clients')]);
@@ -127,9 +135,34 @@
     <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
         <!-- Left: company list -->
         <div class="{selected ? 'hidden lg:flex lg:flex-col' : 'flex flex-col'} w-full lg:w-72 lg:shrink-0 border-b lg:border-b-0 lg:border-r border-[#1e1e1e]">
-            <div class="p-3 border-b border-[#1e1e1e]">
+            <div class="p-3 border-b border-[#1e1e1e] space-y-2">
                 <input bind:value={search} placeholder="Search companies..."
                     class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+                <div class="flex gap-2">
+                    <select bind:value={typeFilter}
+                        class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                        <option value="">All types</option>
+                        {#each TYPES as t}<option value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>{/each}
+                    </select>
+                    <select bind:value={clientFilter}
+                        class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                        <option value="">All clients</option>
+                        {#each clients as c}<option value={c.id}>{c.name}</option>{/each}
+                    </select>
+                </div>
+                {#if industries.length}
+                    <div class="flex gap-2 items-center">
+                        <select bind:value={industryFilter}
+                            class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+                            <option value="">All industries</option>
+                            {#each industries as ind}<option value={ind}>{ind}</option>{/each}
+                        </select>
+                        {#if filtersActive}
+                            <button onclick={() => { typeFilter = ''; clientFilter = ''; industryFilter = ''; }}
+                                class="text-xs text-[#8a8a8a] hover:text-white transition-colors whitespace-nowrap">✕ Clear</button>
+                        {/if}
+                    </div>
+                {/if}
             </div>
 
             {#if showNew}

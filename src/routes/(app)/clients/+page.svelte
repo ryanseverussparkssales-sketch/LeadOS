@@ -15,6 +15,12 @@
 	}
 
 	let clients = $state<Client[]>([]);
+	let clientSearch = $state('');
+	let clientStatusFilter = $state('');
+	const filteredClients = $derived(clients.filter(c =>
+		(!clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase()) || c.industry?.toLowerCase().includes(clientSearch.toLowerCase()))
+		&& (!clientStatusFilter || c.contract_status === clientStatusFilter)
+	));
 	let selected = $state<Client | null>(null);
 	let newClientName = $state('');
 	let newProjectName = $state('');
@@ -342,17 +348,33 @@
 					</button>
 				</div>
 			</div>
+			<div class="px-4 py-2 border-b border-[#1e1e1e] flex gap-2">
+				<input bind:value={clientSearch} placeholder="Search clients..."
+					class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
+				<select bind:value={clientStatusFilter}
+					class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-white focus:border-white focus:outline-none">
+					<option value="">All</option>
+					{#each ['prospect', 'active', 'paused', 'ended'] as st}
+						<option value={st}>{st.charAt(0).toUpperCase() + st.slice(1)}</option>
+					{/each}
+				</select>
+			</div>
 			<div class="flex-1 overflow-y-auto">
-				{#each clients as client}
+				{#each filteredClients as client}
 					<button
 						onclick={() => { selected = client; loadEngagements(client.id); engagements = []; loadDocs(client.id); docs = []; }}
 						class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === client.id ? 'bg-white/10' : 'hover:bg-white/5'}"
 					>
-						<p class="text-sm text-white font-medium truncate">{client.name}</p>
+						<div class="flex items-center gap-2">
+							<p class="text-sm text-white font-medium truncate flex-1">{client.name}</p>
+							{#if client.contract_status}
+								<span class="text-[10px] px-1.5 py-0.5 rounded-full capitalize {client.contract_status === 'active' ? 'text-[var(--accent)] bg-[var(--accent)]/10' : client.contract_status === 'paused' ? 'text-yellow-400 bg-yellow-400/10' : 'text-[#8a8a8a] bg-white/5'}">{client.contract_status}</span>
+							{/if}
+						</div>
 						<p class="text-xs text-[#7c7c7c] mt-0.5">{projectCount(client)} project{projectCount(client) !== 1 ? 's' : ''}</p>
 					</button>
 				{:else}
-					<p class="text-center text-[#6e6e6e] text-xs py-8">No clients yet</p>
+					<p class="text-center text-[#6e6e6e] text-xs py-8">{clients.length ? 'No clients match the filter' : 'No clients yet'}</p>
 				{/each}
 			</div>
 		</div>

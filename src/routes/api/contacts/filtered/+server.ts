@@ -14,6 +14,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
 		const order       = url.searchParams.get('order') ?? 'asc';
 		const contactType = url.searchParams.get('contact_type');
 		const leadSource  = url.searchParams.get('lead_source');
+		const email       = url.searchParams.get('email');
+		const title       = url.searchParams.get('title');
 		const bizOnly     = url.searchParams.get('is_business') === 'true';
 		const search      = url.searchParams.get('search')?.trim();
 		const rawPage     = parseInt(url.searchParams.get('page') ?? '1');
@@ -22,7 +24,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 		const limit       = Math.min(200, isNaN(rawLimit) ? 50 : rawLimit);
 		const offset      = (page - 1) * limit;
 
-		const validSortCols = ['name', 'company', 'last_called_at', 'call_count'];
+		const validSortCols = ['name', 'company', 'last_called_at', 'call_count', 'email', 'title', 'status', 'created_at', 'contact_score'];
 		const sortCol = validSortCols.includes(sort) ? sort : 'name';
 
 		const includeTest = url.searchParams.get('include_test') === 'true';
@@ -40,16 +42,26 @@ export const GET: RequestHandler = async ({ request, url }) => {
 		if (company)     query = query.ilike('company', `%${company}%`);
 		if (contactType) query = query.eq('contact_type', contactType);
 		if (leadSource)  query = query.eq('lead_source', leadSource);
+		if (email)       query = query.ilike('email', `%${email}%`);
+		if (title)       query = query.ilike('title', `%${title}%`);
 		if (bizOnly)     query = query.eq('is_business', true);
 		if (search)      query = query.or(`name.ilike.%${search}%,company.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
 
-		// Count without pagination
+		// Count with the same filters applied (was unfiltered — pagination totals were wrong when filtering)
 		let countQuery = supabaseAdmin
 			.from('contacts')
 			.select('id', { count: 'exact', head: true })
 			.eq('user_id', ownerId)
 			.is('deleted_at', null);
 		if (!includeTest) countQuery = countQuery.eq('is_test', false);
+		if (status)      countQuery = countQuery.eq('status', status);
+		if (company)     countQuery = countQuery.ilike('company', `%${company}%`);
+		if (contactType) countQuery = countQuery.eq('contact_type', contactType);
+		if (leadSource)  countQuery = countQuery.eq('lead_source', leadSource);
+		if (email)       countQuery = countQuery.ilike('email', `%${email}%`);
+		if (title)       countQuery = countQuery.ilike('title', `%${title}%`);
+		if (bizOnly)     countQuery = countQuery.eq('is_business', true);
+		if (search)      countQuery = countQuery.or(`name.ilike.%${search}%,company.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`);
 		const { count: total } = await countQuery;
 
 		// Apply pagination

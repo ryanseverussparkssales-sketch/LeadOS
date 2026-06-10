@@ -23,6 +23,46 @@
 	let showExport = $state(false);
 	let activeFilters = $state<Filters>({});
 
+	// ── Columns (visibility persisted) + per-column filters ─────
+	const COLUMN_DEFS = [
+		{ key: 'phone',       label: 'Phone' },
+		{ key: 'email',       label: 'Email' },
+		{ key: 'title',       label: 'Title' },
+		{ key: 'status',      label: 'Status' },
+		{ key: 'lead_source', label: 'Lead Source' },
+		{ key: 'tags',        label: 'Tags' },
+		{ key: 'calls',       label: 'Calls' },
+	];
+	const COLS_KEY = 'edelhaus.contacts.columns';
+	function loadCols(): string[] {
+		try {
+			const saved = JSON.parse(localStorage.getItem(COLS_KEY) ?? 'null');
+			if (Array.isArray(saved) && saved.length) return saved.filter(k => COLUMN_DEFS.some(d => d.key === k));
+		} catch { /* fall through to default */ }
+		return ['phone', 'tags', 'calls'];
+	}
+	let visibleCols = $state<string[]>(['phone', 'tags', 'calls']);
+	let showColumns = $state(false);
+	function toggleCol(key: string) {
+		visibleCols = visibleCols.includes(key)
+			? visibleCols.filter(k => k !== key)
+			: COLUMN_DEFS.map(d => d.key).filter(k => visibleCols.includes(k) || k === key);
+		try { localStorage.setItem(COLS_KEY, JSON.stringify(visibleCols)); } catch { /* private mode */ }
+	}
+
+	let colFilters = $state({ status: '', email: '', title: '', lead_source: '' });
+	let showColFilters = $state(false);
+	let colFilterTimer: ReturnType<typeof setTimeout> | null = null;
+	function onColFilterChange() {
+		if (colFilterTimer) clearTimeout(colFilterTimer);
+		colFilterTimer = setTimeout(() => loadContacts(activeFilters, 1), 350);
+	}
+	function clearColFilters() {
+		colFilters = { status: '', email: '', title: '', lead_source: '' };
+		loadContacts(activeFilters, 1);
+	}
+	const colFiltersActive = $derived(Object.values(colFilters).some(Boolean));
+
 	// ── Bulk selection ──────────────────────────────────────────
 	let selectedIds = $state<Set<string>>(new Set());
 	let showBulkTask = $state(false);
@@ -223,6 +263,7 @@
 	}
 
 	onMount(async () => {
+		visibleCols = loadCols();
 		await Promise.all([loadContacts({}), loadTags()]);
 	});
 
@@ -250,6 +291,10 @@
 			if (f.contactType) params.set('contact_type', f.contactType);
 			if (f.leadSource) params.set('lead_source', f.leadSource);
 			if (f.isBusinessOnly) params.set('is_business', 'true');
+			if (colFilters.status) params.set('status', colFilters.status);
+			if (colFilters.email.trim()) params.set('email', colFilters.email.trim());
+			if (colFilters.title.trim()) params.set('title', colFilters.title.trim());
+			if (colFilters.lead_source.trim()) params.set('lead_source', colFilters.lead_source.trim());
 			if (search.trim()) params.set('search', search.trim());
 			params.set('page', String(page));
 			params.set('limit', '50');
@@ -271,7 +316,10 @@
 </script>
 
 <svelte:head><title>Contacts — Edelhaus</title></svelte:head>
-<svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.export-container')) showExport = false; }} />
+<svelte:window onclick={(e: MouseEvent) => {
+	if (!(e.target as Element)?.closest('.export-container')) showExport = false;
+	if (!(e.target as Element)?.closest('.columns-container')) showColumns = false;
+}} />
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-4 sm:px-8 py-4 flex flex-wrap items-center gap-3 justify-between">
@@ -291,6 +339,27 @@
 				class="rounded-lg border border-[#2a2a2a] px-4 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">
 				{showImport ? 'Hide Import' : 'Import'}
 			</button>
+			<div class="relative columns-container">
+				<button onclick={() => showColumns = !showColumns}
+					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
+					⊞ Columns
+				</button>
+				{#if showColumns}
+					<div class="absolute right-0 top-full mt-1 bg-[#111] border border-[var(--c-border-subtle)] rounded-xl shadow-2xl py-2 w-48 z-20">
+						{#each COLUMN_DEFS as col}
+							<label class="flex items-center gap-2 px-4 py-1.5 text-sm text-[#888] hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
+								<input type="checkbox" checked={visibleCols.includes(col.key)} onchange={() => toggleCol(col.key)} class="accent-blue-400" />
+								{col.label}
+							</label>
+						{/each}
+						<div class="border-t border-[#1e1e1e] mt-1 pt-1.5 px-4">
+							<button onclick={() => { showColFilters = !showColFilters; }} class="text-xs text-[#8a8a8a] hover:text-white transition-colors">
+								{showColFilters ? 'Hide column filters' : 'Show column filters'}
+							</button>
+						</div>
+					</div>
+				{/if}
+			</div>
 			<div class="relative export-container">
 				<button onclick={() => showExport = !showExport}
 					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
@@ -350,12 +419,32 @@
 					</div>
 				</div>
 			{:else}
-				<div class="px-4 py-2 border-b border-[#1e1e1e] grid text-xs text-[#6e6e6e]" style="grid-template-columns: minmax(0,1fr) repeat(3, auto);">
+				<div class="px-4 py-2 border-b border-[#1e1e1e] grid text-xs text-[#6e6e6e]" style="grid-template-columns: minmax(0,1fr) repeat({visibleCols.length}, auto);">
 					<span>Name / Company</span>
-					<span class="hidden sm:block px-3">Phone</span>
-					<span class="hidden md:block px-3">Tags</span>
-					<span class="hidden sm:block text-right px-3">Calls</span>
+					{#each COLUMN_DEFS.filter(d => visibleCols.includes(d.key)) as col}
+						<span class="hidden sm:block px-3 {col.key === 'calls' ? 'text-right' : ''}">{col.label}</span>
+					{/each}
 				</div>
+				{#if showColFilters || colFiltersActive}
+					<div class="flex items-center gap-2 px-4 py-2 border-b border-[#1a1a1a] bg-[#0d0d0d] flex-wrap">
+						<select bind:value={colFilters.status} onchange={onColFilterChange}
+							class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+							<option value="">Any status</option>
+							{#each ['active', 'inactive', 'do_not_call', 'customer'] as st}
+								<option value={st}>{st.replace(/_/g, ' ')}</option>
+							{/each}
+						</select>
+						<input bind:value={colFilters.email} oninput={onColFilterChange} placeholder="Filter email…"
+							class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-32" />
+						<input bind:value={colFilters.title} oninput={onColFilterChange} placeholder="Filter title…"
+							class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-32" />
+						<input bind:value={colFilters.lead_source} oninput={onColFilterChange} placeholder="Filter lead source…"
+							class="rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-36" />
+						{#if colFiltersActive}
+							<button onclick={clearColFilters} class="text-xs text-[#8a8a8a] hover:text-white transition-colors">✕ Clear</button>
+						{/if}
+					</div>
+				{/if}
 				<!-- Bulk actions bar -->
 				{#if selectedIds.size > 0}
 					<div class="flex items-center gap-3 px-8 py-4 bg-blue-400/10 border-b border-blue-400/20 text-xs text-blue-300 flex-wrap">
@@ -389,7 +478,7 @@
 					<div class="pl-4 flex-shrink-0">
 						<input type="checkbox" checked={selectedIds.has(contact.id)} onchange={() => toggleSelect(contact.id)} class="accent-blue-400" />
 					</div>
-					<div class="flex-1 min-w-0"><ContactRow {contact} onQuickNote={openQuickNote} onQuickTask={openQuickTask} /></div>
+					<div class="flex-1 min-w-0"><ContactRow {contact} columns={visibleCols} onQuickNote={openQuickNote} onQuickTask={openQuickTask} /></div>
 				</div>
 			{/each}
 

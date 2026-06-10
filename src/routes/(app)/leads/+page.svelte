@@ -13,11 +13,18 @@
 	let scraped = $state<ScrapedContact[]>([]);
 	let scrapeError = $state('');
 
-	// Screenshot
-	let imgFile = $state<File | null>(null);
-	let imgPreview = $state('');
+	// Screenshot (supports batches)
+	let imgFiles = $state<File[]>([]);
+	let imgPreviews = $state<string[]>([]);
 	let extracting = $state(false);
+	let extractProgress = $state('');
 	let extracted = $state<Partial<ScrapedContact> | null>(null);
+
+	// Assignment targets applied when adding scraped contacts
+	let assignCallList = $state('');
+	let assignCampaign = $state('');
+	let campaigns = $state<{ id: string; name: string }[]>([]);
+	let addingAll = $state(false);
 
 	// Enrichment
 	let contacts = $state<Contact[]>([]);
@@ -65,14 +72,16 @@
 	interface StreamerInfo { name?: string; handle?: string; platform?: string; game?: string; followers?: string; email?: string; bio?: string; confidence?: number; }
 
 	onMount(async () => {
-		const [hr, cr, lr] = await Promise.all([
+		const [hr, cr, lr, cpr] = await Promise.all([
 			apiFetch('/api/scraper'),
 			apiFetch('/api/contacts/filtered?limit=100'),
 			apiFetch('/api/call-lists'),
+			apiFetch('/api/campaigns'),
 		]);
 		history = hr.ok ? await hr.json() : [];
 		contacts = cr.ok ? await cr.json() : [];
 		callLists = lr.ok ? await lr.json() : [];
+		campaigns = cpr.ok ? await cpr.json() : [];
 		loadingHistory = false;
 		loading = false;
 	});
@@ -94,43 +103,61 @@
 
 	function handleImageDrop(e: DragEvent) {
 		e.preventDefault();
-		const file = e.dataTransfer?.files[0];
-		if (file && file.type.startsWith('image/')) loadImage(file);
+		const files = Array.from(e.dataTransfer?.files ?? []).filter(f => f.type.startsWith('image/'));
+		if (files.length) loadImages(files);
 	}
 
 	function handleImageInput(e: Event) {
-		const file = (e.target as HTMLInputElement).files?.[0];
-		if (file) loadImage(file);
+		const files = Array.from((e.target as HTMLInputElement).files ?? []);
+		if (files.length) loadImages(files);
 	}
 
-	function loadImage(file: File) {
-		imgFile = file;
-		const reader = new FileReader();
-		reader.onload = (e) => { imgPreview = e.target?.result as string; };
-		reader.readAsDataURL(file);
+	function loadImages(files: File[]) {
+		imgFiles = [...imgFiles, ...files];
+		for (const file of files) {
+			const reader = new FileReader();
+			reader.onload = (e) => { imgPreviews = [...imgPreviews, e.target?.result as string]; };
+			reader.readAsDataURL(file);
+		}
+	}
+
+	function clearImages() {
+		imgFiles = []; imgPreviews = []; extracted = null; extractProgress = '';
+	}
+
+	function fileToBase64(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
 	}
 
 	async function extractScreenshot() {
-		if (!imgFile) return;
+		if (!imgFiles.length || extracting) return;
 		extracting = true; extracted = null;
-		const reader = new FileReader();
-		reader.onload = async (e) => {
-			const dataUrl = e.target?.result as string;
-			const base64 = dataUrl.split(',')[1];
-			const res = await apiFetch('/api/scraper', {
-				method: 'POST',
-				body: JSON.stringify({ mode: 'screenshot', imageBase64: base64, imageType: imgFile!.type }),
-			});
-			if (res.ok) {
-				const data = await res.json();
-				extracted = data.extracted;
-				if (data.saved) history = [data.saved, ...history];
-			} else {
-				toastError('Failed to extract contact info from screenshot');
-			}
-			extracting = false;
-		};
-		reader.readAsDataURL(imgFile);
+		let ok = 0, failed = 0;
+		for (let i = 0; i < imgFiles.length; i++) {
+			extractProgress = `${i + 1}/${imgFiles.length}`;
+			try {
+				const base64 = await fileToBase64(imgFiles[i]);
+				const res = await apiFetch('/api/scraper', {
+					method: 'POST',
+					body: JSON.stringify({ mode: 'screenshot', imageBase64: base64, imageType: imgFiles[i].type }),
+				});
+				if (res.ok) {
+					const data = await res.json();
+					extracted = data.extracted;
+					if (data.saved) history = [data.saved, ...history];
+					ok++;
+				} else failed++;
+			} catch { failed++; }
+		}
+		if (failed) toastError(`Extracted ${ok} of ${imgFiles.length} screenshot${imgFiles.length !== 1 ? 's' : ''}`);
+		else toastSuccess(`Extracted ${ok} screenshot${ok !== 1 ? 's' : ''}`);
+		imgFiles = []; imgPreviews = []; extractProgress = '';
+		extracting = false;
 	}
 
 	async function enrichContact() {
@@ -158,14 +185,35 @@
 		enriching = false;
 	}
 
-	async function acceptContact(id: string) {
-		const res = await apiFetch('/api/scraper/accept', { method: 'POST', body: JSON.stringify({ scrapedId: id }) });
+	async function acceptContact(id: string, quiet = false) {
+		const res = await apiFetch('/api/scraper/accept', {
+			method: 'POST',
+			body: JSON.stringify({
+				scrapedId: id,
+				callListId: assignCallList || undefined,
+				campaignId: assignCampaign || undefined,
+			}),
+		});
 		if (res.ok) {
 			history = history.map(h => h.id === id ? { ...h, status: 'added' } : h);
 			scraped = scraped.map(s => s.id === id ? { ...s, status: 'added' } : s);
-		} else {
-			toastError('Failed to add contact');
+			return true;
 		}
+		if (!quiet) toastError('Failed to add contact');
+		return false;
+	}
+
+	async function addAllPending() {
+		const pending = history.filter(h => h.status !== 'added' && h.status !== 'rejected');
+		if (!pending.length || addingAll) return;
+		addingAll = true;
+		let ok = 0;
+		for (const h of pending) {
+			if (await acceptContact(h.id, true)) ok++;
+		}
+		if (ok === pending.length) toastSuccess(`Added ${ok} contact${ok !== 1 ? 's' : ''}`);
+		else toastError(`Added ${ok} of ${pending.length} contacts`);
+		addingAll = false;
 	}
 
 	async function runSearch() {
@@ -263,7 +311,7 @@
 			{:else if tab === 'screenshot'}
 				<div>
 					<p class="text-xs text-[#999] uppercase tracking-widest mb-3">Extract from Screenshot</p>
-					<p class="text-xs text-[#7c7c7c] mb-4">Upload a screenshot of a business card, LinkedIn profile, or any page with contact info. Claude Vision extracts the details.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Upload screenshots of business cards, LinkedIn profiles, or any pages with contact info — drop several at once. Claude Vision extracts the details from each.</p>
 					<div
 						role="button" tabindex="0"
 						class="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors border-[#2a2a2a] hover:border-[#444]"
@@ -271,19 +319,32 @@
 						ondrop={handleImageDrop}
 						onclick={() => document.getElementById('img-input')?.click()}
 						onkeydown={(e) => e.key === 'Enter' && document.getElementById('img-input')?.click()}>
-						{#if imgPreview}
-							<img src={imgPreview} alt="preview" class="max-h-40 mx-auto rounded-lg object-contain" />
+						{#if imgPreviews.length}
+							<div class="flex flex-wrap gap-2 justify-center">
+								{#each imgPreviews as preview}
+									<img src={preview} alt="preview" class="max-h-24 rounded-lg object-contain border border-[#2a2a2a]" />
+								{/each}
+							</div>
+							<p class="text-[#6e6e6e] text-xs mt-2">{imgFiles.length} image{imgFiles.length !== 1 ? 's' : ''} queued — drop more or click to add</p>
 						{:else}
-							<p class="text-[#8a8a8a] text-sm">Drop image or click to upload</p>
-							<p class="text-[#6e6e6e] text-xs mt-1">PNG, JPG, WebP</p>
+							<p class="text-[#8a8a8a] text-sm">Drop images or click to upload</p>
+							<p class="text-[#6e6e6e] text-xs mt-1">PNG, JPG, WebP — multiple at once supported</p>
 						{/if}
-						<input id="img-input" type="file" accept="image/*" class="hidden" onchange={handleImageInput} />
+						<input id="img-input" type="file" accept="image/*" multiple class="hidden" onchange={handleImageInput} />
 					</div>
-					{#if imgFile}
-						<button onclick={extractScreenshot} disabled={extracting}
-							class="w-full rounded-lg bg-white py-2.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors">
-							{extracting ? 'Extracting with Claude Vision...' : 'Extract Contact Info'}
-						</button>
+					{#if imgFiles.length}
+						<div class="flex gap-2 mt-3">
+							<button onclick={extractScreenshot} disabled={extracting}
+								class="flex-1 rounded-lg bg-white py-2.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors">
+								{extracting
+									? `Extracting ${extractProgress} with Claude Vision...`
+									: imgFiles.length === 1 ? 'Extract Contact Info' : `Extract ${imgFiles.length} Screenshots`}
+							</button>
+							<button onclick={clearImages} disabled={extracting}
+								class="rounded-lg border border-[#2a2a2a] px-3 py-2.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white disabled:opacity-40 transition-colors">
+								Clear
+							</button>
+						</div>
 					{/if}
 					{#if extracted}
 						<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 space-y-2 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
@@ -449,7 +510,28 @@
 		<!-- Right: scraped contacts history -->
 		<div class="flex-1 flex flex-col overflow-hidden">
 			<div class="border-b border-[#1e1e1e] px-5 py-3">
-				<p class="text-xs text-white font-medium">Scraped Contacts <span class="text-[#6e6e6e] font-normal">({history.length})</span></p>
+				<div class="flex items-center justify-between gap-3 flex-wrap">
+					<p class="text-xs text-white font-medium">Scraped Contacts <span class="text-[#6e6e6e] font-normal">({history.length})</span></p>
+					{#if history.some(h => h.status !== 'added' && h.status !== 'rejected')}
+						<button onclick={addAllPending} disabled={addingAll}
+							class="rounded px-2.5 py-1 text-xs bg-white text-black font-semibold hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors">
+							{addingAll ? 'Adding…' : `+ Add all (${history.filter(h => h.status !== 'added' && h.status !== 'rejected').length})`}
+						</button>
+					{/if}
+				</div>
+				<div class="flex items-center gap-2 mt-2">
+					<span class="text-[10px] text-[#6e6e6e] uppercase tracking-widest whitespace-nowrap">Add to</span>
+					<select bind:value={assignCallList}
+						class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+						<option value="">No call list</option>
+						{#each callLists as l}<option value={l.id}>{l.name}</option>{/each}
+					</select>
+					<select bind:value={assignCampaign}
+						class="flex-1 min-w-0 rounded border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white focus:outline-none">
+						<option value="">No campaign</option>
+						{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
+					</select>
+				</div>
 			</div>
 			<div class="flex-1 overflow-y-auto">
 				{#if loadingHistory}

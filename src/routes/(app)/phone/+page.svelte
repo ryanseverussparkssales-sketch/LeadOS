@@ -615,20 +615,20 @@
 
 		<div class="flex-1 flex flex-col items-center px-5 py-4 gap-3">
 			<!-- Number display -->
-			<div class="w-full rounded-xl border border-[#2a2a2a] bg-[#111] px-4 h-[52px] flex items-center hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
+			<div class="w-full max-w-full overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#111] px-4 h-[52px] flex items-center hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
 				{#if callState === 'connected'}
-					<span class="flex-1 text-center text-[var(--call)] text-xl font-mono leading-none">{formatDuration(callDuration)}</span>
-					<span class="flex items-center gap-1.5 text-[#9a9a9a]">
+					<span class="flex-1 min-w-0 truncate text-center text-[var(--call)] text-xl font-mono leading-none">{formatDuration(callDuration)}</span>
+					<span class="flex items-center gap-1.5 text-[#9a9a9a] flex-shrink-0">
 						{#if muted}<Icon name="micOff" size={14} />{/if}
 						{#if onHold}<Icon name="pause" size={14} />{/if}
 					</span>
 				{:else if callState === 'calling'}
-					<span class="flex-1 text-center text-yellow-400 text-sm font-mono animate-pulse leading-none">Calling {number}…</span>
+					<span class="flex-1 min-w-0 truncate text-center text-yellow-400 text-sm font-mono animate-pulse leading-none">Calling {number}…</span>
 				{:else}
 					<input bind:value={number} placeholder="+1 555 000 0000"
-						class="flex-1 bg-transparent text-white text-center text-xl outline-none placeholder-[#333] font-mono leading-none" style="line-height:1" />
+						class="flex-1 min-w-0 bg-transparent text-white text-center outline-none placeholder-[#333] font-mono leading-none {number.length > 14 ? 'text-base' : 'text-xl'}" style="line-height:1" />
 					{#if number}
-						<button onclick={() => number=number.slice(0,-1)} class="text-[#7c7c7c] hover:text-white px-1 leading-none flex items-center" aria-label="Delete digit"><Icon name="backspace" size={18} /></button>
+						<button onclick={() => number=number.slice(0,-1)} class="flex-shrink-0 text-[#7c7c7c] hover:text-white px-1 leading-none flex items-center" aria-label="Delete digit"><Icon name="backspace" size={18} /></button>
 					{/if}
 				{/if}
 			</div>

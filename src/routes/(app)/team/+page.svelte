@@ -37,6 +37,10 @@
 	}
 	let members = $state<Member[]>([]);
 	let inviteEmail = $state('');
+	let inviteFirst = $state('');
+	let inviteLast = $state('');
+	let invitePhone = $state('');
+	let sendingInviteId = $state<string | null>(null);
 	let inviteRole = $state('agent');
 	let inviting = $state(false);
 	let inviteMsg = $state('');
@@ -137,7 +141,7 @@
 	onMount(load);
 
 	// ── Member actions ────────────────────────────────────────
-	async function invite() {
+	async function addMember(sendInviteNow: boolean) {
 		if (!inviteEmail.trim()) return;
 		if (inviteAsClient && !inviteClientId) { inviteMsg = 'Error: select a client to link this portal user to'; return; }
 		inviting = true; inviteMsg = '';
@@ -145,25 +149,46 @@
 			method: 'POST',
 			body: JSON.stringify({
 				email: inviteEmail,
+				firstName: inviteFirst,
+				lastName: inviteLast,
+				phone: invitePhone,
 				role: inviteAsClient ? 'client' : inviteRole,
 				clientId: inviteAsClient ? inviteClientId : null,
 				portalAccess: inviteAsClient,
+				invite: sendInviteNow,
 			}),
 		});
 		if (res.ok) {
 			const m = await res.json();
 			members = [m, ...members];
-			inviteEmail = '';
+			inviteEmail = ''; inviteFirst = ''; inviteLast = ''; invitePhone = '';
 			inviteAsClient = false;
 			inviteClientId = '';
 			inviteMsg = m.status === 'active'
 				? `✓ ${m.member_email} added as ${m.role}`
-				: `Invite created for ${m.member_email}`;
+				: m.status === 'added'
+					? `✓ ${m.member_email} added to roster — invite them when ready`
+					: `✓ Invite sent to ${m.member_email}`;
 		} else {
 			const e = await res.json();
 			inviteMsg = `Error: ${e.message}`;
 		}
 		inviting = false;
+	}
+
+	async function sendInvite(memberId: string) {
+		sendingInviteId = memberId;
+		const res = await apiFetch(`/api/team/${memberId}/invite`, { method: 'POST' });
+		if (res.ok) {
+			const m = await res.json();
+			members = members.map(x => x.id === memberId ? { ...x, ...m } : x);
+			if (m.email_sent) toastSuccess(`Invite sent to ${m.member_email}`);
+			else toastError('Invite recorded, but the email could not be delivered');
+		} else {
+			const e = await res.json().catch(() => ({ message: 'Invite failed' }));
+			toastError(e.message ?? 'Invite failed');
+		}
+		sendingInviteId = null;
 	}
 
 	async function updateRole(id: string, role: string) {
@@ -281,10 +306,18 @@
 
 			<!-- Invite form -->
 			<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-4 mb-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
-				<div class="text-xs text-[#8a8a8a] uppercase tracking-wide mb-3">Invite Team Member</div>
+				<div class="text-xs text-[#8a8a8a] uppercase tracking-wide mb-3">Add Team Member</div>
+				<div class="flex gap-3 mb-2">
+					<input bind:value={inviteFirst} placeholder="First name"
+						class="flex-1 border border-[#2a2a2a] bg-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					<input bind:value={inviteLast} placeholder="Last name"
+						class="flex-1 border border-[#2a2a2a] bg-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					<input bind:value={invitePhone} type="tel" placeholder="Phone (optional)"
+						class="flex-1 border border-[#2a2a2a] bg-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+				</div>
 				<div class="flex gap-3">
 					<input bind:value={inviteEmail} type="email" placeholder="colleague@company.com"
-						onkeydown={(e) => e.key === 'Enter' && invite()}
+						onkeydown={(e) => e.key === 'Enter' && addMember(false)}
 						class="flex-1 border border-[#2a2a2a] bg-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 					{#if !inviteAsClient}
 						<select bind:value={inviteRole} class="border border-[#2a2a2a] bg-[#1a1a1a] rounded-lg px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
@@ -293,8 +326,14 @@
 							<option value="manager">Manager — sees full admin</option>
 						</select>
 					{/if}
-					<button onclick={invite} disabled={inviting || !inviteEmail.trim()} class="bg-white px-4 py-2 rounded-lg text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors whitespace-nowrap">
-						{inviting ? 'Inviting…' : 'Invite'}
+					<button onclick={() => addMember(false)} disabled={inviting || !inviteEmail.trim()}
+						class="border border-[#2a2a2a] px-4 py-2 rounded-lg text-xs font-semibold text-white hover:border-white disabled:opacity-40 transition-colors whitespace-nowrap"
+						title="Add to roster without sending an invite — set up their HR profile first">
+						{inviting ? '…' : 'Add'}
+					</button>
+					<button onclick={() => addMember(true)} disabled={inviting || !inviteEmail.trim()}
+						class="bg-white px-4 py-2 rounded-lg text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40 transition-colors whitespace-nowrap">
+						{inviting ? 'Working…' : 'Add + Invite'}
 					</button>
 				</div>
 
@@ -346,6 +385,13 @@
 								</div>
 							{/if}
 							<div class="flex items-center gap-2">
+								{#if member.status === 'added' || member.status === 'pending'}
+									<button onclick={() => sendInvite(member.id)} disabled={sendingInviteId === member.id}
+										class="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/40 rounded px-2 py-0.5 hover:border-blue-400 transition-colors font-medium disabled:opacity-40"
+										title={member.status === 'added' ? 'Send their invite email' : 'Resend the invite email'}>
+										{sendingInviteId === member.id ? 'Sending…' : member.status === 'added' ? 'Invite' : 'Resend invite'}
+									</button>
+								{/if}
 								{#if member.role === 'sdr' && !member.verbal_approved_at}
 									<button onclick={() => approveVerbal(member.id)}
 										class="text-xs text-[var(--accent)] hover:text-[var(--accent-hi)] border border-[var(--accent)]/40 rounded px-2 py-0.5 hover:border-[var(--accent)] transition-colors font-medium"
@@ -367,7 +413,7 @@
 					{/each}
 				</div>
 			{:else}
-				<p class="text-[#6e6e6e] text-sm">No team members yet. Invite your first agent above.</p>
+				<p class="text-[#6e6e6e] text-sm">No team members yet. Add your first agent above.</p>
 			{/if}
 
 			<!-- Permissions panel -->
