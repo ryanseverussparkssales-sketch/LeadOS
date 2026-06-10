@@ -68,8 +68,24 @@ export async function processCallRecording(callId: string, recordingUrl: string)
 		});
 
 		if (claudeRes.ok) {
-			const claudeData = await claudeRes.json() as { content: Array<{ type: string; text: string }> };
+			const claudeData = await claudeRes.json() as {
+				content: Array<{ type: string; text: string }>;
+				usage?: { input_tokens?: number; output_tokens?: number };
+			};
 			summary = claudeData.content[0]?.type === 'text' ? claudeData.content[0].text : '';
+			// Real per-tenant AI cost (replaces the old hardcoded 150/100 estimate).
+			try {
+				const { data: c } = await supabaseAdmin.from('calls').select('user_id').eq('id', callId).single();
+				if (c?.user_id && claudeData.usage) {
+					const { logAiUsage } = await import('./analytics');
+					await logAiUsage({
+						userId: c.user_id, callId, source: 'call_summary',
+						model: 'claude-haiku-4-5-20251001',
+						inputTokens: claudeData.usage.input_tokens ?? 0,
+						outputTokens: claudeData.usage.output_tokens ?? 0,
+					});
+				}
+			} catch { /* cost logging is non-fatal */ }
 		} else {
 			const err = await claudeRes.text();
 			console.error('Claude summarization failed:', claudeRes.status, err);
@@ -128,14 +144,28 @@ Return JSON only:
 			body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 300, messages: [{ role: 'user', content: prompt }] }),
 		});
 		if (!res.ok) return;
-		const data = await res.json() as { content: Array<{type:string;text:string}> };
+		const data = await res.json() as {
+			content: Array<{type:string;text:string}>;
+			usage?: { input_tokens?: number; output_tokens?: number };
+		};
 		const text = data.content[0]?.text ?? '{}';
 		const match = text.match(/\{[\s\S]*\}/);
 		if (!match) return;
 		const parsed = JSON.parse(match[0]);
+		const { data: c } = await supabaseAdmin.from('calls').select('user_id').eq('id', callId).single();
 		await supabaseAdmin.from('calls').update({
 			quality_score: Math.min(10, Math.max(0, Math.round(parsed.score ?? 5))),
 			quality_breakdown: JSON.stringify(parsed),
 		}).eq('id', callId);
+		// Real AI cost for the scoring call.
+		if (c?.user_id && data.usage) {
+			const { logAiUsage } = await import('./analytics');
+			await logAiUsage({
+				userId: c.user_id, callId, source: 'call_score',
+				model: 'claude-haiku-4-5-20251001',
+				inputTokens: data.usage.input_tokens ?? 0,
+				outputTokens: data.usage.output_tokens ?? 0,
+			});
+		}
 	} catch { /* non-fatal */ }
 }
