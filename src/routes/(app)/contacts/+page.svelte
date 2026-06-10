@@ -108,7 +108,7 @@
 		if (!quickNoteContactId || !quickNoteText.trim()) return;
 		savingQuickNote = true;
 		try {
-			const res = await apiFetch('/api/contacts/activity', {
+			const res = await apiFetch('/api/contacts/activities', {
 				method: 'POST',
 				body: JSON.stringify({
 					contactId: quickNoteContactId,

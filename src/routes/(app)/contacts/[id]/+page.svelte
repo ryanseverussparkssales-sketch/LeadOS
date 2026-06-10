@@ -433,6 +433,10 @@
 			activityType = 'note'; activityTitle = ''; activityDesc = ''; activityOutcome = ''; activityDuration = '';
 			activityDate = new Date().toISOString().slice(0, 16);
 			showActivityForm = false;
+			toastSuccess('Activity logged');
+		} else {
+			const body = await res.text().catch(() => '');
+			toastError(`Failed to log activity${body ? ': ' + body.slice(0, 80) : ''}`);
 		}
 		savingActivity = false;
 	}

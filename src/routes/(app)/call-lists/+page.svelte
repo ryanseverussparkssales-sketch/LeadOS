@@ -10,7 +10,10 @@
 
 	interface Client { id: string; name: string; }
 	interface Project { id: string; name: string; client: Client; }
-	interface CallList { id: string; name: string; status: string; project: Project; call_list_contacts: [{count: number}]; }
+	interface Campaign { id: string; name: string; project: Project; }
+	interface CallList { id: string; name: string; status: string; campaign: Campaign | null; call_list_contacts: [{count: number}]; }
+	// The API nests ownership under campaign -> project -> client
+	function listProject(l: CallList): Project | undefined { return l.campaign?.project; }
 
 	let lists = $state<CallList[]>([]);
 	let loading = $state(true);
@@ -27,12 +30,16 @@
 	let selectedToAdd = $state<string[]>([]);
 
 	onMount(async () => {
-		await loadLists();
-		// Pre-select from URL param
-		const idParam = $page.url.searchParams.get('id');
-		if (idParam) {
-			const found = lists.find(l => l.id === idParam);
-			if (found) await selectList(found);
+		try {
+			await loadLists();
+			// Pre-select from URL param
+			const idParam = $page.url.searchParams.get('id');
+			if (idParam) {
+				const found = lists.find(l => l.id === idParam);
+				if (found) await selectList(found);
+			}
+		} finally {
+			loading = false;
 		}
 	});
 
@@ -97,11 +104,11 @@
 	);
 
 	const uniqueClients = $derived(
-		[...new Map(lists.map(l => [l.project?.client?.id, l.project?.client])).values()].filter(Boolean)
+		[...new Map(lists.map(l => [listProject(l)?.client?.id, listProject(l)?.client])).values()].filter(Boolean)
 	);
 
 	const filteredLists = $derived(
-		filterClient ? lists.filter(l => l.project?.client?.id === filterClient) : lists
+		filterClient ? lists.filter(l => listProject(l)?.client?.id === filterClient) : lists
 	);
 
 	function contactCount(list: CallList) {
@@ -140,7 +147,7 @@
 				<button onclick={() => selectList(list)}
 					class="w-full text-left px-4 py-3 border-b border-[#1e1e1e] transition-colors {selected?.id === list.id ? 'bg-white/10' : 'hover:bg-white/5'}">
 					<p class="text-sm text-white font-medium truncate">{list.name}</p>
-					<p class="text-xs text-[#7c7c7c] mt-0.5">{list.project?.client?.name} › {list.project?.name}</p>
+					<p class="text-xs text-[#7c7c7c] mt-0.5">{[listProject(list)?.client?.name, listProject(list)?.name].filter(Boolean).join(' › ') || 'No campaign'}</p>
 					<p class="text-xs text-[#6e6e6e] mt-0.5">{contactCount(list)} contacts</p>
 				</button>
 			{:else}
@@ -155,7 +162,7 @@
 				<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
 					<div>
 						<p class="text-white text-sm font-medium">{selected.name}</p>
-						<p class="text-xs text-[#7c7c7c]">{selected.project?.client?.name} › {selected.project?.name}</p>
+						<p class="text-xs text-[#7c7c7c]">{[listProject(selected)?.client?.name, listProject(selected)?.name].filter(Boolean).join(' › ') || 'No campaign'}</p>
 					</div>
 					<div class="flex gap-2">
 						<button onclick={loadAllContacts}

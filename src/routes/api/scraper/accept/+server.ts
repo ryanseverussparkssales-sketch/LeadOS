@@ -9,9 +9,18 @@ async function assignContact(userId: string, contactId: string, callListId?: str
 	const assigned = { callList: false, campaign: false };
 
 	if (callListId) {
+		// Ownership: direct user_id, or via campaign/project -> client (legacy lists have null user_id)
 		const { data: list } = await supabaseAdmin
-			.from('call_lists').select('id').eq('id', callListId).eq('user_id', userId).maybeSingle();
-		if (list) {
+			.from('call_lists')
+			.select('id, user_id, campaign:campaigns(project:projects(client:clients(user_id))), project:projects(client:clients(user_id))')
+			.eq('id', callListId).maybeSingle();
+		type OwnerJoin = { project?: { client?: { user_id?: string } }, client?: { user_id?: string } };
+		const listOwned = list && (
+			list.user_id === userId ||
+			(list.campaign as unknown as OwnerJoin)?.project?.client?.user_id === userId ||
+			(list.project as unknown as OwnerJoin)?.client?.user_id === userId
+		);
+		if (listOwned) {
 			const { data: already } = await supabaseAdmin
 				.from('call_list_contacts').select('id').eq('call_list_id', callListId).eq('contact_id', contactId).maybeSingle();
 			if (!already) {
