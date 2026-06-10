@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { assertAiAccess } from '$lib/server/tier';
 import { safeFetch } from '$lib/server/ssrf';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { MODELS } from '$lib/server/models';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 
@@ -99,7 +100,7 @@ Return ONLY the JSON object, nothing else.`;
 			method: 'POST',
 			headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
 			body: JSON.stringify({
-				model: 'claude-opus-4-6',
+				model: MODELS.opus,
 				max_tokens: 500,
 				messages: [{
 					role: 'user',

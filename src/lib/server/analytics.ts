@@ -8,6 +8,7 @@ export const MODEL_PRICING: Record<string, { input: number; output: number }> = 
 	'claude-sonnet-4-5':         { input: 0.003,  output: 0.015 },
 	'claude-sonnet-4-6':         { input: 0.003,  output: 0.015 },
 	'claude-opus-4-6':           { input: 0.015,  output: 0.075 },
+	'claude-opus-4-8':           { input: 0.015,  output: 0.075 },
 };
 const DEFAULT_PRICE = { input: 0.0008, output: 0.004 }; // fall back to Haiku rates
 
