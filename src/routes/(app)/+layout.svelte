@@ -59,6 +59,18 @@
 			}
 			currentUser.set(session.user);
 
+			// Account gate — a super-admin can suspend a tenant; block the app shell here.
+			try {
+				const { apiFetch } = await import('$lib/api');
+				const stateRes = await apiFetch('/api/account/state');
+				if (stateRes.ok && (await stateRes.json()).suspended) {
+					const { signOut } = await import('$lib/services/auth');
+					await signOut().catch(() => {});
+					goto('/?suspended=1');
+					return;
+				}
+			} catch { /* fail open — never lock out on a hiccup */ }
+
 			// Init Twilio device globally — non-fatal if it fails.
 			// Fires once per app session; the store guard prevents double-init.
 			initTwilioDevice().catch((err) => {
