@@ -107,6 +107,14 @@ export async function processCallRecording(callId: string, recordingUrl: string)
 
 	if (dbErr) console.error('[AI] Failed to save transcript to DB:', dbErr);
 	else console.log('[AI] Transcript + summary saved for call', callId);
+
+	// ── 5. Embed for semantic search (non-fatal; no-op without VOYAGE_API_KEY) ──
+	try {
+		const { embedCall } = await import('./embeddings');
+		await embedCall(callId);
+	} catch (e) {
+		console.error('[AI] embedCall failed:', e instanceof Error ? e.message : e);
+	}
 }
 
 /**

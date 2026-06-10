@@ -173,6 +173,18 @@ const TOOLS: Anthropic.Tool[] = [
 			}
 		}
 	},
+	{
+		name: 'search_calls',
+		description: 'Semantic search over the user\'s past CALLS by meaning (not just keywords). Use when the user asks what was discussed about a topic — e.g. "which calls mentioned pricing concerns", "find calls about the integration", "when did someone bring up budget". Searches transcripts and summaries.',
+		input_schema: {
+			type: 'object' as const,
+			properties: {
+				query: { type: 'string', description: 'Natural-language description of what to find in past calls' },
+				limit: { type: 'number', description: 'Max results (default 5)' },
+			},
+			required: ['query'],
+		},
+	},
 ];
 
 // ── Due date helpers ──────────────────────────────────────────────────────────
@@ -333,6 +345,31 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 
 			if (taskErr) return JSON.stringify({ error: `Failed to create task: ${taskErr.message}` });
 			return JSON.stringify({ created: true, task: { id: task.id, title: task.title, due_date: task.due_date, priority: task.priority }, contact: contactId ? contact_name : null });
+		}
+
+		if (name === 'search_calls') {
+			const { searchCalls } = await import('$lib/server/embeddings');
+			const hits = await searchCalls(ownerId, String(input.query ?? ''), Math.min(Number(input.limit ?? 5), 15));
+			if (!hits.length) {
+				return JSON.stringify({ results: [], note: 'No semantically matching calls found (or call embeddings not indexed yet).' });
+			}
+			const ids = hits.map((h) => h.call_id);
+			const { data: calls } = await supabaseAdmin
+				.from('calls')
+				.select('id, created_at, outcome, summary, contact:contacts(name, company)')
+				.in('id', ids)
+				.eq('user_id', ownerId);
+			const byId = new Map((calls ?? []).map((c) => [c.id, c]));
+			const results = hits
+				.map((h) => {
+					const c: any = byId.get(h.call_id);
+					return c ? {
+						date: c.created_at, outcome: c.outcome, summary: c.summary,
+						contact: c.contact?.name ?? null, similarity: Number(h.similarity.toFixed(3)),
+					} : null;
+				})
+				.filter(Boolean);
+			return JSON.stringify({ results });
 		}
 
 		if (name === 'search_records') {
