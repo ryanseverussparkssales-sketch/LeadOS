@@ -6,6 +6,15 @@ export const POST: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
 	const now = new Date().toISOString();
 
+	// Verify the thread belongs to the caller before touching its messages
+	const { data: thread } = await supabaseAdmin
+		.from('sms_threads')
+		.select('id')
+		.eq('id', params.threadId)
+		.eq('user_id', user.id)
+		.maybeSingle();
+	if (!thread) return json({ success: false }, { status: 404 });
+
 	// Mark all unread inbound messages in this thread as read
 	await supabaseAdmin
 		.from('sms_logs')

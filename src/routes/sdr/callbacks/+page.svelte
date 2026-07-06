@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
@@ -38,7 +39,7 @@
 	}
 </script>
 
-<svelte:head><title>My Callbacks — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>My Callbacks — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8">
 	<div class="flex items-center justify-between mb-6">

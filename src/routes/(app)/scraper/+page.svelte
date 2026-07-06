@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastError } from '$lib/stores/toast';
@@ -157,7 +158,7 @@
 		const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/csv' });
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
-		a.download = 'edelhaus-leads.csv';
+		a.download = `${BRAND.toLowerCase()}-leads.csv`;
 		a.click();
 		URL.revokeObjectURL(a.href);
 	}
@@ -172,8 +173,8 @@
 <div class="wrap">
 	<header class="head">
 		<div>
-			<h1 class="font-display title">Edelhaus Scraper</h1>
-			<p class="sub">Pull leads into Edelhaus — geo-targeted Places search, single pages, or open-web keyword sweeps.</p>
+			<h1 class="font-display title">{BRAND} Scraper</h1>
+			<p class="sub">Pull leads into {BRAND} — geo-targeted Places search, single pages, or open-web keyword sweeps.</p>
 		</div>
 		<button class="btn ghost" onclick={exportCsv} disabled={totalShown === 0}>Export CSV</button>
 	</header>

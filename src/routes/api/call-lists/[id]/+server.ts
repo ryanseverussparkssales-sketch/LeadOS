@@ -1,15 +1,16 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 async function verifyListOwner(listId: string, userId: string) {
+	const ownerId = await getEffectiveUserId(userId);
 	const { data } = await supabaseAdmin
 		.from('call_lists')
 		.select('id, project:projects(client:clients(user_id))')
 		.eq('id', listId)
 		.single();
 	const owner = (data?.project as unknown as { client: { user_id: string } })?.client?.user_id;
-	if (!data || owner !== userId) throw error(403, 'Forbidden');
+	if (!data || owner !== ownerId) throw error(403, 'Forbidden');
 	return data;
 }
 

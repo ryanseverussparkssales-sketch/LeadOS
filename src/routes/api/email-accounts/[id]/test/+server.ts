@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, params }) => {
@@ -32,7 +33,7 @@ export const POST: RequestHandler = async ({ request, params }) => {
         const { sendEmail } = await import('$lib/server/email');
         const result = await sendEmail({
             to: account.email_address,
-            subject: 'Edelhaus — Connection Test',
+            subject: `${BRAND} — Connection Test`,
             html: '<p>Your email account is connected and working correctly.</p>',
             text: 'Your email account is connected and working correctly.',
             userId: ownerId,

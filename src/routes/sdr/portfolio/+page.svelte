@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -104,7 +105,7 @@
 	const allClips = $derived(clips.filter(c => !c.is_featured));
 </script>
 
-<svelte:head><title>My Portfolio — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>My Portfolio — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto space-y-8">
 

@@ -2,11 +2,17 @@ import { writable } from 'svelte/store';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
+export interface ToastAction {
+    label: string;
+    run: () => void;
+}
+
 export interface Toast {
     id: string;
     type: ToastType;
     message: string;
     duration?: number; // ms, default 3500
+    action?: ToastAction; // optional inline button (e.g. Undo)
 }
 
 const { subscribe, update } = writable<Toast[]>([]);
@@ -33,3 +39,16 @@ export const toastSuccess = (msg: string, d?: number) => toast(msg, 'success', d
 export const toastError   = (msg: string, d?: number) => toast(msg, 'error',   d ?? 8000);
 export const toastWarning = (msg: string, d?: number) => toast(msg, 'warning', d ?? 6000);
 export const toastInfo    = (msg: string, d?: number) => toast(msg, 'info',    d ?? 5000);
+
+/**
+ * Show an info toast with an "Undo" action button.
+ * Returns the toast id (dismiss it manually if the underlying action completes).
+ */
+export function toastUndo(message: string, onUndo: () => void, duration = 8000): string {
+    const id = Math.random().toString(36).slice(2);
+    update(all => [...all, { id, type: 'info', message, duration, action: { label: 'Undo', run: onUndo } }]);
+    if (duration > 0) {
+        setTimeout(() => dismiss(id), duration);
+    }
+    return id;
+}

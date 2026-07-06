@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Dialer from '$lib/components/Dialer.svelte';
+	import { titleFor } from '$lib/brand';
 </script>
 
 <svelte:head>
-	<title>Dialer — Edelhaus</title>
+	<title>{titleFor('Dialer')}</title>
 </svelte:head>
 
 <div class="flex flex-col flex-1 h-full">

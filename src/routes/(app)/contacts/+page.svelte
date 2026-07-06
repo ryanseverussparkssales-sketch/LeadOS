@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import FilterSidebar from '$lib/components/FilterSidebar.svelte';
 	import ContactRow from '$lib/components/ContactRow.svelte';
@@ -7,8 +8,35 @@
 	import NewContactModal from '$lib/components/NewContactModal.svelte';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import type { Contact, Filters, Tag } from '$lib/stores';
-	import { toastSuccess, toastError } from '$lib/stores/toast';
+	import { toastSuccess, toastError, toastUndo } from '$lib/stores/toast';
+
+	// ── In-app confirm dialog (replaces window.confirm) ─────────
+	let confirmOpen = $state(false);
+	let confirmState = $state<{
+		title: string;
+		message: string;
+		confirmLabel: string;
+		danger: boolean;
+		onConfirm: () => void;
+	}>({ title: '', message: '', confirmLabel: 'Confirm', danger: false, onConfirm: () => {} });
+
+	function askConfirm(opts: { title: string; message?: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void }) {
+		confirmState = {
+			title: opts.title,
+			message: opts.message ?? '',
+			confirmLabel: opts.confirmLabel ?? 'Confirm',
+			danger: opts.danger ?? false,
+			onConfirm: opts.onConfirm,
+		};
+		confirmOpen = true;
+	}
+
+	// ── Overflow menu (secondary header actions) ────────────────
+	let showOverflow = $state(false);
 
 	let contacts = $state<Contact[]>([]);
 	let totalContacts = $state(0);
@@ -20,7 +48,6 @@
 	let loading = $state(true);
 	let showImport = $state(false);
 	let showNewContact = $state(false);
-	let showExport = $state(false);
 	let activeFilters = $state<Filters>({});
 
 	// ── Columns (visibility persisted) + per-column filters ─────
@@ -42,7 +69,6 @@
 		return ['phone', 'tags', 'calls'];
 	}
 	let visibleCols = $state<string[]>(['phone', 'tags', 'calls']);
-	let showColumns = $state(false);
 	function toggleCol(key: string) {
 		visibleCols = visibleCols.includes(key)
 			? visibleCols.filter(k => k !== key)
@@ -167,9 +193,20 @@
 	let sendingBulkSms = $state(false);
 	let bulkSmsResult = $state('');
 
-	async function sendBulkSms() {
+	function sendBulkSms() {
 		if (!bulkSmsBody.trim()) return;
-		if (!window.confirm(`Send this SMS to ${selectedIds.size} contact${selectedIds.size !== 1 ? 's' : ''}? This sends real text messages.`)) return;
+		const count = selectedIds.size;
+		askConfirm({
+			title: `Send SMS to ${count} contact${count !== 1 ? 's' : ''}?`,
+			message: 'This sends real text messages. Contacts without a phone number will be skipped.',
+			confirmLabel: 'Send',
+			danger: true,
+			onConfirm: doSendBulkSms,
+		});
+	}
+
+	async function doSendBulkSms() {
+		if (!bulkSmsBody.trim()) return;
 		sendingBulkSms = true; bulkSmsResult = '';
 		let sent = 0, failed = 0;
 		const ids = [...selectedIds];
@@ -262,6 +299,125 @@
 		bulkTaskSaving = false;
 	}
 
+	// ── Workstream 2F: bulk actions (tag / campaign / call list / DNC / delete) ──
+	let bulkCampaigns = $state<{ id: string; name: string }[]>([]);
+	let bulkCallLists = $state<{ id: string; name: string; campaignName: string | null }[]>([]);
+	let bulkPickersLoaded = $state(false);
+	let bulkActionRunning = $state(false);
+
+	async function loadBulkPickers() {
+		if (bulkPickersLoaded) return;
+		bulkPickersLoaded = true;
+		try {
+			const [cr, lr] = await Promise.all([apiFetch('/api/campaigns'), apiFetch('/api/call-lists')]);
+			if (cr.ok) {
+				const d = await cr.json();
+				bulkCampaigns = (Array.isArray(d) ? d : []).map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }));
+			}
+			if (lr.ok) {
+				const d = await lr.json();
+				bulkCallLists = (Array.isArray(d) ? d : []).map((l: { id: string; name: string; campaign?: { name?: string } }) => ({
+					id: l.id,
+					name: l.name,
+					campaignName: l.campaign?.name ?? null,
+				}));
+			}
+		} catch {
+			// Non-fatal — pickers just stay empty
+		}
+	}
+
+	$effect(() => {
+		if (selectedIds.size > 0) loadBulkPickers();
+	});
+
+	async function runBulkAction(
+		action: 'add_tag' | 'assign_campaign' | 'add_to_call_list' | 'mark_dnc' | 'soft_delete',
+		payload?: { tagId?: string; campaignId?: string; callListId?: string },
+	) {
+		if (!selectedIds.size || bulkActionRunning) return;
+		// Snapshot the affected ids (and, for reversible actions, their prior state)
+		// BEFORE mutating, so we can offer a genuine Undo afterwards.
+		const affectedIds = [...selectedIds];
+		const priorStatus = new Map<string, string>();
+		if (action === 'mark_dnc') {
+			for (const c of contacts) {
+				if (selectedIds.has(c.id)) priorStatus.set(c.id, (c as { status?: string }).status || 'active');
+			}
+		}
+		bulkActionRunning = true;
+		try {
+			const res = await apiFetch('/api/contacts/bulk', {
+				method: 'POST',
+				body: JSON.stringify({ ids: affectedIds, action, payload }),
+			});
+			if (res.ok) {
+				const d = await res.json();
+				const processed: number = d.processed ?? 0;
+				selectedIds = new Set();
+				await loadContacts(activeFilters, currentPage);
+				// Reversible destructive actions get an Undo toast; everything else a plain success.
+				if (action === 'soft_delete' && processed > 0) {
+					toastUndo(
+						`${processed} contact${processed !== 1 ? 's' : ''} deleted`,
+						() => undoSoftDelete(affectedIds),
+					);
+				} else if (action === 'mark_dnc' && processed > 0) {
+					toastUndo(
+						`${processed} contact${processed !== 1 ? 's' : ''} marked Do Not Call`,
+						() => undoMarkDnc(priorStatus),
+					);
+				} else {
+					toastSuccess(`${processed} contact${processed !== 1 ? 's' : ''} updated${d.skipped ? `, ${d.skipped} skipped` : ''}`);
+				}
+			} else {
+				const body = await res.text().catch(() => '');
+				toastError(`Bulk action failed${body ? ': ' + body.slice(0, 100) : ''}`);
+			}
+		} catch {
+			toastError('Network error running bulk action');
+		} finally {
+			bulkActionRunning = false;
+		}
+	}
+
+	// Undo a soft-delete: clear deleted_at per contact via the existing
+	// PATCH /api/contacts/[id] { restore: true } endpoint.
+	async function undoSoftDelete(ids: string[]) {
+		let restored = 0;
+		for (const id of ids) {
+			try {
+				const res = await apiFetch(`/api/contacts/${id}`, {
+					method: 'PATCH',
+					body: JSON.stringify({ restore: true }),
+				});
+				if (res.ok) restored++;
+			} catch { /* count only successful restores */ }
+		}
+		await loadContacts(activeFilters, currentPage);
+		if (restored) toastSuccess(`${restored} contact${restored !== 1 ? 's' : ''} restored`);
+		else toastError('Could not restore contacts');
+	}
+
+	// Undo a DNC mark: put each contact back to its captured prior status via
+	// the existing PATCH /api/contacts/[id] { status } endpoint.
+	async function undoMarkDnc(priorStatus: Map<string, string>) {
+		let restored = 0;
+		for (const [id, status] of priorStatus) {
+			const target = status === 'do_not_call' ? 'active' : status;
+			try {
+				const res = await apiFetch(`/api/contacts/${id}`, {
+					method: 'PATCH',
+					body: JSON.stringify({ status: target }),
+				});
+				if (res.ok) restored++;
+			} catch { /* count only successful restores */ }
+		}
+		await loadContacts(activeFilters, currentPage);
+		if (restored) toastSuccess(`Restored status for ${restored} contact${restored !== 1 ? 's' : ''}`);
+		else toastError('Could not restore contacts');
+	}
+
 	onMount(async () => {
 		visibleCols = loadCols();
 		await Promise.all([loadContacts({}), loadTags()]);
@@ -315,73 +471,73 @@
 	}
 </script>
 
-<svelte:head><title>Contacts — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Contacts')}</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => {
-	if (!(e.target as Element)?.closest('.export-container')) showExport = false;
-	if (!(e.target as Element)?.closest('.columns-container')) showColumns = false;
+	if (!(e.target as Element)?.closest('.overflow-container')) showOverflow = false;
 }} />
 
 <div class="flex flex-col flex-1 h-full">
-	<div class="border-b border-[#1e1e1e] px-4 sm:px-8 py-4 flex flex-wrap items-center gap-3 justify-between">
-		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">
-			Contacts
+	<PageHeader title="Contacts">
+		{#snippet titleExtra()}
 			{#if !loading}
 				<span class="text-[#6e6e6e] font-normal ml-2">({totalContacts})</span>
 			{/if}
-		</h2>
-		<div class="flex flex-wrap items-center gap-2">
-			<input bind:value={search} oninput={onSearchChange} placeholder="Search contacts..." class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-36 sm:w-48" />
+		{/snippet}
+		{#snippet actions()}
+			<!-- Primary actions: search + New Contact stay visible. -->
+			<input bind:value={search} oninput={onSearchChange} placeholder="Search contacts..." class="rounded-lg border border-[var(--c-border)] bg-[var(--c-input)] px-3 py-1.5 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none w-36 sm:w-48" />
 			<button onclick={() => { showNewContact = true; showImport = false; }}
 				class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
 				+ New
 			</button>
-			<button onclick={() => { showImport = !showImport; showNewContact = false; }}
-				class="rounded-lg border border-[#2a2a2a] px-4 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">
-				{showImport ? 'Hide Import' : 'Import'}
-			</button>
-			<div class="relative columns-container">
-				<button onclick={() => showColumns = !showColumns}
-					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
-					⊞ Columns
+			<!-- Secondary actions collapsed into a single overflow menu. -->
+			<div class="relative overflow-container">
+				<button onclick={() => showOverflow = !showOverflow} aria-label="More actions" aria-haspopup="menu" aria-expanded={showOverflow}
+					class="rounded-lg border border-[var(--c-border)] px-3 py-1.5 text-sm leading-none text-[var(--c-text-muted)] hover:text-white hover:border-white transition-colors">
+					⋯
 				</button>
-				{#if showColumns}
-					<div class="absolute right-0 top-full mt-1 bg-[#111] border border-[var(--c-border-subtle)] rounded-xl shadow-2xl py-2 w-48 z-20">
+				{#if showOverflow}
+					<div class="absolute right-0 top-full mt-1 bg-[var(--c-card)] border border-[var(--c-border-subtle)] rounded-xl shadow-2xl py-2 w-56 z-30" role="menu">
+						<button onclick={() => { showImport = !showImport; showNewContact = false; }}
+							class="w-full text-left px-4 py-2 text-sm text-[var(--c-text-secondary)] hover:text-white hover:bg-white/5 transition-colors">
+							{showImport ? '⊟ Hide Import' : '⤓ Import CSV'}
+						</button>
+
+						<div class="border-t border-[var(--c-border)] my-1"></div>
+
+						<div class="px-4 py-1 text-[10px] uppercase tracking-widest text-[var(--c-text-muted)]">Columns</div>
 						{#each COLUMN_DEFS as col}
-							<label class="flex items-center gap-2 px-4 py-1.5 text-sm text-[#888] hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
+							<label class="flex items-center gap-2 px-4 py-1.5 text-sm text-[var(--c-text-secondary)] hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
 								<input type="checkbox" checked={visibleCols.includes(col.key)} onchange={() => toggleCol(col.key)} class="accent-blue-400" />
 								{col.label}
 							</label>
 						{/each}
-						<div class="border-t border-[#1e1e1e] mt-1 pt-1.5 px-4">
-							<button onclick={() => { showColFilters = !showColFilters; }} class="text-xs text-[#8a8a8a] hover:text-white transition-colors">
+						<div class="px-4 py-1.5">
+							<button onclick={() => { showColFilters = !showColFilters; }} class="text-xs text-[var(--c-text-muted)] hover:text-white transition-colors">
 								{showColFilters ? 'Hide column filters' : 'Show column filters'}
 							</button>
 						</div>
-					</div>
-				{/if}
-			</div>
-			<div class="relative export-container">
-				<button onclick={() => showExport = !showExport}
-					class="rounded-lg border border-[var(--c-border-subtle)] px-4 py-1.5 text-xs text-[#8a8a8a] hover:text-white hover:border-white transition-colors">
-					↓ Export
-				</button>
-				{#if showExport}
-					<div class="absolute right-0 top-full mt-1 bg-[#111] border border-[var(--c-border-subtle)] rounded-xl shadow-2xl py-2 w-48 z-20">
-						<a href="/api/export?type=contacts" download class="block px-4 py-2 text-sm text-[#888] hover:text-white hover:bg-white/5 transition-colors">
+
+						<div class="border-t border-[var(--c-border)] my-1"></div>
+
+						<div class="px-4 py-1 text-[10px] uppercase tracking-widest text-[var(--c-text-muted)]">Export</div>
+						<a href="/api/export?type=contacts" download class="block px-4 py-2 text-sm text-[var(--c-text-secondary)] hover:text-white hover:bg-white/5 transition-colors">
 							Contacts CSV
 						</a>
-						<a href="/api/export?type=calls" download class="block px-4 py-2 text-sm text-[#888] hover:text-white hover:bg-white/5 transition-colors">
+						<a href="/api/export?type=calls" download class="block px-4 py-2 text-sm text-[var(--c-text-secondary)] hover:text-white hover:bg-white/5 transition-colors">
 							Calls CSV
+						</a>
+
+						<div class="border-t border-[var(--c-border)] my-1"></div>
+
+						<a href="/contacts/dedup" class="block px-4 py-2 text-sm text-[var(--c-text-secondary)] hover:text-white hover:bg-white/5 transition-colors">
+							🔗 Find duplicates
 						</a>
 					</div>
 				{/if}
 			</div>
-			<!-- FIX 5: Dedup link -->
-			<a href="/contacts/dedup" class="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
-				🔗 Dedup
-			</a>
-		</div>
-	</div>
+		{/snippet}
+	</PageHeader>
 
 	{#if showImport}
 		<div class="border-b border-[#1e1e1e] p-8 bg-[#0d0d0d]">
@@ -408,18 +564,14 @@
 					{/each}
 				</div>
 			{:else if contacts.length === 0}
-				<div class="flex items-center justify-center py-24 text-center">
-					<div>
-						<p class="text-[#7c7c7c] text-sm">No contacts yet</p>
-						<p class="text-[#333] text-xs mt-1">Create one manually or import a CSV</p>
-						<div class="mt-4 flex gap-3 justify-center">
-							<a href="/import" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#888] hover:border-white hover:text-white transition-colors">Import CSV</a>
-							<button onclick={() => showNewContact = true} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">+ New Contact</button>
-						</div>
-					</div>
-				</div>
+				<EmptyState icon="👥" title="No contacts yet" hint="Create one manually or import a CSV">
+					{#snippet action()}
+						<a href="/import" class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#888] hover:border-white hover:text-white transition-colors">Import CSV</a>
+						<button onclick={() => showNewContact = true} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">+ New Contact</button>
+					{/snippet}
+				</EmptyState>
 			{:else}
-				<div class="px-4 py-2 border-b border-[#1e1e1e] grid text-xs text-[#6e6e6e]" style="grid-template-columns: minmax(0,1fr) repeat({visibleCols.length}, auto);">
+				<div class="sticky top-0 z-10 bg-[var(--c-card)] px-4 py-2 border-b border-[var(--c-border)] grid text-xs uppercase tracking-wider text-[var(--c-text-muted)]" style="grid-template-columns: minmax(0,1fr) repeat({visibleCols.length}, auto);">
 					<span>Name / Company</span>
 					{#each COLUMN_DEFS.filter(d => visibleCols.includes(d.key)) as col}
 						<span class="hidden sm:block px-3 {col.key === 'calls' ? 'text-right' : ''}">{col.label}</span>
@@ -458,6 +610,56 @@
 					<button onclick={() => showBulkSms = true} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
 						💬 SMS ({selectedIds.size})
 					</button>
+					<!-- Workstream 2F: bulk tag / campaign / call list / DNC / delete -->
+					<select disabled={bulkActionRunning}
+						onchange={(e) => { const el = e.currentTarget as HTMLSelectElement; const v = el.value; el.value = ''; if (v) runBulkAction('add_tag', { tagId: v }); }}
+						class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-[#9a9a9a] focus:border-white focus:outline-none disabled:opacity-40">
+						<option value="">🏷 Add tag…</option>
+						{#each tags as t}
+							<option value={t.id}>{t.name}</option>
+						{/each}
+					</select>
+					<select disabled={bulkActionRunning}
+						onchange={(e) => { const el = e.currentTarget as HTMLSelectElement; const v = el.value; el.value = ''; if (v) runBulkAction('assign_campaign', { campaignId: v }); }}
+						class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-[#9a9a9a] focus:border-white focus:outline-none disabled:opacity-40">
+						<option value="">📣 Assign campaign…</option>
+						{#each bulkCampaigns as c}
+							<option value={c.id}>{c.name}</option>
+						{/each}
+					</select>
+					<select disabled={bulkActionRunning}
+						onchange={(e) => { const el = e.currentTarget as HTMLSelectElement; const v = el.value; el.value = ''; if (v) runBulkAction('add_to_call_list', { callListId: v }); }}
+						class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2 py-1.5 text-xs text-[#9a9a9a] focus:border-white focus:outline-none disabled:opacity-40">
+						<option value="">📋 Add to call list…</option>
+						{#each bulkCallLists as l}
+							<option value={l.id}>{l.name}{l.campaignName ? ` — ${l.campaignName}` : ''}</option>
+						{/each}
+					</select>
+					<button disabled={bulkActionRunning}
+						onclick={() => askConfirm({
+							title: `Mark ${selectedIds.size} contact${selectedIds.size !== 1 ? 's' : ''} as Do Not Call?`,
+							message: 'They will be flagged and skipped by the dialer. You can undo this.',
+							confirmLabel: 'Mark DNC',
+							danger: true,
+							onConfirm: () => runBulkAction('mark_dnc'),
+						})}
+						class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors disabled:opacity-40">
+						🚫 DNC
+					</button>
+					<button disabled={bulkActionRunning}
+						onclick={() => askConfirm({
+							title: `Delete ${selectedIds.size} contact${selectedIds.size !== 1 ? 's' : ''}?`,
+							message: 'They will no longer appear in your contact list. You can undo this.',
+							confirmLabel: 'Delete',
+							danger: true,
+							onConfirm: () => runBulkAction('soft_delete'),
+						})}
+						class="rounded-lg border border-red-500/30 px-3 py-1.5 text-xs text-red-400 hover:border-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
+						🗑 Delete
+					</button>
+					{#if bulkActionRunning}
+						<span class="text-[#8a8a8a]">Working…</span>
+					{/if}
 					<button onclick={() => selectedIds = new Set()} class="text-[#8a8a8a] hover:text-white transition-colors ml-auto">Deselect</button>
 				</div>
 			{/if}
@@ -474,7 +676,7 @@
 			</div>
 
 			{#each contacts as contact}
-				<div class="flex items-center border-b border-[#1a1a1a]">
+				<div class="contact-row flex items-center border-b border-[var(--c-border-ghost)] transition-colors">
 					<div class="pl-4 flex-shrink-0">
 						<input type="checkbox" checked={selectedIds.has(contact.id)} onchange={() => toggleSelect(contact.id)} class="accent-blue-400" />
 					</div>
@@ -510,6 +712,15 @@
 		onCreated={() => loadContacts({})}
 	/>
 {/if}
+
+<ConfirmDialog
+	bind:open={confirmOpen}
+	title={confirmState.title}
+	message={confirmState.message}
+	confirmLabel={confirmState.confirmLabel}
+	danger={confirmState.danger}
+	onConfirm={confirmState.onConfirm}
+/>
 
 	<!-- FIX 4: Bulk SMS modal -->
 	{#if showBulkSms}
@@ -595,3 +806,11 @@
 		</div>
 	</div>
 	{/if}
+
+<style>
+	/* Dense CRM table: subtle hover fill on each contact row. Dividers and the
+	   sticky header are applied inline with design tokens. */
+	.contact-row:hover {
+		background: var(--c-input);
+	}
+</style>

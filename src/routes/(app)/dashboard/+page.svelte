@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import { page } from '$app/stores';
@@ -42,6 +44,52 @@
 	let showPicker = $state(false);
 	let greeting = $state('');
 	let dashboardLoading = $state(true);
+
+	// ── Hero KPI band ────────────────────────────────────────────────────────
+	// Reuses two existing endpoints (no new endpoints): /api/agency for today's
+	// dialing stats + connect rate, /api/deals/forecast for weighted pipeline.
+	// Each source is fetched independently and fails soft — a missing source
+	// leaves its numbers null (rendered as "—"), never fabricated.
+	let heroLoading = $state(true);
+	let heroConnectRate = $state<number | null>(null);
+	let heroDials = $state<number | null>(null);
+	let heroWins = $state<number | null>(null);
+	let heroPipeline = $state<number | null>(null);
+
+	function formatPipeline(v: number): string {
+		if (v >= 1_000_000) return '$' + (v / 1_000_000).toFixed(v >= 10_000_000 ? 0 : 1) + 'M';
+		if (v >= 1_000) return '$' + Math.round(v / 1_000) + 'k';
+		return '$' + v;
+	}
+
+	async function loadHeroMetrics() {
+		heroLoading = true;
+		// Today's dialing stats + connect rate + wins
+		try {
+			const res = await apiFetch('/api/agency');
+			if (res.ok) {
+				const data = await res.json();
+				const t = data?.teamTotals ?? {};
+				heroConnectRate = typeof t.connectRate === 'number' ? t.connectRate : null;
+				heroDials = typeof t.dials === 'number' ? t.dials : null;
+				heroWins = typeof t.wins === 'number' ? t.wins : null;
+			}
+		} catch (e) {
+			console.warn('[dashboard] hero agency stats failed (non-fatal):', e);
+		}
+		// Weighted pipeline (open deals)
+		try {
+			const res = await apiFetch('/api/deals/forecast');
+			if (res.ok) {
+				const data = await res.json();
+				const w = data?.pipeline?.weighted;
+				heroPipeline = typeof w === 'number' ? w : null;
+			}
+		} catch (e) {
+			console.warn('[dashboard] hero forecast failed (non-fatal):', e);
+		}
+		heroLoading = false;
+	}
 
 	// Picker filter/search state
 	let pickerCategory = $state<string>('all');
@@ -99,6 +147,9 @@
 		} catch {
 			greeting = 'Hello';
 		}
+
+		// Hero KPI band — fire-and-forget; renders skeletons until resolved
+		loadHeroMetrics();
 
 		// Check for Spotify OAuth result
 		try {
@@ -226,19 +277,61 @@
 	);
 </script>
 
-<svelte:head><title>Dashboard — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Dashboard')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<!-- Header -->
-	<div class="border-b border-[#1e1e1e] px-8 sm:px-8 py-4 flex items-center justify-between">
-		<div>
-			<h2 class="text-white" style="font-family:var(--font-display);font-weight:300;font-size:26px;letter-spacing:-.01em;line-height:1">{greeting}</h2>
+	<PageHeader title={greeting} titleSize={26}>
+		{#snippet sub()}
 			<p class="mt-1" style="font-family:var(--font-label);font-size:9px;letter-spacing:.2em;color:var(--c-text-faint)">{new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }).toUpperCase()}</p>
+		{/snippet}
+		{#snippet actions()}
+			<button onclick={() => showPicker = !showPicker}
+				class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">
+				{showPicker ? 'Done' : '+ Add Widget'}
+			</button>
+		{/snippet}
+	</PageHeader>
+
+	<!-- Hero KPI band — F-pattern anchor: one focal number + supporting stats -->
+	<div class="hero-band">
+		<!-- Primary metric: today's connect rate — the single number the eye lands on -->
+		<div class="hero-primary">
+			<p class="hero-label">Connect Rate · Today</p>
+			{#if heroLoading}
+				<div class="hero-skel hero-skel-value"></div>
+			{:else}
+				<p class="hero-value">{heroConnectRate === null ? '—' : heroConnectRate + '%'}</p>
+			{/if}
 		</div>
-		<button onclick={() => showPicker = !showPicker}
-			class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#999] hover:border-white hover:text-white transition-colors">
-			{showPicker ? 'Done' : '+ Add Widget'}
-		</button>
+
+		<!-- Supporting metrics: clearly secondary -->
+		<div class="hero-supporting">
+			<div class="hero-stat">
+				<p class="hero-stat-label">Dials Today</p>
+				{#if heroLoading}
+					<div class="hero-skel hero-skel-stat"></div>
+				{:else}
+					<p class="hero-stat-value">{heroDials === null ? '—' : heroDials.toLocaleString()}</p>
+				{/if}
+			</div>
+			<div class="hero-stat">
+				<p class="hero-stat-label">Wins Today</p>
+				{#if heroLoading}
+					<div class="hero-skel hero-skel-stat"></div>
+				{:else}
+					<p class="hero-stat-value">{heroWins === null ? '—' : heroWins.toLocaleString()}</p>
+				{/if}
+			</div>
+			<div class="hero-stat">
+				<p class="hero-stat-label">Weighted Pipeline</p>
+				{#if heroLoading}
+					<div class="hero-skel hero-skel-stat"></div>
+				{:else}
+					<p class="hero-stat-value">{heroPipeline === null ? '—' : formatPipeline(heroPipeline)}</p>
+				{/if}
+			</div>
+		</div>
 	</div>
 
 	<!-- Configurable Top Band -->
@@ -417,6 +510,83 @@
 </div>
 
 <style>
+  /* ── Hero KPI band ───────────────────────────────────────────────────── */
+  .hero-band {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 32px 56px;
+    padding: 22px 32px 24px;
+    background: var(--c-card);
+    border-bottom: 1px solid var(--c-border);
+  }
+  .hero-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+  }
+  .hero-label {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+  .hero-value {
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
+    line-height: 1;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .hero-supporting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 20px 48px;
+    padding-bottom: 4px;
+  }
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 96px;
+  }
+  .hero-stat-label {
+    font-family: var(--font-label);
+    font-size: var(--text-label);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c-text-muted);
+  }
+  .hero-stat-value {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    line-height: 1;
+    color: var(--c-text-primary);
+  }
+  /* Loading skeletons — sized to their final glyphs so there is no layout jump */
+  .hero-skel {
+    border-radius: 5px;
+    background: linear-gradient(90deg, #161616 0%, #202020 50%, #161616 100%);
+    background-size: 200% 100%;
+    animation: hero-shimmer 1.2s ease-in-out infinite;
+  }
+  .hero-skel-value { width: 132px; height: 48px; }
+  .hero-skel-stat  { width: 72px;  height: 20px; }
+  @keyframes hero-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @media (max-width: 640px) {
+    .hero-band { flex-direction: column; align-items: flex-start; gap: 20px; padding: 18px 20px 20px; }
+    .hero-supporting { gap: 18px 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-skel { animation: none; }
+  }
+
   /* ── Configurable top band ───────────────────────────────────────────── */
   .top-band-container {
     border-bottom: 1px solid #1e1e1e;

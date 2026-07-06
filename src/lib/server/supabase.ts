@@ -2,17 +2,51 @@ import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { SUPABASE_SERVICE_KEY } from '$env/static/private';
 import { error } from '@sveltejs/kit';
+import { createHash } from 'crypto';
 import { isSuperAdmin } from './superadmin';
 
 export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 	auth: { autoRefreshToken: false, persistSession: false }
 });
 
+/**
+ * Personal API token auth (machine-to-machine: MCP clients, scripts, Zapier).
+ * Tokens are minted in Settings → API Tokens (`ldo_` prefix, SHA-256 hash stored,
+ * see api/settings/api-tokens). Returns a synthetic user pinned to the token's
+ * owner, with `token_scopes` attached so callers can gate write access.
+ */
+async function authenticateApiToken(rawToken: string) {
+	const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+	const { data: row } = await supabaseAdmin
+		.from('api_tokens')
+		.select('id, user_id, name, scopes, expires_at')
+		.eq('token_hash', tokenHash)
+		.maybeSingle();
+	if (!row) throw error(401, 'Unauthorized');
+	if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) {
+		throw error(401, 'Token expired');
+	}
+	// Touch last_used_at (fire and forget — never block the request on it)
+	supabaseAdmin.from('api_tokens')
+		.update({ last_used_at: new Date().toISOString() })
+		.eq('id', row.id)
+		.then(() => {}, () => {});
+	return {
+		id: row.user_id,
+		email: `api-token:${row.name}`,
+		token_scopes: (row.scopes as string[] | null) ?? ['read'],
+		is_api_token: true,
+	} as { id: string; email: string; token_scopes: string[]; is_api_token: true };
+}
+
 // Validate the bearer token and return the REAL authenticated user (no impersonation).
 async function authenticateRaw(request: Request) {
 	const authHeader = request.headers.get('authorization');
 	const token = authHeader?.replace('Bearer ', '');
 	if (!token) throw error(401, 'Unauthorized');
+
+	// Personal API tokens (ldo_…) — machine callers, checked against api_tokens.
+	if (token.startsWith('ldo_')) return authenticateApiToken(token);
 
 	const { data, error: authError } = await supabaseAdmin.auth.getUser(token);
 	if (authError || !data.user) throw error(401, 'Unauthorized');

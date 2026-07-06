@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 
 	interface Objection { id: string; objection: string; response: string; follow_up: string | null; }
@@ -19,7 +20,7 @@
 	});
 </script>
 
-<svelte:head><title>Scripts — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Scripts — {BRAND} SDR</title></svelte:head>
 
 <div class="flex flex-1 overflow-hidden">
 	<!-- Script list -->

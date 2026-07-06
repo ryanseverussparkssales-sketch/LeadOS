@@ -136,12 +136,10 @@ async function fetchViaHistory(account: GmailAccount, accessToken: string): Prom
         }
     }
 
-    const messages: any[] = [];
-    for (const msgId of messageIds) {
-        const msg = await fetchFullMessage(msgId, accessToken);
-        if (msg) messages.push(msg);
-    }
-    return messages;
+    // Cap per-message GETs per account per run (keeps Gmail request count bounded
+    // under the cron time budget). Rare overflow beyond the cap is picked up by
+    // normal INBOX activity or the list fallback; cap matches first-run maxResults.
+    return fetchFullMessages(messageIds.slice(0, MAX_MESSAGES_PER_SYNC), accessToken);
 }
 
 async function fetchRecentMessages(
@@ -177,10 +175,22 @@ async function fetchRecentMessages(
     }
 
     const items: any[] = (list.messages ?? []).slice(0, maxResults);
+    return fetchFullMessages(items.map((i: any) => i.id), accessToken);
+}
+
+/** Max full-message GETs per account per sync run (history path). */
+const MAX_MESSAGES_PER_SYNC = 25;
+/** Concurrent full-message GETs — same total request count, lower wall time. */
+const FETCH_CONCURRENCY = 5;
+
+async function fetchFullMessages(messageIds: string[], accessToken: string): Promise<any[]> {
     const messages: any[] = [];
-    for (const item of items) {
-        const msg = await fetchFullMessage(item.id, accessToken);
-        if (msg) messages.push(msg);
+    for (let i = 0; i < messageIds.length; i += FETCH_CONCURRENCY) {
+        const chunk = messageIds.slice(i, i + FETCH_CONCURRENCY);
+        const results = await Promise.all(
+            chunk.map((id) => fetchFullMessage(id, accessToken))
+        );
+        for (const msg of results) if (msg) messages.push(msg);
     }
     return messages;
 }

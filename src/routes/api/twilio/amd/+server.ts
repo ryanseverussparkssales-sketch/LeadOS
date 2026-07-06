@@ -9,7 +9,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const form = await request.formData();
 	const params: Record<string, string> = {};
 	for (const [k, v] of form.entries()) params[k] = v as string;
-	assertTwilioSignature(request, url, params);
+	await assertTwilioSignature(request, url, params);
 
 	const callSid = form.get('CallSid') as string;
 	const answeredBy = form.get('AnsweredBy') as string; // human | machine_end_beep | machine_end_silence | fax | unknown

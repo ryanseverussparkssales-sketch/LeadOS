@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { supabase } from '$lib/services/auth';
 	import { toastError } from '$lib/stores/toast';
@@ -56,7 +57,7 @@
 	};
 </script>
 
-<svelte:head><title>Agency — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Agency')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
@@ -121,7 +122,7 @@
 												<span class="text-[9px] text-yellow-400 border border-yellow-800/30 px-1.5 py-0.5 rounded">Needs leads</span>
 											{/if}
 										</div>
-										<p class="text-xs text-[#7c7c7c]">{rep.queueSize} in queue</p>
+										<p class="text-xs {rep.queueSize === 0 && data.sdrStats.some((r: any) => r.queueSize > 0) ? 'text-yellow-400' : 'text-[#7c7c7c]'}">{rep.queueSize} in queue</p>
 									</div>
 									<div class="grid grid-cols-3 gap-2 text-center">
 										<div>

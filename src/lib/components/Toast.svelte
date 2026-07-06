@@ -25,6 +25,9 @@
         >
             <span class="toast-icon">{ICONS[t.type]}</span>
             <span class="toast-msg">{t.message}</span>
+            {#if t.action}
+                <button class="toast-action" onclick={() => { t.action?.run(); dismiss(t.id); }}>{t.action.label}</button>
+            {/if}
             <button class="toast-close" onclick={() => dismiss(t.id)} aria-label="Dismiss"><Icon name="x" size={14} /></button>
             {#if t.duration && t.duration > 0}
                 <div class="toast-bar" style="animation-duration:{t.duration}ms"></div>
@@ -74,6 +77,23 @@
     color: #ccc;
     flex: 1;
     line-height: 1.4;
+}
+.toast-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent, #c8a24a);
+    background: none;
+    border: 1px solid var(--accent, #c8a24a);
+    cursor: pointer;
+    padding: 3px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, color 0.15s;
+}
+.toast-action:hover {
+    background: var(--accent, #c8a24a);
+    color: var(--accent-ink, #1a1408);
 }
 .toast-close {
     font-size: 10px;

@@ -1,14 +1,16 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 async function verifyListOwner(listId: string, userId: string) {
+	const ownerId = await getEffectiveUserId(userId);
 	const { data } = await supabaseAdmin
 		.from('call_lists')
 		.select('id, project:projects(client:clients(user_id))')
 		.eq('id', listId).single();
 	const owner = (data?.project as unknown as { client: { user_id: string } })?.client?.user_id;
-	if (!data || owner !== userId) throw error(403, 'Forbidden');
+	if (!data || owner !== ownerId) throw error(403, 'Forbidden');
+	return ownerId;
 }
 
 export const GET: RequestHandler = async ({ request, params }) => {
@@ -34,14 +36,14 @@ export const GET: RequestHandler = async ({ request, params }) => {
 // POST: add one or many contacts to this call list
 export const POST: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
-	await verifyListOwner(params.id, user.id);
+	const ownerId = await verifyListOwner(params.id, user.id);
 
 	const { contact_ids } = await request.json();
 	if (!contact_ids?.length) throw error(400, 'contact_ids required');
 
-	// Verify contacts belong to user
+	// Verify contacts belong to the effective owner (agency tenant)
 	const { data: contacts } = await supabaseAdmin
-		.from('contacts').select('id').in('id', contact_ids).eq('user_id', user.id);
+		.from('contacts').select('id').in('id', contact_ids).eq('user_id', ownerId);
 	const validIds = contacts?.map(c => c.id) ?? [];
 
 	const rows = validIds.map((contact_id, i) => ({

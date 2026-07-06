@@ -2,6 +2,7 @@ import { requireAuth } from '$lib/server/supabase';
 import { assertAiAccess } from '$lib/server/tier';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 
 const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
@@ -18,7 +19,7 @@ export const POST = async ({ request }) => {
     const stream = await anthropic.messages.stream({
         model,
         max_tokens: 2048,
-        system: `You are Claude, a helpful AI assistant embedded in Edelhaus — a sales CRM. 
+        system: `You are Claude, a helpful AI assistant embedded in ${BRAND} — a sales CRM.
 The user may ask you anything: writing help, research, brainstorming, explanations, code, math, creative work — anything.
 Be direct and concise. Use markdown formatting when it helps readability (headers, bullets, code blocks).
 Today's date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`,

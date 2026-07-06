@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import { startImpersonation } from '$lib/stores/impersonation';
@@ -210,7 +211,7 @@
 	};
 </script>
 
-<svelte:head><title>Platform Admin — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Platform Admin')}</title></svelte:head>
 
 <div class="h-full overflow-y-auto">
 	{#if loading}
@@ -225,7 +226,7 @@
 		<div class="max-w-6xl mx-auto px-6 py-8 space-y-6">
 			<div class="flex items-end justify-between">
 				<div>
-					<h1 class="text-2xl font-bold text-white">Edelhaus Admin</h1>
+					<h1 class="text-2xl font-bold text-white">{BRAND} Admin</h1>
 					<p class="text-[#9a9a9a] text-sm mt-1">Master control across every account on the platform.</p>
 				</div>
 				<div class="flex gap-1">
@@ -505,7 +506,7 @@
 						{#each owners as o}<option value={o.id}>{o.agency_name || o.email}</option>{/each}
 					</select>
 				{/if}
-				<p class="text-[10px] text-[#9a9a9a] leading-relaxed">They sign in with this email + temp password. {form.type === 'admin' ? 'Admins get the Edelhaus Admin dashboard and unlimited access.' : form.type === 'rep' ? 'Reps appear under the chosen agency.' : 'Creates a fresh agency workspace.'}</p>
+				<p class="text-[10px] text-[#9a9a9a] leading-relaxed">They sign in with this email + temp password. {form.type === 'admin' ? `Admins get the ${BRAND} Admin dashboard and unlimited access.` : form.type === 'rep' ? 'Reps appear under the chosen agency.' : 'Creates a fresh agency workspace.'}</p>
 				<button onclick={createAccount} disabled={creating} class="w-full rounded-lg bg-[var(--call)] text-[var(--call-ink)] py-2.5 text-sm font-semibold hover:bg-[var(--call-hi)] disabled:opacity-50 transition-colors">{creating ? 'Creating…' : 'Create account'}</button>
 			</div>
 		</div>

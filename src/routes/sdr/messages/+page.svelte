@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { getSession } from '$lib/services/auth';
 	import Inbox from '$lib/components/Inbox.svelte';
 
@@ -11,7 +12,7 @@
 	});
 </script>
 
-<svelte:head><title>Messages — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Messages — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-hidden">
 	<Inbox currentUserRole="sdr" currentUserName={userName} showNewChannel={false} />

@@ -2,17 +2,28 @@ import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request, params }) => {
-	await requireAuth(request);
-
-	// Verify the list exists (ownership via campaign hierarchy, no user_id on call_lists)
-	const { data: list } = await supabaseAdmin
+/**
+ * Verify the list belongs to the caller's (effective) tenant before touching
+ * queue positions. Ownership can be direct (call_lists.user_id) or via either
+ * hierarchy path (campaign→project→client or project→client). 404 on any miss.
+ */
+async function assertListOwner(listId: string, userId: string): Promise<void> {
+	const ownerId = await getEffectiveUserId(userId);
+	const { data } = await supabaseAdmin
 		.from('call_lists')
-		.select('id')
-		.eq('id', params.listId)
+		.select('id, user_id, project:projects(client:clients(user_id)), campaign:campaigns(project:projects(client:clients(user_id)))')
+		.eq('id', listId)
 		.maybeSingle();
+	if (!data) throw error(404, 'Call list not found');
+	const direct = (data as any).user_id;
+	const viaProject = (data as any).project?.client?.user_id;
+	const viaCampaign = (data as any).campaign?.project?.client?.user_id;
+	if (![direct, viaProject, viaCampaign].includes(ownerId)) throw error(404, 'Call list not found');
+}
 
-	if (!list) throw error(404, 'Call list not found');
+export const POST: RequestHandler = async ({ request, params }) => {
+	const user = await requireAuth(request);
+	await assertListOwner(params.listId, user.id);
 
 	// Get the max queue_position in this list
 	const { data: maxRow } = await supabaseAdmin
@@ -39,7 +50,8 @@ export const POST: RequestHandler = async ({ request, params }) => {
 
 // DELETE — undo a skip: move contact to front of queue
 export const DELETE: RequestHandler = async ({ request, params }) => {
-	await requireAuth(request);
+	const user = await requireAuth(request);
+	await assertListOwner(params.listId, user.id);
 
 	// Find the current minimum queue_position so we can go just before it
 	const { data: minRow } = await supabaseAdmin

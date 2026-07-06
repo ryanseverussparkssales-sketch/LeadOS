@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
+	import { replaceState } from '$app/navigation';
 	import { get } from 'svelte/store';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import FormField from '$lib/components/FormField.svelte';
+	import { dealSchema, flattenErrors } from '$lib/schemas';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface Contact { id:string; name:string; company:string; }
@@ -15,18 +21,58 @@
 		won_at:string|null; lost_at:string|null; updated_at:string;
 	}
 
+	// Colors use the app's brass/crimson system. Mid-stages are muted neutrals
+	// that warm toward brass as they approach Won, so the accent leads the eye.
 	const STAGES = [
-		{ key:'prospect',    label:'Prospect',    color:'#6b7280', prob:10 },
-		{ key:'qualified',   label:'Qualified',   color:'#3b82f6', prob:25 },
-		{ key:'demo',        label:'Demo',        color:'#eab308', prob:40 },
-		{ key:'proposal',    label:'Proposal',    color:'#f97316', prob:60 },
-		{ key:'negotiation', label:'Negotiation', color:'#a855f7', prob:80 },
-		{ key:'won',         label:'Won ✓',       color:'#22c55e', prob:100 },
-		{ key:'lost',        label:'Lost ✗',      color:'#ef4444', prob:0 },
+		{ key:'prospect',    label:'Prospect',    color:'#8a8a8a', prob:10 },
+		{ key:'qualified',   label:'Qualified',   color:'#9a9488', prob:25 },
+		{ key:'demo',        label:'Demo',        color:'#a89c78', prob:40 },
+		{ key:'proposal',    label:'Proposal',    color:'#b49f60', prob:60 },
+		{ key:'negotiation', label:'Negotiation', color:'#c0a552', prob:80 },
+		{ key:'won',         label:'Won ✓',       color:'#c8a24a', prob:100 },
+		{ key:'lost',        label:'Lost ✗',      color:'#a01e2e', prob:0 },
 	];
+
+	interface ForecastBucket { weighted:number; best:number; count:number; }
+	interface Forecast {
+		pipeline:ForecastBucket; commit:ForecastBucket; thisMonth:ForecastBucket;
+		nextMonth:ForecastBucket; thisQuarter:ForecastBucket; noCloseDate:ForecastBucket;
+		wonThisMonth:{value:number;count:number}; wonThisQuarter:{value:number;count:number};
+	}
 
 	let deals = $state<Deal[]>([]);
 	let clients = $state<Client[]>([]);
+	let forecast = $state<Forecast | null>(null);
+	let clientFilter = $state('');
+
+	function dealsUrl() {
+		return clientFilter ? `/api/deals?client_id=${encodeURIComponent(clientFilter)}` : '/api/deals';
+	}
+
+	async function loadForecast(clientId: string = clientFilter) {
+		try {
+			const qs = clientId ? `?client_id=${encodeURIComponent(clientId)}` : '';
+			const r = await apiFetch(`/api/deals/forecast${qs}`);
+			if (r.ok) forecast = await r.json();
+		} catch { /* non-fatal */ }
+	}
+
+	async function onClientFilterChange() {
+		// Persist filter in the URL so refresh keeps it
+		try {
+			const u = new URL(window.location.href);
+			if (clientFilter) u.searchParams.set('client', clientFilter);
+			else u.searchParams.delete('client');
+			replaceState(u, {});
+		} catch { /* non-fatal */ }
+		loading = true;
+		try {
+			const dr = await apiFetch(dealsUrl());
+			if (dr.ok) deals = await dr.json();
+		} catch { /* non-fatal */ }
+		loading = false;
+		loadForecast();
+	}
 	let loading = $state(true);
 	let showNew = $state(false);
 	let selectedDeal = $state<Deal | null>(null);
@@ -49,7 +95,7 @@
 		if (!importCsv) return;
 		importingDeals = true;
 		const res = await apiFetch('/api/deals/import', { method:'POST', body: JSON.stringify({ csv: importCsv }) });
-		if (res.ok) { importResult = await res.json(); if (importResult!.created > 0) { const dr = await apiFetch('/api/deals'); if (dr.ok) deals = await dr.json(); } }
+		if (res.ok) { importResult = await res.json(); if (importResult!.created > 0) { const dr = await apiFetch(dealsUrl()); if (dr.ok) deals = await dr.json(); } }
 		else { toastError('Failed to import deals'); }
 		importingDeals = false;
 	}
@@ -62,6 +108,8 @@
 	let nTitle = $state(''); let nValue = $state(0); let nContact = $state('');
 	let nClient = $state(''); let nClose = $state(''); let nNotes = $state('');
 	let saving = $state(false);
+	// Per-field validation errors from the shared zod deal schema.
+	let newDealErrors = $state<Record<string, string>>({});
 
 	// Contact search-on-demand (replaces upfront 200-contact fetch)
 	let contactSearchQuery = $state('');
@@ -79,10 +127,13 @@
 	}
 
 	onMount(async () => {
-		const [dr, clr] = await Promise.all([apiFetch('/api/deals'), apiFetch('/api/clients')]);
+		// Restore client filter from URL (?client=) so refresh keeps it
+		clientFilter = get(page).url.searchParams.get('client') ?? '';
+		const [dr, clr] = await Promise.all([apiFetch(dealsUrl()), apiFetch('/api/clients')]);
 		deals   = dr.ok ? await dr.json() : [];
 		clients  = clr.ok ? await clr.json() : [];
 		loading = false;
+		loadForecast();
 
 		// Auto-open deal from GlobalSearch deep link
 		const dealId = get(page).url.searchParams.get('deal');
@@ -97,10 +148,25 @@
 	function totalPipeline() { return deals.filter(d => d.stage !== 'lost').reduce((s, d) => s + (d.value * d.probability / 100), 0); }
 
 	async function createDeal() {
-		if (!nTitle.trim()) return;
+		// Typed, schema-driven validation before hitting the API. The POST payload
+		// below is unchanged — this is a pre-submit gate that surfaces per-field
+		// errors through FormField (title required, value >= 0).
+		newDealErrors = {};
+		const parsed = dealSchema.safeParse({
+			title: nTitle.trim(),
+			value: Number(nValue),
+			contactId: nContact || undefined,
+			clientId: nClient || undefined,
+			expectedClose: nClose || undefined,
+			notes: nNotes || undefined,
+		});
+		if (!parsed.success) {
+			newDealErrors = flattenErrors(parsed.error);
+			return;
+		}
 		saving = true;
 		const res = await apiFetch('/api/deals', { method: 'POST', body: JSON.stringify({ title: nTitle, value: nValue, contactId: nContact || null, clientId: nClient || null, expectedClose: nClose || null, notes: nNotes || null }) });
-		if (res.ok) { deals = [await res.json(), ...deals]; showNew = false; nTitle = ''; nValue = 0; nContact = ''; nClose = ''; toastSuccess('Deal added'); }
+		if (res.ok) { deals = [await res.json(), ...deals]; showNew = false; nTitle = ''; nValue = 0; nContact = ''; nClose = ''; nNotes = ''; newDealErrors = {}; toastSuccess('Deal added'); loadForecast(); }
 		else { toastError('Failed to add deal'); }
 		saving = false;
 	}
@@ -109,12 +175,13 @@
 		if (newStage === 'lost') { pendingLostDealId = dealId; lostReason = ''; showLostModal = true; return; }
 		const extra = newStage === 'won' ? { won_at: new Date().toISOString() } : {};
 		const res = await apiFetch(`/api/deals/${dealId}`, { method: 'PATCH', body: JSON.stringify({ stage: newStage, ...extra }) });
-		if (res.ok) { const updated = await res.json(); deals = deals.map(d => d.id === dealId ? updated : d); toastSuccess('Deal updated'); }
+		if (res.ok) { const updated = await res.json(); deals = deals.map(d => d.id === dealId ? updated : d); toastSuccess('Deal updated'); loadForecast(); }
 		else { toastError('Failed to move deal'); }
 	}
 
 	async function confirmLost() {
 		const res = await apiFetch(`/api/deals/${pendingLostDealId}`, { method: 'PATCH', body: JSON.stringify({ stage: 'lost', lost_reason: lostReason, lost_at: new Date().toISOString() }) });
+		if (res.ok) loadForecast();
 		if (res.ok) { const updated = await res.json(); deals = deals.map(d => d.id === pendingLostDealId ? updated : d); toastSuccess('Deal updated'); }
 		else { toastError('Failed to update deal'); }
 		showLostModal = false;
@@ -191,23 +258,71 @@
 
 	function fmt$(n: number) { return n >= 1000 ? `$${(n/1000).toFixed(0)}k` : `$${n}`; }
 	function fmtDate(s: string | null) { return s ? new Date(s).toLocaleDateString() : '—'; }
+
+	// Deal drawer presentation + a11y
+	let drawerEl = $state<HTMLElement | null>(null);
+	function closeDrawer() { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }
+	function focusDrawer(node: HTMLElement) {
+		// Move focus into the drawer when it opens
+		const target = node.querySelector<HTMLElement>('[data-drawer-focus]') ?? node;
+		target.focus();
+	}
+	function onWindowKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && selectedDeal) closeDrawer();
+	}
 </script>
 
-<svelte:head><title>Pipeline — Edelhaus</title></svelte:head>
+<svelte:window onkeydown={onWindowKeydown} />
+
+<svelte:head><title>{titleFor('Pipeline')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
-	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">
-		<div>
-			<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Deal Pipeline</h2>
+	<PageHeader title="Deal Pipeline">
+		{#snippet sub()}
 			<p class="text-xs text-[#6e6e6e] mt-0.5">Weighted forecast: <span class="text-[var(--accent)]">{fmt$(Math.round(totalPipeline()))}</span></p>
+		{/snippet}
+		{#snippet actions()}
+			<select bind:value={clientFilter} onchange={onClientFilterChange} class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs text-[#999] focus:border-white focus:outline-none">
+				<option value="">All clients</option>
+				{#each clients as c}<option value={c.id}>{c.name}</option>{/each}
+			</select>
+			<button onclick={() => window.open('/api/export?type=deals', '_blank')} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Export</button>
+			<button onclick={() => showImportDeals = !showImportDeals} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↑ Import CSV</button>
+			<button onclick={() => { showNew = !showNew; if (showNew && clientFilter) nClient = clientFilter; }}
+				class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
+				+ New Deal
+			</button>
+		{/snippet}
+	</PageHeader>
+
+	{#if forecast}
+		<div class="border-b border-[var(--c-border)] bg-[var(--c-card)] px-8 py-3 flex items-center gap-8 overflow-x-auto shrink-0">
+			<!-- Focal figure: this month's weighted forecast -->
+			<div class="shrink-0 pr-8 border-r border-[var(--c-border)]">
+				<p class="text-[10px] uppercase tracking-wider text-[var(--c-text-muted)]">This month</p>
+				<p class="text-[22px] leading-tight font-semibold text-[var(--accent)]">{fmt$(forecast.thisMonth.weighted)}</p>
+				<p class="text-[11px] text-[var(--c-text-muted)]">weighted · of {fmt$(forecast.thisMonth.best)} best · {forecast.thisMonth.count} deals</p>
+			</div>
+			<div class="shrink-0">
+				<p class="text-[10px] uppercase tracking-wider text-[var(--c-text-muted)]">This quarter</p>
+				<p class="text-[11px] text-[var(--c-text-secondary)]">{fmt$(forecast.thisQuarter.weighted)} <span class="text-[var(--c-text-muted)]">of {fmt$(forecast.thisQuarter.best)}</span></p>
+			</div>
+			<div class="shrink-0">
+				<p class="text-[10px] uppercase tracking-wider text-[var(--c-text-muted)]">Commit (≥75%)</p>
+				<p class="text-[11px] text-[var(--c-text-secondary)]">{fmt$(forecast.commit.weighted)} <span class="text-[var(--c-text-muted)]">{forecast.commit.count} deals</span></p>
+			</div>
+			<div class="shrink-0">
+				<p class="text-[10px] uppercase tracking-wider text-[var(--c-text-muted)]">Won · month / quarter</p>
+				<p class="text-[11px] text-[var(--c-text-secondary)]">{fmt$(forecast.wonThisMonth.value)} <span class="text-[var(--c-text-muted)]">/ {fmt$(forecast.wonThisQuarter.value)}</span></p>
+			</div>
+			{#if forecast.noCloseDate.count > 0}
+				<div class="shrink-0">
+					<p class="text-[10px] uppercase tracking-wider text-[var(--c-text-muted)]">No close date</p>
+					<p class="text-[11px] text-[var(--c-text-secondary)]">{forecast.noCloseDate.count} deals <span class="text-[var(--c-text-muted)]">({fmt$(forecast.noCloseDate.weighted)})</span></p>
+				</div>
+			{/if}
 		</div>
-		<button onclick={() => window.open('/api/export?type=deals', '_blank')} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↓ Export</button>
-		<button onclick={() => showImportDeals = !showImportDeals} class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#999] hover:border-white hover:text-white transition-colors">↑ Import CSV</button>
-		<button onclick={() => showNew = !showNew}
-			class="rounded-lg bg-white px-4 py-1.5 text-xs font-semibold text-black hover:bg-[#e5e5e5] transition-colors">
-			+ New Deal
-		</button>
-	</div>
+	{/if}
 
 	{#if showImportDeals}
 	<div class="border-b border-[#1e1e1e] bg-[#0d0d0d] px-8 py-4">
@@ -230,32 +345,70 @@
 
 {#if showNew}
 		<div class="border-b border-[#1e1e1e] bg-[#0d0d0d] px-8 py-4">
-			<div class="grid grid-cols-5 gap-3 max-w-4xl">
-				<div class="col-span-2"><input bind:value={nTitle} placeholder="Deal title *" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
-				<div><input type="number" bind:value={nValue} placeholder="Value ($)" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" /></div>
-				<div><DatePicker bind:value={nClose} onchange={(v) => nClose = v} /></div>
-				<div class="flex gap-2">
-					<button onclick={createDeal} disabled={saving || !nTitle.trim()} class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? '...' : 'Add'}</button>
+			<div class="grid grid-cols-5 gap-3 max-w-4xl items-start">
+				<div class="col-span-2">
+					<FormField label="Deal title" required error={newDealErrors.title}>
+						{#snippet children({ id, describedBy })}
+							<input {id} aria-describedby={describedBy} bind:value={nTitle} placeholder="Deal title" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						{/snippet}
+					</FormField>
+				</div>
+				<div>
+					<FormField label="Value ($)" error={newDealErrors.value}>
+						{#snippet children({ id, describedBy })}
+							<input {id} aria-describedby={describedBy} type="number" min="0" bind:value={nValue} placeholder="Value ($)" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none" />
+						{/snippet}
+					</FormField>
+				</div>
+				<div>
+					<FormField label="Close date">
+						{#snippet children()}
+							<DatePicker bind:value={nClose} onchange={(v) => nClose = v} />
+						{/snippet}
+					</FormField>
+				</div>
+				<div class="flex gap-2 pt-6">
+					<button onclick={createDeal} disabled={saving} class="flex-1 rounded-lg bg-white py-2 text-xs font-semibold text-black disabled:opacity-40 hover:bg-[#e5e5e5]">{saving ? '...' : 'Add'}</button>
 					<button onclick={() => showNew = false} class="text-xs text-[#7c7c7c] hover:text-white px-2"><Icon name="x" size={14} /></button>
 				</div>
-				<div class="relative">
-					<input
-						bind:value={contactSearchQuery}
-						oninput={searchPickerContacts}
-						placeholder={searchingContacts ? 'Searching...' : 'Search contact...'}
-						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none"
-					/>
-					{#if pickerContacts.length > 0}
-						<div class="absolute z-20 top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg max-h-40 overflow-y-auto">
-							<button onclick={() => { nContact = ''; contactSearchQuery = ''; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-[#7c7c7c] hover:bg-white/5">No contact</button>
-							{#each pickerContacts as c}
-								<button onclick={() => { nContact = c.id; contactSearchQuery = c.name; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-white hover:bg-white/5 truncate">{c.name}{c.company ? ` · ${c.company}` : ''}</button>
-							{/each}
-						</div>
-					{/if}
+				<div>
+					<FormField label="Contact" error={newDealErrors.contactId}>
+						{#snippet children({ id, describedBy })}
+							<div class="relative">
+								<input
+									{id}
+									aria-describedby={describedBy}
+									bind:value={contactSearchQuery}
+									oninput={searchPickerContacts}
+									placeholder={searchingContacts ? 'Searching...' : 'Search contact...'}
+									class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none"
+								/>
+								{#if pickerContacts.length > 0}
+									<div class="absolute z-20 top-full left-0 right-0 mt-1 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg max-h-40 overflow-y-auto">
+										<button onclick={() => { nContact = ''; contactSearchQuery = ''; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-[#7c7c7c] hover:bg-white/5">No contact</button>
+										{#each pickerContacts as c}
+											<button onclick={() => { nContact = c.id; contactSearchQuery = c.name; pickerContacts = []; }} class="w-full text-left px-3 py-2 text-xs text-white hover:bg-white/5 truncate">{c.name}{c.company ? ` · ${c.company}` : ''}</button>
+										{/each}
+									</div>
+								{/if}
+							</div>
+						{/snippet}
+					</FormField>
 				</div>
-				<div><select bind:value={nClient} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none"><option value="">No client</option>{#each clients as c}<option value={c.id}>{c.name}</option>{/each}</select></div>
-				<div class="col-span-3"><input bind:value={nNotes} placeholder="Notes" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" /></div>
+				<div>
+					<FormField label="Client" error={newDealErrors.clientId}>
+						{#snippet children({ id, describedBy })}
+							<select {id} aria-describedby={describedBy} bind:value={nClient} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white focus:border-white focus:outline-none"><option value="">No client</option>{#each clients as c}<option value={c.id}>{c.name}</option>{/each}</select>
+						{/snippet}
+					</FormField>
+				</div>
+				<div class="col-span-3">
+					<FormField label="Notes" error={newDealErrors.notes}>
+						{#snippet children({ id, describedBy })}
+							<input {id} aria-describedby={describedBy} bind:value={nNotes} placeholder="Notes" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						{/snippet}
+					</FormField>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -268,7 +421,7 @@
 				<div class="flex-shrink-0 w-[240px]">
 					<div class="h-6 w-24 bg-[#1a1a1a] rounded animate-pulse mb-3"></div>
 					{#each {length: 3} as __}
-						<div class="rounded-xl bg-[#111] border border-[#1a1a1a] p-3 mb-2">
+						<div class="rounded-xl bg-[var(--c-input)] border border-[var(--c-border)] p-3 mb-2">
 							<div class="h-3 w-3/4 bg-[#1a1a1a] rounded animate-pulse mb-2"></div>
 							<div class="h-2.5 w-1/2 bg-[#1a1a1a] rounded animate-pulse mb-2"></div>
 							<div class="h-2.5 w-2/3 bg-[#1a1a1a] rounded animate-pulse"></div>
@@ -301,14 +454,14 @@
 					</div>
 
 					<!-- Deal cards -->
-					<div class="flex-1 overflow-y-auto space-y-2 min-h-[60px] rounded-xl border p-2 transition-colors {dragOverStage === stage.key ? 'border-white/30 bg-white/5' : 'border-[#1e1e1e] bg-[#0a0a0a]'}">
+					<div class="flex-1 overflow-y-auto space-y-2 min-h-[60px] rounded-xl border p-2 transition-colors {dragOverStage === stage.key ? 'border-white/30 bg-white/5' : 'border-[var(--c-border)] bg-[var(--c-card)]'}">
 						{#each dealsInStage(stage.key) as deal}
 							{@const daysStale = Math.floor((Date.now() - new Date(deal.updated_at ?? deal.created_at).getTime()) / (1000 * 60 * 60 * 24))}
 							<div
 								draggable="true"
 								ondragstart={() => dragStart(deal.id)}
 								onclick={() => { selectedDeal = deal; confirmDeleteId = null; }}
-								class="rounded-lg border border-[#2a2a2a] bg-[#111111] p-3 cursor-grab active:cursor-grabbing hover:border-[#444] transition-colors group">
+								class="rounded-lg border border-[var(--c-border-subtle)] bg-[var(--c-input)] p-3 cursor-grab active:cursor-grabbing hover:border-[#444] transition-colors group">
 
 								<p class="text-sm text-white font-medium mb-1 truncate">{deal.title}</p>
 								{#if deal.contact}<p class="text-xs text-[#7c7c7c] truncate">{deal.contact.name}{deal.contact.company ? ` · ${deal.contact.company}` : ''}</p>{/if}
@@ -337,7 +490,22 @@
 
 <!-- Deal detail sidebar -->
 {#if selectedDeal}
-	<div class="fixed right-0 top-0 h-full w-80 bg-[#111111] border-l border-[#2a2a2a] z-40 overflow-y-auto p-6 space-y-4">
+	<!-- Dimmed backdrop (click to close) -->
+	<div
+		class="fixed inset-0 bg-black/50 z-30"
+		onclick={closeDrawer}
+		transition:fly={{ duration: 150, opacity: 0 }}
+		aria-hidden="true"
+	></div>
+	<div
+		bind:this={drawerEl}
+		use:focusDrawer
+		role="dialog"
+		aria-modal="true"
+		aria-label="Deal details"
+		tabindex="-1"
+		transition:fly={{ x: 400, duration: 200 }}
+		class="fixed right-0 top-0 h-full w-80 bg-[var(--c-card)] border-l border-[var(--c-border-subtle)] z-40 overflow-y-auto p-6 space-y-4 focus:outline-none">
 		<!-- Panel header with edit toggle -->
 		<div class="flex items-center justify-between mb-4">
 			{#if editingDeal}
@@ -346,8 +514,8 @@
 				<button onclick={() => editingDeal = false} class="text-xs text-[#7c7c7c] hover:text-white">Cancel</button>
 			{:else}
 				<p class="text-white font-semibold flex-1">{selectedDeal.title}</p>
-				<button onclick={startEditDeal} class="text-xs text-[#6e6e6e] hover:text-white border border-[#2a2a2a] rounded-lg px-2.5 py-1 transition-colors mr-2">Edit</button>
-				<button onclick={() => { selectedDeal = null; confirmDeleteId = null; editingDeal = false; }} class="text-[#7c7c7c] hover:text-white"><Icon name="x" size={14} /></button>
+				<button data-drawer-focus onclick={startEditDeal} class="text-xs text-[#6e6e6e] hover:text-white border border-[#2a2a2a] rounded-lg px-2.5 py-1 transition-colors mr-2">Edit</button>
+				<button onclick={closeDrawer} class="text-[#7c7c7c] hover:text-white"><Icon name="x" size={14} /></button>
 			{/if}
 		</div>
 

@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 // POST — send a message to Microsoft Teams via Incoming Webhook
@@ -17,9 +18,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		'@type': 'MessageCard',
 		'@context': 'http://schema.org/extensions',
 		themeColor: color ?? '0078D4',
-		summary: title ?? 'Edelhaus Notification',
+		summary: title ?? `${BRAND} Notification`,
 		sections: [{
-			activityTitle: title ?? 'Edelhaus',
+			activityTitle: title ?? BRAND,
 			activityText: text,
 			facts: facts ?? [],
 		}],

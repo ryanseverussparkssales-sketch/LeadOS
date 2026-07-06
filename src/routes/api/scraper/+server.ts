@@ -5,6 +5,7 @@ import { safeFetch } from '$lib/server/ssrf';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import { MODELS } from '$lib/server/models';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 // GET: list scraped contacts
@@ -36,7 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		let html = '';
 		try {
 			const res = await safeFetch(url, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Edelhaus/1.0)' },
+				headers: { 'User-Agent': `Mozilla/5.0 (compatible; ${BRAND}/1.0)` },
 				signal: AbortSignal.timeout(10000),
 			});
 			html = (await res.text()).slice(0, 50000);
@@ -191,7 +192,7 @@ Return ONLY the JSON.`;
 		let searchHtml = '';
 		try {
 			const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query + ' contact phone')}`, {
-				headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Edelhaus/1.0)' },
+				headers: { 'User-Agent': `Mozilla/5.0 (compatible; ${BRAND}/1.0)` },
 				signal: AbortSignal.timeout(10000),
 			});
 			searchHtml = await ddgRes.text();

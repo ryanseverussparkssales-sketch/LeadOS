@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -17,7 +19,13 @@
 		timestamp_seconds: number | null; created_at: string;
 	}
 
+	interface RepStat {
+		user_id: string; email: string; calls: number; scoredCalls: number;
+		avgQualityScore: number | null; coachedCalls: number; coverage: number; avgRating: number | null;
+	}
+
 	let calls = $state<Call[]>([]);
+	let repStats = $state<RepStat[]>([]);
 	let loading = $state(true);
 	let selectedCall = $state<Call | null>(null);
 	let feedback = $state<Feedback[]>([]);
@@ -38,10 +46,17 @@
 	const WIN_OUTCOMES = ['appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback'];
 
 	onMount(async () => {
-		const r = await apiFetch('/api/calls?limit=100');
+		const [r, statsRes] = await Promise.all([
+			apiFetch('/api/calls?limit=100'),
+			apiFetch('/api/agency/coaching-stats'),
+		]);
 		if (r.ok) {
 			const data = await r.json();
 			calls = data.filter((c: Call) => c.recording_url || c.raw_transcript);
+		}
+		if (statsRes.ok) {
+			const d = await statsRes.json();
+			repStats = d.reps ?? [];
 		}
 		loading = false;
 	});
@@ -99,6 +114,29 @@
 		audioEl.play().catch(() => {});
 	}
 
+	// ── Hand a call off to the in-app Assistant ────────────────────────
+	// Stash a ready-to-send prompt (contact + summary + transcript excerpt) in
+	// sessionStorage; the Assistant page pre-fills its composer from it on mount.
+	function discussWithAssistant() {
+		const c = selectedCall;
+		if (!c || (!c.summary && !c.raw_transcript)) return;
+		const name = c.contact?.name ?? 'this contact';
+		const company = c.contact?.company ? ` at ${c.contact.company}` : '';
+		const summary = (c.summary ?? '').trim() || '(no AI summary available)';
+		const transcript = (c.raw_transcript ?? '').trim();
+		const excerpt = transcript.length > 4000 ? `${transcript.slice(0, 4000)}…` : transcript;
+		const seed =
+			`Here's my last call with ${name}${company}. Summary: ${summary}` +
+			(excerpt ? `\n\nTranscript:\n${excerpt}` : '') +
+			`\n\nHelp me draft a follow-up and next steps.`;
+		try {
+			if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('assistant_seed', seed);
+		} catch {
+			/* ignore */
+		}
+		goto('/assistant');
+	}
+
 	const OUTCOME_LABEL: Record<string, string> = {
 		appointment_set: '📅 Appt', demo_scheduled: '🖥 Demo',
 		callback: '🔄 Callback', voicemail: '📬 VM', no_answer: '—',
@@ -110,7 +148,7 @@
 	);
 </script>
 
-<svelte:head><title>Call Review — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Call Review')}</title></svelte:head>
 
 <div class="flex h-full overflow-hidden">
 
@@ -119,6 +157,27 @@
 		<div class="px-5 py-4 border-b border-[#1a1a1a]">
 			<h2 class="text-sm text-white font-medium">Call Review</h2>
 			<p class="text-[10px] text-[#6e6e6e] mt-0.5">Recorded calls — leave coaching notes</p>
+
+			{#if repStats.length > 0}
+				<div class="mt-3 space-y-1.5">
+					<p class="text-[9px] uppercase tracking-wider text-[#6e6e6e]">Coaching · last 30 days</p>
+					{#each repStats as rep}
+						<div class="rounded-lg border border-[#1a1a1a] bg-[#0d0d0d] px-2.5 py-1.5">
+							<div class="flex items-center justify-between gap-2">
+								<p class="text-[10px] text-white truncate">{rep.email}</p>
+								{#if rep.avgQualityScore !== null}
+									<span class="text-[10px] shrink-0 {rep.avgQualityScore >= 7 ? 'text-[var(--accent)]' : rep.avgQualityScore >= 5 ? 'text-yellow-400' : 'text-red-400'}">AI {rep.avgQualityScore}/10</span>
+								{/if}
+							</div>
+							<div class="flex items-center gap-2 mt-0.5 text-[9px] text-[#7c7c7c]">
+								<span>{rep.calls} calls</span>
+								<span>· {rep.coachedCalls} coached ({rep.coverage}%)</span>
+								{#if rep.avgRating !== null}<span>· ★ {rep.avgRating}</span>{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
 			<select bind:value={filterOutcome}
 				class="mt-3 w-full rounded-lg border border-[#2a2a2a] bg-[#111] px-2 py-1.5 text-xs text-white focus:outline-none">
 				<option value="">All outcomes</option>
@@ -183,11 +242,20 @@
 							{selectedCall.call_duration_seconds ? fmtSecs(selectedCall.call_duration_seconds) : '—'}
 						</p>
 					</div>
-					{#if selectedCall.outcome}
-						<span class="text-xs border border-[#2a2a2a] px-2 py-0.5 rounded text-[#888]">
-							{OUTCOME_LABEL[selectedCall.outcome] ?? selectedCall.outcome}
-						</span>
-					{/if}
+					<div class="flex flex-col items-end gap-2 shrink-0">
+						{#if selectedCall.outcome}
+							<span class="text-xs border border-[#2a2a2a] px-2 py-0.5 rounded text-[#888]">
+								{OUTCOME_LABEL[selectedCall.outcome] ?? selectedCall.outcome}
+							</span>
+						{/if}
+						{#if selectedCall.summary || selectedCall.raw_transcript}
+							<button onclick={discussWithAssistant}
+								title="Open this call in the Assistant to draft a follow-up"
+								class="rounded-lg border border-[var(--accent)]/60 bg-[var(--accent)]/10 px-3 py-1.5 text-xs font-medium text-[var(--accent-hi)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/15 transition-colors whitespace-nowrap">
+								✦ Discuss with Assistant
+							</button>
+						{/if}
+					</div>
 				</div>
 
 				<!-- Audio player -->

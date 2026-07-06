@@ -4,6 +4,7 @@ import { incrementQuota } from '$lib/server/quotas';
 import { deliverWebhooks } from '$lib/server/webhooks';
 import { processCadence } from '$lib/server/cadence';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request, params }) => {
@@ -36,7 +37,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 
 	// Mark contact as 'called' in call_list_contacts AND campaign_contacts
 	const { data: callRecord } = await supabaseAdmin
-		.from('calls').select('contact_id, call_list_id, campaign_id').eq('id', params.id).single();
+		.from('calls').select('contact_id, call_list_id, campaign_id').eq('id', params.id).eq('user_id', user.id).single();
 	if (callRecord?.contact_id && callRecord?.call_list_id) {
 		await supabaseAdmin
 			.from('call_list_contacts')
@@ -110,7 +111,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 <p>Your campaign just got a <strong>${LABELS[body.outcome] ?? 'win'}</strong>.</p>
 <p><strong>${contactRow?.name ?? 'A contact'}${contactRow?.company ? ` at ${contactRow.company}` : ''}</strong> is now in your pipeline.</p>
 <p>View all appointments and activity in your <a href="${env.PUBLIC_SITE_URL ?? 'https://lead-os-livid.vercel.app'}/client-portal">client portal →</a></p>
-<p style="color:#888;font-size:12px">— ${clientBizName} via Edelhaus</p>`,
+<p style="color:#888;font-size:12px">— ${clientBizName} via ${BRAND}</p>`,
 					});
 				}
 			} catch (err) {

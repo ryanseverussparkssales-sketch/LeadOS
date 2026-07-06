@@ -20,6 +20,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const {
 		name, website, industry, description, logo_url,
 		primary_contact_name, primary_contact_email, primary_contact_phone,
@@ -29,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const { data, error: e } = await supabaseAdmin
 		.from('clients')
 		.insert({
-			user_id: user.id,
+			user_id: ownerId,
 			name: name.trim(),
 			website: website ?? null,
 			industry: industry ?? null,

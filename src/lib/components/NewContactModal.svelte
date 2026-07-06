@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { apiFetch } from '$lib/api';
 	import Icon from '$lib/components/Icon.svelte';
+	import FormField from '$lib/components/FormField.svelte';
+	import { contactSchema, flattenErrors } from '$lib/schemas';
 
 	let { onClose, onCreated, leadSource = '' }: {
 		onClose: () => void;
@@ -13,9 +15,12 @@
 	let email = $state('');
 	let company = $state('');
 	let title = $state('');
+	let notes = $state('');
 	let source = $state('manual');
 	let saving = $state(false);
 	let error = $state('');
+	// Per-field validation errors, keyed by schema field name.
+	let fieldErrors = $state<Record<string, string>>({});
 
 	const canSubmit = $derived(
 		name.trim().length > 0 &&
@@ -24,9 +29,29 @@
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
-		if (!phone.trim() && !email.trim() && !company.trim()) { error = 'Phone, email, or company is required'; return; }
-		saving = true;
 		error = '';
+		fieldErrors = {};
+
+		// Client-side validation via the shared contact schema.
+		const parsed = contactSchema.safeParse({
+			name,
+			email: email.trim(),
+			phone,
+			company,
+			title,
+			notes,
+		});
+		if (!parsed.success) {
+			fieldErrors = flattenErrors(parsed.error);
+			return;
+		}
+		// The create endpoint requires at least one contact channel.
+		if (!phone.trim() && !email.trim() && !company.trim()) {
+			error = 'Phone, email, or company is required';
+			return;
+		}
+
+		saving = true;
 		try {
 			const res = await apiFetch('/api/contacts/create', {
 				method: 'POST',
@@ -63,52 +88,64 @@
 
 		<form onsubmit={handleSubmit} class="p-5 space-y-4">
 			<div class="grid grid-cols-2 gap-4">
-				<div>
-					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Name</label>
-					<input bind:value={name} placeholder="Full name (optional)"
-						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-					<p class="text-xs text-[#6e6e6e] mt-1">Phone, email, or company required</p>
-				</div>
-				<div>
-					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Phone</label>
-					<input bind:value={phone} placeholder="+1 555 000 0000"
-						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-				</div>
+				<FormField label="Name" required error={fieldErrors.name} hint="Phone, email, or company required">
+					{#snippet children({ id, describedBy })}
+						<input bind:value={name} placeholder="Full name" {id} aria-describedby={describedBy}
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					{/snippet}
+				</FormField>
+				<FormField label="Phone" error={fieldErrors.phone}>
+					{#snippet children({ id, describedBy })}
+						<input bind:value={phone} placeholder="+1 555 000 0000" {id} aria-describedby={describedBy}
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					{/snippet}
+				</FormField>
 			</div>
 
-			<div>
-				<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Company</label>
-				<input bind:value={company} placeholder="Acme Corp"
-					class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-			</div>
+			<FormField label="Company" error={fieldErrors.company}>
+				{#snippet children({ id, describedBy })}
+					<input bind:value={company} placeholder="Acme Corp" {id} aria-describedby={describedBy}
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+				{/snippet}
+			</FormField>
 
 			<div class="grid grid-cols-2 gap-4">
-				<div>
-					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Title</label>
-					<input bind:value={title} placeholder="VP of Sales"
-						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-				</div>
-				<div>
-					<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Email</label>
-					<input bind:value={email} type="email" placeholder="name@company.com"
-						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
-				</div>
+				<FormField label="Title" error={fieldErrors.title}>
+					{#snippet children({ id, describedBy })}
+						<input bind:value={title} placeholder="VP of Sales" {id} aria-describedby={describedBy}
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					{/snippet}
+				</FormField>
+				<FormField label="Email" error={fieldErrors.email}>
+					{#snippet children({ id, describedBy })}
+						<input bind:value={email} type="email" placeholder="name@company.com" {id} aria-describedby={describedBy}
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+					{/snippet}
+				</FormField>
 			</div>
 
+			<FormField label="Notes" error={fieldErrors.notes}>
+				{#snippet children({ id, describedBy })}
+					<textarea bind:value={notes} placeholder="Context, next steps…" rows="2" {id} aria-describedby={describedBy}
+						class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+				{/snippet}
+			</FormField>
+
 			{#if !leadSource}
-			<div>
-				<label class="block text-xs text-[#999] uppercase tracking-widest mb-1.5">Source</label>
-				<select bind:value={source} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
-					<option value="manual">Manual Entry</option>
-					<option value="referral">Referral</option>
-					<option value="website">Website</option>
-					<option value="linkedin">LinkedIn</option>
-					<option value="facebook">Facebook</option>
-					<option value="cold_outreach">Cold Outreach</option>
-					<option value="event">Event</option>
-					<option value="other">Other</option>
-				</select>
-			</div>
+			<FormField label="Source">
+				{#snippet children({ id, describedBy })}
+					<select bind:value={source} {id} aria-describedby={describedBy} class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none">
+						<option value="manual">Manual Entry</option>
+						<option value="referral">Referral</option>
+						<option value="website">Website</option>
+						<option value="linkedin">LinkedIn</option>
+						<option value="facebook">Facebook</option>
+						<option value="cold_outreach">Cold Outreach</option>
+						<option value="event">Event</option>
+						<option value="other">Other</option>
+					</select>
+				{/snippet}
+			</FormField>
 			{/if}
 
 			{#if error}

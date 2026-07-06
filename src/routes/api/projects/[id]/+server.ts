@@ -1,14 +1,15 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 async function verifyProjectOwner(projectId: string, userId: string) {
+	const ownerId = await getEffectiveUserId(userId);
 	const { data } = await supabaseAdmin
 		.from('projects')
 		.select('id, client:clients(user_id)')
 		.eq('id', projectId)
 		.single();
-	if (!data || (data.client as { user_id: string })?.user_id !== userId)
+	if (!data || (data.client as { user_id: string })?.user_id !== ownerId)
 		throw error(403, 'Forbidden');
 	return data;
 }

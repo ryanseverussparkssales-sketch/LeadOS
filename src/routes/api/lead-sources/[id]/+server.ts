@@ -15,6 +15,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 			auto_call_list_id: body.auto_call_list_id ?? null,
 			default_contact_type: body.default_contact_type ?? 'lead',
 			description: body.description ?? null,
+			field_mapping: body.field_mapping ?? null,
 			updated_at: new Date().toISOString(),
 		})
 		.eq('id', params.id)

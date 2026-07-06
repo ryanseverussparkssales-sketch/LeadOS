@@ -1,5 +1,5 @@
 {
-	"name": "rogueos-mvp",
+	"name": "rogueos",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -12,9 +12,12 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
 		"check:tenancy": "node scripts/check-tenancy.mjs"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
@@ -30,10 +33,13 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.100.1",
+		"@sentry/sveltekit": "^10.63.0",
 		"@supabase/supabase-js": "^2.106.2",
 		"@twilio/voice-sdk": "^2.18.3",
 		"dompurify": "^3.4.8",
 		"nodemailer": "^6.9.14",
-		"twilio": "^6.0.2"
+		"sveltekit-superforms": "^2.27.1",
+		"twilio": "^6.0.2",
+		"zod": "^3.24.4"
 	}
 }

@@ -4,6 +4,7 @@ import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supa
 import { rateLimitUser } from '$lib/server/rateLimit';
 import Anthropic from '@anthropic-ai/sdk';
 import { ANTHROPIC_API_KEY } from '$env/static/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
@@ -79,7 +80,7 @@ const TOOLS: Anthropic.Tool[] = [
 	},
 	{
 		name: 'create_task',
-		description: 'Create a new task or follow-up in Edelhaus. Use when the user says "add a task", "remind me to", "create a follow-up", "schedule a callback", etc.',
+		description: `Create a new task or follow-up in ${BRAND}. Use when the user says "add a task", "remind me to", "create a follow-up", "schedule a callback", etc.`,
 		input_schema: {
 			type: 'object' as const,
 			properties: {
@@ -107,7 +108,7 @@ const TOOLS: Anthropic.Tool[] = [
 	},
 	{
 		name: 'navigate_to',
-		description: 'Navigate the user to a specific page in Edelhaus. Use when user says "go to", "open", "take me to", "show me the X page".',
+		description: `Navigate the user to a specific page in ${BRAND}. Use when user says "go to", "open", "take me to", "show me the X page".`,
 		input_schema: {
 			type: 'object' as const,
 			properties: {
@@ -133,7 +134,7 @@ const TOOLS: Anthropic.Tool[] = [
 	},
 	{
 		name: 'get_tutorial',
-		description: 'Get a tutorial or explanation of a Edelhaus feature. Use when user asks "how do I", "what is", "explain", "help me with", "how does X work".',
+		description: `Get a tutorial or explanation of a ${BRAND} feature. Use when user asks "how do I", "what is", "explain", "help me with", "how does X work".`,
 		input_schema: {
 			type: 'object' as const,
 			properties: {
@@ -439,7 +440,7 @@ async function executeTool(name: string, input: Record<string, unknown>, ownerId
 		if (name === 'get_tutorial') {
 			const { topic } = input as { topic: string };
 			const tutorials: Record<string, string> = {
-				campaigns: 'Edelhaus campaigns work in a hierarchy: Clients → Projects → Campaigns → Call Lists → Contacts. Create a Client first, then a Project under it, then a Campaign, then a Call List, then import contacts into that list. The Campaign Dialer (/dialer) auto-dials through your call lists.',
+				campaigns: `${BRAND} campaigns work in a hierarchy: Clients → Projects → Campaigns → Call Lists → Contacts. Create a Client first, then a Project under it, then a Campaign, then a Call List, then import contacts into that list. The Campaign Dialer (/dialer) auto-dials through your call lists.`,
 				power_dialer: 'The Power Dialer auto-advances to the next contact after each call ends. Enable it with the ⚡ button in the Campaign Dialer header. After saving a call outcome, it counts down 3 seconds then dials automatically. You can skip or cancel the countdown.',
 				sequences: 'Sequences are automated email drip campaigns. Create them at /sequences — give them a name, trigger (manual/lead arrived/call completed), and define steps (subject + body + delay in days). Enroll contacts manually or via automations. The system advances steps daily via cron.',
 				contacts: 'Contacts live at /contacts. Import via CSV (Import Center), scrape from websites (Lead Gen), or add manually. Each contact has a timeline showing all calls, SMS, emails, and activities. Use bulk select to run actions on multiple contacts at once.',
@@ -558,7 +559,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const { messages, systemPrompt: customSystem } = await request.json();
 
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-	const systemPrompt = customSystem ?? `You are Edelhaus AI — a sales intelligence assistant embedded in a CRM. You help manage contacts, calls, tasks, campaigns, and pipeline.
+	const systemPrompt = customSystem ?? `You are ${BRAND} AI — a sales intelligence assistant embedded in a CRM. You help manage contacts, calls, tasks, campaigns, and pipeline.
 
 Use tools to look up live data. Be concise and actionable. Today is ${today}.`;
 

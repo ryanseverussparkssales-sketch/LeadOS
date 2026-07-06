@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BRAND } from '$lib/brand';
 	import StatsWidget from '$lib/components/widgets/StatsWidget.svelte';
 	import DailyGoalsWidget from '$lib/components/widgets/DailyGoalsWidget.svelte';
 	import QuotaWidget from '$lib/components/widgets/QuotaWidget.svelte';
@@ -7,7 +8,7 @@
 	import LeaderboardWidget from '$lib/components/widgets/LeaderboardWidget.svelte';
 </script>
 
-<svelte:head><title>Dashboard — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Dashboard — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-6">
 	<div class="max-w-5xl mx-auto">

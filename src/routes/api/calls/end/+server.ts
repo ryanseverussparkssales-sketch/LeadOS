@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const params: Record<string, string> = {};
 	for (const [k, v] of formData.entries()) params[k] = typeof v === 'string' ? v : '';
 
-	assertTwilioSignature(request, url, params);
+	await assertTwilioSignature(request, url, params);
 
 	const callSid = params.CallSid;
 	const recordingUrl = params.RecordingUrl;

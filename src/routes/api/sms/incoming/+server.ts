@@ -92,7 +92,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const form = await request.formData();
 	const sigParams: Record<string, string> = {};
 	for (const [k, v] of form.entries()) sigParams[k] = v as string;
-	assertTwilioSignature(request, url, sigParams);
+	await assertTwilioSignature(request, url, sigParams);
 
 	try {
 		const from    = form.get('From') as string;

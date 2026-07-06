@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, AGENCY_BRAND, titleFor } from '$lib/brand';
 
 	let name = $state('');
 	let email = $state('');
@@ -42,21 +43,21 @@
 	}
 </script>
 
-<svelte:head><title>Hire SDRs — Edelhaus</title>
-	<meta property="og:title" content="Hire SDRs — Edelhaus" />
+<svelte:head><title>{titleFor('Hire SDRs')}</title>
+	<meta property="og:title" content="Hire SDRs — {BRAND}" />
 	<meta property="og:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta property="og:image" content="https://lead-os-livid.vercel.app/og-image.png" />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="Edelhaus" />
+	<meta property="og:site_name" content={BRAND} />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Hire SDRs — Edelhaus" />
+	<meta name="twitter:title" content="Hire SDRs — {BRAND}" />
 	<meta name="twitter:description" content="Managed outbound appointment setting for home improvement, B2B, and adjacent verticals. Performance-based. Speak with a lead generation expert." />
 	<meta name="twitter:image" content="https://lead-os-livid.vercel.app/og-image.png" /></svelte:head>
 
 <div class="min-h-screen bg-[#0a0a0a] text-white">
 
 	<nav class="border-b border-[#1a1a1a] px-8 py-5 flex items-center justify-between">
-		<a href="/" class="font-semibold">Edelhaus</a>
+		<a href="/" class="font-semibold">{BRAND}</a>
 		<div class="flex items-center gap-5">
 			<a href="/?mode=login" class="text-xs text-[#7c7c7c] hover:text-white transition-colors">Log in</a>
 		</div>
@@ -66,7 +67,7 @@
 
 		<!-- Hero -->
 		<div class="text-center mb-16">
-			<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">Edelhaus</p>
+			<p class="text-xs text-[#6e6e6e] uppercase tracking-widest mb-4">{AGENCY_BRAND}</p>
 			<h1 class="text-5xl font-bold tracking-tight mb-5">Hire vetted SDRs.<br/><span class="text-[#6e6e6e]">Pay per appointment.</span></h1>
 			<p class="text-[#7c7c7c] text-lg max-w-xl mx-auto leading-relaxed">
 				We source, screen, and manage sales reps for your outbound campaigns.
@@ -215,6 +216,6 @@
 	</div>
 
 	<footer class="border-t border-[#1a1a1a] px-8 py-6 text-center">
-		<p class="text-xs text-[#333]">Edelhaus · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
+		<p class="text-xs text-[#333]">{AGENCY_BRAND} · <a href="mailto:ryan@sparkscuriosity.com" class="hover:text-white transition-colors">ryan@sparkscuriosity.com</a></p>
 	</footer>
 </div>

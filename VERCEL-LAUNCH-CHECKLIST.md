@@ -150,3 +150,20 @@ Common causes:
 - Missing env var → check Vercel function logs for "Cannot read properties of undefined"
 - TypeScript error → run `npm run build` locally first
 - `SUPABASE_SERVICE_KEY` name mismatch → verify it matches exactly what's in `src/lib/server/supabase.ts` line 3
+
+---
+
+## 2026-07-05 additions
+- **New env var (optional):** `SENTRY_DSN` — enables server error reporting via `@sentry/sveltekit` in `hooks.server.ts` `handleError`. Leave unset to skip Sentry entirely (errors still log to console).
+- **Migrations:** run `supabase/migrations/0006` → `0007` → `0008` → `0009` in order in the Supabase SQL Editor (lead_source field_mapping, client digest columns, sequence channel/sms_body, booking_links table). All are idempotent.
+- **New cron:** `/api/cron/client-digest` — Mondays 13:00 UTC (already in `vercel.json`, authorized via `CRON_SECRET`). Sends the weekly client digest to clients with `digest_enabled = true`.
+- **`npm install` required before build/deploy** — new dependency `@sentry/sveltekit` was added to `package.json`.
+- **New public routes:** `/book/[slug]` (public booking page) backed by `/api/booking/[slug]/slots` (rate limit 30 req/min/IP) and `/api/booking/[slug]/book` (rate limit 10 req/min/IP). `/api/webhook/[token]` is also rate limited (120 req/min per token+IP). No auth on these routes by design — all writes derive the tenant from the booking link / webhook token row.
+
+---
+
+## 2026-07-05 additions (assistant)
+
+- **New env var (optional):** `PUBLIC_GUPPY_URL` — the URL of the local Guppy engine the `/assistant` page prefers when reachable. Defaults to `http://127.0.0.1:8080` if unset, so you do **not** need to add it for a cloud-only deployment. It is read at build time (a `PUBLIC_` var baked into the client bundle), so changing it requires a redeploy.
+- **The Assistant works cloud-only with just `ANTHROPIC_API_KEY`** (already in Step 7). With no local engine reachable, `/assistant` automatically streams from the cloud fallback route (`/api/assistant/stream`) — no extra setup.
+- **Local mode is optional and per-user:** it only works on a machine where Guppy is running locally, and Guppy must set `GUPPY_ALLOWED_ORIGINS` to the deployment origin (e.g. `https://<your-app>.vercel.app`) so the browser is allowed to call `localhost` from the deployed app. This is a Guppy-side env var (its CORS is already env-driven — no code change) and does not affect the Vercel deployment.

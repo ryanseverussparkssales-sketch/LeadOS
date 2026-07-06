@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -126,7 +127,7 @@
 	);
 </script>
 
-<svelte:head><title>Time — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Time')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">

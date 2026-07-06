@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId, normalizePhone } from '$lib/server/supabase';
+import { logWrite } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 
 async function getOrCreateDefaultList(ownerId: string): Promise<string | null> {
@@ -21,6 +22,7 @@ async function getOrCreateDefaultList(ownerId: string): Promise<string | null> {
 		.select('id')
 		.single();
 
+	if (clientErr) console.error('[calls/start] default client insert failed:', clientErr.message);
 	if (clientErr || !client) return null;
 
 	const { data: project, error: projectErr } = await supabaseAdmin
@@ -29,13 +31,15 @@ async function getOrCreateDefaultList(ownerId: string): Promise<string | null> {
 		.select('id')
 		.single();
 
+	if (projectErr) console.error('[calls/start] default project insert failed:', projectErr.message);
 	if (projectErr || !project) return null;
 
 	const { data: list } = await supabaseAdmin
 		.from('call_lists')
 		.insert({ project_id: project.id, name: 'Default', status: 'active', user_id: ownerId })
 		.select('id')
-		.single();
+		.single()
+		.then(logWrite('default call_list insert'));
 
 	return list?.id ?? null;
 }
@@ -90,7 +94,8 @@ export const POST: RequestHandler = async ({ request }) => {
 						status: 'active',
 						contact_type: 'lead',
 						lead_source: 'desk_phone',
-					}).select('id, phone, call_count, status, name').single();
+					}).select('id, phone, call_count, status, name').single()
+					.then(logWrite('desk-phone contact insert'));
 				contact = created ?? null;
 			}
 		}
@@ -119,6 +124,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		.select()
 		.single();
 
+		if (callErr) console.error('[calls/start] call insert failed:', callErr.message);
 		if (callErr || !call) throw error(500, callErr?.message ?? 'Failed to create call record');
 
 		// Increment call_count and set last_called_at (fire-and-forget)

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -100,7 +101,7 @@
 	const overdue = $derived(tasks.filter(t => isOverdue(t)).length);
 </script>
 
-<svelte:head><title>Tasks — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Tasks')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-2">

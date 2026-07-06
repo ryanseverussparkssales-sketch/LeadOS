@@ -14,6 +14,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto, onNavigate } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
+	import { fade, fly } from 'svelte/transition';
 
 	// Page transition — cross-fade between routes
 	onNavigate((navigation) => {
@@ -46,6 +47,11 @@
 	$effect(() => {
 		if ($navigating) sidebarOpen = false;
 	});
+
+	// Close mobile sidebar on Escape
+	function onGlobalKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && sidebarOpen) sidebarOpen = false;
+	}
 
 	onMount(async () => {
 		// Wrap the entire auth check in try/catch so that any transient network
@@ -139,6 +145,8 @@
 	});
 </script>
 
+<svelte:window onkeydown={onGlobalKeydown} />
+
 <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[1000] focus:top-2 focus:left-2 focus:bg-white focus:text-black focus:px-3 focus:py-1.5 focus:rounded focus:text-sm">Skip to content</a>
 
 <OfflineBanner />
@@ -164,18 +172,27 @@
 			<Sidebar />
 		</div>
 
-		<!-- Mobile sidebar overlay -->
+		<!-- Mobile sidebar — off-canvas drawer with backdrop -->
 		{#if sidebarOpen}
 			<div
 				class="fixed inset-0 z-40 md:hidden"
 				role="button"
 				tabindex="-1"
+				aria-label="Close navigation"
 				onclick={() => sidebarOpen = false}
 				onkeydown={(e) => e.key === 'Escape' && (sidebarOpen = false)}
+				transition:fade={{ duration: 150 }}
 			>
 				<div class="absolute inset-0 bg-black/60"></div>
 			</div>
-			<div class="fixed inset-y-0 left-0 z-50 md:hidden flex flex-col">
+			<div
+				id="mobile-sidebar"
+				class="fixed inset-y-0 left-0 z-50 md:hidden flex flex-col shadow-2xl"
+				role="dialog"
+				aria-modal="true"
+				aria-label="Navigation"
+				transition:fly={{ x: -224, duration: 200, opacity: 1 }}
+			>
 				<Sidebar />
 			</div>
 		{/if}
@@ -190,10 +207,12 @@
 					onclick={() => sidebarOpen = !sidebarOpen}
 					class="p-1.5 rounded hover:bg-[#1a1a1a] text-[#888] hover:text-white transition-colors"
 					aria-label="Toggle sidebar"
+					aria-expanded={sidebarOpen}
+					aria-controls="mobile-sidebar"
 				>
 					☰
 				</button>
-				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">EDELHAUS</span>
+				<span class="text-sm font-bold tracking-widest text-[#f5f5f5]">ROGUEOS</span>
 			</div>
 
 			<OnboardingChecklist />

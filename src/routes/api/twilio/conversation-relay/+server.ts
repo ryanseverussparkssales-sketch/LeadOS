@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { assertTwilioSignature } from '$lib/server/twilioVerify';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 const escapeXml = (s: string) =>
@@ -19,7 +20,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const form = await request.formData();
 	const params: Record<string, string> = {};
 	for (const [k, v] of form.entries()) params[k] = v as string;
-	assertTwilioSignature(request, url, params);
+	await assertTwilioSignature(request, url, params);
 
 	const wsBase = env.RELAY_WS_URL; // e.g. wss://relay.yourdomain.com
 	const base = url.origin.replace(/^http:/, 'https:');
@@ -39,7 +40,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const persona = url.searchParams.get('persona') ?? '';
 	const greeting = mode === 'practice'
 		? (env.RELAY_PRACTICE_GREETING ?? 'Hello?')   // the AI buyer answers; the rep pitches
-		: (env.RELAY_WELCOME_GREETING ?? "Hi, this is the Edelhaus assistant calling — do you have a quick minute?");
+		: (env.RELAY_WELCOME_GREETING ?? `Hi, this is the ${BRAND} assistant calling — do you have a quick minute?`);
 
 	const attrs = [
 		`url="${escapeXml(wsUrl)}"`,

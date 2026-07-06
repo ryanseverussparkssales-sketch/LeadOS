@@ -5,6 +5,7 @@
  */
 
 // ─── Widget component imports ───────────────────────────────────────────────
+import { BRAND } from '$lib/brand';
 import StatsWidget from '$lib/components/widgets/StatsWidget.svelte';
 import CrossSellWidget from '$lib/components/widgets/CrossSellWidget.svelte';
 import RecentCallsWidget from '$lib/components/widgets/RecentCallsWidget.svelte';
@@ -212,7 +213,7 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
 	// ── TOOLS ───────────────────────────────────────────────────────────────
 	'chat': {
 		type: 'chat', label: 'AI Assistant', icon: '✦',
-		description: 'Ask Edelhaus AI anything about your data',
+		description: `Ask ${BRAND} AI anything about your data`,
 		component: ChatWidget, defaultCols: 1, defaultRows: 'lg',
 		category: 'tools',
 	},

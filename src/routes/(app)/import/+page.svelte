@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { CRM_TEMPLATES } from '$lib/crmTemplates';
 	import CSVImportAdvanced from '$lib/components/CSVImportAdvanced.svelte';
@@ -138,7 +139,7 @@
 	function fmtDate(iso: string) { return new Date(iso).toLocaleString(); }
 </script>
 
-<svelte:head><title>Import Center — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Import Center')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">

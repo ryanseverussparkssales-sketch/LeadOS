@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { getSession } from '$lib/services/auth';
 
@@ -67,7 +68,7 @@
 	const totalChecks = 4;
 </script>
 
-<svelte:head><title>Getting Started — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Getting Started — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 
@@ -108,7 +109,7 @@
 							<p class="text-xs text-[var(--accent)]">✓ Approved — you're cleared to dial live campaigns</p>
 						{:else}
 							<p class="text-xs text-[#8a8a8a] mb-3">Before your first live dial we do a quick 15-minute call. You talk, Ryan listens. If it's a fit you're in the same day.</p>
-							<a href="mailto:ryanseverussparkssales@gmail.com?subject=Verbal call request — Edelhaus&body=Hi Ryan, I'd like to schedule my intro call."
+							<a href="mailto:ryanseverussparkssales@gmail.com?subject=Verbal call request — {BRAND}&body=Hi Ryan, I'd like to schedule my intro call."
 								class="inline-block rounded-lg border border-yellow-800/40 bg-yellow-950/10 px-4 py-2 text-xs text-yellow-400 hover:bg-yellow-950/20 transition-colors">
 								Request your call →
 							</a>

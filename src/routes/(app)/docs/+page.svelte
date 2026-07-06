@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { getSession } from '$lib/services/auth';
@@ -144,7 +145,7 @@
 	}
 </script>
 
-<svelte:head><title>Docs — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Docs')}</title></svelte:head>
 
 {#if showAssignModal}
 	<FileAssignModal files={pendingFiles} onclose={() => { showAssignModal = false; pendingFiles = []; }} onsaved={onDocsSaved} />

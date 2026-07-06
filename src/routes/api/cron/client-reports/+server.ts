@@ -10,6 +10,7 @@
 
 import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { AGENCY_BRAND } from '$lib/brand';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { sendEmail } from '$lib/server/email';
 
@@ -38,10 +39,13 @@ export const GET = async ({ request }: { request: Request }) => {
 		// Get all clients for this owner
 		const { data: clients } = await supabaseAdmin
 			.from('clients')
-			.select('id, name, primary_contact_email')
+			.select('*')
 			.eq('user_id', owner.user_id);
 
 		for (const client of clients ?? []) {
+			// Clients opted into the new per-campaign digest (/api/cron/client-digest)
+			// get that instead — skip here to avoid two Monday emails.
+			if ((client as any).digest_enabled) continue;
 			// Get calls for this client's contacts this week
 			const { data: contacts } = await supabaseAdmin
 				.from('contact_client_assoc')
@@ -140,7 +144,7 @@ export const GET = async ({ request }: { request: Request }) => {
   <a href="${env.PUBLIC_SITE_URL ?? 'https://lead-os-livid.vercel.app'}/client-portal" class="cta">View Full Report →</a>
 
   <div class="footer">
-    Sent by ${owner.agency_name ?? 'Edelhaus'} · <a href="${env.PUBLIC_SITE_URL ?? ''}/client-portal" style="color:#aaa">View portal</a>
+    Sent by ${owner.agency_name ?? AGENCY_BRAND} · <a href="${env.PUBLIC_SITE_URL ?? ''}/client-portal" style="color:#aaa">View portal</a>
   </div>
 </div>
 </body>

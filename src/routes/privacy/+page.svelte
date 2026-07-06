@@ -1,18 +1,22 @@
+<script lang="ts">
+	import { BRAND, AGENCY_BRAND, titleFor } from '$lib/brand';
+</script>
+
 <svelte:head>
-	<title>Privacy Policy — Edelhaus</title>
-	<meta name="description" content="Privacy Policy for Edelhaus. How we collect, use, and protect your data." />
+	<title>{titleFor('Privacy Policy')}</title>
+	<meta name="description" content="Privacy Policy for {BRAND}. How we collect, use, and protect your data." />
 </svelte:head>
 
 <div class="min-h-screen bg-[#000] text-white" style="font-family:var(--font-ui,'Inter',system-ui,sans-serif)">
 	<nav class="flex items-center justify-between px-8 py-6 border-b border-[#0f0f0f]">
-		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">EDELHAUS</a>
+		<a href="/" style="font-family:var(--font-label,'Cormorant SC',serif);font-size:14px;letter-spacing:.28em;color:#fff">ROGUEOS</a>
 		<a href="/terms" class="text-xs text-[#6e6e6e] hover:text-white transition-colors">Terms of Service</a>
 	</nav>
 
 	<div class="max-w-3xl mx-auto px-8 py-16">
 		<p style="font-family:var(--font-label,'Cormorant SC',serif);font-size:9px;letter-spacing:.22em;color:#333;margin-bottom:12px">Legal</p>
 		<h1 style="font-family:var(--font-display,'Playfair Display',Georgia,serif);font-weight:300;font-size:36px;color:#fff;margin-bottom:8px">Privacy Policy</h1>
-		<p class="text-xs text-[#6e6e6e] mb-12">Last updated: June 2026 · Edelhaus LLC</p>
+		<p class="text-xs text-[#6e6e6e] mb-12">Last updated: June 2026 · {AGENCY_BRAND} LLC</p>
 
 		<div style="font-size:13px;color:#888;line-height:1.8">
 
@@ -52,7 +56,7 @@
 	</div>
 
 	<div class="border-t border-[#0a0a0a] px-8 py-6 flex items-center justify-between max-w-5xl mx-auto">
-		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:11px;letter-spacing:.22em;color:#222">EDELHAUS</span>
+		<span style="font-family:var(--font-label,'Cormorant SC',serif);font-size:11px;letter-spacing:.22em;color:#222">ROGUEOS</span>
 		<div class="flex gap-6 text-[10px] text-[#2a2a2a]">
 			<a href="/terms" class="hover:text-white transition-colors">Terms</a>
 			<a href="/privacy" class="hover:text-white transition-colors">Privacy</a>

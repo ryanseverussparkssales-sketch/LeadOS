@@ -1,9 +1,10 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request, url }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const clientId = url.searchParams.get('client_id');
 
 	let query = supabaseAdmin
@@ -13,10 +14,14 @@ export const GET: RequestHandler = async ({ request, url }) => {
 		.order('name');
 
 	if (clientId) {
+		// Verify the client belongs to this agency before returning its projects
+		const { data: client } = await supabaseAdmin
+			.from('clients').select('id').eq('id', clientId).eq('user_id', ownerId).maybeSingle();
+		if (!client) throw error(403, 'Forbidden');
 		query = query.eq('client_id', clientId);
 	} else {
-		// Only return projects for this user's clients
-		query = query.eq('client.user_id', user.id);
+		// Only return projects for this agency's clients
+		query = query.eq('client.user_id', ownerId);
 	}
 
 	const { data } = await query;
@@ -25,12 +30,13 @@ export const GET: RequestHandler = async ({ request, url }) => {
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const { name, client_id } = await request.json();
 	if (!name?.trim() || !client_id) throw error(400, 'name and client_id required');
 
-	// Verify client ownership
+	// Verify client ownership (agency-scoped)
 	const { data: client } = await supabaseAdmin
-		.from('clients').select('id').eq('id', client_id).eq('user_id', user.id).single();
+		.from('clients').select('id').eq('id', client_id).eq('user_id', ownerId).single();
 	if (!client) throw error(403, 'Forbidden');
 
 	const { data, error: e } = await supabaseAdmin

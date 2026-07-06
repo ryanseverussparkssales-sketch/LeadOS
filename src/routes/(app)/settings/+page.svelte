@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { supabase } from '$lib/services/auth';
 	import { currentUser } from '$lib/stores';
@@ -193,6 +194,91 @@
 	// ── Password change ───────────────────────────────────────
 	let newPassword = $state(''); let confirmPassword = $state(''); let passwordMsg = $state(''); let changingPw = $state(false);
 
+	// ── Local AI Engine (Guppy) ───────────────────────────────
+	// The assistant page prefers the local Guppy engine (faster, private, voice)
+	// and falls back to cloud. The URL is read at build time from PUBLIC_GUPPY_URL,
+	// so this input is informational (writes localStorage for a future runtime read);
+	// the local token IS read live by the assistant page on each request.
+	let guppyLocalUrl = $state('http://127.0.0.1:8080');
+	let guppyLocalToken = $state('');
+	let guppyTestState = $state<'idle'|'testing'|'ok'|'fail'>('idle');
+
+	function loadGuppySettings() {
+		if (typeof localStorage === 'undefined') return;
+		guppyLocalUrl = localStorage.getItem('guppy_local_url') || 'http://127.0.0.1:8080';
+		guppyLocalToken = localStorage.getItem('guppy_local_token') || '';
+	}
+
+	function saveGuppyUrl() {
+		if (typeof localStorage === 'undefined') return;
+		localStorage.setItem('guppy_local_url', guppyLocalUrl.trim());
+	}
+
+	function saveGuppyToken() {
+		if (typeof localStorage === 'undefined') return;
+		const t = guppyLocalToken.trim();
+		if (t) localStorage.setItem('guppy_local_token', t);
+		else localStorage.removeItem('guppy_local_token');
+	}
+
+	async function testGuppyConnection() {
+		if (typeof fetch === 'undefined') return;
+		guppyTestState = 'testing';
+		const base = guppyLocalUrl.trim().replace(/\/+$/, '');
+		const ctrl = new AbortController();
+		const timer = setTimeout(() => ctrl.abort(), 1500);
+		try {
+			const r = await fetch(`${base}/health`, { signal: ctrl.signal });
+			guppyTestState = r.ok ? 'ok' : 'fail';
+		} catch {
+			guppyTestState = 'fail';
+		} finally {
+			clearTimeout(timer);
+		}
+	}
+
+	// ── Quo / OpenPhone calling ───────────────────────────────
+	let quoStatus = $state<{ configured: boolean; webhookSecret: boolean } | null>(null);
+	let quoSyncing = $state(false);
+	const quoWebhookUrl = $derived(
+		typeof window !== 'undefined' ? `${window.location.origin}/api/voip/quo/webhook` : '/api/voip/quo/webhook'
+	);
+
+	async function loadQuoStatus() {
+		const r = await apiFetch('/api/voip/quo/status');
+		quoStatus = r.ok ? await r.json() : null;
+	}
+
+	async function copyQuoWebhook() {
+		if (typeof navigator === 'undefined' || !navigator.clipboard) {
+			toastError('Clipboard not available in this browser');
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(quoWebhookUrl);
+			toastSuccess('Webhook URL copied');
+		} catch {
+			toastError('Could not copy — copy it manually');
+		}
+	}
+
+	async function syncQuoCalls() {
+		quoSyncing = true;
+		try {
+			const r = await apiFetch('/api/voip/quo/sync', { method: 'POST' });
+			if (r.ok) {
+				const d = await r.json();
+				toastSuccess(`Synced ${d.synced ?? 0} call${(d.synced ?? 0) === 1 ? '' : 's'} · ${d.transcribed ?? 0} transcribed`);
+				loadQuoStatus();
+			} else {
+				toastError('Quo sync failed — check your API key');
+			}
+		} catch {
+			toastError('Quo sync failed — check your connection');
+		}
+		quoSyncing = false;
+	}
+
 	onMount(async () => {
 		const tierRes = await apiFetch('/api/portal/tier');
 		if (tierRes.ok) { const d = await tierRes.json(); currentTier = d.tier; }
@@ -222,6 +308,8 @@
 		// Load email accounts + handle OAuth callback params
 		handleGmailCallbackParams();
 		loadEmailAccounts();
+		loadGuppySettings();
+		loadQuoStatus();
 		// Load audio devices
 		try {
 			await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -311,7 +399,7 @@
 	const SETTINGS_BACKED = new Set(['profile','agency','appearance','calling','communication','voice','contacts','productivity','widgets','notifications','data']);
 </script>
 
-<svelte:head><title>Settings — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Settings')}</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 	<!-- Left sidebar nav -->
@@ -599,6 +687,82 @@
 					</div>
 				{/each}
 				<p class="text-xs text-[#6e6e6e] mt-2">Credentials are stored in your .env.local file. To update them, edit that file and restart the server.</p>
+
+				<!-- Local AI Engine (Guppy) -->
+				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
+					<div class="flex items-center gap-3">
+						<span class="text-2xl">✦</span>
+						<div>
+							<p class="text-white text-sm font-medium">Local AI Engine (Guppy)</p>
+							<p class="text-xs text-[#7c7c7c]">A local engine gives the Assistant faster, private, voice-capable AI. Cloud (Claude) is the automatic fallback.</p>
+						</div>
+					</div>
+					<div>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Local engine URL (restart to apply)</label>
+						<input bind:value={guppyLocalUrl} onchange={saveGuppyUrl} placeholder="http://127.0.0.1:8080"
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
+						<p class="text-xs text-[#333] mt-1">The engine reads its URL from PUBLIC_GUPPY_URL at build time — this value is saved for future use and a manual restart is required to change the active endpoint.</p>
+					</div>
+					<div>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Local engine token (optional)</label>
+						<input bind:value={guppyLocalToken} onchange={saveGuppyToken} type="password" placeholder="••••••••"
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none font-mono" />
+						<p class="text-xs text-[#333] mt-1">Read live by the Assistant page and sent as a bearer token to the local engine.</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<button onclick={testGuppyConnection} disabled={guppyTestState === 'testing'}
+							class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors disabled:opacity-40">
+							{guppyTestState === 'testing' ? 'Testing…' : 'Test connection'}
+						</button>
+						{#if guppyTestState === 'ok'}
+							<span class="text-xs text-[var(--accent)]">✓ reachable</span>
+						{:else if guppyTestState === 'fail'}
+							<span class="text-xs text-red-400">✗ unreachable</span>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Quo / OpenPhone Calling -->
+				<div class="rounded-xl border border-[#2a2a2a] bg-[#111] p-5 space-y-4 hover:border-[#262626] hover:bg-[#0f0f0f] transition-colors">
+					<div class="flex items-center gap-3">
+						<span class="text-2xl">☎️</span>
+						<div>
+							<p class="text-white text-sm font-medium">Quo / OpenPhone Calling</p>
+							<p class="text-xs text-[#7c7c7c]">Calls placed through Quo auto-sync with transcripts into Call Review and become available to the Assistant.</p>
+						</div>
+					</div>
+
+					<div>
+						<label class="text-xs text-[#7c7c7c] block mb-1">Webhook URL — paste into Quo (Settings → Webhooks)</label>
+						<div class="flex gap-2">
+							<input value={quoWebhookUrl} readonly
+								class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none font-mono" />
+							<button onclick={copyQuoWebhook}
+								class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors whitespace-nowrap">
+								Copy
+							</button>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-2">
+						{#if quoStatus?.configured}
+							<span class="text-xs text-[var(--accent)]">✓ Connected</span>
+							{#if !quoStatus.webhookSecret}
+								<span class="text-xs text-yellow-400">· webhook secret not set (QUO_WEBHOOK_SECRET)</span>
+							{/if}
+						{:else}
+							<span class="text-xs text-red-400">✗ Set QUO_API_KEY, QUO_PHONE_NUMBER_ID, QUO_WEBHOOK_SECRET in Vercel env</span>
+						{/if}
+					</div>
+
+					<div class="flex items-center gap-3">
+						<button onclick={syncQuoCalls} disabled={quoSyncing}
+							class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors disabled:opacity-40">
+							{quoSyncing ? 'Syncing…' : 'Sync recent calls'}
+						</button>
+						<span class="text-xs text-[#333]">The API key & webhook secret are set as server env vars in Vercel — not entered here.</span>
+					</div>
+				</div>
 			</div>
 
 		<!-- ── INTEGRATIONS ───────────────────────────────── -->
@@ -812,7 +976,7 @@
 		<!-- ── TOKENS ──────────────────────────────────────── -->
 		{:else if section === 'tokens'}
 			<h2 class="text-white text-sm font-medium mb-6">API Tokens</h2>
-			<p class="text-xs text-[#7c7c7c]">Tokens let external tools access Edelhaus via API.</p>
+			<p class="text-xs text-[#7c7c7c]">Tokens let external tools access {BRAND} via API.</p>
 			<div class="flex gap-3">
 				<input bind:value={newTokenName} placeholder="Token name" class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
 				<button onclick={createToken} disabled={creatingToken || !newTokenName.trim()} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black disabled:opacity-40">Create</button>

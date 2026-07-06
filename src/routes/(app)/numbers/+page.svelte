@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
@@ -10,6 +11,52 @@
 	interface Voicemail { id:string; caller_id:string; duration_seconds:number; transcript:string|null; recording_url:string|null; status:string; received_at:string; phone_number:{phone_number:string}|null; }
 	interface MissedCall { id:string; caller_id:string; returned:boolean; received_at:string; notes:string|null; phone_number:{phone_number:string}|null; }
 	interface SearchResult { phoneNumber:string; friendlyName:string; locality:string; region:string; type:string; monthlyFee:number; }
+
+	// Number health (daily utilization + 7-day volume) — /api/phone/health
+	interface NumberHealth { id:string; calls_today:number; daily_limit:number; utilization:number; sevenDay:number[]; sevenDayTotal:number; last_used_at:string|null; }
+	let health = $state<Record<string, NumberHealth>>({});
+	let healthWarnings = $state(0);
+	let editingLimitId = $state<string|null>(null);
+	let limitInput = $state(100);
+	let savingLimit = $state(false);
+
+	async function loadHealth() {
+		const r = await apiFetch('/api/phone/health');
+		if (!r.ok) return;
+		const d = await r.json();
+		const map: Record<string, NumberHealth> = {};
+		for (const h of d.numbers ?? []) map[h.id] = h;
+		health = map;
+		healthWarnings = d.warnings ?? 0;
+	}
+
+	async function saveLimit(numId: string) {
+		const limit = Math.max(1, Math.floor(Number(limitInput) || 0));
+		if (!limit) return;
+		savingLimit = true;
+		const r = await apiFetch(`/api/phone/numbers/${numId}`, { method: 'PUT', body: JSON.stringify({ daily_limit: limit }) });
+		if (r.ok) {
+			const h = health[numId];
+			if (h) health = { ...health, [numId]: { ...h, daily_limit: limit, utilization: Math.round((h.calls_today / limit) * 100) } };
+			healthWarnings = Object.values(health).filter(x => x.utilization >= 80).length;
+			editingLimitId = null;
+		} else {
+			toastError('Could not save limit — run phone-number-health-migration.sql if daily_limit is missing');
+		}
+		savingLimit = false;
+	}
+
+	function usageBarClass(u: number): string {
+		return u < 60 ? 'bg-emerald-500' : u <= 85 ? 'bg-yellow-500' : 'bg-red-500';
+	}
+
+	function fmtLastUsed(iso: string | null): string {
+		if (!iso) return 'never used';
+		const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+		if (days <= 0) return 'used today';
+		if (days === 1) return 'used yesterday';
+		return `used ${days}d ago`;
+	}
 
 	let numbers = $state<PhoneNumber[]>([]);
 	let voicemails = $state<Voicemail[]>([]);
@@ -187,6 +234,7 @@
 
 		loadA2PStatus();
 		loadTeam();
+		loadHealth();
 	});
 
 	async function addNumber() {
@@ -214,14 +262,14 @@
 	}
 
 	async function deleteNumber(id: string) {
-		if (!confirm('Remove this number from Edelhaus? (It will not be released from Twilio — use Release for that.)')) return;
+		if (!confirm(`Remove this number from ${BRAND}? (It will not be released from Twilio — use Release for that.)`)) return;
 		await apiFetch(`/api/phone/numbers/${id}`, { method: 'DELETE' });
 		numbers = numbers.filter(n => n.id !== id);
 	}
 
 	async function releaseNumber(num: PhoneNumber) {
 		if (!num.twilio_phone_sid) {
-			if (!confirm(`Remove ${num.phone_number} from Edelhaus? (No Twilio SID on record — will only remove from Edelhaus.)`)) return;
+			if (!confirm(`Remove ${num.phone_number} from ${BRAND}? (No Twilio SID on record — will only remove from ${BRAND}.)`)) return;
 			await apiFetch(`/api/phone/numbers/${num.id}`, { method: 'DELETE' });
 			numbers = numbers.filter(n => n.id !== num.id);
 			return;
@@ -298,7 +346,7 @@
 			setTimeout(() => { purchaseTarget = null; }, 3500);
 		} else if (r.status === 207 && d.purchased) {
 			// Twilio purchase OK but DB save failed — auto-retry via /api/phone/numbers
-			purchaseMsg = 'Purchased from Twilio — saving to Edelhaus...';
+			purchaseMsg = `Purchased from Twilio — saving to ${BRAND}...`;
 			const retryRes = await apiFetch('/api/phone/numbers', {
 				method: 'POST',
 				body: JSON.stringify({
@@ -423,7 +471,7 @@
 	}
 </script>
 
-<svelte:head><title>Phone Manager — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Phone Manager')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4">
@@ -443,7 +491,12 @@
 
 			<!-- Toolbar -->
 			<div class="border-b border-[#1e1e1e] px-8 py-3 flex justify-between items-center">
-				<p class="text-xs text-[#7c7c7c]">{numbers.length} number{numbers.length !== 1 ? 's' : ''}</p>
+				<p class="text-xs text-[#7c7c7c]">
+					{numbers.length} number{numbers.length !== 1 ? 's' : ''}
+					{#if healthWarnings > 0}
+						<span class="ml-2 text-yellow-400">⚠ {healthWarnings} near daily limit</span>
+					{/if}
+				</p>
 				<div class="flex gap-2">
 					<button onclick={() => { showBuy = !showBuy; showAdd = false; }}
 						class="rounded-lg px-3 py-1 text-xs transition-colors {showBuy ? 'bg-white text-black' : 'border border-[#2a2a2a] text-[#999] hover:border-white hover:text-white'}">
@@ -568,7 +621,7 @@
 			<!-- Buy Numbers Panel -->
 			{#if showBuy}
 				<div class="border-b border-[#1e1e1e] bg-[#0a0a0a] p-6">
-					<p class="text-xs text-[#7c7c7c] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with Edelhaus webhooks.</p>
+					<p class="text-xs text-[#7c7c7c] mb-4">Search Twilio's number inventory. Numbers are provisioned instantly and auto-configured with {BRAND} webhooks.</p>
 
 					<!-- Type toggle -->
 					<div class="flex gap-2 mb-4">
@@ -711,6 +764,41 @@
 											{#if num.client}<span>Client: {num.client.name}</span>{/if}
 											{#if num.campaign}<span>Campaign: {num.campaign.name}</span>{/if}
 										</div>
+										<!-- Number health: today's utilization + 7-day volume -->
+										{#if health[num.id]}
+											{@const h = health[num.id]}
+											<div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-[#6e6e6e]">
+												<span class="font-mono">{h.calls_today}/{h.daily_limit} today</span>
+												<div class="h-1 w-28 rounded-full bg-[#1a1a1a] overflow-hidden shrink-0">
+													<div class="h-full rounded-full {usageBarClass(h.utilization)}" style="width:{Math.min(h.utilization, 100)}%"></div>
+												</div>
+												{#if h.utilization >= 100}
+													<span class="text-red-400">over limit — rotate or raise limit</span>
+												{:else if h.utilization >= 80}
+													<span class="text-yellow-400">⚠ near daily limit</span>
+												{/if}
+												<span class="text-[#555]">·</span>
+												<span>7d: {h.sevenDayTotal}</span>
+												<span class="text-[#555]">·</span>
+												<span>{fmtLastUsed(h.last_used_at)}</span>
+												<span class="text-[#555]">·</span>
+												{#if editingLimitId === num.id}
+													<input type="number" bind:value={limitInput} min="1"
+														onkeydown={(e) => { if (e.key === 'Enter') saveLimit(num.id); if (e.key === 'Escape') editingLimitId = null; }}
+														class="w-16 rounded border border-[#2a2a2a] bg-[#111] px-1.5 py-0.5 text-xs text-white font-mono focus:border-white focus:outline-none" />
+													<button onclick={() => saveLimit(num.id)} disabled={savingLimit}
+														class="text-xs text-white border border-[#2a2a2a] px-1.5 py-0.5 rounded hover:border-white transition-colors disabled:opacity-40">
+														{savingLimit ? '...' : 'Set'}
+													</button>
+													<button onclick={() => editingLimitId = null} class="text-xs text-[#6e6e6e] hover:text-white">x</button>
+												{:else}
+													<button onclick={() => { editingLimitId = num.id; limitInput = h.daily_limit; }}
+														class="text-xs text-[#6e6e6e] hover:text-white underline decoration-[#333] underline-offset-2 transition-colors">
+														edit limit
+													</button>
+												{/if}
+											</div>
+										{/if}
 									</div>
 									<div class="flex items-center gap-2 shrink-0">
 										<button onclick={() => toggleStatus(num)}

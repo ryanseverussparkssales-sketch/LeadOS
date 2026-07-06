@@ -23,6 +23,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 	const user = await requireAuth(request);
 	const ownerId = await getEffectiveUserId(user.id);
 	const { data } = await supabaseAdmin.from('templates').select('use_count').eq('id', params.id).eq('user_id', ownerId).single();
-	await supabaseAdmin.from('templates').update({ use_count: (data?.use_count ?? 0) + 1 }).eq('id', params.id);
+	if (!data) throw error(404, 'Template not found');
+	await supabaseAdmin.from('templates').update({ use_count: (data.use_count ?? 0) + 1 }).eq('id', params.id).eq('user_id', ownerId);
 	return json({ success: true });
 };

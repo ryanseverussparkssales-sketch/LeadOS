@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 
 	type Period = 'month' | 'quarter' | 'year';
@@ -22,7 +23,7 @@
 	const PERIOD_LABELS: Record<Period,string> = { month:'This Month', quarter:'This Quarter', year:'This Year' };
 </script>
 
-<svelte:head><title>Win/Loss — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Win/Loss')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">

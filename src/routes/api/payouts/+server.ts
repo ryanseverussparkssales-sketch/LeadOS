@@ -1,6 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
+import { logWrite } from '$lib/server/db';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 // GET — list payouts. Owner sees all; SDR sees own.
@@ -82,7 +84,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		payoutId = existing.id;
 		await supabaseAdmin.from('payouts')
 			.update({ status: 'processing', amount_cents, notes: notes ?? null })
-			.eq('id', payoutId);
+			.eq('id', payoutId)
+			.then(logWrite('payout retry → processing update'));
 	} else {
 		const { data: reserved, error: resErr } = await supabaseAdmin.from('payouts').insert({
 			owner_user_id: ownerId, team_member_id, call_id,
@@ -98,7 +101,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	// Stripe not configured — leave the reserved row as a manual 'pending' payout.
 	if (!env.STRIPE_SECRET_KEY) {
 		const { data: payout } = await supabaseAdmin.from('payouts')
-			.update({ status: 'pending' }).eq('id', payoutId).select().single();
+			.update({ status: 'pending' }).eq('id', payoutId).select().single()
+			.then(logWrite('payout → pending update (no Stripe key)'));
 		return json(payout, { status: 201 });
 	}
 
@@ -116,7 +120,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			amount: String(amount_cents),
 			currency: 'usd',
 			destination: member.stripe_connect_account_id,
-			description: `Edelhaus payout — call ${call_id}`,
+			description: `${BRAND} payout — call ${call_id}`,
 			'metadata[call_id]': call_id,
 			'metadata[team_member_id]': team_member_id,
 		}),
@@ -127,7 +131,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Mark the reserved row failed (retryable) — don't throw, let admin see it.
 		const { data: failedPayout } = await supabaseAdmin.from('payouts')
 			.update({ status: 'failed', notes: err.error?.message ?? 'Stripe transfer failed' })
-			.eq('id', payoutId).select().single();
+			.eq('id', payoutId).select().single()
+			.then(logWrite('payout → failed update (after Stripe error)'));
 		return json(failedPayout, { status: 200 });
 	}
 

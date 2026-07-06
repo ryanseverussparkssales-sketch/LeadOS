@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
@@ -143,7 +144,7 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between px-5 py-4 border-b border-[#1e1e1e]">
 		<div>
-			<p class="text-white text-sm font-semibold">✦ Edelhaus AI</p>
+			<p class="text-white text-sm font-semibold">✦ {BRAND} AI</p>
 			<p class="text-xs text-[#7c7c7c] mt-0.5">Create, find, navigate, learn · Ctrl+J</p>
 		</div>
 		<button onclick={() => open = false} class="text-[#6e6e6e] hover:text-white text-sm p-1 rounded transition-colors" aria-label="Close"><Icon name="x" size={14} /></button>

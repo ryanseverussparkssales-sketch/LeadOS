@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import DatePicker from '$lib/components/DatePicker.svelte';
@@ -277,7 +278,7 @@
 	}
 </script>
 
-<svelte:head><title>Team — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Team')}</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 

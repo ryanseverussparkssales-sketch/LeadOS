@@ -80,8 +80,12 @@ export const POST = async ({ request }) => {
 			return json({ error: 'Invalid payload' }, { status: 400 });
 		}
 	} else {
-		// No secret configured — log warning and continue (dev mode)
-		console.warn('[email/inbound] RESEND_WEBHOOK_SECRET not set — skipping signature verification');
+		// No secret configured — fail CLOSED in production (unverified inbound email is forgeable)
+		if (process.env.NODE_ENV === 'production') {
+			console.error('[email/inbound] RESEND_WEBHOOK_SECRET not set — rejecting unverified webhook');
+			return json({ error: 'Webhook secret not configured' }, { status: 503 });
+		}
+		console.warn('[email/inbound] RESEND_WEBHOOK_SECRET not set — skipping signature verification (dev only)');
 		body = await request.json().catch(() => null);
 		if (!body) return json({ error: 'Invalid payload' }, { status: 400 });
 	}

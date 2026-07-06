@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 // POST /api/phone/setup — seeds the primary number from TWILIO_PHONE_NUMBER env var
@@ -35,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			friendly_name: 'Primary (from .env)',
 			is_primary: true,
 			status: 'active',
-			voicemail_greeting: 'Hi, you\'ve reached Edelhaus. Please leave a message after the tone.',
+			voicemail_greeting: `Hi, you've reached ${BRAND}. Please leave a message after the tone.`,
 			record_incoming: true,
 		})
 		.select()

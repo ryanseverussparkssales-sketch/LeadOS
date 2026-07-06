@@ -45,6 +45,14 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
     if (targetEmail) query = query.eq('email_address', targetEmail);
     if (targetUserId) query = query.eq('user_id', targetUserId);
 
+    // Cursor fairness: least-recently-synced first (never-synced before that),
+    // bounded so one run can't load an unbounded account list. last_synced_at
+    // is only touched when an account's sync completes, so accounts skipped by
+    // the time-box below sort to the front of the next run.
+    query = query
+        .order('last_synced_at', { ascending: true, nullsFirst: true })
+        .limit(50);
+
     const { data: accounts, error: fetchErr } = await query;
     if (fetchErr) {
         console.error('[gmail/sync] query error:', fetchErr.message);
@@ -53,9 +61,20 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
     if (!accounts?.length) return json({ synced: 0, accounts: 0 });
 
     let totalSynced = 0;
+    let failed = 0;
+    let skipped = 0;
     const errors: string[] = [];
 
+    // Time-box: stop STARTING new accounts after 45s (Vercel cron budget).
+    // Skipped accounts keep their old last_synced_at, so they lead the next run.
+    const startedAt = Date.now();
+    const TIME_BUDGET_MS = 45_000;
+
     for (const account of accounts) {
+        if (Date.now() - startedAt > TIME_BUDGET_MS) {
+            skipped++;
+            continue;
+        }
         try {
             const accessToken = await getValidToken(account as any);
             const rawMessages = await fetchNewMessages(account as any, accessToken);
@@ -132,26 +151,38 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
                 }
             }
 
-            // Upsert one row per thread, bump counts, remember thread id for the log insert
+            // ONE bulk upsert for all threads in this batch (groups map guarantees
+            // unique thread_key|contact_id keys), then bump counts concurrently.
             const threadIdByKey = new Map<string, string>();
-            for (const [gkey, g] of groups) {
-                const { data: thread } = await supabaseAdmin
+            if (groups.size) {
+                const { data: threadRows, error: thrErr } = await supabaseAdmin
                     .from('email_threads')
-                    .upsert({
-                        user_id: g.user_id, contact_id: g.contact_id, subject: g.subject,
-                        thread_key: g.thread_key, last_message_at: g.last_message_at,
-                        last_message_body: g.last_message_body, last_message_direction: g.last_message_direction,
-                    }, { onConflict: 'user_id,thread_key,contact_id' })
-                    .select('id, unread_count, message_count')
-                    .maybeSingle();
-                if (!thread) continue;
-                threadIdByKey.set(gkey, thread.id);
-                if (g.inbound > 0) {
-                    await supabaseAdmin.from('email_threads').update({
-                        unread_count: (thread.unread_count ?? 0) + g.inbound,
-                        message_count: (thread.message_count ?? 0) + g.inbound,
-                    }).eq('id', thread.id);
+                    .upsert(
+                        [...groups.values()].map((g) => ({
+                            user_id: g.user_id, contact_id: g.contact_id, subject: g.subject,
+                            thread_key: g.thread_key, last_message_at: g.last_message_at,
+                            last_message_body: g.last_message_body, last_message_direction: g.last_message_direction,
+                        })),
+                        { onConflict: 'user_id,thread_key,contact_id' }
+                    )
+                    .select('id, thread_key, contact_id, unread_count, message_count');
+                if (thrErr) console.error('[gmail/sync] thread upsert error:', thrErr.message);
+
+                const bumps: Promise<unknown>[] = [];
+                for (const thread of threadRows ?? []) {
+                    const gkey = `${thread.thread_key}|${thread.contact_id ?? ''}`;
+                    threadIdByKey.set(gkey, thread.id);
+                    const g = groups.get(gkey);
+                    if (g && g.inbound > 0) {
+                        bumps.push(Promise.resolve(
+                            supabaseAdmin.from('email_threads').update({
+                                unread_count: (thread.unread_count ?? 0) + g.inbound,
+                                message_count: (thread.message_count ?? 0) + g.inbound,
+                            }).eq('id', thread.id)
+                        ));
+                    }
                 }
+                if (bumps.length) await Promise.all(bumps);
             }
 
             // 1 bulk insert of all new email_logs (ignore any racing duplicates by message_id)
@@ -169,14 +200,18 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
                     email_type: direction === 'inbound' ? 'inbound' : 'outbound', created_at: p.date,
                 };
             });
-            const { error: insErr } = await supabaseAdmin
-                .from('email_logs').upsert(rows, { onConflict: 'message_id', ignoreDuplicates: true });
-            if (insErr) console.error('[gmail/sync] batch insert error:', insErr.message);
-            else totalSynced += rows.length;
+            for (let i = 0; i < rows.length; i += 500) {
+                const chunk = rows.slice(i, i + 500);
+                const { error: insErr } = await supabaseAdmin
+                    .from('email_logs').upsert(chunk, { onConflict: 'message_id', ignoreDuplicates: true });
+                if (insErr) console.error('[gmail/sync] batch insert error:', insErr.message);
+                else totalSynced += chunk.length;
+            }
 
             await touchSynced();
 
         } catch (e: any) {
+            failed++;
             const msg = `${account.email_address}: ${e?.message ?? String(e)}`;
             console.error('[gmail/sync] error for', msg);
             errors.push(msg);
@@ -186,6 +221,8 @@ async function syncAllAccounts(targetEmail: string | null, targetUserId: string 
     return json({
         synced: totalSynced,
         accounts: accounts.length,
+        failed,
+        skipped,
         ...(errors.length ? { errors } : {}),
     });
 }

@@ -1,19 +1,27 @@
 import { env } from '$env/dynamic/private';
 import { supabaseAdmin } from './supabase';
+import { getTwilioCreds, twilioBasicAuth } from './twilio';
 
 /**
  * Downloads a Twilio recording and sends it to Groq Whisper for transcription,
  * then summarizes the transcript with Claude Haiku. Saves both to the calls table.
  */
 export async function processCallRecording(callId: string, recordingUrl: string): Promise<void> {
-	const { GROQ_API_KEY, ANTHROPIC_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN } = env;
+	const { GROQ_API_KEY, ANTHROPIC_API_KEY } = env;
 
 	let transcript = '';
 	let summary = '';
 
 	try {
 		// ── 1. Download the MP3 from Twilio (requires HTTP Basic auth) ──────────
-		const authHeader = 'Basic ' + Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64');
+		// BYOC: recordings for a tenant's own Twilio account can only be fetched with
+		// THAT account's creds — resolve via the call owner (falls back to env).
+		const { data: callOwner } = await supabaseAdmin
+			.from('calls').select('user_id').eq('id', callId).single();
+		const creds = callOwner?.user_id ? await getTwilioCreds(callOwner.user_id) : null;
+		const authHeader = creds?.hasRest
+			? twilioBasicAuth(creds)
+			: 'Basic ' + Buffer.from(`${env.TWILIO_ACCOUNT_SID ?? ''}:${env.TWILIO_AUTH_TOKEN ?? ''}`).toString('base64');
 		const audioRes = await fetch(`${recordingUrl}.mp3`, {
 			headers: { Authorization: authHeader },
 		});

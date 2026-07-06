@@ -57,6 +57,11 @@ Contacts list: `src/routes/api/contacts/filtered/+server.ts` (paginated, is_test
 - `/sdr/profile` + `/sdr/portfolio` — Marketplace profile + supercut clips
 - `/sdr/interview` — AI interview (score ≥ 70 unlocks marketplace listing)
 
+### Booking Links (`src/routes/(app)/booking-links` + `src/routes/book/[slug]`)
+- `/booking-links` — manage public scheduling links (title, duration, availability windows, buffer, horizon)
+- `/book/[slug]` — PUBLIC booking page (no auth); creates contact + appointment + owner task, emails ICS confirmations
+- API: `src/routes/api/booking/` (`links`, `links/[id]`, `[slug]/slots`, `[slug]/book` — public routes rate-limited)
+
 ### Public Site
 - `/` — Landing + login
 - `/pricing` — $20 basic / $40+$5/seat / managed services tiers
@@ -146,6 +151,19 @@ Work on **just design/CSS**:
 - Discord webhook fires on wins
 - Real-time agency command center (Supabase realtime, not polling)
 - 37 API files needed truncation fixes after a long edit session — all repaired
+
+### 2026-07-04/05 session additions (quick wins + waves 1–3)
+- Quick wins: per-source webhook field mapping (migration 0006 `lead_sources.field_mapping`), weighted forecast endpoint (`/api/deals/forecast`), agency coaching stats (`/api/agency/coaching-stats`), BYOC fixes incl. async `verifyTwilioSignature`
+- Wave 1A: one-submit client onboarding (`POST /api/clients/onboard` + Quick Onboard modal on `/clients`) — client → project → campaign → call list → SDR assignments with rollback
+- Wave 1B: weekly client digest email (`lib/server/clientDigest.ts`, `/api/cron/client-digest` Mon 13:00 UTC, migration 0007; client-reports skips digest-enabled clients)
+- Wave 1C: agency dashboard accuracy — owner-scoped queries + real queue depth
+- Wave 1D: infra hardening — `lib/server/db.ts` (`mustWrite`/`logWrite`), rate limit on `/api/webhook/[token]`, Sentry-optional `handleError` in `hooks.server.ts` (`@sentry/sveltekit` dep, `SENTRY_DSN` optional)
+- Wave 2E: `client_id` filter on `/api/deals` + `/api/deals/forecast` + pipeline page
+- Wave 2F: bulk contact actions (`POST /api/contacts/bulk` — tag / campaign / call list / DNC / soft-delete, owner-gated) + bulk UI on `/contacts`
+- Wave 2G: phone number health (`/api/phone/health` — daily utilization + 7-day volume) surfaced on `/numbers`
+- Wave 2H: multi-channel sequences (migration 0008 — per-step `channel` email/sms/call_task + `sms_body`; advance engine sends SMS with quiet hours + creates call tasks; builder UI)
+- Wave 3I: public booking links (migration 0009 `booking_links`; `/api/booking/*`, public `/book/[slug]` page, `/booking-links` management page, sidebar link)
+- Wave 3J: Gmail sync batching
 
 ## What's next (priority order)
 1. Run `vercel deploy --prod` and verify build passes

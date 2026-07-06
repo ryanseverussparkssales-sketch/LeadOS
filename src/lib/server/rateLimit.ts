@@ -63,14 +63,65 @@ export async function rateLimitUser(
 	}
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// Fixed-window in-memory limiter — for PUBLIC endpoints with no userId
+// (e.g. token-authenticated webhooks), keyed by arbitrary string.
+//
+// SERVERLESS CAVEAT: state lives in this module's memory, which is per server
+// instance. On Vercel each *warm* lambda keeps its own Map, so the effective
+// ceiling is `limit × warm instances` and cold starts reset counters. That is
+// acceptable for its purpose — best-effort throttling to damp abuse bursts —
+// not a strict global quota (for that, use rateLimitUser's DB-backed path).
+// ────────────────────────────────────────────────────────────────────────────
+
+type FixedWindow = { count: number; resetAt: number };
+
+const windows = new Map<string, FixedWindow>();
+
+/** Cap the map so a key-spraying attacker can't grow memory unbounded. */
+const MAX_ENTRIES = 10_000;
+
 /**
- * Sync stub kept for backward compatibility with any call-sites that haven't
- * migrated yet. Always allows — non-functional on serverless. Migrate those
- * call-sites to the async rateLimitUser() above.
+ * Count a hit against `key` in the current fixed window.
+ *
+ * @param key      Bucket identifier, e.g. `wh:${token}:${ip}`.
+ * @param limit    Max requests allowed per window.
+ * @param windowMs Window length in milliseconds.
+ * @returns `{ ok: true }` when under the limit; `{ ok: false, retryAfterSeconds }`
+ *          when over (retryAfterSeconds = time until the window resets, min 1).
  */
 export function rateLimit(
-	_request: Request,
-	_opts: RateLimitOptions
-): boolean {
-	return true; // always allow — use rateLimitUser() instead
+	key: string,
+	limit: number,
+	windowMs: number,
+): { ok: boolean; retryAfterSeconds?: number } {
+	const now = Date.now();
+	let win = windows.get(key);
+
+	if (!win || win.resetAt <= now) {
+		// Starting a fresh window. If the map is at capacity, lazily clean up:
+		// drop expired windows first, then evict oldest (Map preserves insertion
+		// order, so the front of the iterator is the oldest entry).
+		if (!windows.has(key) && windows.size >= MAX_ENTRIES) {
+			for (const [k, v] of windows) {
+				if (v.resetAt <= now) windows.delete(k);
+			}
+			while (windows.size >= MAX_ENTRIES) {
+				const oldest = windows.keys().next();
+				if (oldest.done) break;
+				windows.delete(oldest.value);
+			}
+		}
+		win = { count: 0, resetAt: now + windowMs };
+		windows.set(key, win);
+	}
+
+	win.count += 1;
+	if (win.count > limit) {
+		return {
+			ok: false,
+			retryAfterSeconds: Math.max(1, Math.ceil((win.resetAt - now) / 1000)),
+		};
+	}
+	return { ok: true };
 }

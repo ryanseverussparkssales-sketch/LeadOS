@@ -21,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const form = await event.request.clone().formData();
 		const sigParams: Record<string, string> = {};
 		for (const [k, v] of form.entries()) sigParams[k] = v as string;
-		if (!verifyTwilioSignature(event.request, event.url, sigParams)) {
+		if (!(await verifyTwilioSignature(event.request, event.url, sigParams))) {
 			return new Response('Forbidden', { status: 403 });
 		}
 	}
@@ -436,7 +436,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 						if (vm) {
 							const { env } = await import('$env/dynamic/private');
-							const authHeader = 'Basic ' + Buffer.from(env.TWILIO_ACCOUNT_SID + ':' + env.TWILIO_AUTH_TOKEN).toString('base64');
+							// BYOC: fetch the recording with the number owner's creds (falls back to env).
+							const { getTwilioCreds, twilioBasicAuth } = await import('$lib/server/twilio');
+							const vmCreds = await getTwilioCreds(phoneRec.user_id);
+							const authHeader = vmCreds.hasRest
+								? twilioBasicAuth(vmCreds)
+								: 'Basic ' + Buffer.from(env.TWILIO_ACCOUNT_SID + ':' + env.TWILIO_AUTH_TOKEN).toString('base64');
 							const audioRes = await fetch(recordingUrl + '.mp3', { headers: { Authorization: authHeader } });
 							if (audioRes.ok) {
 								const audioBuffer = await audioRes.arrayBuffer();
@@ -466,15 +471,45 @@ export const handle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+// ── Optional Sentry reporting ────────────────────────────────────────────────
+// Lazily initialized once, and ONLY if SENTRY_DSN is set AND @sentry/sveltekit
+// is actually installed. The non-literal import specifier (+ @vite-ignore) keeps
+// Vite from trying to resolve the package at build time, so the app builds and
+// runs fine with the package uninstalled or the DSN unset. Any import/init
+// failure resolves to null and we fall back silently to console logging.
+type SentryLike = { captureException: (e: unknown, ctx?: Record<string, unknown>) => unknown };
+let sentryPromise: Promise<SentryLike | null> | null = null;
+function getSentry(): Promise<SentryLike | null> | null {
+	if (!process.env.SENTRY_DSN) return null;
+	if (!sentryPromise) {
+		const pkg = '@sentry/sveltekit';
+		sentryPromise = import(/* @vite-ignore */ pkg)
+			.then((Sentry) => {
+				Sentry.init({ dsn: process.env.SENTRY_DSN, tracesSampleRate: 0 });
+				return Sentry as SentryLike;
+			})
+			.catch(() => null);
+	}
+	return sentryPromise;
+}
+
 // Capture otherwise-silent server errors (previously there was no handleError hook,
 // so uncaught errors vanished). Logs a structured line + a reference id surfaced to
-// the user. Sentry-ready: if @sentry/sveltekit is installed and SENTRY_DSN is set,
-// report `error` here.
+// the user. If SENTRY_DSN is set and @sentry/sveltekit is installed, the error is
+// also reported to Sentry (fire-and-forget); console logging happens regardless.
 export const handleError: HandleServerError = ({ error, event, status, message }) => {
 	const ref = crypto.randomUUID().slice(0, 8);
 	console.error(
 		`[error] ref=${ref} ${event.request.method} ${event.url.pathname} → ${status} ${message}`,
 		error,
 	);
+	try {
+		getSentry()?.then((sentry) => {
+			sentry?.captureException(error, {
+				tags: { ref },
+				extra: { path: event.url.pathname, method: event.request.method, status, message },
+			});
+		}).catch(() => { /* never let error reporting throw */ });
+	} catch { /* never let error reporting throw */ }
 	return { message: status >= 500 ? `Internal error (ref ${ref})` : message };
 };

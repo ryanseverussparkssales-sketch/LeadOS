@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 
 	interface KnowledgeItem { id: string; title: string; knowledge_type: string; content: string; }
@@ -64,7 +65,7 @@
 	}
 </script>
 
-<svelte:head><title>Client Dossier — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Client Dossier — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-hidden flex flex-col">
 	<!-- Client selector header -->

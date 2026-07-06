@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { get } from 'svelte/store';
@@ -729,7 +730,7 @@
 	}
 </script>
 
-<svelte:head><title>Campaigns — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Campaigns')}</title></svelte:head>
 <svelte:window onclick={(e: MouseEvent) => { if (!(e.target as Element)?.closest('.templates-container')) showTemplates = false; }} />
 
 <div class="flex flex-col flex-1 h-full">

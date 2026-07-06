@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
@@ -116,7 +117,7 @@
 	}
 </script>
 
-<svelte:head><title>Call Lists — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Call Lists')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center gap-4">

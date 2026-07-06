@@ -1,8 +1,10 @@
 /**
  * Agency command center API — scale-safe version
- * Replaces N+1 per-SDR query loop with two aggregated queries:
- *   1. GROUP BY user_id on calls for today's stats (1 query regardless of team size)
- *   2. Single call_list_contacts count per owner (not per SDR)
+ * Constant query count regardless of team size (no N+1):
+ *   1. Team members first (cheap) so the calls query can be scoped to this tenant
+ *   2. One aggregated calls fetch grouped by user_id in JS for today's stats
+ *   3. One pending-contacts fetch grouped by call_list_id, mapped to SDRs via
+ *      campaign_sdrs → call_lists.campaign_id (real per-SDR queue depth)
  */
 import { json } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
@@ -20,8 +22,23 @@ export const GET: RequestHandler = async ({ request }) => {
 	const WIN_OUTCOMES  = new Set(['appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback','follow_up_agreed','referral','proposal_requested']);
 	const ANSWERED_SET  = new Set(['answered','appointment_set','demo_scheduled','meeting_confirmed','signed_up','callback','not_interested','do_not_call','follow_up_agreed']);
 
-	// ── 1. Fetch everything in parallel — 4 queries total regardless of team size ──
-	const [clientsRes, teamRes, todayCallsRes, recentWinsRes, callListsRes] = await Promise.all([
+	// ── 1. Team members first (cheap, ≤100 rows) — needed to scope the calls query ──
+	const teamRes = await supabaseAdmin
+		.from('team_members')
+		.select('id, member_email, member_user_id, role')
+		.eq('owner_user_id', ownerId)
+		.eq('role', 'sdr')
+		.not('portal_access', 'is', true)
+		.limit(100);
+
+	const teamMembers = teamRes.data ?? [];
+	const allUserIds = new Set([
+		ownerId,
+		...teamMembers.map(m => m.member_user_id).filter(Boolean),
+	]);
+
+	// ── 2. Remaining fetches in parallel — constant query count regardless of team size ──
+	const [clientsRes, todayCallsRes, recentWinsRes, callListsRes, campaignSdrsRes] = await Promise.all([
 
 		// Clients + campaigns
 		supabaseAdmin
@@ -30,19 +47,11 @@ export const GET: RequestHandler = async ({ request }) => {
 			.eq('user_id', ownerId)
 			.eq('is_test', false),
 
-		// All SDRs — no per-member queries
-		supabaseAdmin
-			.from('team_members')
-			.select('id, member_email, member_user_id, role')
-			.eq('owner_user_id', ownerId)
-			.eq('role', 'sdr')
-			.not('portal_access', 'is', true)
-			.limit(100),
-
-		// ALL today's calls for owner + all SDRs — one query, aggregated in JS
+		// Today's calls for owner + this owner's SDRs only — one query, aggregated in JS
 		supabaseAdmin
 			.from('calls')
 			.select('id, outcome, user_id')
+			.in('user_id', [...allUserIds])
 			.gte('created_at', todayISO)
 			.limit(5000),  // hard ceiling: 30 reps × 200 calls/day = 6k max
 
@@ -56,22 +65,42 @@ export const GET: RequestHandler = async ({ request }) => {
 			.order('created_at', { ascending: false })
 			.limit(20),
 
-		// All call lists owned by this account (for queue size calc)
+		// Call lists + campaign linkage (schema: call_lists.campaign_id → campaigns.id)
 		supabaseAdmin
 			.from('call_lists')
-			.select('id')
+			.select('id, campaign_id')
 			.limit(500),
+
+		// Campaign ↔ SDR assignments for this owner (campaign_sdrs.sdr_id → team_members.id)
+		supabaseAdmin
+			.from('campaign_sdrs')
+			.select('campaign_id, sdr_id')
+			.eq('owner_user_id', ownerId)
+			.limit(1000),
 	]);
 
-	const teamMembers  = teamRes.data ?? [];
-	const todayCalls   = todayCallsRes.data ?? [];
-	const callListIds  = (callListsRes.data ?? []).map((l: any) => l.id);
+	const todayCalls = todayCallsRes.data ?? [];
 
-	// ── 2. Build per-SDR stats from the single calls batch (pure JS, zero extra queries) ──
-	const allUserIds = new Set([
-		ownerId,
-		...teamMembers.map(m => m.member_user_id).filter(Boolean),
-	]);
+	// Owner's campaign ids (from the clients tree) — scopes call lists to this tenant
+	const ownerCampaignIds = new Set<string>();
+	for (const client of (clientsRes.data ?? []) as any[]) {
+		for (const project of client.projects ?? []) {
+			for (const campaign of project.campaigns ?? []) ownerCampaignIds.add(campaign.id);
+		}
+	}
+
+	// campaign → its call lists (only this owner's campaign-linked lists)
+	const listsByCampaign = new Map<string, string[]>();
+	const callListIds: string[] = [];
+	for (const list of (callListsRes.data ?? []) as any[]) {
+		if (!list.campaign_id || !ownerCampaignIds.has(list.campaign_id)) continue;
+		callListIds.push(list.id);
+		const lists = listsByCampaign.get(list.campaign_id) ?? [];
+		lists.push(list.id);
+		listsByCampaign.set(list.campaign_id, lists);
+	}
+
+	// ── 3. Build per-SDR stats from the single calls batch (pure JS, zero extra queries) ──
 
 	// Group calls by user_id
 	const callsByUser = new Map<string, { total: number; answered: number; wins: number }>();
@@ -84,9 +113,9 @@ export const GET: RequestHandler = async ({ request }) => {
 		callsByUser.set(call.user_id, existing);
 	}
 
-	// ── 3. Queue sizes — single batch count grouped by call_list_id ──
-	// Fetch all pending contacts across all lists in one query
-	let queueCountByList = new Map<string, number>();
+	// ── 4. Queue sizes — single batch count grouped by call_list_id ──
+	// Fetch all pending contacts across this owner's campaign-linked lists in one query
+	const queueCountByList = new Map<string, number>();
 	if (callListIds.length > 0) {
 		const { data: pendingRows } = await supabaseAdmin
 			.from('call_list_contacts')
@@ -101,11 +130,29 @@ export const GET: RequestHandler = async ({ request }) => {
 		}
 	}
 
-	// Map list → member (via campaign_sdrs would be ideal; using call_list ownership for now)
-	// For simplicity: total pending across all lists is the owner's queue pool
-	const totalQueueSize = Array.from(queueCountByList.values()).reduce((s, n) => s + n, 0);
+	// ── 5. Real per-SDR queue depth ────────────────────────────────────────────
+	// SDR → their campaigns (campaign_sdrs) → those campaigns' call lists → sum of
+	// pending contacts. An SDR assigned to no campaign gets 0.
+	// NOTE: a list shared by multiple SDRs counts toward EACH of them — queueSize
+	// is "leads this rep can dial", a shared pool, not a partition of it.
+	const campaignsBySdr = new Map<string, string[]>();
+	for (const row of (campaignSdrsRes.data ?? []) as any[]) {
+		const campaigns = campaignsBySdr.get(row.sdr_id) ?? [];
+		campaigns.push(row.campaign_id);
+		campaignsBySdr.set(row.sdr_id, campaigns);
+	}
 
-	// ── 4. Assemble SDR stats ──────────────────────────────────────────────────
+	const queueSizeForSdr = (teamMemberId: string): number => {
+		let total = 0;
+		for (const campaignId of campaignsBySdr.get(teamMemberId) ?? []) {
+			for (const listId of listsByCampaign.get(campaignId) ?? []) {
+				total += queueCountByList.get(listId) ?? 0;
+			}
+		}
+		return total;
+	};
+
+	// ── 6. Assemble SDR stats ──────────────────────────────────────────────────
 	const sdrStats = teamMembers.map(member => {
 		const stats = member.member_user_id
 			? (callsByUser.get(member.member_user_id) ?? { total: 0, answered: 0, wins: 0 })
@@ -115,11 +162,11 @@ export const GET: RequestHandler = async ({ request }) => {
 			todayCalls:    stats.total,
 			todayAnswered: stats.answered,
 			todayWins:     stats.wins,
-			queueSize:     Math.round(totalQueueSize / Math.max(teamMembers.length, 1)),
+			queueSize:     queueSizeForSdr(member.id),
 		};
 	});
 
-	// ── 5. Owner totals ────────────────────────────────────────────────────────
+	// ── 7. Owner totals ────────────────────────────────────────────────────────
 	const ownerStats  = callsByUser.get(ownerId) ?? { total: 0, answered: 0, wins: 0 };
 	const sdrTotals   = sdrStats.reduce(
 		(acc, m) => ({ total: acc.total + m.todayCalls, answered: acc.answered + m.todayAnswered, wins: acc.wins + m.todayWins }),

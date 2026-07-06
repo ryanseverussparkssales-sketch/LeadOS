@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy, tick } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError, toastInfo } from '$lib/stores/toast';
@@ -597,7 +598,7 @@
 	}
 </script>
 
-<svelte:head><title>Phone — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Phone')}</title></svelte:head>
 
 <div class="flex flex-1 h-full overflow-hidden">
 

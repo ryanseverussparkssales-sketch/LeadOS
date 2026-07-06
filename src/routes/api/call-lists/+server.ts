@@ -1,9 +1,10 @@
 import { json, error } from '@sveltejs/kit';
-import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request, url }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const campaignId = url.searchParams.get('campaign_id');
 
 	let query = supabaseAdmin
@@ -21,7 +22,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 	const filtered = (data ?? []).filter(l => {
 		const viaCampaign = (l.campaign as unknown as OwnerJoin)?.project?.client?.user_id;
 		const viaProject = (l.project as unknown as OwnerJoin)?.client?.user_id;
-		return l.user_id === user.id || viaCampaign === user.id || viaProject === user.id;
+		return l.user_id === ownerId || viaCampaign === ownerId || viaProject === ownerId;
 	}).map(l => {
 		// Back-fill campaign.project from the direct project join for legacy lists with no campaign
 		if (!l.campaign && l.project) return { ...l, campaign: { id: null, name: null, project: l.project } };
@@ -32,6 +33,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
+	const ownerId = await getEffectiveUserId(user.id);
 	const { name, campaign_id, project_id: directProjectId } = await request.json();
 	if (!name?.trim()) throw error(400, 'name required');
 	if (!campaign_id && !directProjectId) throw error(400, 'campaign_id or project_id required');
@@ -46,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (!campaign) throw error(404, 'Campaign not found');
 		const owner = (campaign.project as unknown as { client: { user_id: string } })?.client?.user_id;
-		if (owner !== user.id) throw error(403, 'Forbidden');
+		if (owner !== ownerId) throw error(403, 'Forbidden');
 
 		const { data, error: e } = await supabaseAdmin
 			.from('call_lists')
@@ -55,7 +57,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				project_id: campaign.project_id,
 				name: name.trim(),
 				status: 'active',
-				user_id: user.id,
+				user_id: ownerId,
 			})
 			.select()
 			.single();
@@ -69,12 +71,12 @@ export const POST: RequestHandler = async ({ request }) => {
 		.select('id, client:clients(user_id)')
 		.eq('id', directProjectId)
 		.single();
-	if (!project || (project.client as unknown as { user_id: string })?.user_id !== user.id)
+	if (!project || (project.client as unknown as { user_id: string })?.user_id !== ownerId)
 		throw error(403, 'Forbidden');
 
 	const { data, error: e } = await supabaseAdmin
 		.from('call_lists')
-		.insert({ project_id: directProjectId, name: name.trim(), status: 'active', user_id: user.id })
+		.insert({ project_id: directProjectId, name: name.trim(), status: 'active', user_id: ownerId })
 		.select()
 		.single();
 	if (e) throw error(400, e.message);

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { BRAND } from '$lib/brand';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { slide } from 'svelte/transition';
@@ -15,6 +16,7 @@
 
 	// DIALING — primary tools, ordered by priority
 	const DIALING = [
+		{ href: '/assistant',    label: 'Assistant',        icon: 'sparkle' },
 		{ href: '/inbox',        label: 'Inbox',            icon: 'inbox' },
 		{ href: '/dialer',       label: 'Power Dialer',     icon: 'target' },
 		{ href: '/phone',        label: 'Desk Phone',       icon: 'phone' },
@@ -27,7 +29,7 @@
 		{ href: '/contacts',     label: 'Contacts',         icon: 'users' },
 		{ href: '/companies',    label: 'Companies',        icon: 'building' },
 		{ href: '/leads',        label: 'Lead Gen',         icon: 'search' },
-		{ href: '/scraper',      label: 'Edelhaus Scraper',     icon: 'radar' },
+		{ href: '/scraper',      label: `${BRAND} Scraper`,     icon: 'radar' },
 		{ href: '/leads-inbox',  label: 'Lead Inbox',       icon: 'download' },
 		{ href: '/import',       label: 'Import',           icon: 'upload' },
 	];
@@ -70,6 +72,7 @@
 		{ href: '/team',         label: 'Team',             icon: 'user' },
 		{ href: '/financials',   label: 'Financials',       icon: 'wallet' },
 		{ href: '/pipeline',     label: 'Pipeline',         icon: 'pipeline' },
+		{ href: '/booking-links', label: 'Booking Links',   icon: 'calendar' },
 		{ href: '/my-leads',     label: 'My Leads',         icon: 'star' },
 	];
 
@@ -149,10 +152,10 @@
 
 		// Auto-switch mode based on current path
 		const p = $page.url.pathname;
-		if (['/agency','/clients','/team','/pipeline','/financials','/my-leads'].some(s => p.startsWith(s))) mode = 'agency';
+		if (['/agency','/clients','/team','/pipeline','/financials','/my-leads','/booking-links'].some(s => p.startsWith(s))) mode = 'agency';
 		else if (['/campaigns','/projects','/scripts','/templates','/messaging','/sequences'].some(s => p.startsWith(s))) mode = 'campaigns';
 		else if (['/analytics','/reports','/win-loss','/leaderboard','/time'].some(s => p.startsWith(s))) mode = 'analyze';
-		else if (['/dialer','/phone','/calls','/contacts','/leads','/scraper','/inbox','/import'].some(s => p.startsWith(s))) mode = 'dial';
+		else if (['/assistant','/dialer','/phone','/calls','/contacts','/leads','/scraper','/inbox','/import'].some(s => p.startsWith(s))) mode = 'dial';
 
 		try {
 			const res = await apiFetch('/api/notifications');
@@ -174,7 +177,7 @@
 	<!-- Logo / collapse toggle -->
 	<div class="flex items-center justify-between px-3 py-3 border-b border-[var(--c-border)]">
 		{#if !collapsed}
-			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">EDELHAUS</span>
+			<span class="px-1" style="font-family:var(--font-label);font-size:16px;letter-spacing:.28em;font-weight:400;color:#fff">ROGUEOS</span>
 		{/if}
 		<button
 			onclick={() => collapsed = !collapsed}
@@ -233,7 +236,7 @@
 	{/if}
 
 	<!-- Nav groups -->
-	<nav class="rogue-nav flex-1 overflow-y-auto px-2 pb-2 space-y-3">
+	<nav class="rogue-nav flex-1 overflow-y-auto px-2 pb-2 space-y-3" aria-label="Primary">
 
 		<!-- DIAL MODE: Dialing + Contacts -->
 		{#if mode === 'dial'}
@@ -241,7 +244,7 @@
 		<!-- DIALING -->
 		<div>
 			{#if !collapsed}
-				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-faint)">DIALING</div>
+				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-muted)">DIALING</div>
 			{/if}
 			<div class="space-y-0.5">
 				{#each DIALING as item, i}
@@ -297,7 +300,7 @@
 		<!-- CONTACTS -->
 		<div>
 			{#if !collapsed}
-				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-faint)">CONTACTS</div>
+				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-muted)">CONTACTS</div>
 			{/if}
 			<div class="space-y-0.5">
 				{#each CONTACTS as item}
@@ -323,7 +326,7 @@
 		<!-- WORK -->
 		<div>
 			{#if !collapsed}
-				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-faint)">WORK</div>
+				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-muted)">WORK</div>
 			{/if}
 			<div class="space-y-0.5">
 				{#each WORK as item}
@@ -426,7 +429,7 @@
 		<!-- AGENCY -->
 		<div>
 			{#if !collapsed}
-				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-faint)">AGENCY</div>
+				<div class="px-2 pb-1 font-label" style="font-family:var(--font-label);font-size:9px;letter-spacing:.22em;color:var(--c-text-muted)">AGENCY</div>
 			{/if}
 			<div class="space-y-0.5">
 				{#each AGENCY as item}
@@ -465,7 +468,7 @@
 	</nav>
 
 	<!-- Footer: AI Assistant, Help, user -->
-	<div class="border-t border-[var(--c-border)] px-2 py-2 space-y-0.5">
+	<div class="rogue-nav border-t border-[var(--c-border)] px-2 py-2 space-y-0.5">
 		{#each [
 			{ href: '/ai-assistant', label: 'AI Assistant', icon: '✦' },
 			{ href: '/help', label: 'Help & Support', icon: '?' },
@@ -478,19 +481,15 @@
 				{#if !collapsed}<span class="truncate">{item.label}</span>{/if}
 			</a>
 		{/each}
-		<div class="px-2
-mt-2 border-t border-[#1a1a1a] pt-2">
-	{#if $superAdmin}
-		<a href="/admin" aria-current={isActive('/admin') ? 'page' : undefined}
-			class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[var(--call)] hover:bg-[var(--call)]/10 {isActive('/admin') ? 'bg-[var(--call)]/10' : ''}">
-			<Icon name="shield" class="flex-shrink-0 text-current" />
-			{#if !collapsed}<span class="truncate">Platform Admin</span>{/if}
-		</a>
+		{#if $superAdmin}
+		<div class="px-2 mt-2 border-t border-[var(--c-border)] pt-2">
+			<a href="/admin" aria-current={isActive('/admin') ? 'page' : undefined}
+				title={collapsed ? 'Platform Admin' : undefined}
+				class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[var(--call)] hover:bg-[var(--call)]/10 {isActive('/admin') ? 'bg-[var(--call)]/10' : ''}">
+				<Icon name="shield" class="flex-shrink-0 text-current" />
+				{#if !collapsed}<span class="truncate">Platform Admin</span>{/if}
+			</a>
+		</div>
 	{/if}
-	<a href="/settings" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-[#888] hover:text-[#ccc] hover:bg-[#111]">
-		<span>⚙️</span>
-		{#if !collapsed}<span>Settings</span>{/if}
-	</a>
-</div>
 </div>
 </aside>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { currentUser } from '$lib/stores';
 	import { toastError } from '$lib/stores/toast';
@@ -19,7 +20,7 @@
 	});
 </script>
 
-<svelte:head><title>Messaging — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Messaging')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between shrink-0">

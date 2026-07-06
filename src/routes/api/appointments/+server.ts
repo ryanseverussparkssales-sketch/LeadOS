@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin, getEffectiveUserId } from '$lib/server/supabase';
 import { sendEmail } from '$lib/server/email';
+import { PRODID } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 function generateICS(opts: {
@@ -12,7 +13,7 @@ function generateICS(opts: {
 	return [
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
-		'PRODID:-//Edelhaus//EN',
+		`PRODID:${PRODID}`,
 		'METHOD:REQUEST',
 		'BEGIN:VEVENT',
 		`UID:${opts.uid}@leados`,
@@ -114,7 +115,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const contactName = (appt.contact as any)?.name ?? 'Contact';
 
 				const ics = [
-					'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Edelhaus//EN','METHOD:REQUEST',
+					'BEGIN:VCALENDAR','VERSION:2.0',`PRODID:${PRODID}`,'METHOD:REQUEST',
 					'BEGIN:VEVENT',
 					`UID:${appt.id}@leados`,
 					`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').split('.')[0]}Z`,

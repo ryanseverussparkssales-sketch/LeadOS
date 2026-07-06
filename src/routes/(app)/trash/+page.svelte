@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
@@ -133,7 +134,7 @@
 	}
 </script>
 
-<svelte:head><title>Trash — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Trash')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto bg-[#0a0a0a]">
 	<!-- Header -->

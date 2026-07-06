@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { apiFetch } from '$lib/api';
+    import { AGENCY_BRAND } from '$lib/brand';
     import Inbox from '$lib/components/Inbox.svelte';
 
     let data = $state<any>(null);
     let loading = $state(true);
     let activeTab = $state<'dashboard' | 'overview' | 'wins' | 'approvals' | 'invoices' | 'messages' | 'docs'>('dashboard');
-    let agencyName = $state('Edelhaus');
+    let agencyName = $state(AGENCY_BRAND);
 
     interface WinEntry { id: string; outcome: string; created_at: string; contact: { name: string; company: string; phone: string } | null; call_duration_seconds: number | null; summary: string | null; recording_url: string | null; raw_transcript: string | null; }
     let wins = $state<WinEntry[]>([]);

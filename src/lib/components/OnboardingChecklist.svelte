@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { apiFetch } from '$lib/api';
+	import { BRAND } from '$lib/brand';
 
 	interface ChecklistItem {
 		id: string;
@@ -82,7 +83,7 @@
 					</div>
 					<span class="text-xs text-[#7c7c7c]">{completedCount}/{items.length} complete</span>
 				</div>
-				<span class="text-xs text-white font-medium">Get Edelhaus set up</span>
+				<span class="text-xs text-white font-medium">Get {BRAND} set up</span>
 				<span class="text-[10px] text-[#6e6e6e]">{expanded ? '▲' : '▼'}</span>
 			</button>
 			<button onclick={dismiss} class="text-[#333] hover:text-white text-xs ml-4">Dismiss</button>

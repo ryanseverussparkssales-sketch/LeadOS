@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
@@ -99,7 +100,7 @@
 	}
 </script>
 
-<svelte:head><title>AI Interview — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>AI Interview — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-2xl mx-auto">
 	<div class="mb-6">

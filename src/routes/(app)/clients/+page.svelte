@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { apiFetch } from '$lib/api';
+	import { titleFor } from '$lib/brand';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
 	interface CallList { id: string; name: string; status: string; }
@@ -12,6 +14,7 @@
 		primary_contact_name?: string; primary_contact_email?: string; primary_contact_phone?: string;
 		linkedin_url?: string; contract_value?: number; contract_status?: string;
 		tags?: string[]; timezone?: string; notes?: string;
+		digest_enabled?: boolean; digest_email?: string | null;
 	}
 
 	let clients = $state<Client[]>([]);
@@ -325,20 +328,105 @@
 	function projectCount(c: Client) {
 		return c.projects?.length ?? 0;
 	}
+
+	// ── Quick Onboard wizard ────────────────────────────────────────────────
+	interface TeamMember { id: string; member_email: string; role: string; first_name?: string | null; last_name?: string | null; portal_access?: boolean | null; }
+	let showOnboard = $state(false);
+	let onboardStep = $state(1);
+	let onboarding = $state(false);
+	let obClientName = $state('');
+	let obClientEmail = $state('');
+	let obCampaignName = $state('');
+	let obCallListName = $state('');
+	let obDailyGoal = $state('');
+	let obScriptNotes = $state('');
+	let obSdrIds = $state<string[]>([]);
+	let teamSdrs = $state<TeamMember[]>([]);
+	let teamLoaded = $state(false);
+	let onboardResult = $state<{ campaignId: string; clientName: string } | null>(null);
+	const obStep1Valid = $derived(obClientName.trim().length > 0 && obCampaignName.trim().length > 0);
+
+	function openOnboard() {
+		showOnboard = true;
+		onboardStep = 1;
+		onboardResult = null;
+		obClientName = ''; obClientEmail = ''; obCampaignName = '';
+		obCallListName = ''; obDailyGoal = ''; obScriptNotes = '';
+		obSdrIds = [];
+		if (!teamLoaded) loadTeamSdrs();
+	}
+
+	async function loadTeamSdrs() {
+		try {
+			const r = await apiFetch('/api/team');
+			if (r.ok) {
+				const all: TeamMember[] = await r.json();
+				teamSdrs = all.filter(m => m.role === 'sdr' && !m.portal_access);
+			}
+			teamLoaded = true;
+		} catch {
+			teamSdrs = [];
+			teamLoaded = true;
+		}
+	}
+
+	function memberLabel(m: TeamMember) {
+		const name = [m.first_name, m.last_name].filter(Boolean).join(' ');
+		return name || m.member_email;
+	}
+
+	function toggleSdr(id: string) {
+		obSdrIds = obSdrIds.includes(id) ? obSdrIds.filter(s => s !== id) : [...obSdrIds, id];
+	}
+
+	async function submitOnboard() {
+		if (!obStep1Valid || onboarding) return;
+		onboarding = true;
+		try {
+			const res = await apiFetch('/api/clients/onboard', {
+				method: 'POST',
+				body: JSON.stringify({
+					clientName: obClientName.trim(),
+					clientEmail: obClientEmail.trim() || undefined,
+					campaignName: obCampaignName.trim(),
+					callListName: obCallListName.trim() || undefined,
+					dailyCallGoal: obDailyGoal ? parseInt(obDailyGoal) : undefined,
+					scriptNotes: obScriptNotes.trim() || undefined,
+					sdrIds: obSdrIds.length ? obSdrIds : undefined,
+				}),
+			});
+			if (res.ok) {
+				const d = await res.json();
+				onboardResult = { campaignId: d.campaignId, clientName: obClientName.trim() };
+				toastSuccess(`${obClientName.trim()} onboarded — client, campaign & call list created`);
+				await load();
+			} else {
+				let msg = 'Onboarding failed';
+				try {
+					const err = await res.json();
+					if (err?.step) msg = `Onboarding failed at step: ${err.step}`;
+					else if (err?.message) msg = err.message;
+					else if (err?.error) msg = err.error;
+				} catch { /* keep default */ }
+				toastError(msg);
+			}
+		} catch {
+			toastError('Network error during onboarding');
+		}
+		onboarding = false;
+	}
 </script>
 
-<svelte:head><title>Clients — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Clients')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
-	<div class="border-b border-[#1e1e1e] px-8 py-4">
-		<h2 style="font-family:var(--font-display);font-weight:300;font-size:20px;letter-spacing:-.01em;color:#fff">Clients</h2>
-	</div>
+	<PageHeader title="Clients" />
 
 	<div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
 		<!-- Client list -->
 		<div class="{selected ? 'hidden lg:flex lg:flex-col' : 'flex flex-col'} w-full lg:w-72 lg:shrink-0 border-b lg:border-b-0 lg:border-r border-[#1e1e1e]">
 			<!-- New client -->
-			<div class="p-4 border-b border-[#1e1e1e]">
+			<div class="p-4 border-b border-[#1e1e1e] space-y-2">
 				<div class="flex gap-2">
 					<input bind:value={newClientName} placeholder="New client name" onkeydown={(e) => e.key === 'Enter' && createClient()}
 						class="flex-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
@@ -347,6 +435,10 @@
 						+
 					</button>
 				</div>
+				<button onclick={openOnboard}
+					class="w-full rounded-lg border border-[var(--accent)]/40 px-3 py-2 text-xs text-[var(--accent)] hover:bg-[var(--accent-hi)] transition-colors">
+					⚡ Quick Onboard
+				</button>
 			</div>
 			<div class="px-4 py-2 border-b border-[#1e1e1e] flex gap-2">
 				<input bind:value={clientSearch} placeholder="Search clients..."
@@ -367,6 +459,9 @@
 					>
 						<div class="flex items-center gap-2">
 							<p class="text-sm text-white font-medium truncate flex-1">{client.name}</p>
+							{#if client.digest_enabled}
+								<span class="text-[10px] px-1.5 py-0.5 rounded-full text-blue-400 bg-blue-400/10" title="Weekly digest enabled">digest ✓</span>
+							{/if}
 							{#if client.contract_status}
 								<span class="text-[10px] px-1.5 py-0.5 rounded-full capitalize {client.contract_status === 'active' ? 'text-[var(--accent)] bg-[var(--accent)]/10' : client.contract_status === 'paused' ? 'text-yellow-400 bg-yellow-400/10' : 'text-[#8a8a8a] bg-white/5'}">{client.contract_status}</span>
 							{/if}
@@ -435,6 +530,21 @@
 						<div class="mt-3"><label class="text-xs text-[#7c7c7c] block mb-1">Notes</label>
 							<textarea bind:value={clientEdit.notes} rows="2" class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white focus:border-white focus:outline-none resize-none"></textarea>
 						</div>
+						<div class="mt-3 rounded-lg border border-[#1a1a1a] bg-[#0d0d0d] p-3">
+							<label class="flex items-center gap-2 text-xs text-white cursor-pointer">
+								<input type="checkbox" bind:checked={clientEdit.digest_enabled} class="accent-white" />
+								Weekly digest email
+							</label>
+							{#if clientEdit.digest_enabled}
+								<div class="mt-2">
+									<label class="text-xs text-[#7c7c7c] block mb-1">Digest recipient</label>
+									<input bind:value={clientEdit.digest_email} type="email"
+										placeholder={clientEdit.primary_contact_email || 'email@company.com'}
+										class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+									<p class="text-[10px] text-[#6e6e6e] mt-1">Leave blank to send to the primary contact email.</p>
+								</div>
+							{/if}
+						</div>
 						<div class="flex gap-2 mt-3">
 							<button onclick={() => editingClient = false} class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">Cancel</button>
 							<button onclick={saveClientEdit} class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">Save Profile</button>
@@ -455,6 +565,7 @@
 								{#if selected.primary_contact_phone}<div><span class="text-[#7c7c7c]">Phone</span><a href="/phone?number={selected.primary_contact_phone}" class="text-[var(--accent)] hover:underline">{selected.primary_contact_phone}</a></div>{/if}
 								{#if selected.website}<div class="col-span-2"><span class="text-[#7c7c7c]">Website</span><a href={selected.website} target="_blank" rel="noopener" class="text-blue-400 hover:underline ml-2">{selected.website} ↗</a></div>{/if}
 								{#if selected.contract_status && selected.contract_status !== 'active'}<div><span class="text-[#7c7c7c]">Status</span><span class="text-yellow-400 capitalize ml-1">{selected.contract_status}</span></div>{/if}
+								{#if selected.digest_enabled}<div><span class="text-[#7c7c7c]">Weekly digest</span><p class="text-blue-400">✓ {selected.digest_email || selected.primary_contact_email || 'primary contact'}</p></div>{/if}
 							</div>
 							{#if selected.notes}<p class="text-xs text-[#8a8a8a] mt-2 border-t border-[#1a1a1a] pt-2">{selected.notes}</p>{/if}
 						</div>
@@ -593,7 +704,7 @@
 							<button
 								onclick={() => { selected = client; loadEngagements(client.id); engagements = []; loadDocs(client.id); docs = []; }}
 								class="rounded-xl border border-[#1a1a1a] bg-[#080808] hover:border-[#262626] hover:bg-[#0f0f0f] px-4 py-3 text-left transition-colors cursor-pointer">
-								<p class="text-sm text-white font-medium truncate">{client.name}</p>
+								<p class="text-sm text-white font-medium truncate">{client.name}{#if client.digest_enabled}<span class="text-[10px] text-blue-400 ml-1.5" title="Weekly digest enabled">digest ✓</span>{/if}</p>
 								<p class="text-[10px] text-[#6e6e6e] mt-0.5">{client.projects?.length ?? 0} project{(client.projects?.length ?? 0) !== 1 ? 's' : ''}</p>
 							</button>
 						{/each}
@@ -610,3 +721,132 @@
 		</div><!-- /client detail panel -->
 	</div><!-- /flex row -->
 </div>
+
+<!-- Quick Onboard modal -->
+{#if showOnboard}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+		onclick={() => { if (!onboarding) showOnboard = false; }}
+		onkeydown={(e) => { if (e.key === 'Escape' && !onboarding) showOnboard = false; }}
+		role="button" tabindex="-1" aria-label="Close onboarding wizard">
+		<div class="w-full max-w-lg rounded-xl border border-[#2a2a2a] bg-[#111] p-5 max-h-[90vh] overflow-y-auto"
+			onclick={(e) => { e.stopPropagation(); }}
+			onkeydown={(e) => { e.stopPropagation(); }}
+			role="dialog" aria-modal="true" aria-label="Quick client onboarding" tabindex="-1">
+
+			<div class="flex items-center justify-between mb-4">
+				<h3 class="text-white text-sm font-semibold">⚡ Quick Onboard</h3>
+				<div class="flex items-center gap-3">
+					{#if !onboardResult}
+						<span class="text-[10px] text-[#6e6e6e] uppercase tracking-widest">Step {onboardStep} of 2</span>
+					{/if}
+					<button onclick={() => { if (!onboarding) showOnboard = false; }}
+						class="text-[#7c7c7c] hover:text-white transition-colors" aria-label="Close">
+						<Icon name="x" size={16} />
+					</button>
+				</div>
+			</div>
+
+			{#if onboardResult}
+				<!-- Success state -->
+				<div class="text-center py-6">
+					<div class="w-12 h-12 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/40 flex items-center justify-center mx-auto mb-4">
+						<span class="text-xl">✓</span>
+					</div>
+					<p class="text-white text-sm mb-1">{onboardResult.clientName} is ready to go</p>
+					<p class="text-xs text-[#7c7c7c] mb-5">Client, project, campaign and call list created{obSdrIds.length ? ` · ${obSdrIds.length} SDR${obSdrIds.length !== 1 ? 's' : ''} assigned` : ''}.</p>
+					<div class="flex gap-2 justify-center">
+						<a href={`/campaigns?select=${onboardResult.campaignId}`}
+							class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5]">
+							Open Campaign →
+						</a>
+						<button onclick={() => showOnboard = false}
+							class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
+							Done
+						</button>
+					</div>
+				</div>
+			{:else if onboardStep === 1}
+				<!-- Step 1: client + campaign -->
+				<div class="space-y-3">
+					<div class="grid grid-cols-2 gap-3">
+						<div>
+							<label for="ob-client-name" class="text-xs text-[#7c7c7c] block mb-1">Client name *</label>
+							<input id="ob-client-name" bind:value={obClientName} placeholder="Acme Corp"
+								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						</div>
+						<div>
+							<label for="ob-client-email" class="text-xs text-[#7c7c7c] block mb-1">Client email</label>
+							<input id="ob-client-email" bind:value={obClientEmail} type="email" placeholder="contact@acme.com"
+								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						</div>
+						<div>
+							<label for="ob-campaign-name" class="text-xs text-[#7c7c7c] block mb-1">Campaign name *</label>
+							<input id="ob-campaign-name" bind:value={obCampaignName} placeholder="Acme Q3 Outbound"
+								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						</div>
+						<div>
+							<label for="ob-list-name" class="text-xs text-[#7c7c7c] block mb-1">Call list name</label>
+							<input id="ob-list-name" bind:value={obCallListName} placeholder={obCampaignName.trim() ? `${obCampaignName.trim()} List` : 'Auto from campaign'}
+								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						</div>
+						<div>
+							<label for="ob-daily-goal" class="text-xs text-[#7c7c7c] block mb-1">Daily call goal</label>
+							<input id="ob-daily-goal" bind:value={obDailyGoal} type="number" min="1" placeholder="100"
+								class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none" />
+						</div>
+					</div>
+					<div>
+						<label for="ob-script-notes" class="text-xs text-[#7c7c7c] block mb-1">Script notes <span class="text-[#444]">(saved as a starter script)</span></label>
+						<textarea id="ob-script-notes" bind:value={obScriptNotes} rows="3" placeholder="Opener, key talking points, offer details…"
+							class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-sm text-white placeholder-[#444] focus:border-white focus:outline-none resize-none"></textarea>
+					</div>
+					<div class="flex justify-end gap-2 pt-1">
+						<button onclick={() => showOnboard = false}
+							class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors">
+							Cancel
+						</button>
+						<button onclick={() => onboardStep = 2} disabled={!obStep1Valid}
+							class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
+							Next: Assign SDRs →
+						</button>
+					</div>
+				</div>
+			{:else}
+				<!-- Step 2: SDR assignment -->
+				<div class="space-y-3">
+					<p class="text-xs text-[#7c7c7c]">Assign SDRs to <span class="text-white">{obCampaignName.trim()}</span> (optional — you can do this later).</p>
+					{#if !teamLoaded}
+						<p class="text-xs text-[#6e6e6e] py-4 text-center">Loading team…</p>
+					{:else if teamSdrs.length === 0}
+						<p class="text-xs text-[#6e6e6e] py-4 text-center">No SDRs on your team yet. You can add them under Team and assign later.</p>
+					{:else}
+						<div class="max-h-56 overflow-y-auto space-y-1.5 rounded-lg border border-[#1a1a1a] bg-[#0d0d0d] p-2">
+							{#each teamSdrs as m}
+								{@const checked = obSdrIds.includes(m.id)}
+								<button onclick={() => toggleSdr(m.id)}
+									class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors {checked ? 'bg-white/10 border border-[var(--accent)]/40' : 'border border-transparent hover:bg-white/5'}">
+									<span class="w-4 h-4 rounded border flex items-center justify-center text-[10px] {checked ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-[#2a2a2a] text-transparent'}">✓</span>
+									<span class="flex-1 min-w-0">
+										<span class="text-xs text-white block truncate">{memberLabel(m)}</span>
+										<span class="text-[10px] text-[#6e6e6e] block truncate">{m.member_email}</span>
+									</span>
+								</button>
+							{/each}
+						</div>
+						<p class="text-[10px] text-[#6e6e6e]">{obSdrIds.length} selected</p>
+					{/if}
+					<div class="flex justify-between gap-2 pt-1">
+						<button onclick={() => onboardStep = 1} disabled={onboarding}
+							class="rounded-lg border border-[#2a2a2a] px-4 py-2 text-xs text-[#9a9a9a] hover:border-white hover:text-white transition-colors disabled:opacity-40">
+							← Back
+						</button>
+						<button onclick={submitOnboard} disabled={onboarding || !obStep1Valid}
+							class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-black hover:bg-[#e5e5e5] disabled:opacity-40">
+							{onboarding ? 'Creating…' : `Create Client${obSdrIds.length ? ` + Assign ${obSdrIds.length} SDR${obSdrIds.length !== 1 ? 's' : ''}` : ''}`}
+						</button>
+					</div>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}

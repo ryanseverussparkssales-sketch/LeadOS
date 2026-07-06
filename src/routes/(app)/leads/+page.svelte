@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 
@@ -261,7 +262,7 @@
 	}
 </script>
 
-<svelte:head><title>Lead Gen — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Lead Gen')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full">
 	<!-- Header + tabs -->
@@ -479,7 +480,7 @@
 							</button>
 						</div>
 					{:else}
-						<p class="text-xs text-[#888]">Map your CSV columns to Edelhaus fields. {csvTotalRows} rows detected.</p>
+						<p class="text-xs text-[#888]">Map your CSV columns to {BRAND} fields. {csvTotalRows} rows detected.</p>
 						<div class="grid grid-cols-2 gap-3">
 							{#each [['name','Name / Business'],['phone','Phone'],['email','Email'],['company','Company'],['title','Title']] as [field, label]}
 								<div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND, titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -225,7 +226,7 @@
 
 	async function testSlack() {
 		slackTesting = true;
-		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 Edelhaus test message from ${slackConfig.workspaceName || 'Edelhaus'}`, channel: slackConfig.defaultChannel }) });
+		const res = await apiFetch('/api/slack', { method: 'POST', body: JSON.stringify({ text: `🧪 ${BRAND} test message from ${slackConfig.workspaceName || BRAND}`, channel: slackConfig.defaultChannel }) });
 		slackTestMsg = res.ok ? '✓ Message sent' : '✗ Failed — check webhook URL';
 		slackTesting = false;
 		setTimeout(() => slackTestMsg = '', 4000);
@@ -244,7 +245,7 @@
 	}
 </script>
 
-<svelte:head><title>Marketing — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Marketing')}</title></svelte:head>
 
 <div class="flex flex-col h-full bg-[#0a0a0a] text-[#f5f5f5] overflow-auto">
 

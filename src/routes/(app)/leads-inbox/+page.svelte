@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
@@ -48,6 +49,7 @@
 
 	// Edit source
 	let editingSource = $state(false);
+	let editMapping = $state('');
 	let editData = $state<Partial<LeadSource>>({});
 
 	// Campaigns / clients / call lists for pickers
@@ -307,9 +309,21 @@
 
 	async function saveSourceEdit() {
 		if (!selectedSource) return;
+		// Parse field mapping JSON (empty ⇒ clear mapping, use default extraction)
+		let fieldMapping: Record<string, string> | null = null;
+		if (editMapping.trim()) {
+			try {
+				const parsed = JSON.parse(editMapping);
+				if (typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('not an object');
+				fieldMapping = parsed;
+			} catch {
+				toastError('Field mapping must be a JSON object like {"phone": "data.phone_number"}');
+				return;
+			}
+		}
 		const res = await apiFetch(`/api/lead-sources/${selectedSource.id}`, {
 			method: 'PATCH',
-			body: JSON.stringify(editData),
+			body: JSON.stringify({ ...editData, field_mapping: fieldMapping }),
 		});
 		if (res.ok) {
 			const updated = await res.json();
@@ -379,7 +393,7 @@
 	const allLeadsSelected = $derived(selectedSource === null);
 </script>
 
-<svelte:head><title>Lead Inbox — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Lead Inbox')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-hidden">
 	<!-- Header -->
@@ -487,14 +501,21 @@
 				<!-- Source header with stats + edit -->
 				<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between flex-shrink-0">
 					{#if editingSource}
-						<div class="flex gap-3 flex-1 mr-4">
-							<input bind:value={editData.name} placeholder="Source name"
-								class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-sm text-white focus:border-white focus:outline-none" />
-							<select bind:value={editData.campaign_id}
-								class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-sm text-white focus:outline-none">
-								<option value="">No campaign</option>
-								{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
-							</select>
+						<div class="flex flex-col gap-3 flex-1 mr-4">
+							<div class="flex gap-3">
+								<input bind:value={editData.name} placeholder="Source name"
+									class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-sm text-white focus:border-white focus:outline-none" />
+								<select bind:value={editData.campaign_id}
+									class="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-sm text-white focus:outline-none">
+									<option value="">No campaign</option>
+									{#each campaigns as c}<option value={c.id}>{c.name}</option>{/each}
+								</select>
+							</div>
+							<div>
+								<p class="text-[10px] text-[#6e6e6e] mb-1">Field mapping (optional) — contact field → payload path, e.g. {`{"phone": "data.phone_number", "email": "lead.email"}`}. Leave empty for auto-detection.</p>
+								<textarea bind:value={editMapping} rows="3" placeholder={'{\n  "phone": "data.phone_number"\n}'}
+									class="w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-2 text-xs font-mono text-white placeholder-[#444] focus:border-white focus:outline-none"></textarea>
+							</div>
 						</div>
 						<div class="flex gap-2">
 							<button onclick={saveSourceEdit}
@@ -549,7 +570,7 @@
 								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 								{selectedSource.status === 'active' ? '⏸ Pause' : '▶ Activate'}
 							</button>
-							<button onclick={() => { editingSource = true; editData = { ...selectedSource }; }}
+							<button onclick={() => { editingSource = true; editData = { ...selectedSource }; editMapping = (selectedSource as any).field_mapping ? JSON.stringify((selectedSource as any).field_mapping, null, 2) : ''; }}
 								class="rounded-lg border border-[#2a2a2a] px-3 py-1.5 text-xs text-[#8a8a8a] hover:border-white hover:text-white transition-colors">
 								Edit
 							</button>

@@ -1,10 +1,14 @@
-<svelte:head><title>Help & Support — Edelhaus</title></svelte:head>
+<script lang="ts">
+	import { BRAND, titleFor } from '$lib/brand';
+</script>
+
+<svelte:head><title>{titleFor('Help & Support')}</title></svelte:head>
 <div class="flex flex-col flex-1 h-full items-center justify-center px-8">
 	<div class="max-w-lg text-center space-y-6">
 		<p class="text-5xl">🛟</p>
 		<h1 class="text-white text-2xl font-semibold">Help & Support</h1>
 		<p class="text-[#7c7c7c] text-sm leading-relaxed">
-			Need help with Edelhaus? Jump back into setup or your account below.
+			Need help with {BRAND}? Jump back into setup or your account below.
 		</p>
 		<div class="rounded-xl border border-[#1a1a1a] bg-[#111] p-5 text-left">
 			<p class="text-xs text-[#7c7c7c] uppercase tracking-widest mb-3">Quick links</p>

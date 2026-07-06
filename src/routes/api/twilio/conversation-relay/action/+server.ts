@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const form = await request.formData();
 	const params: Record<string, string> = {};
 	for (const [k, v] of form.entries()) params[k] = v as string;
-	assertTwilioSignature(request, url, params);
+	await assertTwilioSignature(request, url, params);
 
 	let handoff: { outcome?: string } = {};
 	try { handoff = JSON.parse(params['HandoffData'] ?? '{}'); } catch { /* ignore */ }

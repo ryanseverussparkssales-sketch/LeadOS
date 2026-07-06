@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { apiFetch } from '$lib/api';
+	import { BRAND } from '$lib/brand';
 	import { onMount, onDestroy } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import TemplatePicker from '$lib/components/TemplatePicker.svelte';
@@ -140,7 +141,7 @@
 
 			if (res.ok) {
 				const d = await res.json();
-				emailSentMsg = `✓ Sent from ${d.from ?? 'Edelhaus'} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
+				emailSentMsg = `✓ Sent from ${d.from ?? BRAND} via ${d.method === 'smtp' ? 'Gmail SMTP' : 'Resend'}`;
 			} else {
 				emailSentMsg = 'Send failed — check email accounts in Settings';
 			}

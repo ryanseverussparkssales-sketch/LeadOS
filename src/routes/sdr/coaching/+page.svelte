@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { BRAND } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import { toastSuccess, toastError } from '$lib/stores/toast';
 	import UpgradePrompt from '$lib/components/UpgradePrompt.svelte';
@@ -38,7 +39,7 @@
 	const trendColor = (t: string) => t === 'up' ? 'text-[var(--accent)]' : t === 'down' ? 'text-red-400' : 'text-[#7c7c7c]';
 </script>
 
-<svelte:head><title>Coaching — Edelhaus SDR</title></svelte:head>
+<svelte:head><title>Coaching — {BRAND} SDR</title></svelte:head>
 
 <div class="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto">
 

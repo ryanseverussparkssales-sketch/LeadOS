@@ -1,20 +1,28 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { getTwilioCreds, twilioBasicAuth, type TwilioCreds } from '$lib/server/twilio';
 import { env } from '$env/dynamic/private';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
-const BASE = `https://api.twilio.com/2010-04-01/Accounts/${env.TWILIO_ACCOUNT_SID ?? ''}`;
+// Per-tenant: numbers are searched/purchased/released on the EFFECTIVE owner's
+// Twilio account (BYOC) and fall back to the platform env account only when the
+// tenant hasn't configured their own. Mirrors sms/send + twilio/token.
+const restBase = (creds: TwilioCreds) =>
+	`https://api.twilio.com/2010-04-01/Accounts/${creds.accountSid}`;
 
-const authHeader = () => {
-	const creds = Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64');
-	return { 'Authorization': `Basic ${creds}`, 'Content-Type': 'application/x-www-form-urlencoded' };
-};
+const authHeader = (creds: TwilioCreds) => ({
+	'Authorization': twilioBasicAuth(creds),
+	'Content-Type': 'application/x-www-form-urlencoded',
+});
 
 // GET: search available numbers
 // ?type=local|tollfree&areaCode=612&contains=800&limit=20
 export const GET: RequestHandler = async ({ request, url }) => {
-	await requireAuth(request);
-	if (!env.TWILIO_ACCOUNT_SID || !env.TWILIO_AUTH_TOKEN) throw error(400, 'Twilio not configured');
+	const user = await requireAuth(request);
+	const creds = await getTwilioCreds(user.id);
+	if (!creds.hasRest) throw error(400, 'Twilio not configured');
+	const BASE = restBase(creds);
 
 	const type = url.searchParams.get('type') ?? 'local';
 	const areaCode = url.searchParams.get('areaCode') ?? '';
@@ -29,7 +37,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 	if (areaCode && type === 'local') params.set('AreaCode', areaCode);
 	if (contains) params.set('Contains', contains);
 
-	const res = await fetch(`${endpoint}?${params}`, { headers: authHeader() });
+	const res = await fetch(`${endpoint}?${params}`, { headers: authHeader(creds) });
 	if (!res.ok) {
 		const body = await res.text();
 		throw error(502, `Twilio search failed: ${body}`);
@@ -53,7 +61,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
 // Body: { phoneNumber, friendlyName, clientId, campaignId, isPrimary }
 export const POST: RequestHandler = async ({ request }) => {
 	const user = await requireAuth(request);
-	if (!env.TWILIO_ACCOUNT_SID || !env.TWILIO_AUTH_TOKEN) throw error(400, 'Twilio not configured');
+	const creds = await getTwilioCreds(user.id);
+	if (!creds.hasRest) throw error(400, 'Twilio not configured');
+	const BASE = restBase(creds);
 
 	const { phoneNumber, friendlyName, clientId, campaignId, isPrimary } = await request.json();
 	if (!phoneNumber) throw error(400, 'phoneNumber required');
@@ -75,7 +85,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const purchaseRes = await fetch(`${BASE}/IncomingPhoneNumbers.json`, {
 		method: 'POST',
-		headers: authHeader(),
+		headers: authHeader(creds),
 		body: purchaseBody,
 	});
 
@@ -114,7 +124,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			registered: false,
 			twilioSid: purchased.sid,
 			phoneNumber: purchased.phone_number,
-			error: 'Purchased from Twilio but failed to save to Edelhaus: ' + dbErr.message,
+			error: `Purchased from Twilio but failed to save to ${BRAND}: ` + dbErr.message,
 		}, { status: 207 });
 	}
 
@@ -125,7 +135,9 @@ export const POST: RequestHandler = async ({ request }) => {
 // ?sid=PNxxx&id=uuid
 export const DELETE: RequestHandler = async ({ request, url }) => {
 	const user = await requireAuth(request);
-	if (!env.TWILIO_ACCOUNT_SID || !env.TWILIO_AUTH_TOKEN) throw error(400, 'Twilio not configured');
+	const creds = await getTwilioCreds(user.id);
+	if (!creds.hasRest) throw error(400, 'Twilio not configured');
+	const BASE = restBase(creds);
 
 	const sid = url.searchParams.get('sid');
 	const numberId = url.searchParams.get('id');
@@ -144,7 +156,7 @@ export const DELETE: RequestHandler = async ({ request, url }) => {
 	try {
 		await fetch(`${BASE}/IncomingPhoneNumbers/${sid}.json`, {
 			method: 'DELETE',
-			headers: authHeader(),
+			headers: authHeader(creds),
 		});
 	} catch { /* continue */ }
 

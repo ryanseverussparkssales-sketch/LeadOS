@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 	import Dialer from '$lib/components/Dialer.svelte';
 
@@ -40,7 +41,7 @@
 	});
 </script>
 
-<svelte:head><title>SDR Queue — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('SDR Queue')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 overflow-hidden">
 	<!-- Stats bar -->

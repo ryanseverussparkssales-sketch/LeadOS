@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import Icon from '$lib/components/Icon.svelte';
 	import { page } from '$app/stores';
 	import { apiFetch } from '$lib/api';
@@ -442,7 +443,7 @@
 	}
 </script>
 
-<svelte:head><title>{contact?.name ?? 'Contact'} — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor(contact?.name ?? 'Contact')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	{#if loading}

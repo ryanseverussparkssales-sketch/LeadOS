@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { requireAuth, supabaseAdmin } from '$lib/server/supabase';
+import { BRAND } from '$lib/brand';
 import type { RequestHandler } from './$types';
 
 // POST — send a message to Slack via stored webhook URL or bot token
@@ -21,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const payload = {
 		text,
 		channel: channel ?? slackConfig.default_channel ?? '#general',
-		username: username ?? 'Edelhaus',
+		username: username ?? BRAND,
 		icon_emoji: iconEmoji ?? ':telephone_receiver:',
 	};
 

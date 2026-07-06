@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { titleFor } from '$lib/brand';
 	import { apiFetch } from '$lib/api';
 
 	type Period = 'today' | 'week' | 'month' | 'all';
@@ -35,7 +36,7 @@
 	}
 </script>
 
-<svelte:head><title>Leaderboard — Edelhaus</title></svelte:head>
+<svelte:head><title>{titleFor('Leaderboard')}</title></svelte:head>
 
 <div class="flex flex-col flex-1 h-full overflow-y-auto">
 	<div class="border-b border-[#1e1e1e] px-8 py-4 flex items-center justify-between">
